@@ -14,6 +14,8 @@ import ApprovalWorkflow from "@/pages/approval-workflow";
 import UserManagement from "@/pages/user-management";
 import SystemSettings from "@/pages/system-settings";
 import AuditLogs from "@/pages/audit-logs";
+import AIInsights from "@/pages/ai-insights";
+import KnowledgeBase from "@/pages/knowledge-base";
 
 function Router() {
   return (
@@ -28,6 +30,8 @@ function Router() {
       <Route path="/user-management" component={UserManagement} />
       <Route path="/system-settings" component={SystemSettings} />
       <Route path="/audit-logs" component={AuditLogs} />
+      <Route path="/ai-insights" component={AIInsights} />
+      <Route path="/knowledge-base" component={KnowledgeBase} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
