@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
 import DataCollection from "@/pages/data-collection";
 import GlobalSources from "@/pages/global-sources";
+import Analytics from "@/pages/analytics";
 import RegulatoryUpdates from "@/pages/regulatory-updates";
 import NewsletterManager from "@/pages/newsletter-manager";
 import ApprovalWorkflow from "@/pages/approval-workflow";
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/" component={Dashboard} />
       <Route path="/data-collection" component={DataCollection} />
       <Route path="/global-sources" component={GlobalSources} />
+      <Route path="/analytics" component={Analytics} />
       <Route path="/regulatory-updates" component={RegulatoryUpdates} />
       <Route path="/newsletter-manager" component={NewsletterManager} />
       <Route path="/approval-workflow" component={ApprovalWorkflow} />
