@@ -32,9 +32,13 @@ export default function DataCollection() {
 
   const syncMutation = useMutation({
     mutationFn: async (sourceId: string) => {
-      return await apiRequest(`/api/data-sources/${sourceId}/sync`, "POST");
+      console.log(`Frontend: Starting sync for source ${sourceId}`);
+      const result = await apiRequest(`/api/data-sources/${sourceId}/sync`, "POST");
+      console.log(`Frontend: Sync result:`, result);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Frontend: Sync successful", data);
       queryClient.invalidateQueries({ queryKey: ["/api/data-sources"] });
       toast({
         title: "Sync Started",
@@ -42,9 +46,10 @@ export default function DataCollection() {
       });
     },
     onError: (error) => {
+      console.error("Frontend: Sync error:", error);
       toast({
         title: "Sync Failed", 
-        description: "Failed to start data source synchronization.",
+        description: `Failed to start data source synchronization: ${error.message}`,
         variant: "destructive",
       });
     },
