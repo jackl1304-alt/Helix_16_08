@@ -38,6 +38,7 @@ export interface IStorage {
   getDataSourceByType(type: string): Promise<DataSource | undefined>;
   createDataSource(dataSource: InsertDataSource): Promise<DataSource>;
   updateDataSourceLastSync(id: string, lastSyncAt: Date): Promise<void>;
+  updateDataSource(id: string, updateData: Partial<InsertDataSource>): Promise<DataSource>;
 
   // Regulatory updates operations
   getRegulatoryUpdates(params: {
@@ -146,6 +147,15 @@ export class DatabaseStorage implements IStorage {
       .update(dataSources)
       .set({ lastSyncAt })
       .where(eq(dataSources.id, id));
+  }
+
+  async updateDataSource(id: string, updateData: Partial<InsertDataSource>): Promise<DataSource> {
+    const [dataSource] = await db
+      .update(dataSources)
+      .set(updateData)
+      .where(eq(dataSources.id, id))
+      .returning();
+    return dataSource;
   }
 
   async getRegulatoryUpdates(params: {
