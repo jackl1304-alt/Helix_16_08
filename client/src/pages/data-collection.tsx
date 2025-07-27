@@ -34,7 +34,7 @@ export default function DataCollection() {
 
   const syncMutation = useMutation({
     mutationFn: async (sourceId: string) => {
-      await apiRequest("POST", `/api/data-sources/${sourceId}/sync`);
+      return await apiRequest(`/api/data-sources/${sourceId}/sync`, "POST");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/data-sources"] });

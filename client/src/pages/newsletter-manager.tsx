@@ -57,7 +57,7 @@ export default function NewsletterManager() {
 
   const createNewsletterMutation = useMutation({
     mutationFn: async (newsletterData: any) => {
-      await apiRequest("POST", "/api/newsletters", newsletterData);
+      return await apiRequest("/api/newsletters", "POST", newsletterData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/newsletters"] });

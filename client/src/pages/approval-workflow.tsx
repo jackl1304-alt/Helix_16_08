@@ -40,7 +40,7 @@ export default function ApprovalWorkflow() {
 
   const updateApprovalMutation = useMutation({
     mutationFn: async ({ id, status, comments }: { id: string; status: string; comments?: string }) => {
-      await apiRequest("PATCH", `/api/approvals/${id}`, { 
+      return await apiRequest(`/api/approvals/${id}`, "PATCH", { 
         status, 
         comments, 
         reviewerId: "current-user" // In real app, this would come from auth context
