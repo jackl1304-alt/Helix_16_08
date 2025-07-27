@@ -195,8 +195,12 @@ class DataCollectionService {
         await storage.createRegulatoryUpdate(updateData);
       }
 
-      // Also collect recalls
-      await this.collectFDARecalls();
+      // Also collect recalls (catch errors to not break main sync)
+      try {
+        await this.collectFDARecalls();
+      } catch (recallError) {
+        console.error("Error collecting FDA recalls (continuing with main sync):", recallError);
+      }
       
       console.log("FDA data collection completed");
     } catch (error) {
