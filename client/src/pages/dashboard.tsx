@@ -25,12 +25,9 @@ export default function Dashboard() {
       <main className="flex-1 overflow-auto">
         <div className={device.isMobile ? "p-4" : device.isTablet ? "p-6" : "p-8"}>
             {/* Dashboard Header */}
-            <div className="mb-8 flex items-center">
-              <HeaderLogo />
-              <div className="ml-4">
-                <h1 className="text-2xl font-bold text-gray-900">Regulatory Intelligence Dashboard</h1>
-                <p className="text-gray-600 mt-1">Real-time monitoring of global MedTech regulatory landscape</p>
-              </div>
+            <div className="mb-8">
+              <h1 className="text-2xl font-bold text-gray-900">Regulatory Intelligence Dashboard</h1>
+              <p className="text-gray-600 mt-1">Real-time monitoring of global MedTech regulatory landscape</p>
             </div>
 
             {/* Status Cards */}
