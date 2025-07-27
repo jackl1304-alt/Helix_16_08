@@ -21,6 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import logoPath from "@assets/tmp_4b23ca96-d4e9-4839-9375-75a53368ad60_1753652563564.jpeg";
 
 const navigation = [
@@ -48,6 +49,7 @@ const administration = [
 
 export function MobileSidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [location] = useLocation();
 
   const renderNavItem = (item: any, isActive: boolean, onClose?: () => void) => (
@@ -85,81 +87,122 @@ export function MobileSidebar() {
           </div>
         </Link>
         
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
+        <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+          <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm">
               <Menu className="h-5 w-5" />
             </Button>
-          </DialogTrigger>
+          </DropdownMenuTrigger>
           
-          <DialogContent className="sm:max-w-md p-0 h-full max-h-screen mobile-sidebar-dialog">
-            <div className="dialog-content flex flex-col h-full relative">
-              {/* Header */}
-              <DialogHeader className="p-6 border-b border-gray-200">
-                <div className="flex items-center">
-                  <img 
-                    src={logoPath} 
-                    alt="Helix Logo" 
-                    className="h-12 w-12 rounded-lg object-cover mr-3"
-                  />
-                  <div>
-                    <DialogTitle className="text-xl font-bold text-gray-900">
-                      Helix
-                    </DialogTitle>
-                    <p className="text-sm text-gray-500">
-                      MedTech Regulatory Intelligence
-                    </p>
-                  </div>
-                </div>
-              </DialogHeader>
-
-              {/* Navigation */}
-              <div className="dialog-navigation flex-1 p-4 pb-20">
-                {/* Main Navigation */}
-                <div className="space-y-2">
-                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-2">
-                    Hauptmodule
-                  </h3>
-                  {navigation.map((item) => {
-                    const isActive = location === item.href;
-                    return renderNavItem(item, isActive, () => setIsOpen(false));
-                  })}
-                </div>
-
-                {/* Knowledge Base */}
-                <div className="mt-6 space-y-2">
-                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-2">
-                    Knowledge Base
-                  </h3>
-                  {knowledgeBase.map((item) => {
-                    const isActive = location === item.href;
-                    return renderNavItem(item, isActive, () => setIsOpen(false));
-                  })}
-                </div>
-
-                {/* Administration */}
-                <div className="mt-6 space-y-2">
-                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-2">
-                    Administration
-                  </h3>
-                  {administration.map((item) => {
-                    const isActive = location === item.href;
-                    return renderNavItem(item, isActive, () => setIsOpen(false));
-                  })}
-                </div>
-              </div>
-
-              {/* Footer */}
-              <div className="flex-shrink-0 border-t border-gray-200 p-4 bg-white">
-                <div className="text-xs text-gray-500 text-center">
-                  <div className="font-medium">Helix Platform</div>
-                  <div className="mt-1">Version 2.0</div>
-                  <div className="mt-1">© 2025 MedTech Intelligence</div>
+          <DropdownMenuContent 
+            align="end" 
+            className="w-80 max-h-[80vh] overflow-y-auto"
+            sideOffset={8}
+          >
+            {/* Header */}
+            <div className="p-4 border-b border-gray-200">
+              <div className="flex items-center">
+                <img 
+                  src={logoPath} 
+                  alt="Helix Logo" 
+                  className="h-8 w-8 rounded object-cover mr-2"
+                />
+                <div>
+                  <div className="font-semibold text-gray-900">Helix</div>
+                  <div className="text-xs text-gray-500">MedTech Intelligence</div>
                 </div>
               </div>
             </div>
-          </DialogContent>
-        </Dialog>
+
+            {/* Main Navigation */}
+            <DropdownMenuLabel className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              Hauptmodule
+            </DropdownMenuLabel>
+            {navigation.map((item) => {
+              const isActive = location === item.href;
+              return (
+                <Link key={item.name} href={item.href}>
+                  <DropdownMenuItem 
+                    className={cn(
+                      "flex items-center px-4 py-3 cursor-pointer",
+                      isActive && "bg-blue-50 text-blue-600"
+                    )}
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    <item.icon className={cn(
+                      "mr-3 h-4 w-4",
+                      isActive ? "text-blue-600" : "text-gray-400"
+                    )} />
+                    {item.name}
+                  </DropdownMenuItem>
+                </Link>
+              );
+            })}
+
+            <DropdownMenuSeparator />
+
+            {/* Knowledge Base */}
+            <DropdownMenuLabel className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              Knowledge Base
+            </DropdownMenuLabel>
+            {knowledgeBase.map((item) => {
+              const isActive = location === item.href;
+              return (
+                <Link key={item.name} href={item.href}>
+                  <DropdownMenuItem 
+                    className={cn(
+                      "flex items-center px-4 py-3 cursor-pointer",
+                      isActive && "bg-blue-50 text-blue-600"
+                    )}
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    <item.icon className={cn(
+                      "mr-3 h-4 w-4",
+                      isActive ? "text-blue-600" : "text-gray-400"
+                    )} />
+                    {item.name}
+                  </DropdownMenuItem>
+                </Link>
+              );
+            })}
+
+            <DropdownMenuSeparator />
+
+            {/* Administration */}
+            <DropdownMenuLabel className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              Administration
+            </DropdownMenuLabel>
+            {administration.map((item) => {
+              const isActive = location === item.href;
+              return (
+                <Link key={item.name} href={item.href}>
+                  <DropdownMenuItem 
+                    className={cn(
+                      "flex items-center px-4 py-3 cursor-pointer",
+                      isActive && "bg-blue-50 text-blue-600"
+                    )}
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    <item.icon className={cn(
+                      "mr-3 h-4 w-4",
+                      isActive ? "text-blue-600" : "text-gray-400"
+                    )} />
+                    {item.name}
+                  </DropdownMenuItem>
+                </Link>
+              );
+            })}
+
+            {/* Footer */}
+            <DropdownMenuSeparator />
+            <div className="p-3 text-center">
+              <div className="text-xs text-gray-500">
+                <div className="font-medium">Helix Platform v2.0</div>
+                <div className="mt-1">© 2025 MedTech Intelligence</div>
+              </div>
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </>
   );
