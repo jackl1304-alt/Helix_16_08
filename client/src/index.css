@@ -197,47 +197,23 @@
   --touch-target-size: 44px;
 }
 
-/* Responsive adjustments */
+/* Mobile dropdown menu styling */
 @media (max-width: 768px) {
-  .mobile-sidebar-dialog [data-radix-dialog-content] {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    transform: none !important;
-    border-radius: 0;
-    max-width: none;
-    max-height: none;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .mobile-sidebar-dialog .dialog-content {
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .mobile-sidebar-dialog .dialog-navigation {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+  /* Custom scrollbar for mobile dropdown */
+  [data-radix-dropdown-menu-content] {
     scrollbar-width: thin;
     scrollbar-color: #cbd5e0 #f7fafc;
   }
   
-  .mobile-sidebar-dialog .dialog-navigation::-webkit-scrollbar {
+  [data-radix-dropdown-menu-content]::-webkit-scrollbar {
     width: 6px;
   }
   
-  .mobile-sidebar-dialog .dialog-navigation::-webkit-scrollbar-track {
+  [data-radix-dropdown-menu-content]::-webkit-scrollbar-track {
     background: #f7fafc;
   }
   
-  .mobile-sidebar-dialog .dialog-navigation::-webkit-scrollbar-thumb {
+  [data-radix-dropdown-menu-content]::-webkit-scrollbar-thumb {
     background-color: #cbd5e0;
     border-radius: 3px;
   }
