@@ -219,41 +219,40 @@
   }
   
   /* Document viewer scrollbar styling */
-  .document-viewer-content {
-    scrollbar-width: auto;
-    scrollbar-color: #2563eb #e2e8f0;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
+  .document-viewer-scroll-container {
+    scrollbar-width: thick;
+    scrollbar-color: #dc2626 #f3f4f6;
   }
   
-  .document-viewer-content::-webkit-scrollbar {
-    width: 16px;
-    background: #f1f5f9;
+  .document-viewer-scroll-container::-webkit-scrollbar {
+    width: 20px;
+    height: 20px;
   }
   
-  .document-viewer-content::-webkit-scrollbar-track {
-    background: #e2e8f0;
-    border-radius: 8px;
-    border: 2px solid #f1f5f9;
+  .document-viewer-scroll-container::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
   }
   
-  .document-viewer-content::-webkit-scrollbar-thumb {
-    background: #2563eb;
-    border-radius: 8px;
-    border: 3px solid #f1f5f9;
-    min-height: 40px;
+  .document-viewer-scroll-container::-webkit-scrollbar-thumb {
+    background: #dc2626;
+    border-radius: 10px;
+    border: 2px solid #f3f4f6;
+    min-height: 50px;
+    min-width: 50px;
   }
   
-  .document-viewer-content::-webkit-scrollbar-thumb:hover {
-    background: #1d4ed8;
+  .document-viewer-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #b91c1c;
   }
   
-  .document-viewer-content::-webkit-scrollbar-thumb:active {
-    background: #1e40af;
+  .document-viewer-scroll-container::-webkit-scrollbar-thumb:active {
+    background: #991b1b;
   }
   
-  .document-viewer-content::-webkit-scrollbar-corner {
-    background: #f1f5f9;
+  .document-viewer-scroll-container::-webkit-scrollbar-corner {
+    background: #f3f4f6;
   }
   
   /* Mobile responsive classes */
