@@ -49,9 +49,8 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
   };
 
   const openInNewWindow = () => {
-    if (document.documentUrl) {
-      window.open(document.documentUrl, '_blank', 'noopener,noreferrer');
-    }
+    // Open our internal document viewer in a new window instead of external links
+    window.open(`/documents/${document.sourceId}/${document.documentId}`, '_blank', 'noopener,noreferrer');
   };
 
   const openDocumentInNewWindow = () => {
