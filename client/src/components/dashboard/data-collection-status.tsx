@@ -39,14 +39,34 @@ export function DataCollectionStatus() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/data-sources"] });
       toast({
-        title: "FolderSync Initiated",
-        description: "Data source synchronization has been started.",
+        title: "Synchronisation gestartet",
+        description: "Datenquelle wird synchronisiert.",
       });
     },
     onError: (error) => {
       toast({
-        title: "FolderSync Failed",
-        description: "Failed to initiate data source synchronization.",
+        title: "Synchronisation fehlgeschlagen",
+        description: "Datenquelle konnte nicht synchronisiert werden.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const toggleActiveMutation = useMutation({
+    mutationFn: async ({ sourceId, isActive }: { sourceId: string; isActive: boolean }) => {
+      await apiRequest("PATCH", `/api/data-sources/${sourceId}`, { isActive });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/data-sources"] });
+      toast({
+        title: "Status geändert",
+        description: "Datenquelle wurde aktiviert/deaktiviert.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Fehler",
+        description: "Status konnte nicht geändert werden.",
         variant: "destructive",
       });
     },
@@ -211,15 +231,30 @@ export function DataCollectionStatus() {
                     >
                       {getStatusText(source)}
                     </Badge>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-6 text-xs"
-                      onClick={() => syncMutation.mutate(source.id)}
-                      disabled={syncMutation.isPending}
-                    >
-                      <FolderSync className="h-3 w-3" />
-                    </Button>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 text-xs"
+                        onClick={() => syncMutation.mutate(source.id)}
+                        disabled={syncMutation.isPending}
+                      >
+                        <FolderSync className="h-3 w-3" />
+                      </Button>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          className="sr-only peer"
+                          checked={source.isActive}
+                          onChange={(e) => toggleActiveMutation.mutate({ 
+                            sourceId: source.id, 
+                            isActive: e.target.checked 
+                          })}
+                          disabled={toggleActiveMutation.isPending}
+                        />
+                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
