@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, FileText, Download } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface RegulatoryUpdate {
@@ -170,16 +170,47 @@ export function RecentUpdates() {
                         {priorityLabels[update.priority]}
                       </Badge>
                       <span className="text-xs text-gray-500">Source: {update.region}</span>
-                      {update.sourceUrl && (
+                      <div className="flex gap-2">
                         <Button
                           variant="ghost"
                           size="sm"
                           className="text-xs text-primary hover:text-primary/80 p-0 h-auto"
-                          onClick={() => window.open(update.sourceUrl, '_blank')}
+                          onClick={() => {
+                            // Navigate to internal document viewer
+                            window.location.href = `/documents/${update.sourceId}/${update.id}`;
+                          }}
                         >
-                          View Details <ExternalLink className="ml-1 h-3 w-3" />
+                          <FileText className="h-3 w-3 mr-1" />
+                          Volltext
                         </Button>
-                      )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs text-primary hover:text-primary/80 p-0 h-auto"
+                          onClick={async () => {
+                            try {
+                              // Fetch full content and download
+                              const response = await fetch(`/api/regulatory-updates/${update.id}`);
+                              const fullUpdate = await response.json();
+                              const content = fullUpdate.content || `Titel: ${update.title}\n\nBeschreibung: ${update.description}\n\nQuelle: ${update.region}\nPriorität: ${update.priority}\nTyp: ${update.updateType}`;
+                              const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                              const url = URL.createObjectURL(blob);
+                              const a = document.createElement('a');
+                              a.href = url;
+                              a.download = `${update.title.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_')}.txt`;
+                              document.body.appendChild(a);
+                              a.click();
+                              document.body.removeChild(a);
+                              URL.revokeObjectURL(url);
+                            } catch (error) {
+                              console.error('Download error:', error);
+                            }
+                          }}
+                        >
+                          <Download className="h-3 w-3 mr-1" />
+                          Download
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
