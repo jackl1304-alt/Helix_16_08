@@ -1,0 +1,168 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+  
+  /* Custom Helix colors matching design */
+  --helix-blue-50: hsl(214, 100%, 97%);
+  --helix-blue-100: hsl(214, 95%, 93%);
+  --helix-blue-500: hsl(207, 90%, 54%);
+  --helix-blue-600: hsl(207, 90%, 54%);
+  --helix-blue-700: hsl(207, 90%, 54%);
+  
+  --success-50: hsl(142, 76%, 96%);
+  --success-100: hsl(142, 85%, 91%);
+  --success-500: hsl(142, 76%, 36%);
+  --success-600: hsl(142, 76%, 36%);
+  
+  --warning-50: hsl(43, 96%, 96%);
+  --warning-100: hsl(43, 96%, 89%);
+  --warning-500: hsl(21, 90%, 48%);
+  --warning-600: hsl(21, 91%, 44%);
+  
+  --red-50: hsl(0, 86%, 97%);
+  --red-100: hsl(0, 93%, 94%);
+  --red-200: hsl(0, 96%, 89%);
+  --red-500: hsl(0, 84%, 60%);
+  --red-600: hsl(0, 72%, 51%);
+  --red-700: hsl(0, 74%, 42%);
+  --red-800: hsl(0, 70%, 35%);
+  
+  --yellow-50: hsl(55, 92%, 95%);
+  --yellow-100: hsl(55, 97%, 88%);
+  --yellow-200: hsl(53, 98%, 77%);
+  --yellow-500: hsl(45, 93%, 47%);
+  --yellow-600: hsl(32, 95%, 44%);
+  --yellow-700: hsl(26, 90%, 37%);
+  --yellow-800: hsl(23, 83%, 31%);
+  
+  --purple-100: hsl(270, 100%, 98%);
+  --purple-500: hsl(271, 91%, 65%);
+  
+  --green-100: hsl(142, 76%, 96%);
+  --green-500: hsl(142, 76%, 36%);
+  --green-600: hsl(142, 76%, 36%);
+  
+  --blue-50: hsl(214, 100%, 97%);
+  --blue-100: hsl(214, 95%, 93%);
+  --blue-200: hsl(213, 97%, 87%);
+  --blue-500: hsl(217, 91%, 60%);
+  --blue-600: hsl(221, 83%, 53%);
+  --blue-700: hsl(224, 76%, 48%);
+  --blue-800: hsl(226, 71%, 40%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+/* Custom utility classes for Helix colors */
+.bg-primary-50 {
+  background-color: var(--helix-blue-50);
+}
+
+.bg-primary-100 {
+  background-color: var(--helix-blue-100);
+}
+
+.text-primary-500 {
+  color: var(--helix-blue-500);
+}
+
+.text-primary-600 {
+  color: var(--helix-blue-600);
+}
+
+.text-primary-700 {
+  color: var(--helix-blue-700);
+}
+
+.bg-green-100 {
+  background-color: var(--success-100);
+}
+
+.text-green-600 {
+  color: var(--success-600);
+}
+
+.bg-yellow-100 {
+  background-color: var(--warning-100);
+}
+
+.text-yellow-600 {
+  color: var(--warning-600);
+}
+
+.bg-red-100 {
+  background-color: var(--red-100);
+}
+
+.text-red-600 {
+  color: var(--red-600);
+}
+
+.bg-blue-100 {
+  background-color: var(--blue-100);
+}
+
+.text-blue-600 {
+  color: var(--blue-600);
+}
+
+.bg-purple-100 {
+  background-color: var(--purple-100);
+}
+
+.text-purple-500 {
+  color: var(--purple-500);
+}
