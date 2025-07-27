@@ -208,3 +208,64 @@ export type Subscriber = typeof subscribers.$inferSelect;
 export type InsertSubscriber = z.infer<typeof insertSubscriberSchema>;
 export type KnowledgeBase = typeof knowledgeBase.$inferSelect;
 export type InsertKnowledgeBase = z.infer<typeof insertKnowledgeBaseSchema>;
+
+// Historical data types
+export interface HistoricalDataRecord {
+  id: string;
+  sourceId: string;
+  documentId: string;
+  documentTitle: string;
+  documentUrl: string;
+  content: string;
+  metadata: {
+    fileType: string;
+    pageCount: number;
+    language: string;
+    authority: string;
+  };
+  originalDate: string;
+  downloadedAt: string;
+  version: number;
+  checksum: string;
+  language: string;
+  region: string;
+  category: string;
+  deviceClasses: string[];
+  status: string;
+}
+
+export interface DetailedComparison {
+  addedContent: string[];
+  removedContent: string[];
+  modifiedSections: string[];
+  structuralChanges: string[];
+  contentDiffPercentage: number;
+  significantChanges: boolean;
+}
+
+export interface ChangeDetection {
+  id?: string;
+  documentId: string;
+  documentTitle?: string;
+  sourceId?: string;
+  changeType: 'content_update' | 'metadata_change' | 'structural_change' | 'status_change' | 'modified';
+  changesSummary: string[];
+  impactAssessment: 'low' | 'medium' | 'high' | 'critical';
+  detectedAt?: Date;
+  affectedSections?: string[];
+  previousVersion: HistoricalDataRecord | number;
+  currentVersion: HistoricalDataRecord | number;
+  confidence?: number;
+  affectedStakeholders?: string[];
+  detailedComparison?: DetailedComparison;
+}
+
+export interface HistoricalReport {
+  totalDocuments: number;
+  timeRange: { start: string; end: string };
+  changesDetected: number;
+  highImpactChanges: number;
+  categorization: Record<string, number>;
+  languageDistribution: Record<string, number>;
+  recentActivity: ChangeDetection[];
+}
