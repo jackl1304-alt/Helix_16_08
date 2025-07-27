@@ -6,11 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Download, Search, TrendingUp, AlertTriangle, Clock, FileText, Globe, Languages } from "lucide-react";
+import { Calendar, Download, Search, TrendingUp, AlertTriangle, Clock, FileText, Globe, Languages, ExternalLink } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ChangeComparison } from "@/components/change-comparison";
+import { DocumentViewer, DocumentLink } from "@/components/document-viewer";
 import { HistoricalDataRecord, ChangeDetection, HistoricalReport } from "@shared/schema";
 
 // Types are now imported from shared schema
@@ -269,6 +270,7 @@ export default function HistoricalData() {
               {isLoadingData ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <span className="ml-2">Lade historische Dokumente...</span>
                 </div>
               ) : (
                 <Table>
@@ -280,16 +282,14 @@ export default function HistoricalData() {
                       <TableHead>Datum</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Geräteklassen</TableHead>
+                      <TableHead>Aktionen</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredData.map((doc) => (
                       <TableRow key={doc.id}>
                         <TableCell>
-                          <div>
-                            <p className="font-medium">{doc.documentTitle}</p>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">{doc.documentId}</p>
-                          </div>
+                          <DocumentLink document={doc} />
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline">{doc.category}</Badge>
@@ -317,6 +317,28 @@ export default function HistoricalData() {
                             ))}
                           </div>
                         </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <DocumentViewer 
+                              document={doc}
+                              trigger={
+                                <Button variant="outline" size="sm">
+                                  <FileText className="h-4 w-4 mr-1" />
+                                  Anzeigen
+                                </Button>
+                              }
+                            />
+                            {doc.documentUrl && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => window.open(doc.documentUrl, '_blank', 'noopener,noreferrer')}
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -338,6 +360,12 @@ export default function HistoricalData() {
               {isLoadingChanges ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <span className="ml-2">Lade Änderungshistorie...</span>
+                </div>
+              ) : changes.length === 0 ? (
+                <div className="flex items-center justify-center py-8 text-gray-500">
+                  <FileText className="h-8 w-8 mr-2" />
+                  <span>Keine Änderungen erkannt. Das System analysiert kontinuierlich alle Dokumente auf Aktualisierungen.</span>
                 </div>
               ) : (
                 <div className="space-y-4">

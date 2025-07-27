@@ -276,6 +276,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Document routes
+  app.get('/api/documents/:documentId', async (req, res) => {
+    try {
+      const { documentId } = req.params;
+      
+      // Suche Dokument in allen historischen Daten
+      const allSources = ['fda_guidance', 'ema_guidelines', 'bfarm_guidance', 'mhra_guidance', 'swissmedic_guidance'];
+      
+      for (const sourceId of allSources) {
+        const documents = await historicalDataService.getHistoricalData(sourceId);
+        const document = documents.find(doc => doc.id === documentId || doc.documentId === documentId);
+        
+        if (document) {
+          return res.json(document);
+        }
+      }
+      
+      res.status(404).json({ message: 'Dokument nicht gefunden' });
+    } catch (error) {
+      console.error('Fehler beim Abrufen des Dokuments:', error);
+      res.status(500).json({ message: 'Serverfehler beim Abrufen des Dokuments' });
+    }
+  });
+
+  // Dokument-Download
+  app.get('/api/documents/:documentId/download', async (req, res) => {
+    try {
+      const { documentId } = req.params;
+      
+      const allSources = ['fda_guidance', 'ema_guidelines', 'bfarm_guidance', 'mhra_guidance', 'swissmedic_guidance'];
+      
+      for (const sourceId of allSources) {
+        const documents = await historicalDataService.getHistoricalData(sourceId);
+        const document = documents.find(doc => doc.id === documentId || doc.documentId === documentId);
+        
+        if (document) {
+          const filename = `${document.documentTitle.replace(/[^a-z0-9]/gi, '_')}.txt`;
+          
+          res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+          res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+          
+          return res.send(document.content);
+        }
+      }
+      
+      res.status(404).json({ message: 'Dokument nicht gefunden' });
+    } catch (error) {
+      console.error('Fehler beim Herunterladen des Dokuments:', error);
+      res.status(500).json({ message: 'Serverfehler beim Herunterladen des Dokuments' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
