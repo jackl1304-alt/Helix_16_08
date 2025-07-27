@@ -178,11 +178,13 @@ export default function LegalCases() {
                   <SelectValue placeholder="Quelle wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {legalSources && Object.entries(legalSources as Record<string, any>).map(([id, source]) => (
-                    <SelectItem key={id} value={id}>
-                      {source.name} ({source.country})
-                    </SelectItem>
-                  ))}
+                  {legalSources && Object.entries(legalSources as Record<string, { name: string; country: string }>).map(([id, source]) => {
+                    return (
+                      <SelectItem key={id} value={id}>
+                        {source.name} ({source.country})
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
@@ -351,7 +353,7 @@ export default function LegalCases() {
                           <div className="space-y-1">
                             <DocumentLink document={legalCase} />
                             <div className="text-xs text-gray-500 space-y-1">
-                              <div>Rechtsquelle: {legalSources[selectedSource]?.name || selectedSource}</div>
+                              <div>Rechtsquelle: {(legalSources as Record<string, { name: string }>)?.[selectedSource]?.name || selectedSource}</div>
                               <div>ID: {legalCase.documentId}</div>
                               <div className="flex items-center gap-1">
                                 <FileText className="h-3 w-3" />
@@ -402,11 +404,30 @@ export default function LegalCases() {
                                 </Button>
                               }
                             />
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => {
+                                const blob = new Blob([legalCase.content], { type: 'text/plain' });
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `${legalCase.documentTitle.replace(/[^a-z0-9]/gi, '_')}.txt`;
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                                URL.revokeObjectURL(url);
+                              }}
+                              title="Dokument herunterladen"
+                            >
+                              <Download className="h-4 w-4" />
+                            </Button>
                             {legalCase.documentUrl && (
                               <Button 
                                 variant="ghost" 
                                 size="sm"
                                 onClick={() => window.open(legalCase.documentUrl, '_blank', 'noopener,noreferrer')}
+                                title="Original öffnen"
                               >
                                 <FileText className="h-4 w-4" />
                               </Button>

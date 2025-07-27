@@ -328,11 +328,30 @@ export default function HistoricalData() {
                                 </Button>
                               }
                             />
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => {
+                                const blob = new Blob([doc.content], { type: 'text/plain' });
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `${doc.documentTitle.replace(/[^a-z0-9]/gi, '_')}.txt`;
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                                URL.revokeObjectURL(url);
+                              }}
+                              title="Dokument herunterladen"
+                            >
+                              <Download className="h-4 w-4" />
+                            </Button>
                             {doc.documentUrl && (
                               <Button 
                                 variant="ghost" 
                                 size="sm"
                                 onClick={() => window.open(doc.documentUrl, '_blank', 'noopener,noreferrer')}
+                                title="Original öffnen"
                               >
                                 <ExternalLink className="h-4 w-4" />
                               </Button>
