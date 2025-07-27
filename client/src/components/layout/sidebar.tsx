@@ -10,7 +10,8 @@ import {
   Brain,
   Book,
   Users,
-  Settings
+  Settings,
+  Archive
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +28,7 @@ const navigation = [
 const knowledgeBase = [
   { name: "AI Insights", href: "/ai-insights", icon: Brain },
   { name: "Custom Knowledge", href: "/knowledge-base", icon: Book },
+  { name: "Historische Daten", href: "/historical-data", icon: Archive },
 ];
 
 const administration = [
