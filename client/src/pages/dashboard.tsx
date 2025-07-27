@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Plus, Upload, Download, Settings } from "lucide-react";
 import { useDevice } from "@/hooks/use-device";
 import { ResponsiveGrid } from "@/components/responsive-layout";
+import { HeaderLogo } from "@/components/layout/logo";
 
 export default function Dashboard() {
   const device = useDevice();
@@ -24,9 +25,12 @@ export default function Dashboard() {
       <main className="flex-1 overflow-auto">
         <div className={device.isMobile ? "p-4" : device.isTablet ? "p-6" : "p-8"}>
             {/* Dashboard Header */}
-            <div className="mb-8">
-              <h1 className="text-2xl font-bold text-gray-900">Regulatory Intelligence Dashboard</h1>
-              <p className="text-gray-600 mt-1">Real-time monitoring of global MedTech regulatory landscape</p>
+            <div className="mb-8 flex items-center">
+              <HeaderLogo />
+              <div className="ml-4">
+                <h1 className="text-2xl font-bold text-gray-900">Regulatory Intelligence Dashboard</h1>
+                <p className="text-gray-600 mt-1">Real-time monitoring of global MedTech regulatory landscape</p>
+              </div>
             </div>
 
             {/* Status Cards */}

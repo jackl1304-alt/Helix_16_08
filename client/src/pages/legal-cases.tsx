@@ -178,7 +178,7 @@ export default function LegalCases() {
                   <SelectValue placeholder="Quelle wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(legalSources as Record<string, any>).map(([id, source]) => (
+                  {legalSources && Object.entries(legalSources as Record<string, any>).map(([id, source]) => (
                     <SelectItem key={id} value={id}>
                       {source.name} ({source.country})
                     </SelectItem>
