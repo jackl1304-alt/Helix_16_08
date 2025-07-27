@@ -145,8 +145,8 @@ export function DataCollectionStatus() {
     );
   }
 
-  // Separate current and historical sources
-  const currentSources = sources.filter(source => source.category === "current");
+  // Separate current and historical sources (with fallback for missing category)
+  const currentSources = sources.filter(source => source.category === "current" || !source.category);
   const historicalSources = sources.filter(source => source.category === "historical");
 
   return (
