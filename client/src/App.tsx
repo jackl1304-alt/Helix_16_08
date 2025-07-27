@@ -24,18 +24,11 @@ import { ResponsiveLayout } from "@/components/responsive-layout";
 function Router() {
   return (
     <Switch>
-      {/* Pages without Sidebar */}
-      <Route path="/landing" component={Landing} />
-      <Route path="/404" component={NotFound} />
-      
-      {/* Pages with Sidebar */}
+      {/* Pages with Sidebar only */}
       <Route path="/" component={Dashboard} />
-      <Route path="/data-collection" component={DataCollection} />
       <Route path="/global-sources" component={GlobalSources} />
       <Route path="/analytics" component={Analytics} />
       <Route path="/regulatory-updates" component={RegulatoryUpdates} />
-      <Route path="/newsletter-manager" component={NewsletterManager} />
-      <Route path="/approval-workflow" component={ApprovalWorkflow} />
       <Route path="/user-management" component={UserManagement} />
       <Route path="/system-settings" component={SystemSettings} />
       <Route path="/audit-logs" component={AuditLogs} />
@@ -59,6 +52,9 @@ function App() {
           {/* Pages without Sidebar */}
           <Route path="/landing" component={Landing} />
           <Route path="/404" component={NotFound} />
+          <Route path="/data-collection" component={DataCollection} />
+          <Route path="/approval-workflow" component={ApprovalWorkflow} />
+          <Route path="/newsletter-manager" component={NewsletterManager} />
           
           {/* All other pages with Sidebar */}
           <Route>
