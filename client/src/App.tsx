@@ -25,36 +25,27 @@ function Router() {
   return (
     <Switch>
       {/* Pages without Sidebar */}
-      <Route path="/landing">
-        <Landing />
-      </Route>
-      <Route path="/404">
-        <NotFound />
-      </Route>
+      <Route path="/landing" component={Landing} />
+      <Route path="/404" component={NotFound} />
       
       {/* Pages with Sidebar */}
-      <Route>
-        <ResponsiveLayout>
-          <Switch>
-            <Route path="/" component={Dashboard} />
-            <Route path="/data-collection" component={DataCollection} />
-            <Route path="/global-sources" component={GlobalSources} />
-            <Route path="/analytics" component={Analytics} />
-            <Route path="/regulatory-updates" component={RegulatoryUpdates} />
-            <Route path="/newsletter-manager" component={NewsletterManager} />
-            <Route path="/approval-workflow" component={ApprovalWorkflow} />
-            <Route path="/user-management" component={UserManagement} />
-            <Route path="/system-settings" component={SystemSettings} />
-            <Route path="/audit-logs" component={AuditLogs} />
-            <Route path="/ai-insights" component={AIInsights} />
-            <Route path="/knowledge-base" component={KnowledgeBase} />
-            <Route path="/historical-data" component={HistoricalData} />
-            <Route path="/legal-cases" component={LegalCases} />
-            {/* Fallback to 404 */}
-            <Route component={() => <NotFound />} />
-          </Switch>
-        </ResponsiveLayout>
-      </Route>
+      <Route path="/" component={Dashboard} />
+      <Route path="/data-collection" component={DataCollection} />
+      <Route path="/global-sources" component={GlobalSources} />
+      <Route path="/analytics" component={Analytics} />
+      <Route path="/regulatory-updates" component={RegulatoryUpdates} />
+      <Route path="/newsletter-manager" component={NewsletterManager} />
+      <Route path="/approval-workflow" component={ApprovalWorkflow} />
+      <Route path="/user-management" component={UserManagement} />
+      <Route path="/system-settings" component={SystemSettings} />
+      <Route path="/audit-logs" component={AuditLogs} />
+      <Route path="/ai-insights" component={AIInsights} />
+      <Route path="/knowledge-base" component={KnowledgeBase} />
+      <Route path="/historical-data" component={HistoricalData} />
+      <Route path="/legal-cases" component={LegalCases} />
+      
+      {/* Fallback to 404 */}
+      <Route component={NotFound} />
     </Switch>
   );
 }
@@ -64,7 +55,18 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <Router />
+        <Switch>
+          {/* Pages without Sidebar */}
+          <Route path="/landing" component={Landing} />
+          <Route path="/404" component={NotFound} />
+          
+          {/* All other pages with Sidebar */}
+          <Route>
+            <ResponsiveLayout>
+              <Router />
+            </ResponsiveLayout>
+          </Route>
+        </Switch>
       </TooltipProvider>
     </QueryClientProvider>
   );
