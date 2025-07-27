@@ -106,17 +106,52 @@ export default function LegalCases() {
     },
   });
 
-  // Filter legal data based on search term  
+  // Filter legal data based on search term and device type
   const filteredData = legalData.filter((record) => {
-    if (!searchTerm) return true;
+    // Search filter
+    const matchesSearch = !searchTerm || (() => {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        record.documentTitle.toLowerCase().includes(searchLower) ||
+        record.documentId.toLowerCase().includes(searchLower) ||
+        record.category.toLowerCase().includes(searchLower) ||
+        record.content.toLowerCase().includes(searchLower)
+      );
+    })();
     
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      record.documentTitle.toLowerCase().includes(searchLower) ||
-      record.documentId.toLowerCase().includes(searchLower) ||
-      record.category.toLowerCase().includes(searchLower) ||
-      record.content.toLowerCase().includes(searchLower)
-    );
+    // Device type filter
+    const matchesDeviceType = selectedDeviceType === "all" || (() => {
+      const deviceClasses = record.deviceClasses.map(cls => cls.toLowerCase());
+      switch (selectedDeviceType) {
+        case "mobile":
+          return deviceClasses.some(cls => 
+            cls.includes('mobile') || 
+            cls.includes('handheld') || 
+            cls.includes('portable') ||
+            cls.includes('smartphone') ||
+            cls.includes('wearable')
+          );
+        case "desktop":
+          return deviceClasses.some(cls => 
+            cls.includes('desktop') || 
+            cls.includes('stationary') || 
+            cls.includes('console') ||
+            cls.includes('workstation') ||
+            cls.includes('server')
+          );
+        case "tablet":
+          return deviceClasses.some(cls => 
+            cls.includes('tablet') || 
+            cls.includes('pad') || 
+            cls.includes('slate') ||
+            cls.includes('touchscreen')
+          );
+        default:
+          return true;
+      }
+    })();
+    
+    return matchesSearch && matchesDeviceType;
   });
 
   const getStatusColor = (status: string) => {
@@ -155,6 +190,15 @@ export default function LegalCases() {
         <div className="flex items-center gap-4">
           {/* Device Type Selection */}
           <div className="flex gap-2">
+            <Button
+              variant={selectedDeviceType === "all" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedDeviceType("all")}
+              className="flex items-center gap-1"
+              title="Alle Geräte"
+            >
+              <Globe className="h-4 w-4" />
+            </Button>
             <Button
               variant={selectedDeviceType === "mobile" ? "default" : "outline"}
               size="sm"
@@ -323,6 +367,15 @@ export default function LegalCases() {
               <CardTitle>Juristische Entscheidungen</CardTitle>
               <CardDescription>
                 {filteredData.length} von {legalData.length} Rechtsfällen
+                {selectedDeviceType !== "all" && (
+                  <span className="ml-2 text-blue-600 dark:text-blue-400">
+                    (gefiltert für {
+                      selectedDeviceType === "mobile" ? "Mobile Geräte" :
+                      selectedDeviceType === "desktop" ? "Desktop-Systeme" :
+                      selectedDeviceType === "tablet" ? "Tablet-Geräte" : "Alle Geräte"
+                    })
+                  </span>
+                )}
               </CardDescription>
             </CardHeader>
             <CardContent>
