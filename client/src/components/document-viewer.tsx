@@ -78,18 +78,18 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
         )}
       </DialogTrigger>
 
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
+      <DialogContent className="max-w-7xl w-[95vw] h-[95vh] overflow-hidden flex flex-col" aria-describedby="document-description">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 pr-8">
             <FileText className="h-5 w-5" />
             {document.documentTitle}
           </DialogTitle>
-          <div className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-            Vollständiges Rechtsdokument - Klicken Sie auf die Links unten für weitere Details oder Download
+          <div id="document-description" className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+            Vollständiges Rechtsdokument - Scrollen Sie im rechten Bereich. Verwenden Sie Strg+Scroll zum Zoomen.
           </div>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(90vh-8rem)]">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
           {/* Dokument-Metadaten */}
           <div className="lg:col-span-1">
             <Card className="h-full">
@@ -192,33 +192,61 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
           </div>
 
           {/* Dokument-Inhalt */}
-          <div className="lg:col-span-2">
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="text-base">Dokument-Inhalt</CardTitle>
+          <div className="lg:col-span-2 flex flex-col min-h-0">
+            <Card className="flex-1 flex flex-col">
+              <CardHeader className="flex-shrink-0">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base">Dokument-Volltext</CardTitle>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const contentDiv = document.getElementById('document-content');
+                        if (contentDiv) {
+                          const currentSize = parseInt(contentDiv.style.fontSize) || 14;
+                          contentDiv.style.fontSize = `${currentSize === 14 ? 16 : currentSize === 16 ? 18 : 14}px`;
+                        }
+                      }}
+                    >
+                      Text vergrößern
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={openInNewWindow}
+                      disabled={!document.documentUrl}
+                    >
+                      <ExternalLink className="h-4 w-4 mr-1" />
+                      Original
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={downloadDocument}>
+                      <Download className="h-4 w-4 mr-1" />
+                      Download
+                    </Button>
+                  </div>
+                </div>
               </CardHeader>
-              <CardContent className="h-[calc(100%-4rem)]">
-                <ScrollArea className="h-full">
-                  <div className="space-y-4 pr-4">
-                    {formatContent(document.content).map((paragraph, index) => (
-                      <div key={index} className="text-sm leading-relaxed">
-                        {paragraph.startsWith('#') ? (
-                          <h3 className="font-semibold text-base mb-2 text-blue-700 dark:text-blue-300">
-                            {paragraph.replace(/^#+\s*/, '')}
-                          </h3>
-                        ) : paragraph.startsWith('##') ? (
-                          <h4 className="font-medium text-sm mb-1 text-gray-700 dark:text-gray-300">
-                            {paragraph.replace(/^#+\s*/, '')}
-                          </h4>
-                        ) : paragraph.startsWith('*') || paragraph.startsWith('-') ? (
-                          <li className="ml-4 list-disc text-gray-600 dark:text-gray-400">
-                            {paragraph.replace(/^[*-]\s*/, '')}
-                          </li>
-                        ) : (
-                          <p className="text-gray-700 dark:text-gray-300">
-                            {paragraph}
-                          </p>
-                        )}
+              <CardContent className="flex-1 p-0 overflow-hidden">
+                <ScrollArea className="h-full w-full">
+                  <div 
+                    id="document-content"
+                    className="p-6 text-sm leading-relaxed whitespace-pre-wrap font-mono bg-white dark:bg-gray-900 border-l-4 border-blue-500 min-h-full"
+                    style={{ 
+                      fontSize: '14px',
+                      lineHeight: '1.6',
+                      userSelect: 'text',
+                      cursor: 'text',
+                      overflowWrap: 'break-word',
+                      wordBreak: 'break-word'
+                    }}
+                  >
+                    {formatContent(document.content).map((line, index) => (
+                      <div key={index} className="mb-2 hover:bg-gray-50 dark:hover:bg-gray-800 px-2 py-1 rounded transition-colors">
+                        <span className="text-gray-400 mr-4 select-none font-mono text-xs inline-block w-12 text-right">
+                          {String(index + 1).padStart(3, '0')}:
+                        </span>
+                        <span className="inline-block">{line}</span>
                       </div>
                     ))}
                   </div>
