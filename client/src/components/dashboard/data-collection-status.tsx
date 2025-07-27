@@ -54,19 +54,23 @@ export function DataCollectionStatus() {
 
   const toggleActiveMutation = useMutation({
     mutationFn: async ({ sourceId, isActive }: { sourceId: string; isActive: boolean }) => {
-      await apiRequest("PATCH", `/api/data-sources/${sourceId}`, { isActive });
+      console.log(`Toggle für ${sourceId} auf ${isActive}`);
+      const response = await apiRequest("PATCH", `/api/data-sources/${sourceId}`, { isActive });
+      console.log('Toggle Response:', response);
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/data-sources"] });
       toast({
-        title: "Status geändert",
-        description: "Datenquelle wurde aktiviert/deaktiviert.",
+        title: "✅ Status geändert",
+        description: "Datenquelle wurde erfolgreich aktiviert/deaktiviert.",
       });
     },
     onError: (error) => {
+      console.error('Toggle Error:', error);
       toast({
-        title: "Fehler",
-        description: "Status konnte nicht geändert werden.",
+        title: "❌ Fehler beim Toggle",
+        description: `Status konnte nicht geändert werden: ${error.message}`,
         variant: "destructive",
       });
     },
@@ -252,7 +256,9 @@ export function DataCollectionStatus() {
                           })}
                           disabled={toggleActiveMutation.isPending}
                         />
-                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
+                        <div className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${source.isActive ? 'bg-green-600' : 'bg-gray-300'}`}>
+                          <div className={`absolute top-0.5 left-0.5 bg-white border border-gray-300 rounded-full h-5 w-5 transition-transform duration-200 ${source.isActive ? 'translate-x-5' : 'translate-x-0'}`}></div>
+                        </div>
                       </label>
                     </div>
                   </div>
@@ -318,14 +324,31 @@ export function DataCollectionStatus() {
                       >
                         Archived
                       </Badge>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 text-xs"
-                        onClick={() => setLocation("/historical-data")}
-                      >
-                        View Archive
-                      </Button>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-6 text-xs"
+                          onClick={() => setLocation("/historical-data")}
+                        >
+                          View Archive
+                        </Button>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            checked={source.isActive}
+                            onChange={(e) => toggleActiveMutation.mutate({ 
+                              sourceId: source.id, 
+                              isActive: e.target.checked 
+                            })}
+                            disabled={toggleActiveMutation.isPending}
+                          />
+                          <div className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${source.isActive ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                            <div className={`absolute top-0.5 left-0.5 bg-white border border-gray-300 rounded-full h-5 w-5 transition-transform duration-200 ${source.isActive ? 'translate-x-5' : 'translate-x-0'}`}></div>
+                          </div>
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>
