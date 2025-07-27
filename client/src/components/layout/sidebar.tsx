@@ -30,8 +30,9 @@ const knowledgeBase = [
 ];
 
 const administration = [
-  { name: "User Management", href: "/users", icon: Users },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "User Management", href: "/user-management", icon: Users },
+  { name: "System Settings", href: "/system-settings", icon: Settings },
+  { name: "Audit Logs", href: "/audit-logs", icon: FileText },
 ];
 
 export function Sidebar() {

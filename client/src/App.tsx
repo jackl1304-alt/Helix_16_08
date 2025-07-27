@@ -11,6 +11,9 @@ import Analytics from "@/pages/analytics";
 import RegulatoryUpdates from "@/pages/regulatory-updates";
 import NewsletterManager from "@/pages/newsletter-manager";
 import ApprovalWorkflow from "@/pages/approval-workflow";
+import UserManagement from "@/pages/user-management";
+import SystemSettings from "@/pages/system-settings";
+import AuditLogs from "@/pages/audit-logs";
 
 function Router() {
   return (
@@ -22,6 +25,9 @@ function Router() {
       <Route path="/regulatory-updates" component={RegulatoryUpdates} />
       <Route path="/newsletter-manager" component={NewsletterManager} />
       <Route path="/approval-workflow" component={ApprovalWorkflow} />
+      <Route path="/user-management" component={UserManagement} />
+      <Route path="/system-settings" component={SystemSettings} />
+      <Route path="/audit-logs" component={AuditLogs} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
