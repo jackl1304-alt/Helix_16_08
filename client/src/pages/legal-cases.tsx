@@ -191,41 +191,37 @@ export default function LegalCases() {
                 variant={selectedDeviceType === "all" ? "default" : "outline"}
                 size="lg"
                 onClick={() => setSelectedDeviceType("all")}
-                className="flex flex-col items-center gap-1 h-16 w-20 border-2"
+                className="px-6 py-3 border-2"
                 title="Alle Geräte"
               >
-                <Globe className="h-6 w-6" />
-                <span className="text-xs">Alle</span>
+                <span className="text-sm font-medium">Alle</span>
               </Button>
               <Button
                 variant={selectedDeviceType === "mobile" ? "default" : "outline"}
                 size="lg"
                 onClick={() => setSelectedDeviceType("mobile")}
-                className="flex flex-col items-center gap-1 h-16 w-20 border-2"
+                className="px-6 py-3 border-2"
                 title="Mobile Geräte"
               >
-                <Smartphone className="h-6 w-6" />
-                <span className="text-xs">Mobile</span>
+                <span className="text-sm font-medium">Mobile</span>
               </Button>
               <Button
                 variant={selectedDeviceType === "desktop" ? "default" : "outline"}
                 size="lg"
                 onClick={() => setSelectedDeviceType("desktop")}
-                className="flex flex-col items-center gap-1 h-16 w-20 border-2"
+                className="px-6 py-3 border-2"
                 title="Desktop-Systeme"
               >
-                <Monitor className="h-6 w-6" />
-                <span className="text-xs">Desktop</span>
+                <span className="text-sm font-medium">Desktop</span>
               </Button>
               <Button
                 variant={selectedDeviceType === "tablet" ? "default" : "outline"}
                 size="lg"
                 onClick={() => setSelectedDeviceType("tablet")}
-                className="flex flex-col items-center gap-1 h-16 w-20 border-2"
+                className="px-6 py-3 border-2"
                 title="Tablet-Geräte"
               >
-                <Tablet className="h-6 w-6" />
-                <span className="text-xs">Tablet</span>
+                <span className="text-sm font-medium">Tablet</span>
               </Button>
             </div>
           </div>

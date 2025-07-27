@@ -54,6 +54,88 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
     }
   };
 
+  const openDocumentInNewTab = () => {
+    // Erstelle eine neue Seite mit dem vollständigen Dokumentinhalt
+    const newWindow = window.open('', '_blank');
+    if (newWindow) {
+      newWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="de">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>${document.documentTitle}</title>
+          <style>
+            body {
+              font-family: monospace;
+              line-height: 1.6;
+              margin: 0;
+              padding: 20px;
+              background-color: #f9fafb;
+            }
+            .header {
+              background: white;
+              padding: 20px;
+              border-radius: 8px;
+              margin-bottom: 20px;
+              box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+            .content {
+              background: white;
+              padding: 20px;
+              border-radius: 8px;
+              white-space: pre-wrap;
+              word-wrap: break-word;
+              border-left: 4px solid #2563eb;
+              box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+            .meta {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+              gap: 10px;
+              margin-top: 15px;
+            }
+            .meta-item {
+              padding: 8px;
+              background: #f3f4f6;
+              border-radius: 4px;
+              font-size: 14px;
+            }
+            .badge {
+              display: inline-block;
+              padding: 2px 8px;
+              background: #dbeafe;
+              color: #1e40af;
+              border-radius: 12px;
+              font-size: 12px;
+              margin: 2px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>${document.documentTitle}</h1>
+            <div class="meta">
+              <div class="meta-item"><strong>Status:</strong> ${document.status}</div>
+              <div class="meta-item"><strong>Datum:</strong> ${new Date(document.originalDate).toLocaleDateString('de-DE')}</div>
+              <div class="meta-item"><strong>Region:</strong> ${document.region}</div>
+              <div class="meta-item"><strong>Sprache:</strong> ${document.language}</div>
+              <div class="meta-item"><strong>Kategorie:</strong> ${document.category}</div>
+              <div class="meta-item"><strong>Behörde:</strong> ${document.metadata.authority}</div>
+            </div>
+            <div style="margin-top: 15px;">
+              <strong>Geräteklassen:</strong><br>
+              ${document.deviceClasses.map(cls => `<span class="badge">${cls}</span>`).join('')}
+            </div>
+          </div>
+          <div class="content">${document.content}</div>
+        </body>
+        </html>
+      `);
+      newWindow.document.close();
+    }
+  };
+
   const downloadDocument = () => {
     // Erstelle einen Download-Link für das Dokument
     const blob = new Blob([document.content], { type: 'text/plain' });
@@ -168,13 +250,12 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
 
                 <div className="space-y-2 pt-4 border-t">
                   <Button 
-                    onClick={openInNewWindow} 
+                    onClick={openDocumentInNewTab} 
                     className="w-full" 
                     size="sm"
-                    disabled={!document.documentUrl}
                   >
                     <ExternalLink className="h-4 w-4 mr-2" />
-                    Original öffnen
+                    In neuem Tab öffnen
                   </Button>
                   
                   <Button 
@@ -214,11 +295,10 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={openInNewWindow}
-                      disabled={!document.documentUrl}
+                      onClick={openDocumentInNewTab}
                     >
                       <ExternalLink className="h-4 w-4 mr-1" />
-                      Original
+                      Neuer Tab
                     </Button>
                     <Button variant="outline" size="sm" onClick={downloadDocument}>
                       <Download className="h-4 w-4 mr-1" />
