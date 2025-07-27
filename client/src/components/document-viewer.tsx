@@ -84,6 +84,9 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
             <FileText className="h-5 w-5" />
             {document.documentTitle}
           </DialogTitle>
+          <div className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+            Vollständiges Rechtsdokument - Klicken Sie auf die Links unten für weitere Details oder Download
+          </div>
         </DialogHeader>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(90vh-8rem)]">
