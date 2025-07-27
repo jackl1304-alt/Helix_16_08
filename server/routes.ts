@@ -335,6 +335,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { sourceId, startDate, endDate, limit } = req.query;
       console.log("Legal data request:", { sourceId, startDate, endDate, limit });
       
+      if (!sourceId) {
+        return res.status(400).json({ error: "Source ID is required" });
+      }
+      
       const data = await legalDataService.getLegalData(
         sourceId as string,
         startDate as string,
@@ -343,10 +347,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const limitedData = limit ? data.slice(0, parseInt(limit as string)) : data;
       console.log(`Returning ${limitedData.length} legal cases for source: ${sourceId}`);
+      
+      res.setHeader('Cache-Control', 'public, max-age=300'); // 5 minutes cache
       res.json(limitedData);
     } catch (error) {
       console.error("Legal data fetch error:", error);
-      res.status(500).json({ error: "Failed to fetch legal data" });
+      res.status(500).json({ 
+        error: "Failed to fetch legal data",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
@@ -384,14 +393,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/legal/sync", async (req, res) => {
     try {
       console.log("Manual legal data sync initiated...");
+      
+      // Clear existing data and reload
+      const legalDataService = require("./services/legalDataService").legalDataService;
       await legalDataService.initializeLegalData();
-      res.json({ success: true, message: "Legal data sync completed" });
+      
+      console.log("Legal data sync completed successfully");
+      res.json({ 
+        success: true, 
+        message: "Legal data sync completed",
+        timestamp: new Date().toISOString()
+      });
     } catch (error) {
       console.error("Legal sync error:", error);
       res.status(500).json({ 
         success: false, 
         error: "Failed to sync legal data",
-        details: error instanceof Error ? error.message : "Unknown error"
+        details: error instanceof Error ? error.message : "Unknown error",
+        timestamp: new Date().toISOString()
       });
     }
   });
