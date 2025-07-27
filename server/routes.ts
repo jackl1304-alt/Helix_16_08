@@ -394,8 +394,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log("Manual legal data sync initiated...");
       
-      // Clear existing data and reload
-      const legalDataService = require("./services/legalDataService").legalDataService;
+      // Use the imported legalDataService directly
       await legalDataService.initializeLegalData();
       
       console.log("Legal data sync completed successfully");
