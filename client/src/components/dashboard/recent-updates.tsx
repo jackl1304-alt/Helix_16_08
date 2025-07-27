@@ -13,6 +13,7 @@ interface RegulatoryUpdate {
   region: string;
   priority: 'low' | 'medium' | 'high' | 'urgent';
   updateType: string;
+  sourceId: string;
   sourceUrl?: string;
   publishedAt: string;
   createdAt: string;
@@ -37,6 +38,7 @@ export function RecentUpdates() {
   
   const { data: updates, isLoading } = useQuery<RegulatoryUpdate[]>({
     queryKey: ["/api/regulatory-updates", { region: selectedRegion === 'all' ? undefined : selectedRegion, limit: 10 }],
+    select: (data) => Array.isArray(data) ? data : [],
   });
 
   if (isLoading) {
@@ -143,7 +145,7 @@ export function RecentUpdates() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {updates.map((update) => {
+          {(updates || []).map((update) => {
             const timeAgo = new Date(update.createdAt).toLocaleString();
             
             return (
@@ -177,7 +179,8 @@ export function RecentUpdates() {
                           className="text-xs text-primary hover:text-primary/80 p-0 h-auto"
                           onClick={() => {
                             // Navigate to internal document viewer
-                            window.location.href = `/documents/${update.sourceId}/${update.id}`;
+                            const sourceId = update.sourceId || update.region.toLowerCase();
+                            window.location.href = `/documents/${sourceId}/${update.id}`;
                           }}
                         >
                           <FileText className="h-3 w-3 mr-1" />
