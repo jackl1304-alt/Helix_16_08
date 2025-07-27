@@ -351,16 +351,14 @@ export default function HistoricalData() {
                             >
                               <Download className="h-4 w-4" />
                             </Button>
-                            {doc.documentUrl && (
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => window.open(doc.documentUrl, '_blank', 'noopener,noreferrer')}
-                                title="Original öffnen"
-                              >
-                                <ExternalLink className="h-4 w-4" />
-                              </Button>
-                            )}
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => window.open(`/documents/${doc.sourceId}/${doc.documentId}`, '_blank', 'noopener,noreferrer')}
+                              title="Dokument in neuem Fenster öffnen"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>

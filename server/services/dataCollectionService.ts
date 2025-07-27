@@ -182,7 +182,7 @@ class DataCollectionService {
           title: `FDA 510(k): ${item.device_name}`,
           description: item.summary || item.decision_description || 'FDA 510(k) clearance',
           sourceId: await this.getFDASourceId(),
-          sourceUrl: `https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpmn/pmn.cfm?ID=${item.k_number}`,
+          sourceUrl: `/regulatory-updates/${item.k_number}`, // Internal link to our data
           region: 'US',
           updateType: 'approval',
           priority: this.determinePriority(item.device_class),

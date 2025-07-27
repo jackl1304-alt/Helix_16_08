@@ -19,6 +19,7 @@ import AIInsights from "@/pages/ai-insights";
 import KnowledgeBase from "@/pages/knowledge-base";
 import HistoricalData from "@/pages/historical-data";
 import LegalCases from "@/pages/legal-cases";
+import DocumentViewer from "@/pages/document-viewer";
 import { ResponsiveLayout } from "@/components/responsive-layout";
 
 function Router() {
@@ -39,6 +40,7 @@ function Router() {
       <Route path="/knowledge-base" component={KnowledgeBase} />
       <Route path="/historical-data" component={HistoricalData} />
       <Route path="/legal-cases" component={LegalCases} />
+      <Route path="/documents/:sourceType/:documentId" component={DocumentViewer} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
