@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, X, ExternalLink } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Check, X, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useState } from "react";
 
 interface Approval {
   id: string;
@@ -20,6 +22,7 @@ interface Approval {
 export function ApprovalWorkflow() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [isExpanded, setIsExpanded] = useState(false);
   
   const { data: approvals, isLoading } = useQuery<Approval[]>({
     queryKey: ["/api/approvals", { status: "pending" }],
@@ -57,8 +60,24 @@ export function ApprovalWorkflow() {
     return (
       <Card>
         <CardHeader>
-          <h2 className="text-lg font-semibold text-gray-900">Pending Approvals</h2>
+          <div 
+            className="flex items-center justify-between cursor-pointer"
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            <h2 className="text-lg font-semibold text-gray-900">Pending Approvals</h2>
+            <div className="flex items-center space-x-2">
+              <Badge variant="outline" className="text-xs">
+                Loading...
+              </Badge>
+              {isExpanded ? (
+                <ChevronUp className="h-5 w-5 text-gray-500" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-gray-500" />
+              )}
+            </div>
+          </div>
         </CardHeader>
+        {isExpanded && (
         <CardContent>
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
@@ -75,6 +94,7 @@ export function ApprovalWorkflow() {
             ))}
           </div>
         </CardContent>
+        )}
       </Card>
     );
   }
@@ -83,8 +103,24 @@ export function ApprovalWorkflow() {
     return (
       <Card>
         <CardHeader>
-          <h2 className="text-lg font-semibold text-gray-900">Pending Approvals</h2>
+          <div 
+            className="flex items-center justify-between cursor-pointer"
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            <h2 className="text-lg font-semibold text-gray-900">Pending Approvals</h2>
+            <div className="flex items-center space-x-2">
+              <Badge variant="outline" className="text-xs bg-green-50 text-green-700">
+                0 pending
+              </Badge>
+              {isExpanded ? (
+                <ChevronUp className="h-5 w-5 text-gray-500" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-gray-500" />
+              )}
+            </div>
+          </div>
         </CardHeader>
+        {isExpanded && (
         <CardContent>
           <div className="text-center py-8">
             <Check className="mx-auto h-12 w-12 text-green-500 mb-3" />
@@ -92,6 +128,7 @@ export function ApprovalWorkflow() {
             <p className="text-sm text-gray-400 mt-1">All items have been reviewed</p>
           </div>
         </CardContent>
+        )}
       </Card>
     );
   }
@@ -99,8 +136,24 @@ export function ApprovalWorkflow() {
   return (
     <Card>
       <CardHeader>
-        <h2 className="text-lg font-semibold text-gray-900">Pending Approvals</h2>
+        <div 
+          className="flex items-center justify-between cursor-pointer"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <h2 className="text-lg font-semibold text-gray-900">Pending Approvals</h2>
+          <div className="flex items-center space-x-2">
+            <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-700">
+              {approvals.length} pending
+            </Badge>
+            {isExpanded ? (
+              <ChevronUp className="h-5 w-5 text-gray-500" />
+            ) : (
+              <ChevronDown className="h-5 w-5 text-gray-500" />
+            )}
+          </div>
+        </div>
       </CardHeader>
+      {isExpanded && (
       <CardContent>
         <div className="space-y-4">
           {approvals.map((approval) => (
@@ -146,6 +199,7 @@ export function ApprovalWorkflow() {
           </Button>
         </div>
       </CardContent>
+      )}
     </Card>
   );
 }

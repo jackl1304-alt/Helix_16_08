@@ -3,6 +3,7 @@ import { StatusCards } from "@/components/dashboard/status-cards";
 import { RecentUpdates } from "@/components/dashboard/recent-updates";
 import { ApprovalWorkflow } from "@/components/dashboard/approval-workflow";
 import { DataCollectionStatus } from "@/components/dashboard/data-collection-status";
+import { NewsletterOverview } from "@/components/dashboard/newsletter-overview";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Plus, Upload, Download, Settings, FolderSync } from "lucide-react";
@@ -143,9 +144,13 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Data Collection Status */}
-            <div className="mt-8">
+            {/* System Management */}
+            <div className="mt-8 space-y-6">
               <DataCollectionStatus />
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <ApprovalWorkflow />
+                <NewsletterOverview />
+              </div>
             </div>
           </div>
         </main>
