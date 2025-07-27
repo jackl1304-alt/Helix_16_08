@@ -333,7 +333,7 @@ export default function HistoricalData() {
                               size="sm"
                               onClick={() => {
                                 try {
-                                  const content = doc.content || `Titel: ${doc.documentTitle}\n\nInhalt: ${doc.summary || 'Vollständiger Inhalt nicht verfügbar'}\n\nQuelle: ${doc.sourceId}\nDatum: ${new Date(doc.originalDate).toLocaleDateString('de-DE')}\nKategorie: ${doc.category}\nSprache: ${doc.language}`;
+                                  const content = doc.content || `Titel: ${doc.documentTitle}\n\nInhalt: Vollständiger Inhalt nicht verfügbar\n\nQuelle: ${doc.sourceId}\nDatum: ${new Date(doc.originalDate).toLocaleDateString('de-DE')}\nKategorie: ${doc.category}\nSprache: ${doc.language}`;
                                   const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
                                   const url = URL.createObjectURL(blob);
                                   const a = document.createElement('a');

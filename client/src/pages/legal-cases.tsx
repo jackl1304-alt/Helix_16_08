@@ -178,6 +178,60 @@ export default function LegalCases() {
       "space-y-6",
       device.isMobile ? "p-4" : device.isTablet ? "p-6" : "p-8"
     )}>
+      {/* Device Type Selection at Top */}
+      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-blue-200 dark:border-blue-700">
+        <CardContent className="p-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-center sm:text-left">
+              <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-100">Gerätetyp Filter</h2>
+              <p className="text-sm text-blue-700 dark:text-blue-300">Rechtsfälle nach Gerätetyp filtern</p>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant={selectedDeviceType === "all" ? "default" : "outline"}
+                size="lg"
+                onClick={() => setSelectedDeviceType("all")}
+                className="flex flex-col items-center gap-1 h-16 w-20 border-2"
+                title="Alle Geräte"
+              >
+                <Globe className="h-6 w-6" />
+                <span className="text-xs">Alle</span>
+              </Button>
+              <Button
+                variant={selectedDeviceType === "mobile" ? "default" : "outline"}
+                size="lg"
+                onClick={() => setSelectedDeviceType("mobile")}
+                className="flex flex-col items-center gap-1 h-16 w-20 border-2"
+                title="Mobile Geräte"
+              >
+                <Smartphone className="h-6 w-6" />
+                <span className="text-xs">Mobile</span>
+              </Button>
+              <Button
+                variant={selectedDeviceType === "desktop" ? "default" : "outline"}
+                size="lg"
+                onClick={() => setSelectedDeviceType("desktop")}
+                className="flex flex-col items-center gap-1 h-16 w-20 border-2"
+                title="Desktop-Systeme"
+              >
+                <Monitor className="h-6 w-6" />
+                <span className="text-xs">Desktop</span>
+              </Button>
+              <Button
+                variant={selectedDeviceType === "tablet" ? "default" : "outline"}
+                size="lg"
+                onClick={() => setSelectedDeviceType("tablet")}
+                className="flex flex-col items-center gap-1 h-16 w-20 border-2"
+                title="Tablet-Geräte"
+              >
+                <Tablet className="h-6 w-6" />
+                <span className="text-xs">Tablet</span>
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
@@ -187,58 +241,17 @@ export default function LegalCases() {
             Gerichtsentscheidungen und juristische Präzedenzfälle aus der Medizintechnik
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          {/* Device Type Selection */}
-          <div className="flex gap-2">
-            <Button
-              variant={selectedDeviceType === "all" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedDeviceType("all")}
-              className="flex items-center gap-1"
-              title="Alle Geräte"
-            >
-              <Globe className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={selectedDeviceType === "mobile" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedDeviceType("mobile")}
-              className="flex items-center gap-1"
-              title="Mobile Geräte"
-            >
-              <Smartphone className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={selectedDeviceType === "desktop" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedDeviceType("desktop")}
-              className="flex items-center gap-1"
-              title="Desktop-Systeme"
-            >
-              <Monitor className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={selectedDeviceType === "tablet" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedDeviceType("tablet")}
-              className="flex items-center gap-1"
-              title="Tablet-Geräte"
-            >
-              <Tablet className="h-4 w-4" />
-            </Button>
-          </div>
-          <Button 
-            onClick={() => syncMutation.mutate()}
-            disabled={syncMutation.isPending}
-          >
-            {syncMutation.isPending ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-            ) : (
-              <Download className="h-4 w-4 mr-2" />
-            )}
-            Daten synchronisieren
-          </Button>
-        </div>
+        <Button 
+          onClick={() => syncMutation.mutate()}
+          disabled={syncMutation.isPending}
+        >
+          {syncMutation.isPending ? (
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+          ) : (
+            <Download className="h-4 w-4 mr-2" />
+          )}
+          Daten synchronisieren
+        </Button>
       </div>
 
       {/* Controls */}
