@@ -55,11 +55,7 @@ export default function RegulatoryUpdates() {
   const [selectedType, setSelectedType] = useState<string>("all");
 
   const { data: updates, isLoading } = useQuery<RegulatoryUpdate[]>({
-    queryKey: ["/api/regulatory-updates", { 
-      region: selectedRegion === 'all' ? undefined : selectedRegion,
-      priority: selectedPriority === 'all' ? undefined : selectedPriority,
-      limit: 100 
-    }],
+    queryKey: ["/api/regulatory-updates"],
     select: (data) => Array.isArray(data) ? data : [],
   });
 
