@@ -16,6 +16,7 @@ import SystemSettings from "@/pages/system-settings";
 import AuditLogs from "@/pages/audit-logs";
 import AIInsights from "@/pages/ai-insights";
 import KnowledgeBase from "@/pages/knowledge-base";
+import HistoricalData from "@/pages/historical-data";
 
 function Router() {
   return (
@@ -32,6 +33,7 @@ function Router() {
       <Route path="/audit-logs" component={AuditLogs} />
       <Route path="/ai-insights" component={AIInsights} />
       <Route path="/knowledge-base" component={KnowledgeBase} />
+      <Route path="/historical-data" component={HistoricalData} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
