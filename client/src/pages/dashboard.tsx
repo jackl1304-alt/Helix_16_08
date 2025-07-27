@@ -1,5 +1,4 @@
 import { Header } from "@/components/layout/header";
-import { Sidebar } from "@/components/layout/sidebar";
 import { StatusCards } from "@/components/dashboard/status-cards";
 import { RecentUpdates } from "@/components/dashboard/recent-updates";
 import { ApprovalWorkflow } from "@/components/dashboard/approval-workflow";
@@ -7,8 +6,12 @@ import { DataCollectionStatus } from "@/components/dashboard/data-collection-sta
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Plus, Upload, Download, Settings } from "lucide-react";
+import { useDevice } from "@/hooks/use-device";
+import { ResponsiveGrid } from "@/components/responsive-layout";
 
 export default function Dashboard() {
+  const device = useDevice();
+  
   const handleSearch = (query: string) => {
     console.log("Search query:", query);
     // TODO: Implement search functionality
@@ -19,7 +22,7 @@ export default function Dashboard() {
       <Header onSearch={handleSearch} />
       
       <main className="flex-1 overflow-auto">
-        <div className="p-8">
+        <div className={device.isMobile ? "p-4" : device.isTablet ? "p-6" : "p-8"}>
             {/* Dashboard Header */}
             <div className="mb-8">
               <h1 className="text-2xl font-bold text-gray-900">Regulatory Intelligence Dashboard</h1>
@@ -29,14 +32,18 @@ export default function Dashboard() {
             {/* Status Cards */}
             <StatusCards />
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className={`grid gap-${device.isMobile ? '4' : '8'} ${
+              device.isMobile ? 'grid-cols-1' : 
+              device.isTablet ? 'grid-cols-1 lg:grid-cols-2' : 
+              'grid-cols-1 lg:grid-cols-3'
+            }`}>
               {/* Recent Updates */}
-              <div className="lg:col-span-2">
+              <div className={device.isDesktop ? "lg:col-span-2" : "col-span-1"}>
                 <RecentUpdates />
               </div>
 
               {/* Sidebar Content */}
-              <div>
+              <div className="col-span-1">
                 {/* Approval Workflow */}
                 <div className="mb-6">
                   <ApprovalWorkflow />
