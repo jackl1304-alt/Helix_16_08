@@ -38,9 +38,11 @@ export default function LegalCases() {
   });
 
   // Fetch legal cases
-  const { data: legalData = [], isLoading: isLoadingData } = useQuery<HistoricalDataRecord[]>({
+  const { data: legalData = [], isLoading: isLoadingData, error: legalDataError } = useQuery<HistoricalDataRecord[]>({
     queryKey: ['/api/legal/data', selectedSource, dateRange.start, dateRange.end],
     enabled: !!selectedSource,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 3,
   });
 
   // Fetch legal change history  
@@ -57,22 +59,28 @@ export default function LegalCases() {
 
   // Sync legal data mutation
   const syncMutation = useMutation({
-    mutationFn: () => apiRequest('/api/legal/sync', { 
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({})
-    }),
-    onSuccess: () => {
+    mutationFn: async () => {
+      const response = await fetch('/api/legal/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      });
+      if (!response.ok) {
+        throw new Error(`Sync failed: ${response.status}`);
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
       toast({
         title: "Rechtssprechungsdaten aktualisiert",
-        description: "Alle Gerichtsentscheidungen wurden erfolgreich synchronisiert.",
+        description: `Alle Gerichtsentscheidungen wurden erfolgreich synchronisiert (${data.timestamp}).`,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/legal'] });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Synchronisationsfehler",
-        description: "Fehler beim Aktualisieren der Rechtssprechungsdaten.",
+        description: `Fehler beim Aktualisieren der Rechtssprechungsdaten: ${error.message}`,
         variant: "destructive",
       });
     },
@@ -267,6 +275,23 @@ export default function LegalCases() {
                 <div className="flex items-center justify-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                   <span className="ml-2">Lade Rechtssprechungsdaten...</span>
+                </div>
+              ) : legalDataError ? (
+                <div className="flex flex-col items-center justify-center py-8 text-red-600">
+                  <AlertTriangle className="h-8 w-8 mb-2" />
+                  <span>Fehler beim Laden der Rechtsdaten</span>
+                  <Button 
+                    variant="outline" 
+                    className="mt-2"
+                    onClick={() => syncMutation.mutate()}
+                  >
+                    Erneut synchronisieren
+                  </Button>
+                </div>
+              ) : filteredData.length === 0 ? (
+                <div className="flex items-center justify-center py-8 text-gray-500">
+                  <Scale className="h-8 w-8 mr-2" />
+                  <span>Keine Rechtsfälle für die gewählten Filter gefunden.</span>
                 </div>
               ) : (
                 <Table>
