@@ -263,7 +263,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await historicalDataService.initializeHistoricalDownload();
       res.json({ success: true, message: "Historical sync completed" });
     } catch (error) {
-      res.status(500).json({ error: "Failed to sync historical data" });
+      console.error("Historical sync error:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: "Failed to sync historical data",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 

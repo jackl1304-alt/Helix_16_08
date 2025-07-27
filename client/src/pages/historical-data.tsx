@@ -85,7 +85,16 @@ export default function HistoricalData() {
   // Sync mutation
   const syncMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest('/api/historical/sync', 'POST');
+      const response = await fetch('/api/historical/sync', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
     },
     onSuccess: () => {
       toast({
