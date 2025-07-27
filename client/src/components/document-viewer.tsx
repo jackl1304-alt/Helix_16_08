@@ -227,12 +227,12 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="flex-1 p-0 relative">
+              <CardContent className="flex-1 p-0">
                 <div 
-                  className="absolute inset-0 overflow-y-auto overflow-x-hidden document-viewer-content"
+                  className="h-full overflow-y-scroll document-viewer-content"
                   style={{
-                    height: '100%',
-                    maxHeight: 'calc(95vh - 300px)'
+                    height: 'calc(95vh - 350px)',
+                    minHeight: '400px'
                   }}
                 >
                   <div 
@@ -244,8 +244,7 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
                       userSelect: 'text',
                       cursor: 'text',
                       overflowWrap: 'break-word',
-                      wordBreak: 'break-word',
-                      minHeight: '100%'
+                      wordBreak: 'break-word'
                     }}
                   >
                     {formatContent(document.content).map((line, index) => (
