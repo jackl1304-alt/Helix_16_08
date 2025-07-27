@@ -430,16 +430,27 @@ export default function LegalCases() {
                             >
                               <Download className="h-4 w-4" />
                             </Button>
-                            {legalCase.documentUrl && (
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => window.open(legalCase.documentUrl, '_blank', 'noopener,noreferrer')}
-                                title="Original öffnen"
-                              >
-                                <FileText className="h-4 w-4" />
-                              </Button>
-                            )}
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => {
+                                // Show full document content in viewer
+                                const modal = document.querySelector('[data-document-viewer]');
+                                if (modal) {
+                                  // Open the document viewer modal
+                                  const viewerButton = document.querySelector(`[data-document-id="${legalCase.id}"]`);
+                                  if (viewerButton) {
+                                    (viewerButton as HTMLButtonElement).click();
+                                  }
+                                } else {
+                                  // Fallback: navigate to document page
+                                  window.location.href = `/documents/${legalCase.sourceId}/${legalCase.documentId}`;
+                                }
+                              }}
+                              title="Volltext anzeigen"
+                            >
+                              <FileText className="h-4 w-4" />
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>

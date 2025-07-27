@@ -354,10 +354,23 @@ export default function HistoricalData() {
                             <Button 
                               variant="ghost" 
                               size="sm"
-                              onClick={() => window.open(`/documents/${doc.sourceId}/${doc.documentId}`, '_blank', 'noopener,noreferrer')}
-                              title="Dokument in neuem Fenster öffnen"
+                              onClick={() => {
+                                // Open document in the same page viewer
+                                const modal = document.querySelector('[data-document-viewer]');
+                                if (modal) {
+                                  // Open the document viewer modal
+                                  const viewerButton = document.querySelector(`[data-document-id="${doc.id}"]`);
+                                  if (viewerButton) {
+                                    (viewerButton as HTMLButtonElement).click();
+                                  }
+                                } else {
+                                  // Fallback: navigate to document page
+                                  window.location.href = `/documents/${doc.sourceId}/${doc.documentId}`;
+                                }
+                              }}
+                              title="Dokument vollständig anzeigen"
                             >
-                              <ExternalLink className="h-4 w-4" />
+                              <FileText className="h-4 w-4" />
                             </Button>
                           </div>
                         </TableCell>
