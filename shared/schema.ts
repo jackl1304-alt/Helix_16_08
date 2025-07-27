@@ -28,11 +28,17 @@ export const users = pgTable("users", {
 export const dataSources = pgTable("data_sources", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: varchar("name").notNull(),
-  type: varchar("type").notNull(), // fda, ema, iso, pubmed
+  type: varchar("type").notNull(), // fda, ema, bfarm, swissmedic, mhra, pmda, nmpa, anvisa, standards, legal
   endpoint: text("endpoint"),
+  region: varchar("region").notNull(), // US, EU, DE, CH, UK, JP, CN, BR, etc.
+  country: varchar("country"), // Specific country code
+  category: varchar("category").notNull(), // regulations, standards, rulings, approvals
+  language: varchar("language").default("en"), // en, de, fr, es, pt, zh, ja, ru
   isActive: boolean("is_active").default(true),
   lastSyncAt: timestamp("last_sync_at"),
+  syncFrequency: varchar("sync_frequency").default("daily"), // daily, weekly, etc.
   configData: jsonb("config_data"),
+  metadata: jsonb("metadata"), // Additional source-specific configuration
   createdAt: timestamp("created_at").defaultNow(),
 });
 
