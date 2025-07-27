@@ -40,6 +40,21 @@ export default function LegalCases() {
   // Fetch legal cases
   const { data: legalData = [], isLoading: isLoadingData, error: legalDataError } = useQuery<HistoricalDataRecord[]>({
     queryKey: ['/api/legal/data', selectedSource, dateRange.start, dateRange.end],
+    queryFn: async () => {
+      if (!selectedSource) throw new Error('No source selected');
+      
+      const params = new URLSearchParams({
+        sourceId: selectedSource,
+        ...(dateRange.start && { startDate: dateRange.start }),
+        ...(dateRange.end && { endDate: dateRange.end })
+      });
+      
+      const response = await fetch(`/api/legal/data?${params}`);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      return response.json();
+    },
     enabled: !!selectedSource,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 3,
@@ -277,16 +292,32 @@ export default function LegalCases() {
                   <span className="ml-2">Lade Rechtssprechungsdaten...</span>
                 </div>
               ) : legalDataError ? (
-                <div className="flex flex-col items-center justify-center py-8 text-red-600">
-                  <AlertTriangle className="h-8 w-8 mb-2" />
-                  <span>Fehler beim Laden der Rechtsdaten</span>
-                  <Button 
-                    variant="outline" 
-                    className="mt-2"
-                    onClick={() => syncMutation.mutate()}
-                  >
-                    Erneut synchronisieren
-                  </Button>
+                <div className="flex flex-col items-center justify-center py-8 text-red-600 space-y-3">
+                  <AlertTriangle className="h-8 w-8" />
+                  <div className="text-center">
+                    <h3 className="font-semibold">Fehler beim Laden der Rechtsdaten</h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {legalDataError instanceof Error ? legalDataError.message : 'Unbekannter Fehler'}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => syncMutation.mutate()}
+                      disabled={syncMutation.isPending}
+                    >
+                      {syncMutation.isPending ? 'Synchronisiere...' : 'Erneut synchronisieren'}
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => {
+                        // Retry the query manually
+                        window.location.reload();
+                      }}
+                    >
+                      Seite neu laden
+                    </Button>
+                  </div>
                 </div>
               ) : filteredData.length === 0 ? (
                 <div className="flex items-center justify-center py-8 text-gray-500">
