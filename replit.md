@@ -189,3 +189,9 @@ The platform is designed for easy deployment on Replit with minimal configuratio
   * Consistent branding across Dashboard, Landing page, and 404 pages
   * Logo with text combinations for different UI contexts
   * Hover effects and accessibility features for logo interactions
+- ✓ Collapsible Data Collection Interface:
+  * Expandable/collapsible sections for current vs historical data sources
+  * Automatic section management with chevron icons for visual feedback
+  * Current sources expanded by default, historical collapsed
+  * Source count badges for quick overview
+  * Improved UX with clickable headers and smooth transitions

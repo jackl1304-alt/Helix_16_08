@@ -2,11 +2,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FolderSync, AlertCircle } from "lucide-react";
+import { FolderSync, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
+import { useState } from "react";
 
 interface DataSource {
   id: string;
@@ -24,6 +25,8 @@ export function DataCollectionStatus() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
+  const [isCurrentExpanded, setIsCurrentExpanded] = useState(true);
+  const [isHistoricalExpanded, setIsHistoricalExpanded] = useState(false);
   
   const { data: sources, isLoading } = useQuery<DataSource[]>({
     queryKey: ["/api/data-sources"],
@@ -155,19 +158,37 @@ export function DataCollectionStatus() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">Aktuelle Datenquellen (2025+)</h2>
-              <p className="text-sm text-gray-600">Live regulatory data collection since January 1, 2025</p>
-            </div>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setLocation("/global-sources")}
+            <div 
+              className="flex items-center cursor-pointer"
+              onClick={() => setIsCurrentExpanded(!isCurrentExpanded)}
             >
-              Manage Sources
-            </Button>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Aktuelle Datenquellen (2025+)</h2>
+                <p className="text-sm text-gray-600">Live regulatory data collection since January 1, 2025</p>
+              </div>
+              <div className="ml-4">
+                {isCurrentExpanded ? (
+                  <ChevronUp className="h-5 w-5 text-gray-500" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-gray-500" />
+                )}
+              </div>
+            </div>
+            <div className="flex space-x-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setLocation("/global-sources")}
+              >
+                Manage Sources
+              </Button>
+              <Badge variant="outline" className="text-xs">
+                {currentSources.length} sources
+              </Badge>
+            </div>
           </div>
         </CardHeader>
+        {isCurrentExpanded && (
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {currentSources.map((source) => (
@@ -205,6 +226,7 @@ export function DataCollectionStatus() {
             ))}
           </div>
         </CardContent>
+        )}
       </Card>
 
       {/* Historical Data Sources (bis 31.12.2024) */}
@@ -212,19 +234,37 @@ export function DataCollectionStatus() {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">Historische Archive (bis 31.12.2024)</h2>
-                <p className="text-sm text-gray-600">Archived regulatory data through December 31, 2024</p>
-              </div>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setLocation("/historical-data")}
+              <div 
+                className="flex items-center cursor-pointer"
+                onClick={() => setIsHistoricalExpanded(!isHistoricalExpanded)}
               >
-                View Archive
-              </Button>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Historische Archive (bis 31.12.2024)</h2>
+                  <p className="text-sm text-gray-600">Archived regulatory data through December 31, 2024</p>
+                </div>
+                <div className="ml-4">
+                  {isHistoricalExpanded ? (
+                    <ChevronUp className="h-5 w-5 text-gray-500" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5 text-gray-500" />
+                  )}
+                </div>
+              </div>
+              <div className="flex space-x-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setLocation("/historical-data")}
+                >
+                  View Archive
+                </Button>
+                <Badge variant="outline" className="text-xs">
+                  {historicalSources.length} archives
+                </Badge>
+              </div>
             </div>
           </CardHeader>
+          {isHistoricalExpanded && (
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {historicalSources.map((source) => (
@@ -257,6 +297,7 @@ export function DataCollectionStatus() {
               ))}
             </div>
           </CardContent>
+          )}
         </Card>
       )}
     </div>
