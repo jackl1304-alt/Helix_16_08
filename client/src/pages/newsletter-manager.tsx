@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Send, Edit, Trash2, Calendar, Users, AlertCircle } from "lucide-react";
+import { Plus, Send, Edit, Trash2, Calendar, Users, AlertCircle, Menu } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -135,13 +135,25 @@ export default function NewsletterManager() {
   }
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Newsletter Manager</h1>
-        <p className="text-gray-600 mt-1">Create and manage regulatory intelligence newsletters</p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header with menu button */}
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Button variant="ghost" size="sm">
+              <Menu className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Newsletter Manager</h1>
+              <p className="text-gray-600">Create and manage regulatory intelligence newsletters</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <Tabs defaultValue="newsletters" className="space-y-6">
+      {/* Main Content */}
+      <div className="p-6">
+        <Tabs defaultValue="newsletters" className="space-y-6">
         <div className="flex items-center justify-between">
           <TabsList>
             <TabsTrigger value="newsletters">Newsletters</TabsTrigger>
@@ -359,6 +371,7 @@ export default function NewsletterManager() {
           </div>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }
