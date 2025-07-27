@@ -11,7 +11,8 @@ import {
   Book,
   Users,
   Settings,
-  Archive
+  Archive,
+  Shield
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoPath from "@assets/tmp_4b23ca96-d4e9-4839-9375-75a53368ad60_1753652563564.jpeg";
@@ -48,11 +49,7 @@ export function Sidebar() {
       <div className="p-6 border-b border-gray-200">
         <Link href="/">
           <div className="flex items-center cursor-pointer">
-            <img 
-              src={logoPath} 
-              alt="Helix Logo" 
-              className="h-10 w-10 rounded-lg object-cover mr-3"
-            />
+            <Shield className="h-8 w-8 text-blue-600 mr-3" />
             <div>
               <h1 className="text-xl font-bold text-gray-900">Helix</h1>
               <p className="text-xs text-gray-500">MedTech Intelligence</p>
