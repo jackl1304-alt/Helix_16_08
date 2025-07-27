@@ -392,52 +392,79 @@ export class DatabaseStorage implements IStorage {
         return; // Sources already initialized
       }
 
-      // Initialize default data sources
+      // Initialize default data sources with category field
       const defaultSources = [
         {
           id: "fda_510k",
           name: "FDA 510(k) Database",
           type: "regulatory" as const,
-          url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpmn/pmn.cfm",
+          category: "current", // Aktuell (2025+)
+          endpoint: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpmn/pmn.cfm",
           region: "USA",
           isActive: true,
           lastSyncAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+          language: "en",
+          syncFrequency: "daily"
         },
         {
           id: "ema_epar", 
           name: "EMA EPAR Database",
           type: "regulatory" as const,
-          url: "https://www.ema.europa.eu/en/medicines/download-medicine-data",
+          category: "current", // Aktuell (2025+)
+          endpoint: "https://www.ema.europa.eu/en/medicines/download-medicine-data",
           region: "Europe",
           isActive: true,
           lastSyncAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
+          language: "en",
+          syncFrequency: "daily"
         },
         {
           id: "bfarm_guidelines",
           name: "BfArM Leitfäden", 
           type: "guidelines" as const,
-          url: "https://www.bfarm.de/DE/Medizinprodukte/_node.html",
+          category: "current", // Aktuell (2025+)
+          endpoint: "https://www.bfarm.de/DE/Medizinprodukte/_node.html",
           region: "Deutschland",
           isActive: true,
           lastSyncAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 hour ago
+          language: "de",
+          syncFrequency: "weekly"
         },
         {
           id: "swissmedic_guidelines",
           name: "Swissmedic Guidelines",
-          type: "guidelines" as const, 
-          url: "https://www.swissmedic.ch/swissmedic/en/home/medical-devices.html",
+          type: "guidelines" as const,
+          category: "current", // Aktuell (2025+)
+          endpoint: "https://www.swissmedic.ch/swissmedic/en/home/medical-devices.html",
           region: "Schweiz",
           isActive: true,
           lastSyncAt: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
+          language: "de",
+          syncFrequency: "weekly"
         },
         {
-          id: "mhra_guidance",
-          name: "MHRA Guidance",
-          type: "guidelines" as const,
-          url: "https://www.gov.uk/topic/medicines-medical-devices-blood/medical-devices-regulation", 
-          region: "UK",
+          id: "fda_historical",
+          name: "FDA Historical Archive",
+          type: "regulatory" as const,
+          category: "historical", // Historisch (bis 31.12.2024)
+          endpoint: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpmn/pmn.cfm",
+          region: "USA",
           isActive: false,
-          lastSyncAt: new Date(Date.now() - 25 * 60 * 60 * 1000), // 25 hours ago
+          lastSyncAt: new Date("2024-12-31T23:59:59Z"), // Letzter Sync 31.12.2024
+          language: "en",
+          syncFrequency: "archived"
+        },
+        {
+          id: "ema_historical",
+          name: "EMA Historical Archive",
+          type: "regulatory" as const,
+          category: "historical", // Historisch (bis 31.12.2024)
+          endpoint: "https://www.ema.europa.eu/en/medicines/download-medicine-data",
+          region: "Europe",
+          isActive: false,
+          lastSyncAt: new Date("2024-12-31T23:59:59Z"), // Letzter Sync 31.12.2024
+          language: "en",
+          syncFrequency: "archived"
         }
       ];
 
