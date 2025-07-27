@@ -44,6 +44,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/data-sources/sync-all", async (req, res) => {
+    try {
+      // Initialize data sources if they don't exist
+      await storage.initializeDataSources();
+      
+      // Sync all active sources
+      const sources = await storage.getDataSources();
+      for (const source of sources.filter(s => s.isActive)) {
+        await dataCollectionService.syncDataSource(source.id);
+      }
+      
+      res.json({ 
+        message: "All data sources sync initiated",
+        synced: sources.filter(s => s.isActive).length
+      });
+    } catch (error) {
+      console.error("Error syncing all data sources:", error);
+      res.status(500).json({ message: "Failed to sync all data sources" });
+    }
+  });
+
   // Regulatory updates routes
   app.get("/api/regulatory-updates", async (req, res) => {
     try {
