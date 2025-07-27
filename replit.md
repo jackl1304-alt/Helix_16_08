@@ -7,6 +7,7 @@ Helix is a comprehensive regulatory intelligence platform designed for the MedTe
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Project name: Changed from AEGIS to Helix (July 27, 2025)
 
 ## System Architecture
 
@@ -115,3 +116,12 @@ The backend follows a Node.js/Express RESTful architecture:
 - **Runtime Error Overlay**: Enhanced development debugging
 
 The platform is designed for easy deployment on Replit with minimal configuration, requiring only database provisioning and environment variable setup.
+
+## Recent Changes
+
+### July 27, 2025
+- ✓ Updated project name from AEGIS to Helix throughout entire codebase
+- ✓ Fixed all TypeScript compilation errors and LSP diagnostics  
+- ✓ Updated branding in UI components, email templates, and CSS properties
+- ✓ Database successfully connected and schema validated
+- ✓ All core services (data collection, NLP, email, scheduler) operational

@@ -1,7 +1,11 @@
 import { storage } from "../storage";
-import * as nlpServiceModule from "./nlpService";
-const nlpService = nlpServiceModule.nlpService;
 import type { InsertRegulatoryUpdate } from "@shared/schema";
+
+// Import nlpService directly to avoid module resolution issues
+async function getNlpService() {
+  const { nlpService } = await import("./nlpService");
+  return nlpService;
+}
 
 interface FDAResponse {
   results: Array<{
@@ -71,7 +75,8 @@ class DataCollectionService {
       for (const item of data.results) {
         if (!item.k_number || !item.device_name) continue;
 
-        const categories = await nlpService.categorizeContent(
+        const nlpSvc = await getNlpService();
+        const categories = await nlpSvc.categorizeContent(
           `${item.device_name} ${item.summary || ''} ${item.medical_specialty_description || ''}`
         );
 
@@ -127,7 +132,8 @@ class DataCollectionService {
       for (const item of data.results) {
         if (!item.product_description) continue;
 
-        const categories = await nlpService.categorizeContent(
+        const nlpSvc = await getNlpService();
+        const categories = await nlpSvc.categorizeContent(
           `${item.product_description} ${item.reason_for_recall || ''}`
         );
 
@@ -175,7 +181,8 @@ class DataCollectionService {
       for (const item of mockEMAData) {
         if (!item.name) continue;
 
-        const categories = await nlpService.categorizeContent(
+        const nlpSvc = await getNlpService();
+        const categories = await nlpSvc.categorizeContent(
           `${item.name} ${item.therapeutic_area || ''} ${item.condition_indication || ''}`
         );
 
