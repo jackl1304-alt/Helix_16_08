@@ -29,6 +29,7 @@ const knowledgeBase = [
   { name: "AI Insights", href: "/ai-insights", icon: Brain },
   { name: "Custom Knowledge", href: "/knowledge-base", icon: Book },
   { name: "Historische Daten", href: "/historical-data", icon: Archive },
+  { name: "Rechtsfälle", href: "/legal-cases", icon: FileText },
 ];
 
 const administration = [
@@ -41,16 +42,16 @@ export function Sidebar() {
   const [location] = useLocation();
 
   return (
-    <aside className="w-64 bg-white shadow-sm border-r border-gray-200">
+    <aside className="fixed left-0 top-0 h-full w-64 bg-white shadow-sm border-r border-gray-200 z-50">
       <nav className="mt-8">
         <div className="px-4 space-y-2">
           {navigation.map((item) => {
             const isActive = location === item.href;
             return (
               <Link key={item.name} href={item.href}>
-                <a
+                <div
                   className={cn(
-                    "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors",
+                    "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer",
                     isActive
                       ? "text-primary bg-primary/10 border border-primary/20"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -61,7 +62,7 @@ export function Sidebar() {
                     isActive ? "text-primary" : "text-gray-400"
                   )} />
                   {item.name}
-                </a>
+                </div>
               </Link>
             );
           })}
@@ -76,9 +77,9 @@ export function Sidebar() {
               const isActive = location === item.href;
               return (
                 <Link key={item.name} href={item.href}>
-                  <a
+                  <div
                     className={cn(
-                      "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors",
+                      "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer",
                       isActive
                         ? "text-primary bg-primary/10 border border-primary/20"
                         : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -89,7 +90,7 @@ export function Sidebar() {
                       isActive ? "text-primary" : "text-gray-400"
                     )} />
                     {item.name}
-                  </a>
+                  </div>
                 </Link>
               );
             })}
@@ -105,9 +106,9 @@ export function Sidebar() {
               const isActive = location === item.href;
               return (
                 <Link key={item.name} href={item.href}>
-                  <a
+                  <div
                     className={cn(
-                      "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors",
+                      "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer",
                       isActive
                         ? "text-primary bg-primary/10 border border-primary/20"
                         : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -118,7 +119,7 @@ export function Sidebar() {
                       isActive ? "text-primary" : "text-gray-400"
                     )} />
                     {item.name}
-                  </a>
+                  </div>
                 </Link>
               );
             })}

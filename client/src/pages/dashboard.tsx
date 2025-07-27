@@ -18,11 +18,8 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-50">
       <Header onSearch={handleSearch} />
       
-      <div className="flex">
-        <Sidebar />
-        
-        <main className="flex-1 overflow-auto">
-          <div className="p-8">
+      <main className="flex-1 overflow-auto">
+        <div className="p-8">
             {/* Dashboard Header */}
             <div className="mb-8">
               <h1 className="text-2xl font-bold text-gray-900">Regulatory Intelligence Dashboard</h1>
@@ -78,7 +75,6 @@ export default function Dashboard() {
             </div>
           </div>
         </main>
-      </div>
     </div>
   );
 }
