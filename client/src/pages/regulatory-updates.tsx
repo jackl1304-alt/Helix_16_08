@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DocumentViewer } from "@/components/document-viewer";
-import { Search, Filter, Bell, AlertTriangle, FileText, Download, ExternalLink } from "lucide-react";
+import { PageLayout, SectionCard } from "@/components/ui/page-layout";
+import { FilterBar } from "@/components/ui/filter-bar";
+import { DataTable } from "@/components/ui/data-table";
+import { Bell, FileText, Download, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface RegulatoryUpdate {
@@ -64,9 +62,11 @@ export default function RegulatoryUpdates() {
       update.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       update.description.toLowerCase().includes(searchTerm.toLowerCase());
     
+    const matchesRegion = selectedRegion === 'all' || update.region === selectedRegion;
+    const matchesPriority = selectedPriority === 'all' || update.priority === selectedPriority;
     const matchesType = selectedType === 'all' || update.updateType === selectedType;
     
-    return matchesSearch && matchesType;
+    return matchesSearch && matchesRegion && matchesPriority && matchesType;
   });
 
   const downloadUpdate = async (update: RegulatoryUpdate) => {
@@ -99,228 +99,188 @@ export default function RegulatoryUpdates() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="space-y-6">
-          <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
-          <div className="h-64 bg-gray-200 rounded animate-pulse"></div>
+  const resetFilters = () => {
+    setSearchTerm("");
+    setSelectedRegion("all");
+    setSelectedPriority("all");
+    setSelectedType("all");
+  };
+
+  const columns = [
+    {
+      key: "title",
+      header: "Update",
+      render: (update: RegulatoryUpdate) => (
+        <div className="space-y-1">
+          <p className="font-medium text-slate-900 dark:text-slate-100">{update.title}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">{update.description}</p>
+          <div className="flex flex-wrap gap-1">
+            {update.deviceClasses?.map(deviceClass => (
+              <Badge key={deviceClass} variant="secondary" className="text-xs">
+                {deviceClass}
+              </Badge>
+            ))}
+          </div>
         </div>
-      </div>
-    );
-  }
+      )
+    },
+    {
+      key: "region",
+      header: "Region",
+      render: (update: RegulatoryUpdate) => (
+        <Badge variant="outline">{update.region}</Badge>
+      )
+    },
+    {
+      key: "updateType",
+      header: "Typ",
+      render: (update: RegulatoryUpdate) => (
+        <Badge variant="outline" className="capitalize">
+          {update.updateType}
+        </Badge>
+      )
+    },
+    {
+      key: "priority",
+      header: "Priorität",
+      render: (update: RegulatoryUpdate) => (
+        <Badge className={priorityColors[update.priority]}>
+          {priorityLabels[update.priority]}
+        </Badge>
+      )
+    },
+    {
+      key: "publishedAt",
+      header: "Datum",
+      render: (update: RegulatoryUpdate) => (
+        <div className="text-sm">
+          <div>{new Date(update.publishedAt).toLocaleDateString('de-DE')}</div>
+          <div className="text-slate-500 dark:text-slate-400">
+            {new Date(update.publishedAt).toLocaleTimeString('de-DE')}
+          </div>
+        </div>
+      )
+    }
+  ];
+
+  const filterOptions = [
+    {
+      label: "Region",
+      value: selectedRegion,
+      onChange: setSelectedRegion,
+      options: [
+        { value: "all", label: "Alle Regionen" },
+        { value: "US", label: "USA (FDA)" },
+        { value: "EU", label: "Europa (EMA)" },
+        { value: "DE", label: "Deutschland (BfArM)" },
+        { value: "CH", label: "Schweiz (Swissmedic)" },
+        { value: "UK", label: "UK (MHRA)" }
+      ]
+    },
+    {
+      label: "Priorität",
+      value: selectedPriority,
+      onChange: setSelectedPriority,
+      options: [
+        { value: "all", label: "Alle Prioritäten" },
+        { value: "urgent", label: "Dringend" },
+        { value: "high", label: "Hoch" },
+        { value: "medium", label: "Mittel" },
+        { value: "low", label: "Niedrig" }
+      ]
+    },
+    {
+      label: "Typ",
+      value: selectedType,
+      onChange: setSelectedType,
+      options: [
+        { value: "all", label: "Alle Typen" },
+        { value: "approval", label: "Zulassung" },
+        { value: "guidance", label: "Leitfaden" },
+        { value: "recall", label: "Rückruf" },
+        { value: "safety_alert", label: "Sicherheitshinweis" }
+      ]
+    }
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Regulatory Updates</h1>
-          <p className="text-gray-600 mt-2">
-            Aktuelle regulatorische Änderungen und Ankündigungen von globalen Gesundheitsbehörden
-          </p>
-        </div>
+    <PageLayout
+      title="Regulatory Updates"
+      description="Aktuelle regulatorische Änderungen und Ankündigungen von globalen Gesundheitsbehörden"
+      icon={Bell}
+      stats={[
+        { label: "Gesamt Updates", value: (updates || []).length },
+        { label: "Gefilterte Updates", value: filteredUpdates.length },
+        { label: "Hohe Priorität", value: filteredUpdates.filter(u => u.priority === 'high' || u.priority === 'urgent').length },
+        { label: "Heute", value: filteredUpdates.filter(u => new Date(u.publishedAt).toDateString() === new Date().toDateString()).length }
+      ]}
+    >
+      <FilterBar
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Titel oder Beschreibung suchen..."
+        filters={filterOptions}
+        onReset={resetFilters}
+      />
 
-        {/* Filters */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Filter className="h-5 w-5" />
-              Filter & Suche
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Suche</label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Titel oder Beschreibung..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Region</label>
-                <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Alle Regionen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Alle Regionen</SelectItem>
-                    <SelectItem value="US">USA (FDA)</SelectItem>
-                    <SelectItem value="EU">Europa (EMA)</SelectItem>
-                    <SelectItem value="DE">Deutschland (BfArM)</SelectItem>
-                    <SelectItem value="CH">Schweiz (Swissmedic)</SelectItem>
-                    <SelectItem value="UK">UK (MHRA)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Priorität</label>
-                <Select value={selectedPriority} onValueChange={setSelectedPriority}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Alle Prioritäten" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Alle Prioritäten</SelectItem>
-                    <SelectItem value="urgent">Dringend</SelectItem>
-                    <SelectItem value="high">Hoch</SelectItem>
-                    <SelectItem value="medium">Mittel</SelectItem>
-                    <SelectItem value="low">Niedrig</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Typ</label>
-                <Select value={selectedType} onValueChange={setSelectedType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Alle Typen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Alle Typen</SelectItem>
-                    <SelectItem value="approval">Zulassung</SelectItem>
-                    <SelectItem value="guidance">Leitfaden</SelectItem>
-                    <SelectItem value="recall">Rückruf</SelectItem>
-                    <SelectItem value="safety_alert">Sicherheitshinweis</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Results */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                Regulatory Updates ({filteredUpdates.length})
-              </CardTitle>
-              <Badge variant="outline" className="text-sm">
-                {filteredUpdates.length} von {(updates || []).length} Updates
-              </Badge>
-            </div>
-            <CardDescription>
-              Klicken Sie auf "Volltext" um das komplette Dokument anzuzeigen oder auf "Download" für Offline-Zugriff
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {filteredUpdates.length === 0 ? (
-              <div className="flex items-center justify-center py-12 text-gray-500">
-                <div className="text-center">
-                  <AlertTriangle className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                  <p className="text-lg font-medium">Keine Updates gefunden</p>
-                  <p className="text-sm">Versuchen Sie andere Filterkriterien</p>
-                </div>
-              </div>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Update</TableHead>
-                    <TableHead>Region</TableHead>
-                    <TableHead>Typ</TableHead>
-                    <TableHead>Priorität</TableHead>
-                    <TableHead>Datum</TableHead>
-                    <TableHead>Aktionen</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredUpdates.map((update) => (
-                    <TableRow key={update.id}>
-                      <TableCell>
-                        <div className="space-y-1">
-                          <p className="font-medium text-gray-900">{update.title}</p>
-                          <p className="text-sm text-gray-600 line-clamp-2">{update.description}</p>
-                          <div className="flex flex-wrap gap-1">
-                            {update.deviceClasses.map(deviceClass => (
-                              <Badge key={deviceClass} variant="secondary" className="text-xs">
-                                {deviceClass}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{update.region}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="capitalize">
-                          {update.updateType}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={priorityColors[update.priority]}>
-                          {priorityLabels[update.priority]}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-sm">
-                          <div>{new Date(update.publishedAt).toLocaleDateString('de-DE')}</div>
-                          <div className="text-gray-500">{new Date(update.publishedAt).toLocaleTimeString('de-DE')}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <DocumentViewer 
-                            document={{
-                              id: update.id,
-                              documentTitle: update.title,
-                              content: update.content,
-                              sourceId: update.sourceId,
-                              originalDate: update.publishedAt,
-                              category: update.updateType,
-                              language: update.rawData?.language || 'de',
-                              deviceClasses: update.deviceClasses,
-                              metadata: {
-                                fileType: 'Regulatory Update',
-                                pageCount: update.rawData?.pages || 1,
-                                language: update.rawData?.language || 'de',
-                                lastModified: update.createdAt
-                              },
-                              downloadedAt: update.createdAt
-                            }}
-                            trigger={
-                              <Button variant="outline" size="sm">
-                                <FileText className="h-4 w-4 mr-1" />
-                                Volltext
-                              </Button>
-                            }
-                          />
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => downloadUpdate(update)}
-                            title="Dokument herunterladen"
-                          >
-                            <Download className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => window.location.href = `/documents/${update.sourceId}/${update.id}`}
-                            title="In neuem Fenster öffnen"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+      <DataTable
+        title="Regulatory Updates"
+        description="Klicken Sie auf Volltext um das komplette Dokument anzuzeigen oder auf Download für Offline-Zugriff"
+        icon={Bell}
+        data={filteredUpdates}
+        columns={columns}
+        isLoading={isLoading}
+        emptyMessage="Keine Updates gefunden"
+        emptyDescription="Versuchen Sie andere Filterkriterien"
+        stats={{
+          total: (updates || []).length,
+          filtered: filteredUpdates.length
+        }}
+        rowActions={(update) => (
+          <>
+            <DocumentViewer 
+              document={{
+                id: update.id,
+                documentTitle: update.title,
+                content: update.content,
+                sourceId: update.sourceId,
+                originalDate: update.publishedAt,
+                category: update.updateType,
+                language: update.rawData?.language || 'de',
+                deviceClasses: update.deviceClasses || [],
+                metadata: {
+                  fileType: 'Regulatory Update',
+                  pageCount: update.rawData?.pages || 1,
+                  language: update.rawData?.language || 'de',
+                  lastModified: update.createdAt
+                },
+                downloadedAt: update.createdAt
+              }}
+              trigger={
+                <Button variant="outline" size="sm">
+                  <FileText className="h-4 w-4" />
+                </Button>
+              }
+            />
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => downloadUpdate(update)}
+              title="Dokument herunterladen"
+            >
+              <Download className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => window.location.href = `/documents/${update.sourceId}/${update.id}`}
+              title="In neuem Fenster öffnen"
+            >
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </>
+        )}
+      />
+    </PageLayout>
   );
 }
