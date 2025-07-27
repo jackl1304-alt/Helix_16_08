@@ -5,11 +5,12 @@ import { ApprovalWorkflow } from "@/components/dashboard/approval-workflow";
 import { DataCollectionStatus } from "@/components/dashboard/data-collection-status";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Plus, Upload, Download, Settings } from "lucide-react";
+import { Plus, Upload, Download, Settings, FolderSync } from "lucide-react";
 import { useDevice } from "@/hooks/use-device";
 import { ResponsiveGrid } from "@/components/responsive-layout";
 import { HeaderLogo } from "@/components/layout/logo";
 import { useLocation } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function Dashboard() {
   const device = useDevice();
@@ -48,6 +49,17 @@ export default function Dashboard() {
 
   const handleConfigureSources = () => {
     setLocation("/global-sources");
+  };
+
+  const handleSyncAllSources = async () => {
+    try {
+      // Trigger sync for all active data sources
+      await apiRequest("POST", "/api/data-sources/sync-all");
+      // Refresh dashboard data
+      window.location.reload();
+    } catch (error) {
+      console.error("Failed to sync data sources:", error);
+    }
   };
 
   return (
@@ -118,6 +130,13 @@ export default function Dashboard() {
                     >
                       <Settings className="mr-2 h-4 w-4" />
                       Configure Sources
+                    </Button>
+                    <Button 
+                      className="w-full flex items-center justify-center bg-blue-600 hover:bg-blue-700"
+                      onClick={handleSyncAllSources}
+                    >
+                      <FolderSync className="mr-2 h-4 w-4" />
+                      Sync All Sources
                     </Button>
                   </CardContent>
                 </Card>

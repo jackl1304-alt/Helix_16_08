@@ -82,6 +82,9 @@ export interface IStorage {
     urgentApprovals: number;
   }>;
   search(query: string): Promise<any[]>;
+  
+  // Initialize data sources
+  initializeDataSources(): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -379,6 +382,71 @@ export class DatabaseStorage implements IStorage {
       ...updates.map(u => ({ ...u, type: 'regulatory_update' })),
       ...knowledge.map(k => ({ ...k, type: 'knowledge' }))
     ];
+  }
+
+  async initializeDataSources(): Promise<void> {
+    try {
+      // Check if sources already exist
+      const existingSources = await db.select().from(dataSources);
+      if (existingSources.length > 0) {
+        return; // Sources already initialized
+      }
+
+      // Initialize default data sources
+      const defaultSources = [
+        {
+          id: "fda_510k",
+          name: "FDA 510(k) Database",
+          type: "regulatory" as const,
+          url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpmn/pmn.cfm",
+          region: "USA",
+          isActive: true,
+          lastSyncAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+        },
+        {
+          id: "ema_epar", 
+          name: "EMA EPAR Database",
+          type: "regulatory" as const,
+          url: "https://www.ema.europa.eu/en/medicines/download-medicine-data",
+          region: "Europe",
+          isActive: true,
+          lastSyncAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
+        },
+        {
+          id: "bfarm_guidelines",
+          name: "BfArM Leitfäden", 
+          type: "guidelines" as const,
+          url: "https://www.bfarm.de/DE/Medizinprodukte/_node.html",
+          region: "Deutschland",
+          isActive: true,
+          lastSyncAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 hour ago
+        },
+        {
+          id: "swissmedic_guidelines",
+          name: "Swissmedic Guidelines",
+          type: "guidelines" as const, 
+          url: "https://www.swissmedic.ch/swissmedic/en/home/medical-devices.html",
+          region: "Schweiz",
+          isActive: true,
+          lastSyncAt: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
+        },
+        {
+          id: "mhra_guidance",
+          name: "MHRA Guidance",
+          type: "guidelines" as const,
+          url: "https://www.gov.uk/topic/medicines-medical-devices-blood/medical-devices-regulation", 
+          region: "UK",
+          isActive: false,
+          lastSyncAt: new Date(Date.now() - 25 * 60 * 60 * 1000), // 25 hours ago
+        }
+      ];
+
+      // Insert all sources
+      await db.insert(dataSources).values(defaultSources);
+      console.log("Initialized default data sources");
+    } catch (error) {
+      console.error("Error initializing data sources:", error);
+    }
   }
 }
 
