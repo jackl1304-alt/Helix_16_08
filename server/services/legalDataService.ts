@@ -162,7 +162,8 @@ export class LegalDataService {
     const caseTypes = this.getCaseTypesBySource(sourceId);
     const selectedCaseType = caseTypes[Math.floor(Math.random() * caseTypes.length)];
     
-    const deviceClasses = ['Class I', 'Class II', 'Class III', 'IVD', 'Software', 'Combination Product'];
+    // Generate device classes with specific device types for filtering
+    const deviceClasses = this.getDeviceClassesByType();
     const selectedDeviceClasses = this.getRandomSelection(deviceClasses, 1, 3);
 
     const caseTitle = this.generateCaseTitle(source, selectedCaseType, caseNumber);
@@ -375,6 +376,27 @@ The case highlights the ongoing evolution of medical device law and the need for
     const count = Math.floor(Math.random() * (max - min + 1)) + min;
     const shuffled = [...array].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);
+  }
+
+  private getDeviceClassesByType(): string[] {
+    const deviceTypes = [
+      // Mobile/Handheld devices
+      'Mobile Health Monitor', 'Handheld Ultrasound', 'Portable ECG Device', 'Mobile Diagnostic Tool',
+      'Wearable Glucose Monitor', 'Smartphone-based Analyzer', 'Portable Blood Pressure Monitor',
+      
+      // Desktop/Stationary devices  
+      'Desktop MRI System', 'Stationary CT Scanner', 'Console-based Ventilator', 'Desktop Lab Analyzer',
+      'Workstation Imaging System', 'Server-based PACS', 'Desktop Surgical Navigation',
+      
+      // Tablet/Touchscreen devices
+      'Tablet-based Ultrasound', 'Touchscreen Patient Monitor', 'Slate-style EHR Terminal',
+      'Pad-based Diagnostic Interface', 'Touchscreen Surgical Display',
+      
+      // General classifications
+      'Class I Device', 'Class II Device', 'Class III Device', 'IVD System', 'Software as Medical Device'
+    ];
+    
+    return deviceTypes;
   }
 
   // API methods for frontend integration
