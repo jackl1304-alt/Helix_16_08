@@ -475,10 +475,16 @@ class DataCollectionService {
   }
 
   async syncDataSource(sourceId: string): Promise<void> {
+    console.log(`Attempting to sync data source: ${sourceId}`);
     const source = await storage.getDataSourceById(sourceId);
     if (!source) {
+      console.error(`Data source not found: ${sourceId}`);
+      // Try to get all sources for debugging
+      const allSources = await storage.getDataSources();
+      console.log(`Available sources: ${allSources.map(s => s.id).join(', ')}`);
       throw new Error("Data source not found");
     }
+    console.log(`Found source: ${source.name} (type: ${source.type})`);
 
     switch (source.type) {
       case 'fda':
