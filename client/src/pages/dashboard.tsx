@@ -9,13 +9,45 @@ import { Plus, Upload, Download, Settings } from "lucide-react";
 import { useDevice } from "@/hooks/use-device";
 import { ResponsiveGrid } from "@/components/responsive-layout";
 import { HeaderLogo } from "@/components/layout/logo";
+import { useLocation } from "wouter";
 
 export default function Dashboard() {
   const device = useDevice();
+  const [, setLocation] = useLocation();
   
   const handleSearch = (query: string) => {
     console.log("Search query:", query);
     // TODO: Implement search functionality
+  };
+
+  const handleCreateNewsletter = () => {
+    setLocation("/newsletter-manager");
+  };
+
+  const handleUploadKnowledge = () => {
+    setLocation("/knowledge-base");
+  };
+
+  const handleExportData = () => {
+    // Trigger data export functionality
+    const data = {
+      timestamp: new Date().toISOString(),
+      exported_by: "dashboard",
+      data_sources: "all_active"
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `helix_export_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleConfigureSources = () => {
+    setLocation("/global-sources");
   };
 
   return (
@@ -56,19 +88,34 @@ export default function Dashboard() {
                     <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <Button className="w-full flex items-center justify-center">
+                    <Button 
+                      className="w-full flex items-center justify-center"
+                      onClick={handleCreateNewsletter}
+                    >
                       <Plus className="mr-2 h-4 w-4" />
                       Create Newsletter
                     </Button>
-                    <Button variant="outline" className="w-full flex items-center justify-center">
+                    <Button 
+                      variant="outline" 
+                      className="w-full flex items-center justify-center"
+                      onClick={handleUploadKnowledge}
+                    >
                       <Upload className="mr-2 h-4 w-4" />
                       Upload Knowledge
                     </Button>
-                    <Button variant="outline" className="w-full flex items-center justify-center">
+                    <Button 
+                      variant="outline" 
+                      className="w-full flex items-center justify-center"
+                      onClick={handleExportData}
+                    >
                       <Download className="mr-2 h-4 w-4" />
                       Export Data
                     </Button>
-                    <Button variant="outline" className="w-full flex items-center justify-center">
+                    <Button 
+                      variant="outline" 
+                      className="w-full flex items-center justify-center"
+                      onClick={handleConfigureSources}
+                    >
                       <Settings className="mr-2 h-4 w-4" />
                       Configure Sources
                     </Button>

@@ -6,6 +6,7 @@ import { FolderSync, AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useLocation } from "wouter";
 
 interface DataSource {
   id: string;
@@ -18,6 +19,7 @@ interface DataSource {
 export function DataCollectionStatus() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
   
   const { data: sources, isLoading } = useQuery<DataSource[]>({
     queryKey: ["/api/data-sources"],
@@ -119,7 +121,11 @@ export function DataCollectionStatus() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">Data Collection Status</h2>
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setLocation("/global-sources")}
+            >
               Configure Sources
             </Button>
           </div>
@@ -140,7 +146,11 @@ export function DataCollectionStatus() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">Data Collection Status</h2>
-          <Button variant="outline" size="sm">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setLocation("/global-sources")}
+          >
             Manage Sources
           </Button>
         </div>
