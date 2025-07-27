@@ -78,7 +78,7 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
         )}
       </DialogTrigger>
 
-      <DialogContent className="max-w-7xl w-[95vw] h-[95vh] overflow-hidden flex flex-col" aria-describedby="document-description">
+      <DialogContent className="max-w-7xl w-[95vw] h-[95vh] flex flex-col" aria-describedby="document-description">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 pr-8">
             <FileText className="h-5 w-5" />
@@ -227,30 +227,13 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="flex-1 p-0">
-                <div 
-                  style={{
-                    height: '500px',
-                    overflowY: 'scroll',
-                    overflowX: 'auto',
-                    border: '3px solid #dc2626',
-                    borderRadius: '12px',
-                    backgroundColor: '#f9fafb',
-                    padding: '0'
-                  }}
-                >
+              <CardContent className="flex-1 p-0 relative">
+                <ScrollArea className="h-[500px] w-full border-2 border-red-500 rounded-lg">
                   <div 
                     id="document-content"
+                    className="p-6 font-mono text-sm leading-relaxed bg-white dark:bg-gray-900 min-h-[1200px] select-text"
                     style={{ 
-                      padding: '24px',
-                      fontSize: '14px',
-                      lineHeight: '1.6',
-                      fontFamily: 'monospace',
-                      backgroundColor: '#ffffff',
                       borderLeft: '4px solid #2563eb',
-                      minHeight: '1200px',
-                      userSelect: 'text',
-                      cursor: 'text',
                       whiteSpace: 'pre-wrap',
                       overflowWrap: 'break-word',
                       wordBreak: 'break-word'
@@ -259,35 +242,21 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
                     {formatContent(document.content).map((line, index) => (
                       <div 
                         key={index} 
+                        className="mb-2 p-2 rounded transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
                         style={{
-                          marginBottom: '8px',
-                          padding: '8px',
-                          borderRadius: '4px',
-                          transition: 'background-color 0.2s',
                           backgroundColor: index % 2 === 0 ? '#f8fafc' : '#ffffff'
                         }}
-                        onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#e2e8f0'}
-                        onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = index % 2 === 0 ? '#f8fafc' : '#ffffff'}
                       >
                         <span 
-                          style={{
-                            color: '#6b7280',
-                            marginRight: '16px',
-                            userSelect: 'none',
-                            fontFamily: 'monospace',
-                            fontSize: '12px',
-                            display: 'inline-block',
-                            width: '48px',
-                            textAlign: 'right'
-                          }}
+                          className="text-gray-500 dark:text-gray-400 mr-4 select-none font-mono text-xs inline-block w-12 text-right"
                         >
                           {String(index + 1).padStart(3, '0')}:
                         </span>
-                        <span style={{ display: 'inline-block' }}>{line}</span>
+                        <span className="inline-block">{line}</span>
                       </div>
                     ))}
                   </div>
-                </div>
+                </ScrollArea>
               </CardContent>
             </Card>
           </div>
