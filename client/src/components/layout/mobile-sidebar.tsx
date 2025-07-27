@@ -92,8 +92,8 @@ export function MobileSidebar() {
             </Button>
           </DialogTrigger>
           
-          <DialogContent className="sm:max-w-md p-0 h-full max-h-screen overflow-hidden mobile-sidebar-dialog">
-            <div className="flex flex-col h-full relative">
+          <DialogContent className="sm:max-w-md p-0 h-full max-h-screen mobile-sidebar-dialog">
+            <div className="dialog-content flex flex-col h-full relative">
               {/* Header */}
               <DialogHeader className="p-6 border-b border-gray-200">
                 <div className="flex items-center">
@@ -114,7 +114,7 @@ export function MobileSidebar() {
               </DialogHeader>
 
               {/* Navigation */}
-              <div className="flex-1 overflow-y-auto p-4 pb-20">
+              <div className="dialog-navigation flex-1 p-4 pb-20">
                 {/* Main Navigation */}
                 <div className="space-y-2">
                   <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-2">
@@ -150,7 +150,7 @@ export function MobileSidebar() {
               </div>
 
               {/* Footer */}
-              <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 p-4 bg-white">
+              <div className="flex-shrink-0 border-t border-gray-200 p-4 bg-white">
                 <div className="text-xs text-gray-500 text-center">
                   <div className="font-medium">Helix Platform</div>
                   <div className="mt-1">Version 2.0</div>
