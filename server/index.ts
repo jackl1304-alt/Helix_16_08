@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { emailService } from "./services/emailService";
+import { historicalDataService } from "./services/historicalDataService";
 
 const app = express();
 app.use(express.json());
@@ -41,6 +42,11 @@ app.use((req, res, next) => {
   // Initialize email service and verify connection
   console.log("Initializing email service...");
   await emailService.verifyConnection();
+  
+  // Initialize historical data service
+  console.log("Initializing historical data collection...");
+  await historicalDataService.initializeHistoricalDownload();
+  await historicalDataService.setupContinuousMonitoring();
   
   const server = await registerRoutes(app);
 
