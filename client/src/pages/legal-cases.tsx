@@ -16,6 +16,7 @@ import { useDevice } from "@/hooks/use-device";
 import { ResponsiveGrid } from "@/components/responsive-layout";
 import { HistoricalDataRecord, ChangeDetection } from "@shared/schema";
 import { cn } from "@/lib/utils";
+import LegalRelationshipViewer from "@/components/legal-relationship-viewer";
 
 interface LegalReport {
   totalCases: number;
@@ -281,8 +282,9 @@ export default function LegalCases() {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="cases" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="cases">Rechtsfälle</TabsTrigger>
+          <TabsTrigger value="analysis">Rechtssprechungsanalyse</TabsTrigger>
           <TabsTrigger value="changes">Änderungen</TabsTrigger>
           <TabsTrigger value="analytics">Analyse</TabsTrigger>
         </TabsList>
@@ -460,6 +462,12 @@ export default function LegalCases() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="analysis">
+          <LegalRelationshipViewer 
+            jurisdiction={selectedSource.includes('us_') ? 'US' : selectedSource.includes('eu_') ? 'EU' : 'DE'}
+          />
         </TabsContent>
 
         <TabsContent value="changes">

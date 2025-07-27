@@ -1120,6 +1120,90 @@ Für technische Fragen:
     }
   });
 
+  // Legal analysis endpoints for related case detection
+  app.get('/api/legal/analysis', async (req, res) => {
+    try {
+      const { theme, jurisdiction } = req.query;
+      const { LegalAnalysisService } = await import('./services/legalAnalysisService');
+      const legalAnalysisService = new LegalAnalysisService();
+      
+      // Hole alle relevanten Fälle
+      const allCases = await legalDataService.getAllLegalCases();
+      let filteredCases = allCases;
+      
+      if (jurisdiction) {
+        filteredCases = allCases.filter(c => c.jurisdiction === jurisdiction);
+      }
+      
+      if (theme) {
+        const searchTerm = theme as string;
+        filteredCases = filteredCases.filter(c => 
+          c.caseTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          c.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          c.keyIssues.some(issue => issue.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+      }
+      
+      const analysis = await legalAnalysisService.analyzeLegalCases(filteredCases);
+      res.json(analysis);
+    } catch (error) {
+      console.error('Error performing legal analysis:', error);
+      res.status(500).json({ error: 'Failed to perform legal analysis' });
+    }
+  });
+
+  app.get('/api/legal/relationships/:caseId', async (req, res) => {
+    try {
+      const { caseId } = req.params;
+      const { LegalAnalysisService } = await import('./services/legalAnalysisService');
+      const legalAnalysisService = new LegalAnalysisService();
+      
+      const allCases = await legalDataService.getAllLegalCases();
+      const targetCase = allCases.find(c => c.id === caseId);
+      
+      if (!targetCase) {
+        return res.status(404).json({ error: 'Case not found' });
+      }
+      
+      const analysis = await legalAnalysisService.analyzeLegalCases(allCases);
+      const relatedRelationships = analysis.relationships.filter(r => 
+        r.caseId1 === caseId || r.caseId2 === caseId
+      );
+      
+      const relatedCaseIds = relatedRelationships.flatMap(r => [r.caseId1, r.caseId2])
+        .filter(id => id !== caseId);
+      const relatedCases = allCases.filter(c => relatedCaseIds.includes(c.id));
+      
+      res.json({
+        targetCase,
+        relatedCases,
+        relationships: relatedRelationships,
+        themes: analysis.themes.filter(t => t.relatedCases.includes(caseId))
+      });
+    } catch (error) {
+      console.error('Error fetching case relationships:', error);
+      res.status(500).json({ error: 'Failed to fetch case relationships' });
+    }
+  });
+
+  app.get('/api/legal/themes', async (req, res) => {
+    try {
+      const { LegalAnalysisService } = await import('./services/legalAnalysisService');
+      const legalAnalysisService = new LegalAnalysisService();
+      const allCases = await legalDataService.getAllLegalCases();
+      const analysis = await legalAnalysisService.analyzeLegalCases(allCases);
+      
+      res.json({
+        themes: analysis.themes,
+        precedentChains: analysis.precedentChains,
+        conflictingDecisions: analysis.conflictingDecisions
+      });
+    } catch (error) {
+      console.error('Error fetching legal themes:', error);
+      res.status(500).json({ error: 'Failed to fetch legal themes' });
+    }
+  });
+
   app.get("/api/legal/changes", async (req, res) => {
     try {
       const { limit } = req.query;
