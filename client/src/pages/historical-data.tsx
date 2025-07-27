@@ -51,7 +51,7 @@ interface HistoricalReport {
 }
 
 export default function HistoricalData() {
-  const [selectedSource, setSelectedSource] = useState<string>("");
+  const [selectedSource, setSelectedSource] = useState<string>("fda_guidance");
   const [dateRange, setDateRange] = useState({ start: "", end: "" });
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
@@ -68,17 +68,44 @@ export default function HistoricalData() {
   // Historical data query
   const { data: historicalData = [], isLoading: isLoadingData } = useQuery<HistoricalDataRecord[]>({
     queryKey: ['/api/historical/data', selectedSource, dateRange.start, dateRange.end],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (selectedSource) params.append('sourceId', selectedSource);
+      if (dateRange.start) params.append('startDate', dateRange.start);
+      if (dateRange.end) params.append('endDate', dateRange.end);
+      params.append('limit', '100');
+      
+      const response = await fetch(`/api/historical/data?${params}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    },
     enabled: !!selectedSource
   });
 
   // Changes query
   const { data: changes = [], isLoading: isLoadingChanges } = useQuery<ChangeDetection[]>({
-    queryKey: ['/api/historical/changes', { limit: 50 }]
+    queryKey: ['/api/historical/changes'],
+    queryFn: async () => {
+      const response = await fetch('/api/historical/changes?limit=50');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    }
   });
 
   // Historical report query
   const { data: report, isLoading: isLoadingReport } = useQuery<HistoricalReport>({
     queryKey: ['/api/historical/report', selectedSource],
+    queryFn: async () => {
+      const response = await fetch(`/api/historical/report/${selectedSource}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    },
     enabled: !!selectedSource
   });
 

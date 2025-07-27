@@ -222,6 +222,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/historical/data", async (req, res) => {
     try {
       const { sourceId, startDate, endDate, limit } = req.query;
+      console.log("Historical data request:", { sourceId, startDate, endDate, limit });
+      
       const data = await historicalDataService.getHistoricalData(
         sourceId as string,
         startDate as string,
@@ -229,8 +231,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
       
       const limitedData = limit ? data.slice(0, parseInt(limit as string)) : data;
+      console.log(`Returning ${limitedData.length} historical documents for source: ${sourceId}`);
       res.json(limitedData);
     } catch (error) {
+      console.error("Historical data fetch error:", error);
       res.status(500).json({ error: "Failed to fetch historical data" });
     }
   });
