@@ -12,7 +12,10 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ChangeComparison } from "@/components/change-comparison";
 import { DocumentViewer, DocumentLink } from "@/components/document-viewer";
+import { useDevice } from "@/hooks/use-device";
+import { ResponsiveGrid } from "@/components/responsive-layout";
 import { HistoricalDataRecord, ChangeDetection } from "@shared/schema";
+import { cn } from "@/lib/utils";
 
 interface LegalReport {
   totalCases: number;
@@ -25,6 +28,7 @@ interface LegalReport {
 }
 
 export default function LegalCases() {
+  const device = useDevice();
   const [selectedSource, setSelectedSource] = useState<string>("us_federal_courts");
   const [dateRange, setDateRange] = useState({ start: "", end: "" });
   const [searchTerm, setSearchTerm] = useState("");
@@ -134,8 +138,11 @@ export default function LegalCases() {
   };
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
+    <div className={cn(
+      "space-y-6",
+      device.isMobile ? "p-4" : device.isTablet ? "p-6" : "p-8"
+    )}>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
             MedTech Rechtssprechung
@@ -163,7 +170,7 @@ export default function LegalCases() {
           <CardTitle className="text-lg">Filteroptionen</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label className="text-sm font-medium">Rechtsquelle</label>
               <Select value={selectedSource} onValueChange={setSelectedSource}>
