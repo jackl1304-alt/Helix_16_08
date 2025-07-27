@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { emailService } from "./services/emailService";
 import { historicalDataService } from "./services/historicalDataService";
+import { legalDataService } from "./services/legalDataService";
 
 const app = express();
 app.use(express.json());
@@ -47,6 +48,10 @@ app.use((req, res, next) => {
   console.log("Initializing historical data collection...");
   await historicalDataService.initializeHistoricalDownload();
   await historicalDataService.setupContinuousMonitoring();
+  
+  // Initialize legal/jurisprudence data
+  console.log("Initializing legal jurisprudence database...");
+  await legalDataService.initializeLegalData();
   
   const server = await registerRoutes(app);
 

@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { historicalDataService } from "./services/historicalDataService";
+import { legalDataService } from "./services/legalDataService";
 import { dataCollectionService } from "./services/dataCollectionService";
 import "./services/schedulerService";
 import { insertRegulatoryUpdateSchema, insertApprovalSchema, insertNewsletterSchema, insertKnowledgeBaseSchema } from "@shared/schema";
@@ -325,6 +326,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Fehler beim Herunterladen des Dokuments:', error);
       res.status(500).json({ message: 'Serverfehler beim Herunterladen des Dokuments' });
+    }
+  });
+
+  // Legal/Jurisprudence data endpoints
+  app.get("/api/legal/data", async (req, res) => {
+    try {
+      const { sourceId, startDate, endDate, limit } = req.query;
+      console.log("Legal data request:", { sourceId, startDate, endDate, limit });
+      
+      const data = await legalDataService.getLegalData(
+        sourceId as string,
+        startDate as string,
+        endDate as string
+      );
+      
+      const limitedData = limit ? data.slice(0, parseInt(limit as string)) : data;
+      console.log(`Returning ${limitedData.length} legal cases for source: ${sourceId}`);
+      res.json(limitedData);
+    } catch (error) {
+      console.error("Legal data fetch error:", error);
+      res.status(500).json({ error: "Failed to fetch legal data" });
+    }
+  });
+
+  app.get("/api/legal/sources", async (req, res) => {
+    try {
+      const sources = await legalDataService.getAllLegalSources();
+      res.json(sources);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch legal sources" });
+    }
+  });
+
+  app.get("/api/legal/changes", async (req, res) => {
+    try {
+      const { limit } = req.query;
+      const changes = await legalDataService.getLegalChangeHistory(
+        limit ? parseInt(limit as string) : undefined
+      );
+      res.json(changes);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch legal change history" });
+    }
+  });
+
+  app.get("/api/legal/report/:sourceId", async (req, res) => {
+    try {
+      const { sourceId } = req.params;
+      const report = await legalDataService.generateLegalReport(sourceId);
+      res.json(report);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to generate legal report" });
+    }
+  });
+
+  app.post("/api/legal/sync", async (req, res) => {
+    try {
+      console.log("Manual legal data sync initiated...");
+      await legalDataService.initializeLegalData();
+      res.json({ success: true, message: "Legal data sync completed" });
+    } catch (error) {
+      console.error("Legal sync error:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: "Failed to sync legal data",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 

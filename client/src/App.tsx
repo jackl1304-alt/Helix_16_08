@@ -17,6 +17,7 @@ import AuditLogs from "@/pages/audit-logs";
 import AIInsights from "@/pages/ai-insights";
 import KnowledgeBase from "@/pages/knowledge-base";
 import HistoricalData from "@/pages/historical-data";
+import LegalCases from "@/pages/legal-cases";
 
 function Router() {
   return (
@@ -34,6 +35,7 @@ function Router() {
       <Route path="/ai-insights" component={AIInsights} />
       <Route path="/knowledge-base" component={KnowledgeBase} />
       <Route path="/historical-data" component={HistoricalData} />
+      <Route path="/legal-cases" component={LegalCases} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
