@@ -2,6 +2,7 @@ import { Link, useLocation } from "wouter";
 import { 
   BarChart3, 
   Database, 
+  Globe,
   FileText, 
   Newspaper, 
   CheckCircle, 
@@ -16,6 +17,7 @@ import { cn } from "@/lib/utils";
 const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
   { name: "Data Collection", href: "/data-collection", icon: Database },
+  { name: "Global Sources", href: "/global-sources", icon: Globe },
   { name: "Regulatory Updates", href: "/regulatory-updates", icon: FileText },
   { name: "Newsletter Manager", href: "/newsletter-manager", icon: Newspaper },
   { name: "Approval Workflow", href: "/approval-workflow", icon: CheckCircle },
