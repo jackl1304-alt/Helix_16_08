@@ -266,8 +266,8 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
                           transition: 'background-color 0.2s',
                           backgroundColor: index % 2 === 0 ? '#f8fafc' : '#ffffff'
                         }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = '#e2e8f0'}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = index % 2 === 0 ? '#f8fafc' : '#ffffff'}
+                        onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#e2e8f0'}
+                        onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = index % 2 === 0 ? '#f8fafc' : '#ffffff'}
                       >
                         <span 
                           style={{

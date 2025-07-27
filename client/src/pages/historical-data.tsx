@@ -332,15 +332,20 @@ export default function HistoricalData() {
                               variant="ghost" 
                               size="sm"
                               onClick={() => {
-                                const blob = new Blob([doc.content], { type: 'text/plain' });
-                                const url = URL.createObjectURL(blob);
-                                const a = document.createElement('a');
-                                a.href = url;
-                                a.download = `${doc.documentTitle.replace(/[^a-z0-9]/gi, '_')}.txt`;
-                                document.body.appendChild(a);
-                                a.click();
-                                document.body.removeChild(a);
-                                URL.revokeObjectURL(url);
+                                try {
+                                  const content = doc.content || `Titel: ${doc.documentTitle}\n\nInhalt: ${doc.summary || 'Vollständiger Inhalt nicht verfügbar'}\n\nQuelle: ${doc.sourceId}\nDatum: ${new Date(doc.originalDate).toLocaleDateString('de-DE')}\nKategorie: ${doc.category}\nSprache: ${doc.language}`;
+                                  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                                  const url = URL.createObjectURL(blob);
+                                  const a = document.createElement('a');
+                                  a.href = url;
+                                  a.download = `${doc.documentTitle.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_')}.txt`;
+                                  document.body.appendChild(a);
+                                  a.click();
+                                  document.body.removeChild(a);
+                                  URL.revokeObjectURL(url);
+                                } catch (error) {
+                                  console.error('Download error:', error);
+                                }
                               }}
                               title="Dokument herunterladen"
                             >

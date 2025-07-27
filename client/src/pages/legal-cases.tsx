@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Download, Search, Scale, AlertTriangle, Clock, FileText, Globe, Users } from "lucide-react";
+import { Calendar, Download, Search, Scale, AlertTriangle, Clock, FileText, Globe, Users, Smartphone, Monitor, Tablet } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -32,6 +32,7 @@ export default function LegalCases() {
   const [selectedSource, setSelectedSource] = useState<string>("us_federal_courts");
   const [dateRange, setDateRange] = useState({ start: "", end: "" });
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedDeviceType, setSelectedDeviceType] = useState<string>("all");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -151,17 +152,49 @@ export default function LegalCases() {
             Gerichtsentscheidungen und juristische Präzedenzfälle aus der Medizintechnik
           </p>
         </div>
-        <Button 
-          onClick={() => syncMutation.mutate()}
-          disabled={syncMutation.isPending}
-        >
-          {syncMutation.isPending ? (
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-          ) : (
-            <Download className="h-4 w-4 mr-2" />
-          )}
-          Daten synchronisieren
-        </Button>
+        <div className="flex items-center gap-4">
+          {/* Device Type Selection */}
+          <div className="flex gap-2">
+            <Button
+              variant={selectedDeviceType === "mobile" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedDeviceType("mobile")}
+              className="flex items-center gap-1"
+              title="Mobile Geräte"
+            >
+              <Smartphone className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={selectedDeviceType === "desktop" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedDeviceType("desktop")}
+              className="flex items-center gap-1"
+              title="Desktop-Systeme"
+            >
+              <Monitor className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={selectedDeviceType === "tablet" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedDeviceType("tablet")}
+              className="flex items-center gap-1"
+              title="Tablet-Geräte"
+            >
+              <Tablet className="h-4 w-4" />
+            </Button>
+          </div>
+          <Button 
+            onClick={() => syncMutation.mutate()}
+            disabled={syncMutation.isPending}
+          >
+            {syncMutation.isPending ? (
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+            ) : (
+              <Download className="h-4 w-4 mr-2" />
+            )}
+            Daten synchronisieren
+          </Button>
+        </div>
       </div>
 
       {/* Controls */}
@@ -178,13 +211,11 @@ export default function LegalCases() {
                   <SelectValue placeholder="Quelle wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {legalSources && Object.entries(legalSources as Record<string, { name: string; country: string }>).map(([id, source]) => {
-                    return (
-                      <SelectItem key={id} value={id}>
-                        {source.name} ({source.country})
-                      </SelectItem>
-                    );
-                  })}
+                  {legalSources && Object.entries(legalSources as Record<string, { name: string; country: string }>).map(([id, source]) => (
+                    <SelectItem key={id} value={id}>
+                      {source.name} ({source.country})
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -408,15 +439,22 @@ export default function LegalCases() {
                               variant="ghost" 
                               size="sm"
                               onClick={() => {
-                                const blob = new Blob([legalCase.content], { type: 'text/plain' });
-                                const url = URL.createObjectURL(blob);
-                                const a = document.createElement('a');
-                                a.href = url;
-                                a.download = `${legalCase.documentTitle.replace(/[^a-z0-9]/gi, '_')}.txt`;
-                                document.body.appendChild(a);
-                                a.click();
-                                document.body.removeChild(a);
-                                URL.revokeObjectURL(url);
+                                try {
+                                  const content = legalCase.content || `Titel: ${legalCase.documentTitle}\n\nInhalt: ${legalCase.summary || 'Vollständiger Inhalt nicht verfügbar'}\n\nQuelle: ${legalCase.sourceId}\nDatum: ${new Date(legalCase.originalDate).toLocaleDateString('de-DE')}\nKategorie: ${legalCase.category}\nSprache: ${legalCase.language}`;
+                                  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                                  const url = URL.createObjectURL(blob);
+                                  const a = document.createElement('a');
+                                  a.href = url;
+                                  a.download = `${legalCase.documentTitle.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_')}.txt`;
+                                  document.body.appendChild(a);
+                                  a.click();
+                                  document.body.removeChild(a);
+                                  URL.revokeObjectURL(url);
+                                  toast({ title: "Download gestartet", description: "Dokument wird heruntergeladen" });
+                                } catch (error) {
+                                  console.error('Download error:', error);
+                                  toast({ title: "Download-Fehler", description: "Dokument konnte nicht heruntergeladen werden", variant: "destructive" });
+                                }
                               }}
                               title="Dokument herunterladen"
                             >
