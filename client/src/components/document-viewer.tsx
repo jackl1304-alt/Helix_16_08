@@ -227,12 +227,20 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="flex-1 p-0 relative">
-                <ScrollArea className="h-[500px] w-full border-2 border-red-500 rounded-lg">
+              <CardContent className="flex-1 p-0">
+                <div 
+                  className="h-[500px] w-full border-4 border-red-600 rounded-lg document-viewer-scroll-container"
+                  style={{
+                    overflow: 'auto',
+                    WebkitOverflowScrolling: 'touch',
+                    overscrollBehavior: 'contain'
+                  }}
+                >
                   <div 
                     id="document-content"
-                    className="p-6 font-mono text-sm leading-relaxed bg-white dark:bg-gray-900 min-h-[1200px] select-text"
+                    className="p-6 font-mono text-sm leading-relaxed bg-white dark:bg-gray-900 select-text"
                     style={{ 
+                      minHeight: '1500px',
                       borderLeft: '4px solid #2563eb',
                       whiteSpace: 'pre-wrap',
                       overflowWrap: 'break-word',
@@ -256,7 +264,7 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
                       </div>
                     ))}
                   </div>
-                </ScrollArea>
+                </div>
               </CardContent>
             </Card>
           </div>
