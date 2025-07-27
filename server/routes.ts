@@ -414,6 +414,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Legal document download endpoint
+  app.get("/api/legal/download/:documentId", async (req, res) => {
+    try {
+      const { documentId } = req.params;
+      console.log(`Legal document download request: ${documentId}`);
+      
+      // Search across all legal sources for the document
+      const allSources = await legalDataService.getAllLegalSources();
+      
+      for (const sourceId of Object.keys(allSources)) {
+        const documents = await legalDataService.getLegalData(sourceId);
+        const document = documents.find(doc => doc.id === documentId || doc.documentId === documentId);
+        
+        if (document) {
+          const filename = `${document.documentTitle.replace(/[^a-z0-9]/gi, '_')}.txt`;
+          
+          res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+          res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+          
+          return res.send(document.content);
+        }
+      }
+      
+      res.status(404).json({ message: 'Rechtsdokument nicht gefunden' });
+    } catch (error) {
+      console.error('Fehler beim Herunterladen des Rechtsdokuments:', error);
+      res.status(500).json({ message: 'Serverfehler beim Herunterladen des Rechtsdokuments' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

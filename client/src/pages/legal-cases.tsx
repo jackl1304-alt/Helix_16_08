@@ -341,7 +341,17 @@ export default function LegalCases() {
                     {filteredData.map((legalCase: HistoricalDataRecord) => (
                       <TableRow key={legalCase.id}>
                         <TableCell>
-                          <DocumentLink document={legalCase} />
+                          <div className="space-y-1">
+                            <DocumentLink document={legalCase} />
+                            <div className="text-xs text-gray-500 space-y-1">
+                              <div>Rechtsquelle: {legalSources[selectedSource]?.name || selectedSource}</div>
+                              <div>ID: {legalCase.documentId}</div>
+                              <div className="flex items-center gap-1">
+                                <FileText className="h-3 w-3" />
+                                <span>Volltext verfügbar - Klicken zum Lesen</span>
+                              </div>
+                            </div>
+                          </div>
                         </TableCell>
                         <TableCell>
                           <Badge className={getCaseTypeColor(legalCase.category)}>
