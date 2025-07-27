@@ -10,45 +10,10 @@ import { Calendar, Download, Search, TrendingUp, AlertTriangle, Clock, FileText,
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { ChangeComparison } from "@/components/change-comparison";
+import { HistoricalDataRecord, ChangeDetection, HistoricalReport } from "@shared/schema";
 
-interface HistoricalDataRecord {
-  id: string;
-  sourceId: string;
-  documentId: string;
-  documentTitle: string;
-  documentUrl: string;
-  content: string;
-  metadata: Record<string, any>;
-  originalDate: string;
-  downloadedAt: string;
-  version: number;
-  checksum: string;
-  language: string;
-  region: string;
-  category: string;
-  deviceClasses: string[];
-  status: 'active' | 'superseded' | 'archived';
-}
-
-interface ChangeDetection {
-  documentId: string;
-  changeType: 'new' | 'modified' | 'deleted' | 'superseded';
-  previousVersion?: HistoricalDataRecord;
-  currentVersion: HistoricalDataRecord;
-  changesSummary: string[];
-  impactAssessment: 'low' | 'medium' | 'high' | 'critical';
-  affectedStakeholders: string[];
-}
-
-interface HistoricalReport {
-  totalDocuments: number;
-  timeRange: { start: string; end: string };
-  changesDetected: number;
-  highImpactChanges: number;
-  categorization: Record<string, number>;
-  languageDistribution: Record<string, number>;
-  recentActivity: ChangeDetection[];
-}
+// Types are now imported from shared schema
 
 export default function HistoricalData() {
   const [selectedSource, setSelectedSource] = useState<string>("fda_guidance");
@@ -377,41 +342,7 @@ export default function HistoricalData() {
               ) : (
                 <div className="space-y-4">
                   {changes.map((change, index) => (
-                    <div key={index} className="border rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium">{change.documentId}</h4>
-                        <div className="flex items-center space-x-2">
-                          <Badge className={getImpactColor(change.impactAssessment)}>
-                            {change.impactAssessment}
-                          </Badge>
-                          <Badge variant="outline">{change.changeType}</Badge>
-                        </div>
-                      </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                        <div className="flex items-center space-x-1">
-                          <Clock className="h-4 w-4" />
-                          <span>{new Date(change.currentVersion.originalDate).toLocaleDateString('de-DE')}</span>
-                        </div>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium">Änderungen:</p>
-                        <ul className="text-sm text-gray-600 dark:text-gray-400 list-disc list-inside">
-                          {change.changesSummary.map((summary, idx) => (
-                            <li key={idx}>{summary}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div className="mt-2">
-                        <p className="text-sm font-medium">Betroffene Stakeholder:</p>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {change.affectedStakeholders.map(stakeholder => (
-                            <Badge key={stakeholder} variant="secondary" className="text-xs">
-                              {stakeholder}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+                    <ChangeComparison key={index} change={change} />
                   ))}
                 </div>
               )}

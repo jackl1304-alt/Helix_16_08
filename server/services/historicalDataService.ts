@@ -1,4 +1,5 @@
 import { emailService } from './emailService';
+import { HistoricalDataRecord, ChangeDetection, DetailedComparison } from '@shared/schema';
 
 interface HistoricalDataConfig {
   sourceId: string;
@@ -10,34 +11,7 @@ interface HistoricalDataConfig {
   retentionPeriod: number; // days
 }
 
-interface HistoricalDataRecord {
-  id: string;
-  sourceId: string;
-  documentId: string;
-  documentTitle: string;
-  documentUrl: string;
-  content: string;
-  metadata: Record<string, any>;
-  originalDate: string;
-  downloadedAt: string;
-  version: number;
-  checksum: string;
-  language: string;
-  region: string;
-  category: string;
-  deviceClasses: string[];
-  status: 'active' | 'superseded' | 'archived';
-}
-
-interface ChangeDetection {
-  documentId: string;
-  changeType: 'new' | 'modified' | 'deleted' | 'superseded';
-  previousVersion?: HistoricalDataRecord;
-  currentVersion: HistoricalDataRecord;
-  changesSummary: string[];
-  impactAssessment: 'low' | 'medium' | 'high' | 'critical';
-  affectedStakeholders: string[];
-}
+// Types are now imported from shared schema
 
 class HistoricalDataService {
   private dataConfigs: HistoricalDataConfig[] = [
@@ -316,7 +290,7 @@ Für Rückfragen wenden Sie sich an die entsprechende Regulierungsbehörde.
         documentVersions.get(baseId)!.push(doc);
       });
 
-      // Erkenne Änderungen zwischen Versionen
+      // Erkenne Änderungen zwischen Versionen mit detaillierter Analyse
       const docIds = Array.from(documentVersions.keys());
       for (const docId of docIds) {
         const versions = documentVersions.get(docId)!;
@@ -324,18 +298,28 @@ Für Rückfragen wenden Sie sich an die entsprechende Regulierungsbehörde.
           versions.sort((a: HistoricalDataRecord, b: HistoricalDataRecord) => new Date(a.originalDate).getTime() - new Date(b.originalDate).getTime());
           
           for (let i = 1; i < versions.length; i++) {
+            const oldDoc = versions[i-1];
+            const newDoc = versions[i];
+            
+            // Detaillierte Vergleichsanalyse
+            const detailedComparison = await this.performDetailedComparison(oldDoc, newDoc);
+            const changesSummary = await this.generateChangesSummary(oldDoc, newDoc, detailedComparison);
+            
             const change: ChangeDetection = {
+              id: `change_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
               documentId: docId,
+              documentTitle: newDoc.documentTitle,
+              sourceId: newDoc.sourceId,
               changeType: 'modified',
-              previousVersion: versions[i-1],
-              currentVersion: versions[i],
-              changesSummary: [
-                'Inhaltliche Aktualisierung',
-                'Regulatorische Anpassungen',
-                'Terminologie-Updates'
-              ],
-              impactAssessment: Math.random() > 0.7 ? 'high' : Math.random() > 0.5 ? 'medium' : 'low',
-              affectedStakeholders: ['Hersteller', 'Notified Bodies', 'Regulatoren']
+              previousVersion: oldDoc,
+              currentVersion: newDoc,
+              changesSummary,
+              impactAssessment: this.assessImpact(detailedComparison, oldDoc, newDoc),
+              detectedAt: new Date(),
+              affectedSections: this.extractAffectedSections(detailedComparison),
+              confidence: this.calculateConfidence(detailedComparison),
+              affectedStakeholders: this.determineAffectedStakeholders(detailedComparison, newDoc),
+              detailedComparison
             };
             changes.push(change);
           }
@@ -344,7 +328,226 @@ Für Rückfragen wenden Sie sich an die entsprechende Regulierungsbehörde.
     }
 
     this.changeHistory = changes;
+    return changes.slice(0, 100);
+  }
+
+  private async performDetailedComparison(oldDoc: HistoricalDataRecord, newDoc: HistoricalDataRecord): Promise<DetailedComparison> {
+    const addedContent = this.findAddedContent(oldDoc.content, newDoc.content);
+    const removedContent = this.findRemovedContent(oldDoc.content, newDoc.content);
+    const modifiedSections = this.findModifiedSections(oldDoc.content, newDoc.content);
+    const structuralChanges = this.detectStructuralChanges(oldDoc, newDoc);
+    
+    const { percentage, significant } = this.calculateContentDifference(oldDoc.content, newDoc.content);
+    
+    return {
+      addedContent,
+      removedContent,
+      modifiedSections,
+      structuralChanges,
+      contentDiffPercentage: percentage,
+      significantChanges: significant
+    };
+  }
+
+  private async generateChangesSummary(oldDoc: HistoricalDataRecord, newDoc: HistoricalDataRecord, comparison: DetailedComparison): Promise<string[]> {
+    const summary: string[] = [];
+    
+    // Inhaltliche Änderungen
+    if (comparison.significantChanges) {
+      summary.push(`Inhaltliche Überarbeitung: ${comparison.contentDiffPercentage}% der Inhalte wurden geändert`);
+    }
+    
+    if (comparison.addedContent.length > 0) {
+      summary.push(`${comparison.addedContent.length} neue Abschnitte hinzugefügt`);
+    }
+    
+    if (comparison.removedContent.length > 0) {
+      summary.push(`${comparison.removedContent.length} Abschnitte entfernt`);
+    }
+    
+    // Metadaten-Änderungen
+    if (JSON.stringify(oldDoc.metadata) !== JSON.stringify(newDoc.metadata)) {
+      if (oldDoc.metadata.pageCount !== newDoc.metadata.pageCount) {
+        summary.push(`Dokumentumfang geändert: ${oldDoc.metadata.pageCount} → ${newDoc.metadata.pageCount} Seiten`);
+      }
+    }
+    
+    // Kategorien und Klassifizierung
+    if (oldDoc.category !== newDoc.category) {
+      summary.push(`Kategorie geändert: ${oldDoc.category} → ${newDoc.category}`);
+    }
+    
+    if (JSON.stringify(oldDoc.deviceClasses.sort()) !== JSON.stringify(newDoc.deviceClasses.sort())) {
+      summary.push(`Geräteklassen aktualisiert: ${oldDoc.deviceClasses.join(', ')} → ${newDoc.deviceClasses.join(', ')}`);
+    }
+    
+    // Status-Änderungen
+    if (oldDoc.status !== newDoc.status) {
+      summary.push(`Status geändert: ${oldDoc.status} → ${newDoc.status}`);
+    }
+    
+    // Strukturelle Änderungen
+    if (comparison.structuralChanges.length > 0) {
+      summary.push(...comparison.structuralChanges);
+    }
+    
+    return summary.length > 0 ? summary : ['Geringfügige Änderungen ohne spezifische Details'];
+  }
+
+  private categorizeChangeType(comparison: DetailedComparison, oldDoc: HistoricalDataRecord, newDoc: HistoricalDataRecord): 'content_update' | 'metadata_change' | 'structural_change' | 'status_change' {
+    if (oldDoc.status !== newDoc.status) return 'status_change';
+    if (comparison.significantChanges || comparison.addedContent.length > 5 || comparison.removedContent.length > 5) return 'content_update';
+    if (comparison.structuralChanges.length > 0 || oldDoc.category !== newDoc.category) return 'structural_change';
+    return 'metadata_change';
+  }
+
+  private assessImpact(comparison: DetailedComparison, oldDoc: HistoricalDataRecord, newDoc: HistoricalDataRecord): 'low' | 'medium' | 'high' | 'critical' {
+    // Status-Änderungen zu "withdrawn" sind kritisch
+    if (oldDoc.status !== newDoc.status && newDoc.status === 'archived') return 'critical';
+    
+    // Große inhaltliche Änderungen
+    if (comparison.contentDiffPercentage > 50) return 'high';
+    if (comparison.contentDiffPercentage > 25) return 'medium';
+    
+    // Geräteklassen-Änderungen sind wichtig
+    if (JSON.stringify(oldDoc.deviceClasses.sort()) !== JSON.stringify(newDoc.deviceClasses.sort())) return 'high';
+    
+    // Kategorie-Änderungen
+    if (oldDoc.category !== newDoc.category) return 'medium';
+    
+    // Viele strukturelle Änderungen
+    if (comparison.structuralChanges.length > 3) return 'medium';
+    
+    return 'low';
+  }
+
+  private calculateContentDifference(oldContent: string, newContent: string): { percentage: number; significant: boolean } {
+    const oldLines = oldContent.split('\n').filter(line => line.trim());
+    const newLines = newContent.split('\n').filter(line => line.trim());
+    
+    const addedLines = newLines.filter(line => !oldLines.includes(line));
+    const removedLines = oldLines.filter(line => !newLines.includes(line));
+    
+    const totalChanges = addedLines.length + removedLines.length;
+    const percentage = Math.round((totalChanges / Math.max(oldLines.length, newLines.length)) * 100);
+    
+    return {
+      percentage,
+      significant: percentage > 10
+    };
+  }
+
+  private findAddedContent(oldContent: string, newContent: string): string[] {
+    const oldLines = new Set(oldContent.split('\n').filter(line => line.trim()));
+    const newLines = newContent.split('\n').filter(line => line.trim());
+    
+    return newLines.filter(line => !oldLines.has(line)).slice(0, 10);
+  }
+
+  private findRemovedContent(oldContent: string, newContent: string): string[] {
+    const newLines = new Set(newContent.split('\n').filter(line => line.trim()));
+    const oldLines = oldContent.split('\n').filter(line => line.trim());
+    
+    return oldLines.filter(line => !newLines.has(line)).slice(0, 10);
+  }
+
+  private findModifiedSections(oldContent: string, newContent: string): string[] {
+    const modifications: string[] = [];
+    
+    // Vereinfachte Sektion-Erkennung basierend auf Überschriften
+    const oldSections = oldContent.match(/#{1,3}\s+.+/g) || [];
+    const newSections = newContent.match(/#{1,3}\s+.+/g) || [];
+    
+    newSections.forEach(newSection => {
+      const sectionTitle = newSection.replace(/#{1,3}\s+/, '');
+      const oldSection = oldSections.find(old => old.includes(sectionTitle));
+      
+      if (!oldSection) {
+        modifications.push(`Neue Sektion: ${sectionTitle}`);
+      } else if (oldSection !== newSection) {
+        modifications.push(`Geänderte Sektion: ${sectionTitle}`);
+      }
+    });
+    
+    return modifications.slice(0, 5);
+  }
+
+  private detectStructuralChanges(oldDoc: HistoricalDataRecord, newDoc: HistoricalDataRecord): string[] {
+    const changes: string[] = [];
+    
+    if (oldDoc.metadata.pageCount !== newDoc.metadata.pageCount) {
+      changes.push(`Seitenzahl geändert: ${oldDoc.metadata.pageCount} → ${newDoc.metadata.pageCount}`);
+    }
+    
+    if (oldDoc.language !== newDoc.language) {
+      changes.push(`Sprache geändert: ${oldDoc.language} → ${newDoc.language}`);
+    }
+    
+    if (oldDoc.metadata.fileType !== newDoc.metadata.fileType) {
+      changes.push(`Dateityp geändert: ${oldDoc.metadata.fileType} → ${newDoc.metadata.fileType}`);
+    }
+    
     return changes;
+  }
+
+  private extractAffectedSections(comparison: DetailedComparison): string[] {
+    const sections: string[] = [];
+    
+    // Extrahiere Abschnittsnamen aus den Änderungen
+    const allChanges = [...comparison.addedContent, ...comparison.removedContent, ...comparison.modifiedSections];
+    allChanges.forEach(change => {
+      if (change.includes('Abschnitt')) {
+        const match = change.match(/Abschnitt \d+(\.\d+)*/g);
+        if (match) sections.push(...match);
+      }
+      if (change.includes('Anhang')) {
+        const match = change.match(/Anhang [A-Z]/g);
+        if (match) sections.push(...match);
+      }
+    });
+    
+    return Array.from(new Set(sections));
+  }
+
+  private calculateConfidence(comparison: DetailedComparison): number {
+    let confidence = 0.5;
+    
+    // Erhöhe Konfidenz basierend auf der Anzahl der Änderungen
+    if (comparison.significantChanges) confidence += 0.2;
+    if (comparison.structuralChanges.length > 0) confidence += 0.15;
+    if (comparison.addedContent.length > 0) confidence += 0.1;
+    if (comparison.removedContent.length > 0) confidence += 0.1;
+    if (comparison.contentDiffPercentage > 20) confidence += 0.1;
+    
+    return Math.min(0.95, confidence);
+  }
+
+  private determineAffectedStakeholders(comparison: DetailedComparison, doc: HistoricalDataRecord): string[] {
+    const stakeholders: string[] = [];
+    
+    // Basis-Stakeholder je nach Dokumenttyp
+    if (doc.sourceId.includes('fda')) {
+      stakeholders.push('US Manufacturers', 'FDA');
+    } else if (doc.sourceId.includes('ema')) {
+      stakeholders.push('EU Manufacturers', 'Notified Bodies', 'EMA');
+    } else if (doc.sourceId.includes('bfarm')) {
+      stakeholders.push('Deutsche Hersteller', 'BfArM');
+    } else if (doc.sourceId.includes('mhra')) {
+      stakeholders.push('UK Manufacturers', 'MHRA');
+    } else if (doc.sourceId.includes('swissmedic')) {
+      stakeholders.push('Schweizer Hersteller', 'Swissmedic');
+    }
+    
+    // Erweitere basierend auf Impact
+    if (comparison.significantChanges) {
+      stakeholders.push('Regulators', 'Quality Assurance Teams');
+    }
+    
+    if (comparison.structuralChanges.length > 0) {
+      stakeholders.push('Compliance Officers', 'Regulatory Affairs');
+    }
+    
+    return Array.from(new Set(stakeholders));
   }
 
   async getHistoricalData(sourceId?: string, startDate?: string, endDate?: string): Promise<HistoricalDataRecord[]> {
