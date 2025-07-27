@@ -14,6 +14,7 @@ import {
   Archive
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import logoPath from "@assets/tmp_4b23ca96-d4e9-4839-9375-75a53368ad60_1753652563564.jpeg";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
@@ -43,7 +44,24 @@ export function Sidebar() {
 
   return (
     <aside className="fixed left-0 top-0 h-full w-64 bg-white shadow-sm border-r border-gray-200 z-50">
-      <nav className="mt-8">
+      {/* Logo Header */}
+      <div className="p-6 border-b border-gray-200">
+        <Link href="/">
+          <div className="flex items-center cursor-pointer">
+            <img 
+              src={logoPath} 
+              alt="Helix Logo" 
+              className="h-10 w-10 rounded-lg object-cover mr-3"
+            />
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">Helix</h1>
+              <p className="text-xs text-gray-500">MedTech Intelligence</p>
+            </div>
+          </div>
+        </Link>
+      </div>
+      
+      <nav className="mt-4">
         <div className="px-4 space-y-2">
           {navigation.map((item) => {
             const isActive = location === item.href;
