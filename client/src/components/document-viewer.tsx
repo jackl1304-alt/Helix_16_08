@@ -202,7 +202,7 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        const contentDiv = document.getElementById('document-content');
+                        const contentDiv = window.document.getElementById('document-content');
                         if (contentDiv) {
                           const currentSize = parseInt(contentDiv.style.fontSize) || 14;
                           contentDiv.style.fontSize = `${currentSize === 14 ? 16 : currentSize === 16 ? 18 : 14}px`;
@@ -227,18 +227,25 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="flex-1 p-0 overflow-hidden">
-                <ScrollArea className="h-full w-full">
+              <CardContent className="flex-1 p-0 relative">
+                <div 
+                  className="absolute inset-0 overflow-y-auto overflow-x-hidden document-viewer-content"
+                  style={{
+                    height: '100%',
+                    maxHeight: 'calc(95vh - 300px)'
+                  }}
+                >
                   <div 
                     id="document-content"
-                    className="p-6 text-sm leading-relaxed whitespace-pre-wrap font-mono bg-white dark:bg-gray-900 border-l-4 border-blue-500 min-h-full"
+                    className="p-6 text-sm leading-relaxed whitespace-pre-wrap font-mono bg-white dark:bg-gray-900 border-l-4 border-blue-500"
                     style={{ 
                       fontSize: '14px',
                       lineHeight: '1.6',
                       userSelect: 'text',
                       cursor: 'text',
                       overflowWrap: 'break-word',
-                      wordBreak: 'break-word'
+                      wordBreak: 'break-word',
+                      minHeight: '100%'
                     }}
                   >
                     {formatContent(document.content).map((line, index) => (
@@ -250,7 +257,7 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
                       </div>
                     ))}
                   </div>
-                </ScrollArea>
+                </div>
               </CardContent>
             </Card>
           </div>
