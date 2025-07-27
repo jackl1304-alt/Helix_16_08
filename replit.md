@@ -195,3 +195,10 @@ The platform is designed for easy deployment on Replit with minimal configuratio
   * Current sources expanded by default, historical collapsed
   * Source count badges for quick overview
   * Improved UX with clickable headers and smooth transitions
+- ✓ Functional Toggle Switches for Data Source Management:
+  * Individual on/off controls for each data source (current and historical)
+  * Visual color coding: Green (active current), Blue (active historical), Gray (inactive)
+  * Real-time backend updates via PATCH /api/data-sources/:id endpoint
+  * Toast notifications for successful status changes with debug logging
+  * Improved toggle design with larger, more visible switches (11×6px)
+  * Historical archives are pausable/resumable for flexible data access control

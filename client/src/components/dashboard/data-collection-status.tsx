@@ -320,9 +320,11 @@ export function DataCollectionStatus() {
                     <div className="flex items-center justify-between mt-2">
                       <Badge
                         variant="outline"
-                        className="text-xs text-blue-600 border-blue-200"
+                        className={`text-xs ${
+                          source.isActive ? 'text-blue-600 border-blue-200' : 'text-gray-500 border-gray-300'
+                        }`}
                       >
-                        Archived
+                        {source.isActive ? 'Aktives Archiv' : 'Pausiertes Archiv'}
                       </Badge>
                       <div className="flex items-center space-x-2">
                         <Button
