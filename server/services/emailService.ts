@@ -1,67 +1,61 @@
-interface EmailParams {
-  to: string[];
+import nodemailer from 'nodemailer';
+
+interface EmailConfig {
+  host: string;
+  port: number;
+  secure: boolean;
+  auth: {
+    user: string;
+    pass: string;
+  };
+}
+
+interface EmailOptions {
+  to: string | string[];
   subject: string;
-  htmlContent: string;
-  textContent?: string;
+  text?: string;
+  html?: string;
+  attachments?: Array<{
+    filename: string;
+    content: Buffer | string;
+    contentType?: string;
+  }>;
 }
 
 class EmailService {
-  private apiKey: string;
+  private transporter: nodemailer.Transporter;
+  private fromEmail: string;
 
   constructor() {
-    this.apiKey = process.env.SENDGRID_API_KEY || process.env.EMAIL_API_KEY || '';
-    if (!this.apiKey) {
-      console.warn('No email API key found. Email functionality will be limited.');
-    }
+    // Gmail configuration
+    this.fromEmail = 'deltawaysnewsletter@gmail.com';
+    
+    const emailConfig: EmailConfig = {
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: 'deltawaysnewsletter@gmail.com',
+        pass: '2021!Emil@Serpha' // Note: Should use App Password for Gmail
+      }
+    };
+
+    this.transporter = nodemailer.createTransport(emailConfig);
   }
 
-  async sendEmail(params: EmailParams): Promise<boolean> {
-    if (!this.apiKey) {
-      console.log('Email sending skipped - no API key configured');
-      console.log('Would send email:', {
-        to: params.to.length + ' recipients',
-        subject: params.subject
-      });
-      return false;
-    }
-
+  async sendEmail(options: EmailOptions): Promise<boolean> {
     try {
-      // Using a generic email sending approach that could work with various providers
-      const response = await fetch('https://api.sendgrid.v3.mail.send', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          personalizations: [{
-            to: params.to.map(email => ({ email })),
-          }],
-          from: {
-            email: process.env.FROM_EMAIL || 'noreply@aegis-platform.com',
-            name: 'AEGIS Regulatory Intelligence'
-          },
-          subject: params.subject,
-          content: [
-            {
-              type: 'text/html',
-              value: params.htmlContent
-            },
-            ...(params.textContent ? [{
-              type: 'text/plain',
-              value: params.textContent
-            }] : [])
-          ]
-        })
-      });
+      const mailOptions = {
+        from: this.fromEmail,
+        to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
+        subject: options.subject,
+        text: options.text,
+        html: options.html,
+        attachments: options.attachments
+      };
 
-      if (!response.ok) {
-        const errorData = await response.text();
-        console.error('Email sending failed:', response.status, errorData);
-        return false;
-      }
-
-      console.log(`Email sent successfully to ${params.to.length} recipients`);
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log('Email sent successfully:', info.messageId);
       return true;
     } catch (error) {
       console.error('Error sending email:', error);
@@ -69,124 +63,191 @@ class EmailService {
     }
   }
 
-  async sendNewsletter(newsletter: any, subscribers: any[]): Promise<boolean> {
-    if (subscribers.length === 0) {
-      console.log('No subscribers to send newsletter to');
-      return true;
+  async sendNewsletter(
+    subscribers: string[],
+    subject: string,
+    htmlContent: string,
+    textContent?: string
+  ): Promise<{ success: boolean; sentCount: number; failedCount: number }> {
+    let sentCount = 0;
+    let failedCount = 0;
+
+    // Send emails in batches to avoid rate limiting
+    const batchSize = 10;
+    for (let i = 0; i < subscribers.length; i += batchSize) {
+      const batch = subscribers.slice(i, i + batchSize);
+      
+      const promises = batch.map(async (email) => {
+        try {
+          await this.sendEmail({
+            to: email,
+            subject: subject,
+            html: htmlContent,
+            text: textContent
+          });
+          sentCount++;
+        } catch (error) {
+          console.error(`Failed to send email to ${email}:`, error);
+          failedCount++;
+        }
+      });
+
+      await Promise.all(promises);
+      
+      // Add delay between batches
+      if (i + batchSize < subscribers.length) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
     }
 
-    const emailParams: EmailParams = {
-      to: subscribers.map(sub => sub.email),
-      subject: newsletter.title,
-      htmlContent: this.generateNewsletterHTML(newsletter),
-      textContent: this.generateNewsletterText(newsletter)
+    return {
+      success: failedCount === 0,
+      sentCount,
+      failedCount
     };
-
-    return await this.sendEmail(emailParams);
   }
 
-  async sendNotification(to: string[], title: string, message: string, priority: string = 'medium'): Promise<boolean> {
-    const priorityColors = {
-      urgent: '#ef4444',
-      high: '#f97316',
-      medium: '#3b82f6',
-      low: '#6b7280'
+  async sendRegulatoryAlert(
+    recipients: string[],
+    updateTitle: string,
+    updateContent: string,
+    priority: 'low' | 'medium' | 'high' | 'critical'
+  ): Promise<boolean> {
+    const priorityEmojis = {
+      low: '🔵',
+      medium: '🟡', 
+      high: '🟠',
+      critical: '🔴'
     };
 
+    const subject = `${priorityEmojis[priority]} Helix Alert: ${updateTitle}`;
+    
     const htmlContent = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>AEGIS Notification</title>
-      </head>
-      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 24px;">🛡️ AEGIS</h1>
-          <p style="color: #e0e7ff; margin: 5px 0 0 0;">Regulatory Intelligence Platform</p>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <h1 style="color: #2563eb; margin: 0;">Helix Regulatory Alert</h1>
+          <p style="color: #6b7280; margin: 5px 0 0 0;">Regulatorische Intelligence Platform</p>
         </div>
         
-        <div style="background: white; border: 1px solid #e5e7eb; border-top: none; padding: 30px; border-radius: 0 0 8px 8px;">
-          <div style="display: flex; align-items: center; margin-bottom: 20px;">
-            <div style="width: 4px; height: 40px; background: ${priorityColors[priority as keyof typeof priorityColors] || priorityColors.medium}; margin-right: 15px; border-radius: 2px;"></div>
-            <div>
-              <h2 style="margin: 0; color: #1f2937; font-size: 20px;">${title}</h2>
-              <span style="background: ${priorityColors[priority as keyof typeof priorityColors] || priorityColors.medium}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; text-transform: uppercase;">${priority} Priority</span>
-            </div>
+        <div style="background-color: white; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
+          <h2 style="color: #1f2937; margin-top: 0;">${updateTitle}</h2>
+          <div style="background-color: #fef3c7; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+            <p style="margin: 0; color: #92400e;"><strong>Priorität:</strong> ${priority.toUpperCase()}</p>
           </div>
-          
-          <div style="background: #f9fafb; border-left: 4px solid #3b82f6; padding: 15px; margin: 20px 0; border-radius: 4px;">
-            <p style="margin: 0; color: #374151;">${message}</p>
-          </div>
-          
-          <div style="text-align: center; margin-top: 30px;">
-            <a href="${process.env.PLATFORM_URL || 'https://helix-platform.com'}" 
-               style="background: #1e40af; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 500;">
-              View in Helix Dashboard
-            </a>
+          <div style="color: #374151; line-height: 1.6;">
+            ${updateContent}
           </div>
         </div>
         
-        <div style="text-align: center; margin-top: 20px; color: #6b7280; font-size: 12px;">
-          <p>This is an automated notification from Helix Regulatory Intelligence Platform</p>
-          <p>© 2025 Helix. All rights reserved.</p>
+        <div style="margin-top: 20px; padding: 16px; background-color: #f3f4f6; border-radius: 6px; text-align: center;">
+          <p style="margin: 0; color: #6b7280; font-size: 14px;">
+            Diese Nachricht wurde automatisch von Helix generiert.<br>
+            © 2025 Helix MedTech Regulatory Intelligence Platform
+          </p>
         </div>
-      </body>
-      </html>
+      </div>
+    `;
+
+    const textContent = `
+HELIX REGULATORY ALERT
+
+${updateTitle}
+
+Priorität: ${priority.toUpperCase()}
+
+${updateContent.replace(/<[^>]*>/g, '')}
+
+---
+Diese Nachricht wurde automatisch von Helix generiert.
+© 2025 Helix MedTech Regulatory Intelligence Platform
     `;
 
     return await this.sendEmail({
-      to,
-      subject: `[Helix] ${title}`,
-      htmlContent,
-      textContent: `Helix Notification\n\n${title}\n\nPriority: ${priority.toUpperCase()}\n\n${message}\n\nView in dashboard: ${process.env.PLATFORM_URL || 'https://helix-platform.com'}`
+      to: recipients,
+      subject: subject,
+      html: htmlContent,
+      text: textContent
     });
   }
 
-  private generateNewsletterHTML(newsletter: any): string {
-    return newsletter.htmlContent || `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${newsletter.title}</title>
-      </head>
-      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px;">
-        <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 30px; border-radius: 8px 8px 0 0; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 28px;">🛡️ AEGIS Newsletter</h1>
-          <p style="color: #e0e7ff; margin: 10px 0 0 0; font-size: 16px;">MedTech Regulatory Intelligence</p>
+  async sendApprovalNotification(
+    recipients: string[],
+    itemTitle: string,
+    itemType: 'newsletter' | 'update' | 'document',
+    status: 'approved' | 'rejected' | 'needs_review',
+    reviewerName: string,
+    comments?: string
+  ): Promise<boolean> {
+    const statusColors = {
+      approved: '#10b981',
+      rejected: '#ef4444', 
+      needs_review: '#f59e0b'
+    };
+
+    const statusEmojis = {
+      approved: '✅',
+      rejected: '❌',
+      needs_review: '⏳'
+    };
+
+    const subject = `${statusEmojis[status]} Approval ${status === 'approved' ? 'Granted' : status === 'rejected' ? 'Rejected' : 'Required'}: ${itemTitle}`;
+    
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <h1 style="color: #2563eb; margin: 0;">Helix Approval Workflow</h1>
+          <p style="color: #6b7280; margin: 5px 0 0 0;">Genehmigungsverfahren</p>
         </div>
         
-        <div style="background: white; border: 1px solid #e5e7eb; border-top: none; padding: 40px; border-radius: 0 0 8px 8px;">
-          <h2 style="color: #1f2937; margin-top: 0;">${newsletter.title}</h2>
-          <div style="color: #374151; line-height: 1.8;">
-            ${newsletter.content || 'Newsletter content goes here...'}
+        <div style="background-color: white; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
+          <h2 style="color: #1f2937; margin-top: 0;">${itemTitle}</h2>
+          
+          <div style="background-color: ${statusColors[status]}15; padding: 12px; border-radius: 6px; margin-bottom: 16px; border-left: 4px solid ${statusColors[status]};">
+            <p style="margin: 0; color: ${statusColors[status]}; font-weight: bold;">
+              Status: ${status === 'approved' ? 'Genehmigt' : status === 'rejected' ? 'Abgelehnt' : 'Überprüfung erforderlich'}
+            </p>
           </div>
+
+          <div style="margin-bottom: 16px;">
+            <p style="margin: 0; color: #6b7280;"><strong>Typ:</strong> ${itemType}</p>
+            <p style="margin: 4px 0 0 0; color: #6b7280;"><strong>Reviewer:</strong> ${reviewerName}</p>
+          </div>
+
+          ${comments ? `
+            <div style="background-color: #f9fafb; padding: 12px; border-radius: 6px; margin-top: 16px;">
+              <p style="margin: 0 0 8px 0; font-weight: bold; color: #374151;">Kommentare:</p>
+              <p style="margin: 0; color: #6b7280;">${comments}</p>
+            </div>
+          ` : ''}
         </div>
         
-        <div style="text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px;">
-          <p>Thank you for subscribing to AEGIS Regulatory Intelligence</p>
-          <p><a href="#" style="color: #3b82f6;">Unsubscribe</a> | <a href="#" style="color: #3b82f6;">Update Preferences</a></p>
-          <p>© 2025 AEGIS. All rights reserved.</p>
+        <div style="margin-top: 20px; padding: 16px; background-color: #f3f4f6; border-radius: 6px; text-align: center;">
+          <p style="margin: 0; color: #6b7280; font-size: 14px;">
+            Diese Benachrichtigung wurde automatisch generiert.<br>
+            © 2025 Helix MedTech Regulatory Intelligence Platform
+          </p>
         </div>
-      </body>
-      </html>
+      </div>
     `;
+
+    return await this.sendEmail({
+      to: recipients,
+      subject: subject,
+      html: htmlContent
+    });
   }
 
-  private generateNewsletterText(newsletter: any): string {
-    return `
-AEGIS Newsletter - ${newsletter.title}
-
-${newsletter.content || 'Newsletter content goes here...'}
-
----
-Thank you for subscribing to AEGIS Regulatory Intelligence
-© 2025 AEGIS. All rights reserved.
-    `.trim();
+  async verifyConnection(): Promise<boolean> {
+    try {
+      await this.transporter.verify();
+      console.log('Email service connection verified successfully');
+      return true;
+    } catch (error) {
+      console.error('Email service connection failed:', error);
+      return false;
+    }
   }
 }
 
 export const emailService = new EmailService();
+export default EmailService;
