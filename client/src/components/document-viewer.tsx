@@ -85,7 +85,7 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
             {document.documentTitle}
           </DialogTitle>
           <div id="document-description" className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-            Vollständiges Rechtsdokument - Scrollen Sie im rechten Bereich. Verwenden Sie Strg+Scroll zum Zoomen.
+            Vollständiges Rechtsdokument - ROTE SCROLLBARS zeigen Scroll-Bereiche an. Klicken und ziehen Sie die roten Scrollbars.
           </div>
         </DialogHeader>
 
@@ -229,30 +229,61 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
               </CardHeader>
               <CardContent className="flex-1 p-0">
                 <div 
-                  className="h-full overflow-y-scroll document-viewer-content"
                   style={{
-                    height: 'calc(95vh - 350px)',
-                    minHeight: '400px'
+                    height: '500px',
+                    overflowY: 'scroll',
+                    overflowX: 'auto',
+                    border: '3px solid #dc2626',
+                    borderRadius: '12px',
+                    backgroundColor: '#f9fafb',
+                    padding: '0'
                   }}
                 >
                   <div 
                     id="document-content"
-                    className="p-6 text-sm leading-relaxed whitespace-pre-wrap font-mono bg-white dark:bg-gray-900 border-l-4 border-blue-500"
                     style={{ 
+                      padding: '24px',
                       fontSize: '14px',
                       lineHeight: '1.6',
+                      fontFamily: 'monospace',
+                      backgroundColor: '#ffffff',
+                      borderLeft: '4px solid #2563eb',
+                      minHeight: '1200px',
                       userSelect: 'text',
                       cursor: 'text',
+                      whiteSpace: 'pre-wrap',
                       overflowWrap: 'break-word',
                       wordBreak: 'break-word'
                     }}
                   >
                     {formatContent(document.content).map((line, index) => (
-                      <div key={index} className="mb-2 hover:bg-gray-50 dark:hover:bg-gray-800 px-2 py-1 rounded transition-colors">
-                        <span className="text-gray-400 mr-4 select-none font-mono text-xs inline-block w-12 text-right">
+                      <div 
+                        key={index} 
+                        style={{
+                          marginBottom: '8px',
+                          padding: '8px',
+                          borderRadius: '4px',
+                          transition: 'background-color 0.2s',
+                          backgroundColor: index % 2 === 0 ? '#f8fafc' : '#ffffff'
+                        }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = '#e2e8f0'}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = index % 2 === 0 ? '#f8fafc' : '#ffffff'}
+                      >
+                        <span 
+                          style={{
+                            color: '#6b7280',
+                            marginRight: '16px',
+                            userSelect: 'none',
+                            fontFamily: 'monospace',
+                            fontSize: '12px',
+                            display: 'inline-block',
+                            width: '48px',
+                            textAlign: 'right'
+                          }}
+                        >
                           {String(index + 1).padStart(3, '0')}:
                         </span>
-                        <span className="inline-block">{line}</span>
+                        <span style={{ display: 'inline-block' }}>{line}</span>
                       </div>
                     ))}
                   </div>
