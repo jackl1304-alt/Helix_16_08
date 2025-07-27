@@ -54,9 +54,9 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
     }
   };
 
-  const openDocumentInNewTab = () => {
-    // Erstelle eine neue Seite mit dem vollständigen Dokumentinhalt
-    const newWindow = window.open('', '_blank');
+  const openDocumentInNewWindow = () => {
+    // Erstelle ein neues Fenster mit dem vollständigen Dokumentinhalt
+    const newWindow = window.open('', '_blank', 'width=1000,height=800,scrollbars=yes,resizable=yes');
     if (newWindow) {
       newWindow.document.write(`
         <!DOCTYPE html>
@@ -67,52 +67,80 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
           <title>${document.documentTitle}</title>
           <style>
             body {
-              font-family: monospace;
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
               line-height: 1.6;
               margin: 0;
               padding: 20px;
               background-color: #f9fafb;
+              color: #333;
             }
             .header {
               background: white;
-              padding: 20px;
-              border-radius: 8px;
+              padding: 25px;
+              border-radius: 12px;
               margin-bottom: 20px;
-              box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+              box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+              border-left: 5px solid #2563eb;
             }
             .content {
               background: white;
-              padding: 20px;
-              border-radius: 8px;
+              padding: 30px;
+              border-radius: 12px;
               white-space: pre-wrap;
               word-wrap: break-word;
-              border-left: 4px solid #2563eb;
-              box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+              box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+              font-family: 'Courier New', monospace;
+              border-left: 4px solid #10b981;
+              max-height: none;
+              overflow: visible;
             }
             .meta {
               display: grid;
-              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-              gap: 10px;
-              margin-top: 15px;
+              grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+              gap: 15px;
+              margin-top: 20px;
             }
             .meta-item {
-              padding: 8px;
-              background: #f3f4f6;
-              border-radius: 4px;
-              font-size: 14px;
+              padding: 12px;
+              background: #f8fafc;
+              border-radius: 8px;
+              font-size: 15px;
+              border: 1px solid #e2e8f0;
             }
             .badge {
               display: inline-block;
-              padding: 2px 8px;
+              padding: 4px 12px;
               background: #dbeafe;
               color: #1e40af;
-              border-radius: 12px;
-              font-size: 12px;
-              margin: 2px;
+              border-radius: 16px;
+              font-size: 13px;
+              margin: 3px;
+              font-weight: 500;
+            }
+            h1 {
+              color: #1f2937;
+              margin-bottom: 10px;
+            }
+            .close-btn {
+              position: fixed;
+              top: 20px;
+              right: 20px;
+              background: #dc2626;
+              color: white;
+              border: none;
+              padding: 10px 15px;
+              border-radius: 8px;
+              cursor: pointer;
+              font-size: 14px;
+              z-index: 1000;
+            }
+            .close-btn:hover {
+              background: #b91c1c;
             }
           </style>
         </head>
         <body>
+          <button class="close-btn" onclick="window.close()">× Schließen</button>
           <div class="header">
             <h1>${document.documentTitle}</h1>
             <div class="meta">
@@ -123,7 +151,7 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
               <div class="meta-item"><strong>Kategorie:</strong> ${document.category}</div>
               <div class="meta-item"><strong>Behörde:</strong> ${document.metadata.authority}</div>
             </div>
-            <div style="margin-top: 15px;">
+            <div style="margin-top: 20px;">
               <strong>Geräteklassen:</strong><br>
               ${document.deviceClasses.map(cls => `<span class="badge">${cls}</span>`).join('')}
             </div>
@@ -133,6 +161,7 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
         </html>
       `);
       newWindow.document.close();
+      newWindow.focus();
     }
   };
 
@@ -250,12 +279,12 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
 
                 <div className="space-y-2 pt-4 border-t">
                   <Button 
-                    onClick={openDocumentInNewTab} 
+                    onClick={openDocumentInNewWindow} 
                     className="w-full" 
                     size="sm"
                   >
                     <ExternalLink className="h-4 w-4 mr-2" />
-                    In neuem Tab öffnen
+                    Neues Fenster öffnen
                   </Button>
                   
                   <Button 
@@ -295,10 +324,10 @@ export function DocumentViewer({ document, trigger }: DocumentViewerProps) {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={openDocumentInNewTab}
+                      onClick={openDocumentInNewWindow}
                     >
                       <ExternalLink className="h-4 w-4 mr-1" />
-                      Neuer Tab
+                      Neues Fenster
                     </Button>
                     <Button variant="outline" size="sm" onClick={downloadDocument}>
                       <Download className="h-4 w-4 mr-1" />
