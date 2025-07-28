@@ -17,6 +17,7 @@ import SystemSettings from "@/pages/system-settings";
 import AuditLogs from "@/pages/audit-logs";
 import AIInsights from "@/pages/ai-insights";
 import KnowledgeBase from "@/pages/knowledge-base";
+import AIApprovalDemo from "@/pages/ai-approval-demo";
 import HistoricalData from "@/pages/historical-data-7am";
 import LegalCases from "@/pages/legal-cases-7am";
 import IntelligentSearch from "@/pages/intelligent-search";
@@ -44,6 +45,7 @@ function Router() {
       <Route path="/historical-data" component={HistoricalData} />
       <Route path="/legal-cases" component={LegalCases} />
       <Route path="/intelligent-search" component={IntelligentSearch} />
+      <Route path="/ai-approval" component={AIApprovalDemo} />
       <Route path="/documents/:sourceType/:documentId" component={DocumentViewer} />
       
       {/* Fallback to 404 */}
