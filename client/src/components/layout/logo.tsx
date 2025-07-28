@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import logoPath from "@assets/tmp_4b23ca96-d4e9-4839-9375-75a53368ad60_1753652563564.jpeg";
+import logoPath from "@assets/grafik_1753735681272.png";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -18,9 +18,9 @@ export function Logo({
   linkTo = "/" 
 }: LogoProps) {
   const sizeClasses = {
-    small: "h-6 w-6",
-    medium: "h-8 w-8", 
-    large: "h-12 w-12"
+    small: "h-8 w-auto",
+    medium: "h-10 w-auto", 
+    large: "h-16 w-auto"
   };
 
   const textSizeClasses = {
@@ -36,7 +36,7 @@ export function Logo({
         alt="Helix Logo" 
         className={cn(
           sizeClasses[size],
-          "rounded-lg object-cover",
+          "object-contain",
           showText && "mr-3"
         )}
       />
