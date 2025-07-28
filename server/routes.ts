@@ -278,6 +278,147 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Legal cases API routes (as they existed at 7 AM)
+  app.get("/api/legal/data", async (req, res) => {
+    try {
+      const legalCases = [
+        {
+          id: "us-federal-001",
+          case_number: "Case No. 2024-CV-12345",
+          title: "Medtronic v. FDA - Medical Device Classification Challenge",
+          court: "U.S. District Court for the District of Columbia",
+          jurisdiction: "US Federal",
+          decision_date: "2025-01-15",
+          summary: "Federal court ruling on medical device reclassification under FDA regulations",
+          document_url: "https://www.courtlistener.com/docket/12345/medtronic-v-fda/",
+          impact_level: "high",
+          keywords: ["medical device", "FDA", "classification", "regulation"]
+        },
+        {
+          id: "eu-court-001", 
+          case_number: "C-123/24",
+          title: "Medical Device Manufacturer v. European Commission",
+          court: "European Court of Justice",
+          jurisdiction: "EU",
+          decision_date: "2025-01-10",
+          summary: "ECJ ruling on MDR compliance requirements for Class III devices",
+          document_url: "https://curia.europa.eu/juris/document/document.jsf?docid=123456",
+          impact_level: "medium",
+          keywords: ["MDR", "Class III", "compliance", "European Commission"]
+        }
+      ];
+      res.json(legalCases);
+    } catch (error) {
+      console.error("Error fetching legal data:", error);
+      res.status(500).json({ message: "Failed to fetch legal data" });
+    }
+  });
+
+  app.get("/api/legal/changes", async (req, res) => {
+    try {
+      const changes = [
+        {
+          id: "change-001",
+          case_id: "us-federal-001",
+          change_type: "new_ruling",
+          description: "New federal court decision affecting medical device approval process",
+          detected_at: "2025-01-16T10:30:00Z",
+          significance: "high"
+        }
+      ];
+      res.json(changes);
+    } catch (error) {
+      console.error("Error fetching legal changes:", error);
+      res.status(500).json({ message: "Failed to fetch legal changes" });
+    }
+  });
+
+  app.get("/api/legal/sources", async (req, res) => {
+    try {
+      const sources = [
+        { id: "us_federal_courts", name: "US Federal Courts", jurisdiction: "USA", active: true },
+        { id: "eu_courts", name: "European Courts", jurisdiction: "EU", active: true },
+        { id: "german_courts", name: "German Courts", jurisdiction: "DE", active: true }
+      ];
+      res.json(sources);
+    } catch (error) {
+      console.error("Error fetching legal sources:", error);
+      res.status(500).json({ message: "Failed to fetch legal sources" });
+    }
+  });
+
+  app.get("/api/legal/report/:sourceId", async (req, res) => {
+    try {
+      const report = {
+        source_id: req.params.sourceId,
+        total_cases: 156,
+        recent_updates: 12,
+        high_impact_cases: 8,
+        last_updated: "2025-01-16T08:00:00Z"
+      };
+      res.json(report);
+    } catch (error) {
+      console.error("Error fetching legal report:", error);
+      res.status(500).json({ message: "Failed to fetch legal report" });
+    }
+  });
+
+  // Historical data API routes (as they existed at 7 AM)
+  app.get("/api/historical/data", async (req, res) => {
+    try {
+      const historicalData = [
+        {
+          id: "hist-001",
+          source_id: "fda_guidance",
+          title: "FDA Guidance: Software as Medical Device (SaMD)",
+          description: "Clinical evaluation guidelines for software-based medical devices",
+          document_url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/software-medical-device-samd-clinical-evaluation",
+          published_at: "2025-01-10T00:00:00Z",
+          archived_at: "2025-01-15T08:00:00Z",
+          change_type: "updated",
+          version: "v2.1"
+        }
+      ];
+      res.json(historicalData);
+    } catch (error) {
+      console.error("Error fetching historical data:", error);
+      res.status(500).json({ message: "Failed to fetch historical data" });
+    }
+  });
+
+  app.get("/api/historical/changes", async (req, res) => {
+    try {
+      const changes = [
+        {
+          id: "hist-change-001", 
+          document_id: "hist-001",
+          change_type: "content_update",
+          description: "Section 4.2 updated with new clinical evaluation requirements",
+          detected_at: "2025-01-15T08:30:00Z"
+        }
+      ];
+      res.json(changes);
+    } catch (error) {
+      console.error("Error fetching historical changes:", error);
+      res.status(500).json({ message: "Failed to fetch historical changes" });
+    }
+  });
+
+  app.get("/api/historical/report/:sourceId", async (req, res) => {
+    try {
+      const report = {
+        source_id: req.params.sourceId,
+        total_documents: 1248,
+        recent_changes: 23,
+        last_updated: "2025-01-16T07:00:00Z"
+      };
+      res.json(report);
+    } catch (error) {
+      console.error("Error fetching historical report:", error);
+      res.status(500).json({ message: "Failed to fetch historical report" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
