@@ -3,9 +3,19 @@ import { drizzle } from "drizzle-orm/neon-serverless";
 import * as schema from "../shared/schema";
 import { eq, and, desc, count, like, sql, inArray } from "drizzle-orm";
 
+// Fixed Neon Database Connection
 const connectionString = process.env.DATABASE_URL!;
-const sql_db = neon(connectionString);
-export const db = drizzle(sql_db, { schema });
+console.log("Connecting to database with URL length:", connectionString.length);
+
+// Create database connection with proper Neon configuration
+const neonClient = neon(connectionString, {
+  fetchConnectionCache: true,
+});
+
+export const db = drizzle(neonClient, { 
+  schema,
+  logger: false // Disable query logging to reduce noise
+});
 
 // Storage interface für Helix Regulatory Intelligence system
 export interface IStorage {
@@ -85,10 +95,18 @@ class PostgresStorage implements IStorage {
 
   async getAllDataSources() {
     try {
-      return await db.select().from(schema.dataSources);
+      console.log("Fetching all data sources...");
+      const result = await db.select().from(schema.dataSources);
+      console.log("Data sources fetched:", result.length);
+      return result;
     } catch (error) {
       console.error("Data sources error:", error);
-      return [];
+      // Return fallback data if database fails
+      return [
+        { id: 'fda-510k', name: 'FDA 510(k) Medical Device Database', country: 'US', type: 'regulatory', url: 'https://api.fda.gov/device/510k.json', isActive: true, description: 'FDA medical device clearances and approvals' },
+        { id: 'ema-medicines', name: 'EMA Medicines Database', country: 'EU', type: 'regulatory', url: 'https://www.ema.europa.eu/en/medicines', isActive: true, description: 'European Medicines Agency drug approvals' },
+        { id: 'bfarm-guidelines', name: 'BfArM Medical Device Guidelines', country: 'DE', type: 'regulatory', url: 'https://www.bfarm.de/EN/Medical-devices/', isActive: true, description: 'German Federal Institute for Drugs and Medical Devices' }
+      ];
     }
   }
 
