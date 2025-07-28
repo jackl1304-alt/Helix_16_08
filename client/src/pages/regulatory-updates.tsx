@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { DocumentViewer } from "@/components/document-viewer";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { PageLayout, SectionCard } from "@/components/ui/page-layout";
 import { FilterBar } from "@/components/ui/filter-bar";
 import { DataTable } from "@/components/ui/data-table";
@@ -13,22 +13,24 @@ interface RegulatoryUpdate {
   id: string;
   title: string;
   description: string;
+  source_id: string;
   sourceId: string;
+  source_url: string;
   sourceUrl: string;
   region: string;
+  update_type: string;
   updateType: string;
   priority: 'low' | 'medium' | 'high' | 'urgent';
+  device_classes: string[];
   deviceClasses: string[];
-  categories: string[];
+  categories: any;
+  published_at: string;
   publishedAt: string;
+  created_at: string;
   createdAt: string;
   content: string;
-  rawData?: {
-    source: string;
-    documentType: string;
-    pages: number;
-    language: string;
-  };
+  raw_data?: any;
+  rawData?: any;
 }
 
 const priorityColors = {
@@ -96,10 +98,10 @@ KATEGORIEN:
 ${update.categories ? JSON.stringify(update.categories, null, 2) : 'Keine Kategorien verfügbar'}
 
 QUELLE-URL:
-${update.sourceUrl || 'Nicht verfügbar'}
+${update.sourceUrl || update.source_url || 'Nicht verfügbar'}
 
 VOLLSTÄNDIGE ROHDATEN:
-${JSON.stringify(update.rawData, null, 2)}
+${JSON.stringify(update.rawData || update.raw_data, null, 2)}
 
 ========================================
 Export erstellt am: ${new Date().toLocaleDateString('de-DE')} um ${new Date().toLocaleTimeString('de-DE')}
@@ -279,61 +281,91 @@ Helix Regulatory Intelligence Platform
         }}
         rowActions={(update) => (
           <>
-            <DocumentViewer 
-              document={{
-                id: update.id,
-                documentTitle: update.title,
-                content: `
-**Titel:** ${update.title}
-
-**Beschreibung:** ${update.description}
-
-**Quelle:** ${update.sourceId}
-
-**Priorität:** ${update.priority}
-
-**Typ:** ${update.updateType}
-
-**Region:** ${update.region}
-
-**Veröffentlichungsdatum:** ${update.publishedAt ? new Date(update.publishedAt).toLocaleDateString('de-DE') : 'Unbekannt'}
-
-**Geräteklassen:** ${update.deviceClasses?.length ? update.deviceClasses.join(', ') : 'Nicht spezifiziert'}
-
-**Kategorien:** ${update.categories ? JSON.stringify(update.categories, null, 2) : 'Keine Kategorien'}
-
-**Vollständiger Inhalt:**
-${update.description}
-
-**Rohdaten:**
-\`\`\`json
-${JSON.stringify(update.rawData, null, 2)}
-\`\`\`
-
-**Quelle-URL:** ${update.sourceUrl || 'Nicht verfügbar'}
-                `,
-                sourceId: update.sourceId,
-                originalDate: update.publishedAt,
-                category: update.updateType,
-                language: update.rawData?.language || 'de',
-                deviceClasses: update.deviceClasses || [],
-                metadata: {
-                  fileType: 'Regulatory Update',
-                  pageCount: update.rawData?.pages || 1,
-                  language: update.rawData?.language || 'de',
-                  lastModified: update.createdAt,
-                  priority: update.priority,
-                  region: update.region,
-                  updateType: update.updateType
-                },
-                downloadedAt: update.createdAt
-              }}
-              trigger={
-                <Button variant="outline" size="sm">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" title="Vollständige Details anzeigen">
                   <FileText className="h-4 w-4" />
                 </Button>
-              }
-            />
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-bold">{update.title}</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Region</label>
+                      <Badge variant="outline">{update.region}</Badge>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Priorität</label>
+                      <Badge className={priorityColors[update.priority]}>{priorityLabels[update.priority]}</Badge>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Typ</label>
+                      <Badge variant="outline">{update.updateType || update.update_type}</Badge>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Datum</label>
+                      <p className="text-sm">{new Date(update.publishedAt || update.published_at).toLocaleDateString('de-DE')}</p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Beschreibung</label>
+                    <p className="mt-1 text-sm">{update.description}</p>
+                  </div>
+                  
+                  {(update.deviceClasses?.length > 0 || update.device_classes?.length > 0) && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Geräteklassen</label>
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {(update.deviceClasses || update.device_classes || []).map((deviceClass, idx) => (
+                          <Badge key={idx} variant="secondary">{deviceClass}</Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {update.categories && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Kategorien</label>
+                      <pre className="mt-1 text-xs bg-gray-100 dark:bg-gray-800 p-3 rounded overflow-x-auto">
+                        {JSON.stringify(update.categories, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+                  
+                  {(update.rawData || update.raw_data) && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Vollständige Rohdaten</label>
+                      <pre className="mt-1 text-xs bg-gray-100 dark:bg-gray-800 p-3 rounded overflow-x-auto max-h-60">
+                        {JSON.stringify(update.rawData || update.raw_data, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+                  
+                  <div className="flex gap-2 pt-4 border-t">
+                    <Button onClick={() => downloadUpdate(update)} variant="outline">
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
+                    {(update.sourceUrl || update.source_url) && (
+                      <Button onClick={() => {
+                        const sourceUrl = update.sourceUrl || update.source_url;
+                        const fullUrl = sourceUrl.startsWith('http') 
+                          ? sourceUrl 
+                          : `https://www.accessdata.fda.gov${sourceUrl}`;
+                        window.open(fullUrl, '_blank');
+                      }} variant="outline">
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        Quelle öffnen
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
             <Button 
               variant="ghost" 
               size="sm"
@@ -346,8 +378,14 @@ ${JSON.stringify(update.rawData, null, 2)}
               variant="ghost" 
               size="sm"
               onClick={() => {
-                if (update.sourceUrl) {
-                  window.open(update.sourceUrl, '_blank');
+                // Verwende die source_url aus den Daten  
+                const sourceUrl = update.sourceUrl || update.source_url;
+                if (sourceUrl && sourceUrl !== 'Nicht verfügbar') {
+                  // Erstelle vollständige URLs für relative Pfade
+                  const fullUrl = sourceUrl.startsWith('http') 
+                    ? sourceUrl 
+                    : `https://www.accessdata.fda.gov${sourceUrl}`;
+                  window.open(fullUrl, '_blank');
                 } else {
                   toast({
                     title: "Link nicht verfügbar",
