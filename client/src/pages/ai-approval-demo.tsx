@@ -27,9 +27,15 @@ export default function AIApprovalDemo() {
   const { data: approvals = [], isLoading } = useQuery<Approval[]>({
     queryKey: ['/api/approvals'],
     queryFn: async () => {
+      console.log('Fetching approvals...');
       const response = await fetch('/api/approvals');
-      if (!response.ok) return [];
-      return response.json();
+      if (!response.ok) {
+        console.error('Failed to fetch approvals:', response.status);
+        return [];
+      }
+      const data = await response.json();
+      console.log('Approvals data:', data);
+      return data;
     },
   });
 

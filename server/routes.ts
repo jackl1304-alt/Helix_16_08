@@ -258,6 +258,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Approvals routes
+  app.get("/api/approvals", async (req, res) => {
+    try {
+      console.log('API: Fetching all approvals from database...');
+      const { neon } = await import('@neondatabase/serverless');
+      const sql = neon(process.env.DATABASE_URL!);
+      const result = await sql`SELECT * FROM approvals ORDER BY created_at DESC`;
+      console.log(`API: Found ${result.length} approvals`);
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching approvals:", error);
+      res.status(500).json({ message: "Failed to fetch approvals" });
+    }
+  });
+
   app.get("/api/approvals/pending", async (req, res) => {
     try {
       const approvals = await storage.getPendingApprovals();
