@@ -351,53 +351,21 @@ Helix Regulatory Intelligence Platform
                 </Button>
                 
                 <Button onClick={() => {
-                  const sourceUrl = update.source_url;
-                  let fullUrl = sourceUrl;
-                  
-                  if (!sourceUrl.startsWith('http')) {
-                    if (sourceUrl.startsWith('/regulatory-updates/')) {
-                      fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
-                    } else if (update.region === 'EU') {
-                      fullUrl = `https://www.ema.europa.eu${sourceUrl}`;
-                    } else if (update.region === 'DE') {
-                      fullUrl = `https://www.bfarm.de${sourceUrl}`;
-                    } else if (update.region === 'CH') {
-                      fullUrl = `https://www.swissmedic.ch${sourceUrl}`;
-                    } else {
-                      fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
-                    }
-                  }
-                  
-                  // Wayback Machine Archive
-                  const waybackUrl = `https://web.archive.org/web/*/${fullUrl}`;
-                  window.open(waybackUrl, '_blank');
-                }} variant="outline" size="sm" title="Archivierte Versionen in Wayback Machine">
-                  🕰️ Archiv
+                  // Alternative: Direkte Google-Suche nach dem Dokumententitel
+                  const searchQuery = encodeURIComponent(`"${update.title}" site:bfarm.de OR site:ema.europa.eu OR site:fda.gov`);
+                  const googleSearchUrl = `https://www.google.com/search?q=${searchQuery}`;
+                  window.open(googleSearchUrl, '_blank');
+                }} variant="outline" size="sm" title="Google-Suche nach diesem Dokument">
+                  🔍 Suchen
                 </Button>
                 
                 <Button onClick={() => {
-                  const sourceUrl = update.source_url;
-                  let fullUrl = sourceUrl;
-                  
-                  if (!sourceUrl.startsWith('http')) {
-                    if (sourceUrl.startsWith('/regulatory-updates/')) {
-                      fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
-                    } else if (update.region === 'EU') {
-                      fullUrl = `https://www.ema.europa.eu${sourceUrl}`;
-                    } else if (update.region === 'DE') {
-                      fullUrl = `https://www.bfarm.de${sourceUrl}`;
-                    } else if (update.region === 'CH') {
-                      fullUrl = `https://www.swissmedic.ch${sourceUrl}`;
-                    } else {
-                      fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
-                    }
-                  }
-                  
-                  // Google Cache
-                  const googleCacheUrl = `https://webcache.googleusercontent.com/search?q=cache:${encodeURIComponent(fullUrl)}`;
-                  window.open(googleCacheUrl, '_blank');
-                }} variant="outline" size="sm" title="Google Cache Suche">
-                  🔍 Cache
+                  // Bing-Suche für bessere internationale Ergebnisse
+                  const searchQuery = encodeURIComponent(`"${update.title}" ${update.region} regulatory`);
+                  const bingSearchUrl = `https://www.bing.com/search?q=${searchQuery}`;
+                  window.open(bingSearchUrl, '_blank');
+                }} variant="outline" size="sm" title="Bing-Suche nach diesem Dokument">
+                  🔎 Bing
                 </Button>
               </>
             )}
@@ -492,33 +460,15 @@ Helix Regulatory Intelligence Platform
                 variant="ghost" 
                 size="sm"
                 onClick={() => {
-                  const sourceUrl = update.source_url;
-                  if (sourceUrl && sourceUrl !== 'Nicht verfügbar') {
-                    let fullUrl = sourceUrl;
-                    
-                    if (!sourceUrl.startsWith('http')) {
-                      if (sourceUrl.startsWith('/regulatory-updates/')) {
-                        fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
-                      } else if (update.region === 'EU') {
-                        fullUrl = `https://www.ema.europa.eu${sourceUrl}`;
-                      } else if (update.region === 'DE') {
-                        fullUrl = `https://www.bfarm.de${sourceUrl}`;
-                      } else if (update.region === 'CH') {
-                        fullUrl = `https://www.swissmedic.ch${sourceUrl}`;
-                      } else {
-                        fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
-                      }
-                    }
-                    
-                    // Wayback Machine
-                    const waybackUrl = `https://web.archive.org/web/*/${fullUrl}`;
-                    window.open(waybackUrl, '_blank');
-                  }
+                  // Google-Suche nach dem Dokumententitel
+                  const searchQuery = encodeURIComponent(`"${update.title}" site:bfarm.de OR site:ema.europa.eu OR site:fda.gov`);
+                  const googleSearchUrl = `https://www.google.com/search?q=${searchQuery}`;
+                  window.open(googleSearchUrl, '_blank');
                 }}
-                title="Archivierte Versionen finden"
+                title="Google-Suche nach diesem Dokument"
                 className="text-xs"
               >
-                🕰️
+                🔍
               </Button>
             </div>
           </>
