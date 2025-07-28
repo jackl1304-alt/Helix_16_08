@@ -67,7 +67,17 @@ class MorningStorage implements IStorage {
     try {
       const result = await sql`SELECT * FROM data_sources ORDER BY created_at`;
       console.log("Fetched data sources:", result.length);
-      return result;
+      
+      // Transform database schema to frontend schema
+      const transformedResult = result.map(source => ({
+        ...source,
+        isActive: source.is_active, // Map is_active to isActive
+        lastSync: source.last_sync_at, // Map last_sync_at to lastSync
+        url: source.url || source.endpoint || `https://api.${source.id}.com/data`
+      }));
+      
+      console.log("Active sources:", transformedResult.filter(s => s.isActive).length);
+      return transformedResult;
     } catch (error) {
       console.error("Data sources error:", error);
       return [];
@@ -124,7 +134,16 @@ class MorningStorage implements IStorage {
   async getActiveDataSources() {
     try {
       const result = await sql`SELECT * FROM data_sources WHERE is_active = true ORDER BY created_at`;
-      return result;
+      
+      // Transform database schema to frontend schema
+      const transformedResult = result.map(source => ({
+        ...source,
+        isActive: source.is_active,
+        lastSync: source.last_sync_at,
+        url: source.url || source.endpoint || `https://api.${source.id}.com/data`
+      }));
+      
+      return transformedResult;
     } catch (error) {
       console.error("Active data sources error:", error);
       return [];
