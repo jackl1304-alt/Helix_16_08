@@ -1,0 +1,36 @@
+Helix MedTech Regulatory Intelligence - Projekt-Statistiken
+===========================================================
+
+Export erstellt am: Mon Jul 28 05:49:30 AM UTC 2025
+Export-Verzeichnis: helix-export-20250728-054840
+
+Projektdateien:
+- TypeScript/JavaScript Dateien: 14239
+- React Komponenten: 87 
+- Server Services: 14
+- Shared Schemas: 1
+
+Datenbank-Tabellen:
+7
+
+Geschätzte Projektgröße (ohne node_modules): 151M
+
+Features:
+- ✅ React Frontend mit TypeScript
+- ✅ Node.js/Express Backend
+- ✅ PostgreSQL Datenbank
+- ✅ Regulatory Data Collection
+- ✅ AI-powered Search (lokal)
+- ✅ Legal Case Database (1800+ Fälle)
+- ✅ Multi-language Support
+- ✅ Email Service Integration
+- ✅ Responsive Design
+- ✅ Global Data Sources (6 aktive)
+
+Deployment-Ready:
+- ✅ Vercel Konfiguration
+- ✅ Railway Konfiguration  
+- ✅ DigitalOcean App Platform
+- ✅ Docker Container
+- ✅ PM2 Produktions-Setup
+- ✅ Nginx Reverse Proxy
