@@ -18,7 +18,7 @@ import AuditLogs from "@/pages/audit-logs";
 import AIInsights from "@/pages/ai-insights";
 import KnowledgeBase from "@/pages/knowledge-base";
 import HistoricalData from "@/pages/historical-data";
-import LegalCases from "@/pages/legal-cases";
+import LegalCases from "@/pages/legal-cases-fixed";
 import IntelligentSearch from "@/pages/intelligent-search";
 import DocumentViewer from "@/pages/document-viewer";
 import SyncManager from "@/pages/sync-manager";

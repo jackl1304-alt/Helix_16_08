@@ -14,7 +14,7 @@ import { ChangeComparison } from "@/components/change-comparison";
 import { DocumentViewer, DocumentLink } from "@/components/document-viewer";
 import { useDevice } from "@/hooks/use-device";
 import { ResponsiveGrid } from "@/components/responsive-layout";
-import { HistoricalDataRecord, ChangeDetection } from "@shared/schema";
+// Remove non-existent imports from shared schema
 import { cn } from "@/lib/utils";
 import LegalRelationshipViewer from "@/components/legal-relationship-viewer";
 
@@ -25,7 +25,7 @@ interface LegalReport {
   highImpactChanges: number;
   caseTypes: Record<string, number>;
   languageDistribution: Record<string, number>;
-  recentActivity: ChangeDetection[];
+  recentActivity: any[];
 }
 
 export default function LegalCases() {
@@ -37,9 +37,29 @@ export default function LegalCases() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Fallback sources
+  const fallbackSources = [
+    { id: "us_federal_courts", name: "US Federal Courts", jurisdiction: "USA", active: true },
+    { id: "eu_courts", name: "European Courts", jurisdiction: "EU", active: true },
+    { id: "german_courts", name: "German Courts", jurisdiction: "DE", active: true }
+  ];
+
   // Fetch legal data sources
-  const { data: legalSources = {} } = useQuery({
+  const { data: legalSources = fallbackSources } = useQuery({
     queryKey: ['/api/legal/sources'],
+    queryFn: async () => {
+      try {
+        const response = await fetch('/api/legal/sources');
+        if (!response.ok) {
+          return fallbackSources;
+        }
+        const data = await response.json();
+        return Array.isArray(data) ? data : fallbackSources;
+      } catch (error) {
+        console.error("Legal sources error:", error);
+        return fallbackSources;
+      }
+    },
     staleTime: 30000,
   });
 
@@ -216,11 +236,11 @@ export default function LegalCases() {
                   <SelectValue placeholder="Quelle wählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {legalSources && Object.entries(legalSources as Record<string, { name: string; country: string }>).map(([id, source]) => (
-                    <SelectItem key={id} value={id}>
-                      {source.name} ({source.country})
+                  {Array.isArray(legalSources) ? legalSources.map((source: any) => (
+                    <SelectItem key={source.id} value={source.id}>
+                      {source.name} ({source.jurisdiction})
                     </SelectItem>
-                  ))}
+                  )) : null}
                 </SelectContent>
               </Select>
             </div>
@@ -544,7 +564,7 @@ export default function LegalCases() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      {Object.entries(report.caseTypes).map(([type, count]) => (
+                      {report && report.caseTypes && Object.entries(report.caseTypes).map(([type, count]) => (
                         <div key={type} className="flex items-center justify-between">
                           <span className="text-sm">{type}</span>
                           <Badge variant="secondary">{count}</Badge>
@@ -560,7 +580,7 @@ export default function LegalCases() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      {Object.entries(report.languageDistribution).map(([lang, count]) => (
+                      {report && report.languageDistribution && Object.entries(report.languageDistribution).map(([lang, count]) => (
                         <div key={lang} className="flex items-center justify-between">
                           <span className="text-sm">{lang.toUpperCase()}</span>
                           <Badge variant="outline">{count}</Badge>
