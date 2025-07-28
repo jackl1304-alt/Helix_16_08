@@ -23,6 +23,7 @@ export interface IStorage {
   getAllDataSources(): Promise<any[]>;
   getRecentRegulatoryUpdates(limit?: number): Promise<any[]>;
   getPendingApprovals(): Promise<any[]>;
+  updateDataSource(id: string, updates: any): Promise<any>;
 }
 
 // PostgreSQL Storage Implementation mit echten Daten
@@ -64,7 +65,10 @@ class PostgresStorage implements IStorage {
 
   async getAllDataSources() {
     try {
-      return await db.select().from(schema.dataSources);
+      // Direkte SQL-Abfrage da Schema noch nicht synchron ist
+      const result = await db.execute(sql`SELECT * FROM data_sources ORDER BY created_at`);
+      console.log("Fetched data sources:", result.rows.length);
+      return result.rows;
     } catch (error) {
       console.error("Data sources error:", error);
       return [];
@@ -73,10 +77,10 @@ class PostgresStorage implements IStorage {
 
   async getRecentRegulatoryUpdates(limit = 10) {
     try {
-      return await db.select()
-        .from(schema.regulatoryUpdates)
-        .orderBy(desc(schema.regulatoryUpdates.publishedDate))
-        .limit(limit);
+      // Direkte SQL-Abfrage da Schema noch nicht synchron ist
+      const result = await db.execute(sql`SELECT * FROM regulatory_updates ORDER BY published_date DESC LIMIT ${limit}`);
+      console.log("Fetched regulatory updates:", result.rows.length);
+      return result.rows;
     } catch (error) {
       console.error("Recent updates error:", error);
       return [];
@@ -85,13 +89,23 @@ class PostgresStorage implements IStorage {
 
   async getPendingApprovals() {
     try {
-      return await db.select()
-        .from(schema.approvals)
-        .where(eq(schema.approvals.status, "pending"))
-        .orderBy(desc(schema.approvals.createdAt));
+      // Direkte SQL-Abfrage da Schema noch nicht synchron ist
+      const result = await db.execute(sql`SELECT * FROM approvals WHERE status = 'pending' ORDER BY created_at DESC`);
+      console.log("Fetched pending approvals:", result.rows.length);
+      return result.rows;
     } catch (error) {
       console.error("Pending approvals error:", error);
       return [];
+    }
+  }
+
+  async updateDataSource(id: string, updates: any) {
+    try {
+      const result = await db.execute(sql`UPDATE data_sources SET is_active = ${updates.isActive} WHERE id = ${id} RETURNING *`);
+      return result.rows[0];
+    } catch (error) {
+      console.error("Update data source error:", error);
+      throw error;
     }
   }
 }
