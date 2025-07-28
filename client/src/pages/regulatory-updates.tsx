@@ -69,6 +69,16 @@ export default function RegulatoryUpdates() {
     return matchesSearch && matchesRegion && matchesPriority && matchesType;
   });
 
+  // Calculate statistics from actual data
+  const totalUpdates = updates?.length || 0;
+  const filteredCount = filteredUpdates.length;
+  const highPriorityCount = (updates || []).filter(u => u.priority === 'high' || u.priority === 'urgent').length;
+  const todayCount = (updates || []).filter(u => {
+    const updateDate = new Date(u.publishedAt).toDateString();
+    const today = new Date().toDateString();
+    return updateDate === today;
+  }).length;
+
   const downloadUpdate = async (update: RegulatoryUpdate) => {
     try {
       const response = await fetch(`/api/regulatory-updates/${update.id}`);
