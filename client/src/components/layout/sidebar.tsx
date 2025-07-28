@@ -13,7 +13,8 @@ import {
   Settings,
   Archive,
   Shield,
-  Search
+  Search,
+  RefreshCw
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoPath from "@assets/tmp_4b23ca96-d4e9-4839-9375-75a53368ad60_1753652563564.jpeg";
@@ -21,6 +22,7 @@ import logoPath from "@assets/tmp_4b23ca96-d4e9-4839-9375-75a53368ad60_175365256
 const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
   { name: "Data Collection", href: "/data-collection", icon: Database },
+  { name: "Sync Manager", href: "/sync-manager", icon: RefreshCw },
   { name: "Global Sources", href: "/global-sources", icon: Globe },
   { name: "Regulatory Updates", href: "/regulatory-updates", icon: FileText },
   { name: "Newsletter Manager", href: "/newsletter-manager", icon: Newspaper },
