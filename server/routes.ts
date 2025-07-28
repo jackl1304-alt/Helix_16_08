@@ -921,6 +921,110 @@ Für technische Fragen:
     }
   });
 
+  // Knowledge base attachment download
+  app.get("/api/knowledge-base/attachments/:fileName", async (req, res) => {
+    try {
+      const { fileName } = req.params;
+      console.log(`Download request for attachment: ${fileName}`);
+      
+      // Generate sample attachment content based on file type
+      let content = '';
+      let contentType = 'application/octet-stream';
+      
+      if (fileName.includes('MDR_Checklist')) {
+        contentType = 'application/pdf';
+        content = `# MDR Compliance Checklist für Klasse III Medizinprodukte
+
+## Vollständige Checkliste zur EU MDR 2017/745 Implementierung
+
+### 1. Technische Dokumentation
+☐ Produktbeschreibung und Zweckbestimmung vollständig
+☐ Risikoanalyse nach ISO 14971 durchgeführt
+☐ Klinische Bewertung nach MEDDEV 2.7/1 Rev. 4
+☐ Gebrauchsanweisung nach EN 62304 erstellt
+☐ Kennzeichnung nach MDR Anhang I erstellt
+
+### 2. Qualitätsmanagementsystem
+☐ QMS nach ISO 13485:2016 implementiert
+☐ Benannte Stelle für Konformitätsbewertung ausgewählt
+☐ Post-Market Surveillance System etabliert
+☐ EUDAMED Registrierung vorbereitet
+☐ Vigilance-System nach MDR Art. 87-92 eingerichtet
+
+### 3. Klinische Studien (falls erforderlich)
+☐ Klinischer Prüfplan erstellt
+☐ Ethikkommission Zustimmung eingeholt
+☐ Sponsorregistrierung bei Behörden
+☐ Good Clinical Practice (GCP) Compliance sichergestellt
+☐ Klinischer Studienbericht nach ICH E3 verfasst
+
+### 4. Regulatorische Einreichung
+☐ CE-Kennzeichnungsverfahren eingeleitet
+☐ EU-Bevollmächtigter benannt
+☐ Konformitätserklärung vorbereitet
+☐ EUDAMED Actor und Device Registrierung
+☐ UDI (Unique Device Identification) System implementiert
+
+### 5. Post-Market Überwachung
+☐ Post-Market Clinical Follow-up (PMCF) Plan erstellt
+☐ Periodic Safety Update Report (PSUR) Prozess etabliert
+☐ Corrective and Preventive Actions (CAPA) System
+☐ Market Surveillance Cooperation mit Behörden
+☐ Incident Reporting nach MDR Art. 87 vorbereitet
+
+---
+Erstellt von: Helix MedTech Regulatory Intelligence Platform
+Letzte Aktualisierung: ${new Date().toLocaleDateString('de-DE')}`;
+      } else if (fileName.includes('Timeline_Template')) {
+        contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        content = `MDR Implementierung Timeline Template
+
+Phase 1: Vorbereitung (Monate 1-3)
+- Woche 1-2: Gap-Analyse durchführen
+- Woche 3-4: Projektteam zusammenstellen
+- Woche 5-8: QMS-Update planen
+- Woche 9-12: Benannte Stelle auswählen
+
+Phase 2: Dokumentation (Monate 4-8)
+- Woche 13-16: Technische Dokumentation überarbeiten
+- Woche 17-20: Risikoanalyse aktualisieren
+- Woche 21-24: Klinische Bewertung durchführen
+- Woche 25-32: Post-Market Surveillance Plan erstellen
+
+Phase 3: Zertifizierung (Monate 9-12)
+- Woche 33-36: Benannte Stelle Audit vorbereiten
+- Woche 37-40: Konformitätsbewertung durchführen
+- Woche 41-44: CE-Kennzeichnung beantragen
+- Woche 45-48: EUDAMED Registrierung abschließen
+
+Phase 4: Markteinführung (Monate 13-15)
+- Woche 49-52: Marktüberwachung implementieren
+- Woche 53-56: Vigilance System aktivieren
+- Woche 57-60: Post-Market Clinical Follow-up starten
+
+Kritische Meilensteine:
+✓ Gap-Analyse abgeschlossen (Monat 1)
+✓ QMS-Update implementiert (Monat 4)
+✓ Technische Dokumentation fertig (Monat 8)
+✓ CE-Kennzeichnung erhalten (Monat 12)
+✓ Markteinführung (Monat 15)
+
+Diese Timeline ist ein Richtwert und kann je nach Produktkomplexität variieren.
+Erstellt mit Helix MedTech Regulatory Intelligence Platform`;
+      }
+      
+      // Set download headers
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+      res.setHeader('Cache-Control', 'no-cache');
+      
+      res.send(content);
+    } catch (error) {
+      console.error("Error downloading attachment:", error);
+      res.status(500).json({ message: "Failed to download attachment" });
+    }
+  });
+
   app.post("/api/knowledge-base", async (req, res) => {
     try {
       const validatedData = insertKnowledgeBaseSchema.parse(req.body);
