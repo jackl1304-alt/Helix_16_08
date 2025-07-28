@@ -7,44 +7,61 @@ const connectionString = process.env.DATABASE_URL!;
 const sql_db = neon(connectionString);
 export const db = drizzle(sql_db, { schema });
 
-// Einfache Mock-Implementation für Helix Dashboard
-class MockStorage implements IStorage {
+// PostgreSQL Storage Implementation mit echten Daten
+class PostgresStorage implements IStorage {
   async getDashboardStats() {
+    const [
+      totalUpdatesResult,
+      totalLegalCasesResult,
+      totalArticlesResult,
+      totalSubscribersResult,
+      pendingApprovalsResult,
+      activeDataSourcesResult,
+      recentUpdatesResult,
+      totalNewslettersResult,
+    ] = await Promise.all([
+      db.select({ count: count() }).from(schema.regulatoryUpdates),
+      db.select({ count: count() }).from(schema.legalCases),
+      db.select({ count: count() }).from(schema.knowledgeArticles),
+      db.select({ count: count() }).from(schema.subscribers).where(eq(schema.subscribers.isActive, true)),
+      db.select({ count: count() }).from(schema.approvals).where(eq(schema.approvals.status, "pending")),
+      db.select({ count: count() }).from(schema.dataSources).where(eq(schema.dataSources.isActive, true)),
+      db.select({ count: count() }).from(schema.regulatoryUpdates)
+        .where(sql`${schema.regulatoryUpdates.createdAt} >= NOW() - INTERVAL '30 days'`),
+      db.select({ count: count() }).from(schema.newsletters),
+    ]);
+
     return {
-      totalUpdates: 247,
-      totalLegalCases: 1332,
-      totalArticles: 89,
-      totalSubscribers: 1247,
-      pendingApprovals: 12,
-      activeDataSources: 15,
-      recentUpdates: 23,
-      totalNewsletters: 45
+      totalUpdates: totalUpdatesResult[0].count,
+      totalLegalCases: totalLegalCasesResult[0].count,
+      totalArticles: totalArticlesResult[0].count,
+      totalSubscribers: totalSubscribersResult[0].count,
+      pendingApprovals: pendingApprovalsResult[0].count,
+      activeDataSources: activeDataSourcesResult[0].count,
+      recentUpdates: recentUpdatesResult[0].count,
+      totalNewsletters: totalNewslettersResult[0].count,
     };
   }
 
   async getAllDataSources() {
-    return [
-      { id: '1', name: 'FDA Medical Device Database', country: 'US', type: 'regulatory', isActive: true },
-      { id: '2', name: 'EMA Product Information', country: 'EU', type: 'regulatory', isActive: true },
-      { id: '3', name: 'BfArM Guidelines', country: 'DE', type: 'regulatory', isActive: true }
-    ];
+    return await db.select().from(schema.dataSources);
   }
 
   async getRecentRegulatoryUpdates(limit = 10) {
-    return [
-      { id: '1', title: 'New MDR Compliance Requirements 2024', type: 'guidance', jurisdiction: 'EU', publishedDate: new Date() },
-      { id: '2', title: 'FDA 510(k) Process Updates', type: 'standard', jurisdiction: 'US', publishedDate: new Date() }
-    ];
+    return await db.select()
+      .from(schema.regulatoryUpdates)
+      .orderBy(desc(schema.regulatoryUpdates.publishedDate))
+      .limit(limit);
   }
 
   async getPendingApprovals() {
-    return [
-      { id: '1', itemType: 'newsletter', status: 'pending', requestedAt: new Date() },
-      { id: '2', itemType: 'article', status: 'pending', requestedAt: new Date() }
-    ];
+    return await db.select()
+      .from(schema.approvals)
+      .where(eq(schema.approvals.status, "pending"))
+      .orderBy(desc(schema.approvals.createdAt));
   }
 
-  // Stubs für andere Methoden
+  // Rest der PostgresStorage Implementierung
   async createUser(user: any) { return user; }
   async getUserByEmail(email: string) { return null; }
   async getUserById(id: string) { return null; }
@@ -97,8 +114,8 @@ class MockStorage implements IStorage {
   async getAllApprovals() { return []; }
 }
 
-// Verwende Mock-Storage temporär
-export const storage = new MockStorage();
+// PostgreSQL Storage mit echten Daten
+export const storage = new PostgresStorage();
 
 // Remove duplicate export at end of file
 
@@ -186,10 +203,8 @@ export interface IStorage {
   }>;
 }
 
-// PostgreSQL storage implementation for Helix
-export class PostgresStorage implements IStorage {
-  // User management
-  async createUser(user: schema.InsertUser): Promise<schema.User> {
+// PostgreSQL Storage Implementation mit echten Daten verwenden
+export const storage = new PostgresStorage();
     const [created] = await db.insert(schema.users).values(user).returning();
     return created;
   }

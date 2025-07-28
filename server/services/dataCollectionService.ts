@@ -1,5 +1,6 @@
 import { storage } from "../storage";
-import type { InsertRegulatoryUpdate } from "@shared/schema";
+import { InsertRegulatoryUpdate } from "../shared/schema";
+import { db } from "../storage";
 
 // Dynamic import to avoid module resolution issues during compilation
 async function getNlpService() {
