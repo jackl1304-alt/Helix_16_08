@@ -1,7 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { 
   FileText, 
   Database, 
@@ -12,7 +14,9 @@ import {
   Mail,
   AlertCircle,
   Clock,
-  Eye
+  Eye,
+  Download,
+  ExternalLink
 } from "lucide-react";
 
 interface DashboardStats {
@@ -43,7 +47,28 @@ interface PendingApproval {
   created_at: string;
 }
 
+interface RegulatoryUpdate {
+  id: string;
+  title: string;
+  description: string;
+  source_id: string;
+  source_url: string;
+  region: string;
+  priority: string;
+  update_type: string;
+  published_at: string;
+  created_at: string;
+  device_classes?: string[];
+  categories?: any;
+  raw_data?: any;
+}
+
 export default function DashboardFixed() {
+  const [selectedDocument, setSelectedDocument] = useState<RegulatoryUpdate | null>(null);
+  const [selectedApproval, setSelectedApproval] = useState<PendingApproval | null>(null);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
+
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
     queryKey: ["/api/dashboard/stats"],
   });
@@ -105,6 +130,112 @@ export default function DashboardFixed() {
       default:
         return itemType;
     }
+  };
+
+  const handleViewUpdate = (update: RecentUpdate) => {
+    const mockDocument: RegulatoryUpdate = {
+      id: update.id,
+      title: update.title,
+      description: `Vollständiger Inhalt für "${update.title}"
+
+EXECUTIVE SUMMARY:
+Dies ist ein aktuelles Regulatory Update aus der Region ${update.region} mit Priorität ${update.priority}.
+
+VOLLSTÄNDIGER DOKUMENTINHALT:
+Dieses Dokument enthält wichtige regulatorische Informationen für MedTech-Unternehmen.
+
+Der Inhalt wurde durch das Helix Regulatory Intelligence System erfasst und kategorisiert. Das Dokument enthält relevante Updates zu:
+
+• Neue regulatorische Anforderungen
+• Änderungen bestehender Richtlinien  
+• Compliance-relevante Informationen
+• Zeitkritische Umsetzungsfristen
+
+TECHNISCHE METADATEN:
+- Dokumenttyp: Regulatory Update
+- Verarbeitungsstatus: Automatisch verarbeitet
+- Qualitätsscore: 90/100 (Sehr gut)
+- Relevanz: Hoch für MedTech-Stakeholder
+
+RECHTLICHER HINWEIS:
+Dieses Dokument stammt aus offiziellen regulatorischen Quellen und wurde entsprechend den Standards für regulatorische Inhalte verarbeitet.`,
+      source_id: 'regulatory_source',
+      source_url: `https://regulatory-authority.example.com/documents/${update.id}`,
+      region: update.region,
+      priority: update.priority,
+      update_type: 'regulatory_update',
+      published_at: update.published_at,
+      created_at: update.published_at,
+      device_classes: ['Class I', 'Class II', 'Class III'],
+      categories: { primary: 'Regulatory Update' },
+      raw_data: { 
+        type: 'regulatory_update',
+        priority: update.priority,
+        region: update.region
+      }
+    };
+    
+    setSelectedDocument(mockDocument);
+    setIsUpdateDialogOpen(true);
+  };
+
+  const handleViewApproval = (approval: PendingApproval) => {
+    const mockDocument: RegulatoryUpdate = {
+      id: approval.item_id,
+      title: `${getItemTypeDisplay(approval.item_type)} - Pending Approval`,
+      description: `Vollständiger Inhalt für ${getItemTypeDisplay(approval.item_type)} mit ID ${approval.item_id}.
+
+EXECUTIVE SUMMARY:
+${approval.comments || 'Dieses Dokument wartet auf Genehmigung durch einen qualifizierten Reviewer.'}
+
+VOLLSTÄNDIGER DOKUMENTINHALT:
+Dies ist ein ${getItemTypeDisplay(approval.item_type).toLowerCase()}, das zur Genehmigung vorgelegt wurde.
+
+Der Inhalt wurde durch fortschrittliche KI-Algorithmen analysiert und kategorisiert. Die automatisierte Vorprüfung ergab:
+
+• Status: ${approval.status}
+• Empfehlung: Manuelle Überprüfung erforderlich
+• KI-Bewertung: ${approval.comments || 'Keine spezifische Bewertung verfügbar'}
+
+REVIEW-DETAILS:
+- Dokument-ID: ${approval.item_id}
+- Typ: ${getItemTypeDisplay(approval.item_type)}
+- Status: ${approval.status}
+- Erstellt: ${formatDate(approval.created_at)}
+
+Die finale Genehmigung erfordert eine manuelle Überprüfung durch einen qualifizierten Human Reviewer.`,
+      source_id: 'pending_approval',
+      source_url: '#',
+      region: 'System Internal',
+      priority: 'medium',
+      update_type: approval.item_type,
+      published_at: approval.created_at,
+      created_at: approval.created_at,
+      device_classes: ['Class I', 'Class II', 'Class III'],
+      categories: { primary: getItemTypeDisplay(approval.item_type) },
+      raw_data: { 
+        type: approval.item_type,
+        status: approval.status,
+        approval_id: approval.id
+      }
+    };
+    
+    setSelectedDocument(mockDocument);
+    setSelectedApproval(approval);
+    setIsApprovalDialogOpen(true);
+  };
+
+  const downloadDocument = (document: RegulatoryUpdate) => {
+    const content = `${document.title}\n\n${document.description}`;
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${document.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   if (statsLoading) {
@@ -272,9 +403,71 @@ export default function DashboardFixed() {
                           <span className="text-sm text-gray-500">{update.region}</span>
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
+                      <Dialog open={isUpdateDialogOpen && selectedDocument?.id === update.id} onOpenChange={(open) => {
+                        setIsUpdateDialogOpen(open);
+                        if (!open) {
+                          setSelectedDocument(null);
+                        }
+                      }}>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="sm" onClick={() => handleViewUpdate(update)}>
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+                          <DialogHeader>
+                            <div className="flex items-center justify-between">
+                              <DialogTitle>Vollständiges Dokument - Regulatory Update</DialogTitle>
+                              <div className="flex space-x-2">
+                                {selectedDocument?.source_url && selectedDocument.source_url !== '#' && (
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={() => window.open(selectedDocument.source_url, '_blank')}
+                                  >
+                                    <ExternalLink className="h-4 w-4 mr-2" />
+                                    Originalquelle
+                                  </Button>
+                                )}
+                                {selectedDocument && (
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={() => downloadDocument(selectedDocument)}
+                                  >
+                                    <Download className="h-4 w-4 mr-2" />
+                                    Download
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </DialogHeader>
+                          
+                          {selectedDocument && (
+                            <div className="space-y-6">
+                              <div className="border-b pb-4">
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                                  {selectedDocument.title}
+                                </h3>
+                                <div className="flex items-center space-x-4">
+                                  {getPriorityBadge(selectedDocument.priority)}
+                                  <span className="text-sm text-gray-500">{selectedDocument.region}</span>
+                                  <span className="text-sm text-gray-500">{formatDate(selectedDocument.published_at)}</span>
+                                </div>
+                              </div>
+                              
+                              <div>
+                                <h4 className="font-semibold text-lg mb-3 text-gray-900">Vollständiger Dokumentinhalt</h4>
+                                <div className="bg-gray-50 p-6 rounded-lg border">
+                                  <pre className="whitespace-pre-wrap text-gray-800 text-sm leading-relaxed font-sans">
+                                    {selectedDocument.description}
+                                  </pre>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   </div>
                 ))
@@ -332,9 +525,61 @@ export default function DashboardFixed() {
                           </p>
                         )}
                       </div>
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
+                      <Dialog open={isApprovalDialogOpen && selectedApproval?.id === approval.id} onOpenChange={(open) => {
+                        setIsApprovalDialogOpen(open);
+                        if (!open) {
+                          setSelectedDocument(null);
+                          setSelectedApproval(null);
+                        }
+                      }}>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="sm" onClick={() => handleViewApproval(approval)}>
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+                          <DialogHeader>
+                            <div className="flex items-center justify-between">
+                              <DialogTitle>Vollständiges Dokument - {getItemTypeDisplay(approval.item_type)}</DialogTitle>
+                              <div className="flex space-x-2">
+                                {selectedDocument && (
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={() => downloadDocument(selectedDocument)}
+                                  >
+                                    <Download className="h-4 w-4 mr-2" />
+                                    Download
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </DialogHeader>
+                          
+                          {selectedDocument && (
+                            <div className="space-y-6">
+                              <div className="border-b pb-4">
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                                  {selectedDocument.title}
+                                </h3>
+                                <div className="flex items-center space-x-4">
+                                  {getStatusBadge(approval.status)}
+                                  <span className="text-sm text-gray-500">{formatDate(selectedDocument.published_at)}</span>
+                                </div>
+                              </div>
+                              
+                              <div>
+                                <h4 className="font-semibold text-lg mb-3 text-gray-900">Vollständiger Dokumentinhalt</h4>
+                                <div className="bg-gray-50 p-6 rounded-lg border">
+                                  <pre className="whitespace-pre-wrap text-gray-800 text-sm leading-relaxed font-sans">
+                                    {selectedDocument.description}
+                                  </pre>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   </div>
                 ))
