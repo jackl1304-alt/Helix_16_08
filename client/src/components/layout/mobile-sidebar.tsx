@@ -81,7 +81,7 @@ export function MobileSidebar() {
             <img 
               src={logoPath} 
               alt="Helix Logo" 
-              className="h-8 w-8 rounded-lg object-cover"
+              className="h-10 w-10 rounded-lg object-cover"
             />
             <span className="text-xs font-medium text-gray-700 mt-1">MedTech Intelligence</span>
           </div>
@@ -105,7 +105,7 @@ export function MobileSidebar() {
                 <img 
                   src={logoPath} 
                   alt="Helix Logo" 
-                  className="h-10 w-10 rounded-lg object-cover mb-2"
+                  className="h-12 w-12 rounded-lg object-cover mb-2"
                 />
                 <div className="text-sm font-medium text-gray-700">MedTech Intelligence</div>
               </div>

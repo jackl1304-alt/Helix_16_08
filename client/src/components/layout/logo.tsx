@@ -18,9 +18,9 @@ export function Logo({
   linkTo = "/" 
 }: LogoProps) {
   const sizeClasses = {
-    small: "h-8 w-8",
-    medium: "h-10 w-10", 
-    large: "h-12 w-12"
+    small: "h-10 w-10",
+    medium: "h-14 w-14", 
+    large: "h-18 w-18"
   };
 
   const textSizeClasses = {

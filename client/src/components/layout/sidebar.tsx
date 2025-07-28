@@ -56,7 +56,7 @@ export function Sidebar() {
             <img 
               src={logoPath} 
               alt="Helix Logo" 
-              className="h-12 w-12 object-cover rounded-lg"
+              className="h-16 w-16 object-cover rounded-lg"
             />
             <p className="text-sm font-medium text-gray-700">MedTech Intelligence</p>
           </div>
