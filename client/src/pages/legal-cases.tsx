@@ -19,6 +19,34 @@ import { cn } from "@/lib/utils";
 import LegalRelationshipViewer from "@/components/legal-relationship-viewer";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
+// Define types
+interface ChangeDetection {
+  id: string;
+  document_id: string;
+  change_type: string;
+  description: string;
+  detected_at: string;
+}
+
+interface LegalDataRecord {
+  id: string;
+  documentTitle?: string;
+  title?: string;
+  documentId: string;
+  summary?: string;
+  content?: string;
+  category: string;
+  region: string;
+  originalDate: string;
+  status: string;
+  deviceClasses: string[];
+  sourceId: string;
+  language?: string;
+  documentUrl?: string;
+  caseNumber?: string;
+  court?: string;
+}
+
 interface LegalReport {
   totalCases: number;
   timeRange: { start: string; end: string };
@@ -93,30 +121,89 @@ export default function LegalCases() {
   ];
 
   // Fetch legal cases
-  const { data: legalData = fallbackLegalData, isLoading: isLoadingData, error: legalDataError } = useQuery<any[]>({
+  const { data: legalData = fallbackLegalData, isLoading: isLoadingData, error: legalDataError } = useQuery<LegalDataRecord[]>({
     queryKey: ['/api/legal/data', selectedSource, dateRange.start, dateRange.end],
     queryFn: async () => {
       try {
-        if (!selectedSource) return fallbackLegalData;
-        
-        const params = new URLSearchParams({
-          sourceId: selectedSource,
-          ...(dateRange.start && { startDate: dateRange.start }),
-          ...(dateRange.end && { endDate: dateRange.end })
-        });
-        
-        const response = await fetch(`/api/legal/data?${params}`);
+        const response = await fetch('/api/legal/data');
         if (!response.ok) {
-          return fallbackLegalData;
+          return fallbackLegalData.map(item => ({
+            id: item.id,
+            documentTitle: item.title,
+            title: item.title,
+            documentId: item.case_number,
+            summary: item.summary,
+            content: `Fall: ${item.title}\n\nGericht: ${item.court}\nDatum: ${item.decision_date}\n\n${item.summary}`,
+            category: item.impact_level,
+            region: item.jurisdiction,
+            originalDate: item.decision_date,
+            status: 'Final Decision',
+            deviceClasses: item.keywords,
+            sourceId: item.jurisdiction,
+            language: 'de',
+            documentUrl: item.document_url,
+            caseNumber: item.case_number,
+            court: item.court
+          }));
         }
         const data = await response.json();
-        return Array.isArray(data) ? data : fallbackLegalData;
+        return Array.isArray(data) ? data.map(item => ({
+          id: item.id,
+          documentTitle: item.title || item.documentTitle,
+          title: item.title || item.documentTitle,
+          documentId: item.caseNumber || item.documentId,
+          summary: item.summary,
+          content: item.content || item.summary,
+          category: item.category || item.impactLevel || 'Legal Case',
+          region: item.jurisdiction || item.region,
+          originalDate: item.decisionDate || item.originalDate,
+          status: item.status || 'Final Decision',
+          deviceClasses: item.keywords || item.deviceClasses || ['medical device'],
+          sourceId: item.jurisdiction || item.sourceId,
+          language: item.language || 'de',
+          documentUrl: item.documentUrl,
+          caseNumber: item.caseNumber,
+          court: item.court
+        })) : fallbackLegalData.map(item => ({
+          id: item.id,
+          documentTitle: item.title,
+          title: item.title,
+          documentId: item.case_number,
+          summary: item.summary,
+          content: `Fall: ${item.title}\n\nGericht: ${item.court}\nDatum: ${item.decision_date}\n\n${item.summary}`,
+          category: item.impact_level,
+          region: item.jurisdiction,
+          originalDate: item.decision_date,
+          status: 'Final Decision',
+          deviceClasses: item.keywords,
+          sourceId: item.jurisdiction,
+          language: 'de',
+          documentUrl: item.document_url,
+          caseNumber: item.case_number,
+          court: item.court
+        }));
       } catch (error) {
         console.error("Legal data error:", error);
-        return fallbackLegalData;
+        return fallbackLegalData.map(item => ({
+          id: item.id,
+          documentTitle: item.title,
+          title: item.title,
+          documentId: item.case_number,
+          summary: item.summary,
+          content: `Fall: ${item.title}\n\nGericht: ${item.court}\nDatum: ${item.decision_date}\n\n${item.summary}`,
+          category: item.impact_level,
+          region: item.jurisdiction,
+          originalDate: item.decision_date,
+          status: 'Final Decision',
+          deviceClasses: item.keywords,
+          sourceId: item.jurisdiction,
+          language: 'de',
+          documentUrl: item.document_url,
+          caseNumber: item.case_number,
+          court: item.court
+        }));
       }
     },
-    enabled: !!selectedSource,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 3,
   });
@@ -405,7 +492,7 @@ export default function LegalCases() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredData.map((legalCase: HistoricalDataRecord) => (
+                    {filteredData.map((legalCase: LegalDataRecord) => (
                       <Dialog key={legalCase.id}>
                         <DialogTrigger asChild>
                           <TableRow className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
@@ -421,7 +508,7 @@ export default function LegalCases() {
                                   {legalCase.summary || 'Rechtsprechung zu Medizinprodukten'}
                                 </div>
                                 <div className="text-xs text-gray-500 space-y-1">
-                                  <div>Rechtsquelle: {(legalSources as Record<string, { name: string }>)?.[selectedSource]?.name || selectedSource}</div>
+                                  <div>Rechtsquelle: {Array.isArray(legalSources) ? legalSources.find(s => s.id === selectedSource)?.name || selectedSource : selectedSource}</div>
                                   <div>ID: {legalCase.documentId}</div>
                                   <div className="flex items-center gap-1">
                                     <FileText className="h-3 w-3" />
@@ -454,8 +541,8 @@ export default function LegalCases() {
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-wrap gap-1">
-                            {legalCase.deviceClasses.map((cls: string) => (
-                              <Badge key={cls} variant="outline" className="text-xs">
+                            {legalCase.deviceClasses?.map((cls: string, index: number) => (
+                              <Badge key={`${legalCase.id}-device-${index}`} variant="outline" className="text-xs">
                                 {cls}
                               </Badge>
                             ))}
@@ -542,7 +629,7 @@ export default function LegalCases() {
                               <div className="prose max-w-none text-sm">
                                 <div className="bg-gray-50 p-4 rounded border-l-4 border-blue-400 mb-4">
                                   <h5 className="font-medium mb-2">Fall-Nummer: {legalCase.caseNumber || legalCase.documentId}</h5>
-                                  <p><strong>Rechtsquelle:</strong> {(legalSources as Record<string, { name: string }>)?.[selectedSource]?.name || selectedSource}</p>
+                                  <p><strong>Rechtsquelle:</strong> {Array.isArray(legalSources) ? legalSources.find(s => s.id === selectedSource)?.name || selectedSource : selectedSource}</p>
                                   <p><strong>Kategorie:</strong> {legalCase.category}</p>
                                   <p><strong>Geräteklassen:</strong> {legalCase.deviceClasses?.join(', ') || 'Alle Klassen'}</p>
                                 </div>
@@ -673,14 +760,14 @@ Quelle: ${legalCase.sourceId}
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                   <span className="ml-2">Lade Änderungshistorie...</span>
                 </div>
-              ) : (changes as ChangeDetection[]).length === 0 ? (
+              ) : (changes as ChangeDetection[] || []).length === 0 ? (
                 <div className="flex items-center justify-center py-8 text-gray-500">
                   <Scale className="h-8 w-8 mr-2" />
                   <span>Keine Rechtssprechungsänderungen erkannt. Das System überwacht kontinuierlich alle Gerichtsentscheidungen.</span>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {(changes as ChangeDetection[]).map((change: ChangeDetection, index: number) => (
+                  {(changes as ChangeDetection[] || []).map((change: ChangeDetection, index: number) => (
                     <ChangeComparison key={index} change={change} />
                   ))}
                 </div>
