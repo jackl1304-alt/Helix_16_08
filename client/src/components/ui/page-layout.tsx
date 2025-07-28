@@ -58,15 +58,23 @@ export function PageLayout({
         {stats && stats.length > 0 && (
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {stats.map((stat, index) => (
-              <Card key={index} className="border-0 bg-white/50 shadow-sm backdrop-blur-sm dark:bg-slate-800/50">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between space-x-2">
+              <Card key={index} className="border-0 bg-white/80 shadow-lg backdrop-blur-sm dark:bg-slate-800/80 hover:shadow-xl transition-shadow">
+                <CardContent className="p-6">
+                  <div className="space-y-2">
                     <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
                       {stat.label}
                     </p>
-                    <Badge variant={stat.variant || "secondary"} className="text-xs">
-                      {stat.value}
-                    </Badge>
+                    <div className="flex items-center">
+                      <span className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                        {typeof stat.value === 'number' ? stat.value.toLocaleString('de-DE') : stat.value}
+                      </span>
+                      <div className={`ml-2 h-2 w-2 rounded-full ${
+                        index === 0 ? 'bg-blue-500' : 
+                        index === 1 ? 'bg-green-500' : 
+                        index === 2 ? 'bg-red-500' : 
+                        'bg-yellow-500'
+                      }`} />
+                    </div>
                   </div>
                 </CardContent>
               </Card>

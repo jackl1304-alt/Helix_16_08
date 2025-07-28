@@ -395,20 +395,44 @@ Helix Regulatory Intelligence Platform
         onReset={resetFilters}
       />
 
-      <DataTable
-        title="Regulatory Updates"
-        description="Klicken Sie auf das erste Icon für vollständige Details, das zweite für Download, das dritte für externe Quelle"
-        icon={Bell}
-        data={filteredUpdates}
-        columns={columns}
-        isLoading={isLoading}
-        emptyMessage="Keine Updates gefunden"
-        emptyDescription="Versuchen Sie andere Filterkriterien"
-        stats={{
-          total: (updates || []).length,
-          filtered: filteredUpdates.length
-        }}
-        rowActions={(update) => (
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="animate-pulse">
+              <div className="h-32 bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-lg p-4">
+                <div className="flex items-center space-x-2 mb-3">
+                  <div className="h-4 bg-blue-300 dark:bg-blue-700 rounded w-2/3"></div>
+                  <div className="h-4 w-4 bg-blue-400 dark:bg-blue-600 rounded"></div>
+                </div>
+                <div className="h-6 bg-blue-200 dark:bg-blue-800 rounded w-full mb-2"></div>
+                <div className="h-4 bg-blue-200 dark:bg-blue-800 rounded w-3/4"></div>
+                <div className="flex justify-between items-center mt-3">
+                  <div className="h-3 bg-blue-200 dark:bg-blue-800 rounded w-1/4"></div>
+                  <div className="flex space-x-1">
+                    <div className="h-6 w-6 bg-blue-300 dark:bg-blue-700 rounded"></div>
+                    <div className="h-6 w-6 bg-blue-300 dark:bg-blue-700 rounded"></div>
+                    <div className="h-6 w-6 bg-blue-300 dark:bg-blue-700 rounded"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <DataTable
+          title="Regulatory Updates"
+          description="Klicken Sie auf das erste Icon für vollständige Details, das zweite für Download, das dritte für externe Quelle"
+          icon={Bell}
+          data={filteredUpdates}
+          columns={columns}
+          isLoading={false}
+          emptyMessage="Keine Updates gefunden"
+          emptyDescription="Versuchen Sie andere Filterkriterien"
+          stats={{
+            total: (updates || []).length,
+            filtered: filteredUpdates.length
+          }}
+          rowActions={(update) => (
           <>
             <DetailDialog update={update} />
             <Button 
@@ -473,7 +497,8 @@ Helix Regulatory Intelligence Platform
             </div>
           </>
         )}
-      />
+        />
+      )}
     </PageLayout>
   );
 }
