@@ -106,12 +106,14 @@ class MorningStorage implements IStorage {
 
   async updateDataSource(id: string, updates: any) {
     try {
+      // Update only existing columns - no updated_at column in this table
       const result = await sql`
         UPDATE data_sources 
-        SET is_active = ${updates.isActive}, updated_at = NOW() 
+        SET is_active = ${updates.isActive}, last_sync_at = NOW() 
         WHERE id = ${id} 
         RETURNING *
       `;
+      console.log("Updated data source:", id, "to active:", updates.isActive);
       return result[0];
     } catch (error) {
       console.error("Update data source error:", error);
