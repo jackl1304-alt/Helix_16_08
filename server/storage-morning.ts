@@ -9,6 +9,15 @@ export interface IStorage {
   getRecentRegulatoryUpdates(limit?: number): Promise<any[]>;
   getPendingApprovals(): Promise<any[]>;
   updateDataSource(id: string, updates: any): Promise<any>;
+  getActiveDataSources(): Promise<any[]>;
+  getHistoricalDataSources(): Promise<any[]>;
+  getAllRegulatoryUpdates(): Promise<any[]>;
+  createDataSource(data: any): Promise<any>;
+  createRegulatoryUpdate(data: any): Promise<any>;
+  getAllLegalCases(): Promise<any[]>;
+  getLegalCasesByJurisdiction(jurisdiction: string): Promise<any[]>;
+  createLegalCase(data: any): Promise<any>;
+  getAllKnowledgeArticles(): Promise<any[]>;
 }
 
 // Direct SQL Storage Implementation for 7AM Morning State
@@ -99,6 +108,108 @@ class MorningStorage implements IStorage {
     } catch (error) {
       console.error("Update data source error:", error);
       throw error;
+    }
+  }
+
+  async getActiveDataSources() {
+    try {
+      const result = await sql`SELECT * FROM data_sources WHERE is_active = true ORDER BY created_at`;
+      return result;
+    } catch (error) {
+      console.error("Active data sources error:", error);
+      return [];
+    }
+  }
+
+  async getHistoricalDataSources() {
+    try {
+      const result = await sql`SELECT * FROM data_sources ORDER BY created_at`;
+      return result;
+    } catch (error) {
+      console.error("Historical data sources error:", error);
+      return [];
+    }
+  }
+
+  async getAllRegulatoryUpdates() {
+    try {
+      const result = await sql`SELECT * FROM regulatory_updates ORDER BY published_date DESC`;
+      return result;
+    } catch (error) {
+      console.error("All regulatory updates error:", error);
+      return [];
+    }
+  }
+
+  async createDataSource(data: any) {
+    try {
+      const result = await sql`
+        INSERT INTO data_sources (id, name, description, url, country, type, is_active)
+        VALUES (${data.id}, ${data.name}, ${data.description}, ${data.url}, ${data.country}, ${data.type}, ${data.isActive})
+        RETURNING *
+      `;
+      return result[0];
+    } catch (error) {
+      console.error("Create data source error:", error);
+      throw error;
+    }
+  }
+
+  async createRegulatoryUpdate(data: any) {
+    try {
+      const result = await sql`
+        INSERT INTO regulatory_updates (title, description, type, source_id, document_url, published_date, priority)
+        VALUES (${data.title}, ${data.description}, ${data.type}, ${data.sourceId}, ${data.documentUrl}, ${data.publishedDate}, ${data.priority})
+        RETURNING *
+      `;
+      return result[0];
+    } catch (error) {
+      console.error("Create regulatory update error:", error);
+      throw error;
+    }
+  }
+
+  async getAllLegalCases() {
+    try {
+      const result = await sql`SELECT * FROM legal_cases ORDER BY decision_date DESC`;
+      return result;
+    } catch (error) {
+      console.error("All legal cases error:", error);
+      return [];
+    }
+  }
+
+  async getLegalCasesByJurisdiction(jurisdiction: string) {
+    try {
+      const result = await sql`SELECT * FROM legal_cases WHERE jurisdiction = ${jurisdiction} ORDER BY decision_date DESC`;
+      return result;
+    } catch (error) {
+      console.error("Legal cases by jurisdiction error:", error);
+      return [];
+    }
+  }
+
+  async createLegalCase(data: any) {
+    try {
+      const result = await sql`
+        INSERT INTO legal_cases (case_number, title, court, jurisdiction, decision_date, summary, document_url)
+        VALUES (${data.caseNumber}, ${data.title}, ${data.court}, ${data.jurisdiction}, ${data.decisionDate}, ${data.summary}, ${data.documentUrl})
+        RETURNING *
+      `;
+      return result[0];
+    } catch (error) {
+      console.error("Create legal case error:", error);
+      throw error;
+    }
+  }
+
+  async getAllKnowledgeArticles() {
+    try {
+      const result = await sql`SELECT * FROM knowledge_articles WHERE is_published = true ORDER BY created_at DESC`;
+      return result;
+    } catch (error) {
+      console.error("All knowledge articles error:", error);
+      return [];
     }
   }
 }
