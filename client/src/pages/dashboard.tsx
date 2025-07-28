@@ -56,13 +56,19 @@ export default function Dashboard() {
     try {
       console.log("Starting sync of all data sources...");
       // Trigger sync for all active data sources
-      await apiRequest("/api/data-sources/sync-all", "POST");
-      console.log("Sync completed successfully");
-      // Refresh dashboard data
-      window.location.reload();
+      const result = await apiRequest("/api/data-sources/sync-all", "POST");
+      console.log("Sync completed successfully:", result);
+      
+      // Show success message
+      alert("Synchronisation erfolgreich gestartet!");
+      
+      // Refresh dashboard data after a short delay
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       console.error("Failed to sync data sources:", error);
-      alert("Sync fehlgeschlagen. Bitte versuchen Sie es erneut.");
+      alert(`Sync fehlgeschlagen: ${error.message}`);
     }
   };
 
