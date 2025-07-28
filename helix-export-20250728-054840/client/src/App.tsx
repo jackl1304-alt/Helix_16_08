@@ -17,11 +17,10 @@ import SystemSettings from "@/pages/system-settings";
 import AuditLogs from "@/pages/audit-logs";
 import AIInsights from "@/pages/ai-insights";
 import KnowledgeBase from "@/pages/knowledge-base";
-import HistoricalData from "@/pages/historical-data-7am";
-import LegalCases from "@/pages/legal-cases-7am";
+import HistoricalData from "@/pages/historical-data";
+import LegalCases from "@/pages/legal-cases";
 import IntelligentSearch from "@/pages/intelligent-search";
 import DocumentViewer from "@/pages/document-viewer";
-import SyncManager from "@/pages/sync-manager";
 import { ResponsiveLayout } from "@/components/responsive-layout";
 
 function Router() {
@@ -33,7 +32,6 @@ function Router() {
       <Route path="/global-sources" component={GlobalSources} />
       <Route path="/analytics" component={Analytics} />
       <Route path="/regulatory-updates" component={RegulatoryUpdates} />
-      <Route path="/sync-manager" component={SyncManager} />
       <Route path="/newsletter-manager" component={NewsletterManager} />
       <Route path="/approval-workflow" component={ApprovalWorkflow} />
       <Route path="/user-management" component={UserManagement} />
