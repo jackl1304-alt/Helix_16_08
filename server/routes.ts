@@ -909,6 +909,26 @@ Für technische Fragen:
     }
   });
 
+  // Intelligent search route
+  app.post("/api/intelligent-search", async (req, res) => {
+    try {
+      const { query, filters } = req.body;
+      
+      if (!query || typeof query !== 'string') {
+        return res.status(400).json({ message: "Query is required" });
+      }
+
+      // Import the intelligent search service
+      const { intelligentSearchService } = await import('./services/intelligentSearchService');
+      
+      const searchResults = await intelligentSearchService.search(query, filters);
+      res.json(searchResults);
+    } catch (error) {
+      console.error("Error in intelligent search:", error);
+      res.status(500).json({ message: "Failed to perform intelligent search" });
+    }
+  });
+
   // Knowledge base routes
   app.get("/api/knowledge-base", async (req, res) => {
     try {
