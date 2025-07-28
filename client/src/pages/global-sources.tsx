@@ -107,14 +107,50 @@ export default function GlobalSources() {
 
   const toggleMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
+      console.log(`Toggling ${id} to ${isActive}`);
       return apiRequest(`/api/data-sources/${id}`, "PATCH", { isActive });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/data-sources"] });
+    onMutate: async ({ id, isActive }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["/api/data-sources"] });
+
+      // Snapshot the previous value
+      const previousDataSources = queryClient.getQueryData(["/api/data-sources"]);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(["/api/data-sources"], (old: DataSource[] = []) =>
+        old.map(source => 
+          source.id === id 
+            ? { ...source, isActive }
+            : source
+        )
+      );
+
+      // Return a context object with the snapshotted value
+      return { previousDataSources };
+    },
+    onError: (err, variables, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      if (context?.previousDataSources) {
+        queryClient.setQueryData(["/api/data-sources"], context.previousDataSources);
+      }
+      toast({
+        title: "Fehler beim Toggle",
+        description: "Status konnte nicht geändert werden.",
+        variant: "destructive",
+      });
+    },
+    onSuccess: (data, { id, isActive }) => {
+      console.log(`Toggle successful for ${id}:`, data);
       toast({
         title: "Datenquelle aktualisiert",
-        description: "Der Status wurde erfolgreich geändert.",
+        description: `${isActive ? 'Aktiviert' : 'Deaktiviert'}`,
       });
+    },
+    onSettled: () => {
+      // Always refetch after error or success to ensure we have the latest data
+      queryClient.invalidateQueries({ queryKey: ["/api/data-sources"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/sync/stats"] });
     },
   });
 
