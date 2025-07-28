@@ -376,7 +376,7 @@ export default function LegalCases() {
                 <Scale className="h-8 w-8 text-blue-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Gesamte Fälle</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{report.totalCases}</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{report?.totalCases || 0}</p>
                 </div>
               </div>
             </CardContent>
@@ -388,7 +388,7 @@ export default function LegalCases() {
                 <AlertTriangle className="h-8 w-8 text-orange-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Erkannte Änderungen</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{report.changesDetected}</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{report?.changesDetected || 0}</p>
                 </div>
               </div>
             </CardContent>
@@ -400,7 +400,7 @@ export default function LegalCases() {
                 <Clock className="h-8 w-8 text-red-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Hoher Impact</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{report.highImpactChanges}</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{report?.highImpactChanges || 0}</p>
                 </div>
               </div>
             </CardContent>
@@ -413,7 +413,7 @@ export default function LegalCases() {
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Sprachen</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                    {Object.keys(report.languageDistribution).length}
+                    {report?.languageDistribution ? Object.keys(report.languageDistribution).length : 0}
                   </p>
                 </div>
               </div>
