@@ -73,15 +73,44 @@ export default function RegulatoryUpdates() {
 
   const downloadUpdate = async (update: RegulatoryUpdate) => {
     try {
-      const response = await fetch(`/api/regulatory-updates/${update.id}`);
-      const fullUpdate = await response.json();
-      const content = fullUpdate.content || `Titel: ${update.title}\n\nBeschreibung: ${update.description}\n\nQuelle: ${update.region}\nPriorität: ${update.priority}\nTyp: ${update.updateType}\n\nVollständiger Inhalt:\n${update.content}`;
+      const content = `
+REGULATORY UPDATE - VOLLSTÄNDIGER EXPORT
+========================================
+
+Titel: ${update.title}
+Beschreibung: ${update.description}
+
+GRUNDINFORMATIONEN:
+- ID: ${update.id}
+- Quelle: ${update.sourceId}
+- Region: ${update.region}
+- Priorität: ${update.priority}
+- Typ: ${update.updateType}
+- Veröffentlichungsdatum: ${update.publishedAt ? new Date(update.publishedAt).toLocaleDateString('de-DE') : 'Unbekannt'}
+- Erstellt am: ${update.createdAt ? new Date(update.createdAt).toLocaleDateString('de-DE') : 'Unbekannt'}
+
+GERÄTEKLASSEN:
+${update.deviceClasses?.length ? update.deviceClasses.join(', ') : 'Nicht spezifiziert'}
+
+KATEGORIEN:
+${update.categories ? JSON.stringify(update.categories, null, 2) : 'Keine Kategorien verfügbar'}
+
+QUELLE-URL:
+${update.sourceUrl || 'Nicht verfügbar'}
+
+VOLLSTÄNDIGE ROHDATEN:
+${JSON.stringify(update.rawData, null, 2)}
+
+========================================
+Export erstellt am: ${new Date().toLocaleDateString('de-DE')} um ${new Date().toLocaleTimeString('de-DE')}
+Helix Regulatory Intelligence Platform
+      `;
       
       const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${update.title.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_')}.txt`;
+      a.download = `HELIX_${update.title.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_')}_${update.id.slice(0, 8)}.txt`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -89,7 +118,7 @@ export default function RegulatoryUpdates() {
       
       toast({
         title: "Download gestartet",
-        description: "Regulatorisches Update wird heruntergeladen."
+        description: `Vollständiges Regulatory Update "${update.title}" wurde heruntergeladen.`
       });
     } catch (error) {
       console.error('Download error:', error);
@@ -254,7 +283,35 @@ export default function RegulatoryUpdates() {
               document={{
                 id: update.id,
                 documentTitle: update.title,
-                content: update.content,
+                content: `
+**Titel:** ${update.title}
+
+**Beschreibung:** ${update.description}
+
+**Quelle:** ${update.sourceId}
+
+**Priorität:** ${update.priority}
+
+**Typ:** ${update.updateType}
+
+**Region:** ${update.region}
+
+**Veröffentlichungsdatum:** ${update.publishedAt ? new Date(update.publishedAt).toLocaleDateString('de-DE') : 'Unbekannt'}
+
+**Geräteklassen:** ${update.deviceClasses?.length ? update.deviceClasses.join(', ') : 'Nicht spezifiziert'}
+
+**Kategorien:** ${update.categories ? JSON.stringify(update.categories, null, 2) : 'Keine Kategorien'}
+
+**Vollständiger Inhalt:**
+${update.description}
+
+**Rohdaten:**
+\`\`\`json
+${JSON.stringify(update.rawData, null, 2)}
+\`\`\`
+
+**Quelle-URL:** ${update.sourceUrl || 'Nicht verfügbar'}
+                `,
                 sourceId: update.sourceId,
                 originalDate: update.publishedAt,
                 category: update.updateType,
@@ -264,7 +321,10 @@ export default function RegulatoryUpdates() {
                   fileType: 'Regulatory Update',
                   pageCount: update.rawData?.pages || 1,
                   language: update.rawData?.language || 'de',
-                  lastModified: update.createdAt
+                  lastModified: update.createdAt,
+                  priority: update.priority,
+                  region: update.region,
+                  updateType: update.updateType
                 },
                 downloadedAt: update.createdAt
               }}
@@ -285,8 +345,18 @@ export default function RegulatoryUpdates() {
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={() => window.location.href = `/documents/${update.sourceId}/${update.id}`}
-              title="In neuem Fenster öffnen"
+              onClick={() => {
+                if (update.sourceUrl) {
+                  window.open(update.sourceUrl, '_blank');
+                } else {
+                  toast({
+                    title: "Link nicht verfügbar",
+                    description: "Für dieses Update ist kein externer Link verfügbar.",
+                    variant: "destructive"
+                  });
+                }
+              }}
+              title="Quelle in neuem Fenster öffnen"
             >
               <ExternalLink className="h-4 w-4" />
             </Button>
