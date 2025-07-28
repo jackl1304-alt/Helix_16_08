@@ -47,19 +47,29 @@ export default function RegulatoryUpdates() {
   const [selectedPriority, setSelectedPriority] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<string>("all");
 
-  // Load real regulatory updates from API
+  // Load real regulatory updates from API  
   const { data: apiUpdates = [], isLoading: isLoadingUpdates } = useQuery({
     queryKey: ['/api/regulatory-updates'],
     queryFn: async () => {
       try {
+        console.log('Fetching regulatory updates from API...');
         const response = await fetch('/api/regulatory-updates');
-        if (!response.ok) return [];
+        if (!response.ok) {
+          console.error('API response not ok:', response.status);
+          return [];
+        }
         const data = await response.json();
+        console.log('API returned', Array.isArray(data) ? data.length : 0, 'updates');
+        console.log('First update:', data[0]);
         return Array.isArray(data) ? data : [];
-      } catch {
+      } catch (error) {
+        console.error('API fetch error:', error);
         return [];
       }
     },
+    enabled: true, // Force enable query
+    refetchOnWindowFocus: false,
+    staleTime: 0, // Always fetch fresh data
   });
 
   // Fallback mock data if API fails
@@ -141,8 +151,11 @@ export default function RegulatoryUpdates() {
     }
   ];
 
-  // Use API data with fallback to mock data
-  const updates = apiUpdates.length > 0 ? apiUpdates.map(update => ({
+  // Use API data with fallback to mock data  
+  console.log('API Updates length:', apiUpdates.length);
+  console.log('Is loading:', isLoadingUpdates);
+  
+  const updates = apiUpdates.length > 0 ? apiUpdates.map((update: any) => ({
     id: update.id,
     title: update.title,
     description: update.description || update.title,
@@ -151,12 +164,14 @@ export default function RegulatoryUpdates() {
     region: update.region || 'Unknown',
     updateType: update.type || update.updateType || 'update',
     priority: (update.priority || 'medium') as 'low' | 'medium' | 'high' | 'urgent',
-    deviceClasses: update.device_classes || update.deviceClasses || [],
-    categories: update.categories || [],
+    deviceClasses: Array.isArray(update.device_classes) ? update.device_classes : (update.deviceClasses || []),
+    categories: Array.isArray(update.categories) ? update.categories : [],
     publishedAt: update.published_at || update.publishedAt || update.created_at || new Date().toISOString(),
     createdAt: update.created_at || update.createdAt || new Date().toISOString(),
     content: update.description || update.content || update.title
   })) : mockUpdates;
+  
+  console.log('Final updates count:', updates.length);
   
   const isLoading = isLoadingUpdates;
 
@@ -399,8 +414,8 @@ export default function RegulatoryUpdates() {
                         <p className="font-medium text-slate-900 dark:text-slate-100">{update.title}</p>
                         <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">{update.description}</p>
                         <div className="flex flex-wrap gap-1">
-                          {update.deviceClasses?.map(deviceClass => (
-                            <Badge key={deviceClass} variant="secondary" className="text-xs">
+                          {update.deviceClasses?.map((deviceClass: string, idx: number) => (
+                            <Badge key={`${update.id}-${idx}`} variant="secondary" className="text-xs">
                               {deviceClass}
                             </Badge>
                           ))}
