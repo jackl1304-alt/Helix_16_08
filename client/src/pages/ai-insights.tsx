@@ -278,6 +278,144 @@ export default function AIInsights() {
         </div>
       </div>
 
+      {/* Quick Overview Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Aktive Analysen</CardTitle>
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">
+              {insights.filter(i => i.category === 'trend_analysis').length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Laufende Trend-Analysen
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Kritische Erkenntnisse</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-red-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-600">
+              {insights.filter(i => i.severity === 'critical' || i.severity === 'high').length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Hohe Priorität Items
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Compliance Gaps</CardTitle>
+            <Target className="h-4 w-4 text-orange-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-orange-600">
+              {insights.filter(i => i.category === 'compliance_gap').length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Identifizierte Lücken
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Durchschnittliches Vertrauen</CardTitle>
+            <Sparkles className="h-4 w-4 text-green-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">
+              {Math.round(insights.reduce((sum, insight) => sum + insight.confidence, 0) / insights.length)}%
+            </div>
+            <p className="text-xs text-muted-foreground">
+              KI-Vertrauen Score
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Summary Statistics */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5" />
+            Schnelle Übersicht
+          </CardTitle>
+          <CardDescription>
+            Zusammenfassung der wichtigsten KI-Erkenntnisse und Trends
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="space-y-2">
+              <h4 className="font-semibold text-sm">Kategorien-Verteilung</h4>
+              <div className="space-y-1">
+                {[
+                  { key: 'trend_analysis', label: 'Trend-Analysen', color: 'bg-blue-500' },
+                  { key: 'risk_assessment', label: 'Risiko-Bewertungen', color: 'bg-red-500' },
+                  { key: 'compliance_gap', label: 'Compliance Lücken', color: 'bg-orange-500' },
+                  { key: 'market_intelligence', label: 'Markt-Intelligence', color: 'bg-green-500' }
+                ].map(cat => (
+                  <div key={cat.key} className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${cat.color}`}></div>
+                      <span>{cat.label}</span>
+                    </div>
+                    <Badge variant="outline">
+                      {insights.filter(i => i.category === cat.key).length}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="font-semibold text-sm">Auswirkungsbereich</h4>
+              <div className="space-y-1">
+                {[
+                  { key: 'high', label: 'Hohe Auswirkung', color: 'text-red-600' },
+                  { key: 'medium', label: 'Mittlere Auswirkung', color: 'text-orange-600' },
+                  { key: 'low', label: 'Geringe Auswirkung', color: 'text-green-600' }
+                ].map(impact => (
+                  <div key={impact.key} className="flex items-center justify-between text-sm">
+                    <span className={impact.color}>{impact.label}</span>
+                    <Badge variant="outline">
+                      {insights.filter(i => i.impact === impact.key).length}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="font-semibold text-sm">Zeitrahmen</h4>
+              <div className="space-y-1">
+                {[
+                  { key: 'immediate', label: 'Sofort', color: 'text-red-600' },
+                  { key: 'short_term', label: 'Kurzfristig', color: 'text-orange-600' },
+                  { key: 'medium_term', label: 'Mittelfristig', color: 'text-blue-600' },
+                  { key: 'long_term', label: 'Langfristig', color: 'text-green-600' }
+                ].map(timeframe => (
+                  <div key={timeframe.key} className="flex items-center justify-between text-sm">
+                    <span className={timeframe.color}>{timeframe.label}</span>
+                    <Badge variant="outline">
+                      {insights.filter(i => i.timeframe === timeframe.key).length}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       <Tabs defaultValue="insights" className="space-y-6">
         <TabsList>
           <TabsTrigger value="insights">KI-Insights</TabsTrigger>
