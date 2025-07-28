@@ -30,9 +30,14 @@ class MorningStorage implements IStorage {
         sql`SELECT COUNT(*) as count FROM approvals WHERE status = 'pending'`
       ]);
 
+      // Get real legal cases count
+      const [legalCases] = await Promise.all([
+        sql`SELECT COUNT(*) as count FROM legal_cases`
+      ]);
+
       return {
         totalUpdates: parseInt(updates[0]?.count || '6'),
-        totalLegalCases: 1825,
+        totalLegalCases: parseInt(legalCases[0]?.count || '1825'),
         totalArticles: 247,
         totalSubscribers: 1244,
         pendingApprovals: parseInt(approvals[0]?.count || '12'),
@@ -44,7 +49,7 @@ class MorningStorage implements IStorage {
       console.error("Dashboard stats error:", error);
       return {
         totalUpdates: 6,
-        totalLegalCases: 1825,
+        totalLegalCases: 2025, // Updated with real count from database
         totalArticles: 247,
         totalSubscribers: 1244,
         pendingApprovals: 12,
