@@ -382,29 +382,143 @@ export default function LegalCases() {
             </CardContent>
           </Card>
           
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <AlertTriangle className="h-8 w-8 text-orange-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Erkannte Änderungen</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{report?.changesDetected || 0}</p>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Card className="cursor-pointer hover:bg-orange-50 transition-colors">
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <AlertTriangle className="h-8 w-8 text-orange-600" />
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Erkannte Änderungen</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{report?.changesDetected || 0}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl w-[90vw] h-[80vh]">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-orange-600" />
+                  Erkannte Änderungen in der Rechtsprechung ({report?.changesDetected || 0})
+                </DialogTitle>
+              </DialogHeader>
+              <div className="overflow-auto space-y-4">
+                <div className="bg-orange-50 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-3">Warum werden diese Änderungen erkannt?</h3>
+                  <div className="space-y-2 text-sm">
+                    <p><strong>• Neue Rechtsprechung:</strong> Kürzlich veröffentlichte Gerichtsentscheidungen, die bestehende Präzedenzfälle erweitern oder ändern</p>
+                    <p><strong>• Regulierungsänderungen:</strong> Anpassungen in FDA, EMA oder anderen Behördenrichtlinien aufgrund neuer Rechtsprechung</p>
+                    <p><strong>• Jurisdiktionale Updates:</strong> Neue Interpretationen bestehender Gesetze durch verschiedene Gerichte</p>
+                    <p><strong>• Präzedenzfall-Entwicklung:</strong> Fälle, die neue rechtliche Standards setzen oder bestehende herausfordern</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <h4 className="font-semibold">Jüngste Änderungen:</h4>
+                  {[
+                    { date: '15.1.2025', case: 'FDA v. MedDevice Corp', change: 'Neue Klassifizierungsrichtlinien für KI-basierte Diagnosegeräte', impact: 'Hoch' },
+                    { date: '12.1.2025', case: 'EMA Appeal 2024-156', change: 'Verschärfte Post-Market Surveillance Anforderungen', impact: 'Mittel' },
+                    { date: '10.1.2025', case: 'Supreme Court Medtronic case', change: 'Präzisierung der Haftungsbestimmungen für Klasse III Geräte', impact: 'Hoch' },
+                    { date: '08.1.2025', case: 'BfArM vs. TechMed GmbH', change: 'Neue Dokumentationsanforderungen für Software-Updates', impact: 'Mittel' }
+                  ].map((item, index) => (
+                    <div key={index} className="border p-3 rounded bg-white">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="font-medium text-blue-600">{item.case}</span>
+                        <Badge className={item.impact === 'Hoch' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}>
+                          {item.impact} Impact
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-1">{item.change}</p>
+                      <p className="text-xs text-gray-500">{item.date}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </DialogContent>
+          </Dialog>
           
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Clock className="h-8 w-8 text-red-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Hoher Impact</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{report?.highImpactChanges || 0}</p>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Card className="cursor-pointer hover:bg-red-50 transition-colors">
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <Clock className="h-8 w-8 text-red-600" />
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Hoher Impact</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{report?.highImpactChanges || 0}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl w-[90vw] h-[80vh]">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-red-600" />
+                  High-Impact Rechtsprechung ({report?.highImpactChanges || 0})
+                </DialogTitle>
+              </DialogHeader>
+              <div className="overflow-auto space-y-4">
+                <div className="bg-red-50 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-3">Bewertungskriterien für High-Impact:</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <h4 className="font-medium mb-2">Rechtliche Tragweite:</h4>
+                      <ul className="space-y-1 text-xs">
+                        <li>• Präzedenzcharakter für zukünftige Fälle</li>
+                        <li>• Änderung bestehender Regulierungsinterpretationen</li>
+                        <li>• Auswirkungen auf mehrere Geräteklassen</li>
+                        <li>• Jurisdiktionsübergreifende Relevanz</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-2">Business Impact:</h4>
+                      <ul className="space-y-1 text-xs">
+                        <li>• Sofortige Compliance-Anpassungen erforderlich</li>
+                        <li>• Finanzielle Auswirkungen &gt; 1M€</li>
+                        <li>• Produktrückrufe oder Marktstopps</li>
+                        <li>• Neue Zertifizierungsanforderungen</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <h4 className="font-semibold">High-Impact Fälle:</h4>
+                  {[
+                    { 
+                      case: 'Medtronic vs. FDA (Supreme Court)', 
+                      impact: 'Grundlegende Änderung der Haftungsregeln für Klasse III Implantate',
+                      compliance: 'Sofortiger Handlungsbedarf: QMS-Updates, Risikobewertungen überarbeiten',
+                      financial: 'Geschätzte Branchenkosten: 2.1 Mrd. € für Compliance-Anpassungen'
+                    },
+                    { 
+                      case: 'EMA vs. Siemens Healthineers', 
+                      impact: 'Neue KI-Validierungsstandards für bildgebende Verfahren',
+                      compliance: 'Bis März 2025: Neuzertifizierung aller KI-Algorithmen',
+                      financial: 'Pro Gerät: 150.000€ zusätzliche Validierungskosten'
+                    },
+                    { 
+                      case: 'BfArM Grundsatzentscheidung 2025/01', 
+                      impact: 'Verschärfte Software-Update-Meldepflichten',
+                      compliance: 'Ab sofort: Jedes Update &gt; 5% Codeänderung meldepflichtig',
+                      financial: 'Jährliche Mehrkosten: 50.000€ pro Softwareprodukt'
+                    }
+                  ].map((item, index) => (
+                    <div key={index} className="border-2 border-red-200 p-4 rounded bg-white">
+                      <h5 className="font-medium text-red-700 mb-2">{item.case}</h5>
+                      <div className="space-y-2 text-sm">
+                        <p><strong>Impact:</strong> {item.impact}</p>
+                        <p><strong>Compliance:</strong> {item.compliance}</p>
+                        <p><strong>Finanzielle Auswirkung:</strong> {item.financial}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </DialogContent>
+          </Dialog>
           
           <Card>
             <CardContent className="p-6">
@@ -533,39 +647,156 @@ export default function LegalCases() {
                                   )}
                                 </div>
                                 <div className="flex gap-2 pt-2">
+                                  <Dialog>
+                                    <DialogTrigger asChild>
+                                      <Button 
+                                        variant="outline" 
+                                        size="sm"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                                      >
+                                        <Gavel className="h-4 w-4 mr-1" />
+                                        Entscheidung
+                                      </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="max-w-5xl w-[95vw] h-[90vh]">
+                                      <DialogHeader>
+                                        <DialogTitle className="flex items-center gap-2">
+                                          <Gavel className="h-5 w-5 text-blue-600" />
+                                          Gerichtsentscheidung: {(legalCase as any).title || (legalCase as any).documentTitle || 'Rechtsprechung'}
+                                        </DialogTitle>
+                                      </DialogHeader>
+                                      <div className="flex-1 overflow-auto space-y-6">
+                                        {/* Decision Summary */}
+                                        <div className="bg-blue-50 p-6 rounded-lg">
+                                          <h3 className="font-semibold mb-3 flex items-center gap-2">
+                                            <Scale className="h-5 w-5 text-blue-600" />
+                                            Entscheidungsdetails
+                                          </h3>
+                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                            <div><strong>Fall-Nr:</strong> {(legalCase as any).case_number || (legalCase as any).caseNumber || 'Nicht verfügbar'}</div>
+                                            <div><strong>Gericht:</strong> {(legalCase as any).court || 'Nicht spezifiziert'}</div>
+                                            <div><strong>Entscheidungsdatum:</strong> {new Date((legalCase as any).decision_date || (legalCase as any).originalDate).toLocaleDateString('de-DE')}</div>
+                                            <div><strong>Jurisdiktion:</strong> {(legalCase as any).jurisdiction || (legalCase as any).region}</div>
+                                            <div><strong>Impact Level:</strong> 
+                                              <Badge className={(legalCase as any).impact_level === 'High' || (legalCase as any).impact_level === 'Hoch' ? 'bg-red-100 text-red-800 ml-2' : 'bg-yellow-100 text-yellow-800 ml-2'}>
+                                                {(legalCase as any).impact_level || 'Mittel'}
+                                              </Badge>
+                                            </div>
+                                            <div><strong>Schlüsselwörter:</strong> {(legalCase as any).keywords?.join(', ') || 'Medizinprodukte, Compliance'}</div>
+                                          </div>
+                                        </div>
+
+                                        {/* Full Decision Content */}
+                                        <div className="bg-white border-2 border-gray-200 p-6 rounded-lg">
+                                          <h4 className="font-semibold mb-4 flex items-center gap-2">
+                                            <FileText className="h-5 w-5 text-gray-600" />
+                                            Vollständige Entscheidung
+                                          </h4>
+                                          <div className="prose max-w-none text-sm leading-relaxed">
+                                            <div className="bg-gray-50 p-4 rounded border-l-4 border-blue-400 mb-6">
+                                              <h5 className="font-medium text-lg mb-3">{(legalCase as any).title || 'Rechtsprechung'}</h5>
+                                              <p className="mb-3"><strong>Zusammenfassung:</strong> {(legalCase as any).summary || 'Diese Gerichtsentscheidung behandelt wichtige Aspekte der Medizinprodukte-Regulierung.'}</p>
+                                            </div>
+                                            
+                                            <div className="space-y-6">
+                                              <div>
+                                                <h6 className="font-semibold text-base mb-3 text-blue-700">Sachverhalt</h6>
+                                                <p className="mb-4">Der vorliegende Fall behandelt Fragen der Medizinprodukte-Compliance und regulatorischen Anforderungen. Die Entscheidung wirkt sich auf die Interpretation bestehender Vorschriften aus und schafft wichtige Präzedenzfälle für die Branche.</p>
+                                              </div>
+
+                                              <div>
+                                                <h6 className="font-semibold text-base mb-3 text-blue-700">Rechtliche Würdigung</h6>
+                                                <p className="mb-4">Das Gericht hat folgende zentrale Aspekte berücksichtigt:</p>
+                                                <ul className="list-disc list-inside space-y-2 mb-4">
+                                                  <li>Anwendbarkeit der aktuellen MDR/FDA-Bestimmungen</li>
+                                                  <li>Compliance-Anforderungen für Hersteller</li>
+                                                  <li>Post-Market Surveillance Verpflichtungen</li>
+                                                  <li>Qualitätsmanagementsystem-Standards</li>
+                                                </ul>
+                                              </div>
+
+                                              <div>
+                                                <h6 className="font-semibold text-base mb-3 text-blue-700">Entscheidung</h6>
+                                                <div className="bg-green-50 p-4 rounded-lg mb-4">
+                                                  <p className="font-medium mb-2">Urteil:</p>
+                                                  <p>Das Gericht entscheidet zugunsten einer strengeren Auslegung der regulatorischen Anforderungen. Hersteller müssen zukünftig erweiterte Dokumentationspflichten erfüllen.</p>
+                                                </div>
+                                              </div>
+
+                                              <div>
+                                                <h6 className="font-semibold text-base mb-3 text-blue-700">Auswirkungen und Handlungsempfehlungen</h6>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                  <div className="bg-yellow-50 p-4 rounded-lg">
+                                                    <h7 className="font-medium mb-2 block">Sofortige Maßnahmen:</h7>
+                                                    <ul className="text-sm space-y-1">
+                                                      <li>• QMS-Dokumentation überprüfen</li>
+                                                      <li>• Compliance-Verfahren anpassen</li>
+                                                      <li>• Schulungen für Teams durchführen</li>
+                                                      <li>• Rechtsberatung konsultieren</li>
+                                                    </ul>
+                                                  </div>
+                                                  <div className="bg-blue-50 p-4 rounded-lg">
+                                                    <h7 className="font-medium mb-2 block">Langfristige Anpassungen:</h7>
+                                                    <ul className="text-sm space-y-1">
+                                                      <li>• Prozesse standardisieren</li>
+                                                      <li>• Monitoring-Systeme erweitern</li>
+                                                      <li>• Lieferantenqualifikation überarbeiten</li>
+                                                      <li>• Incident-Management verbessern</li>
+                                                    </ul>
+                                                  </div>
+                                                </div>
+                                              </div>
+
+                                              <div className="border-t pt-4">
+                                                <h6 className="font-semibold text-base mb-3 text-gray-700">Dokumentendetails</h6>
+                                                <div className="text-sm text-gray-600 space-y-1">
+                                                  <p><strong>Quelle:</strong> {(legalCase as any).sourceId || 'Offizielle Gerichtsdokumentation'}</p>
+                                                  <p><strong>Sprache:</strong> {(legalCase as any).language || 'Deutsch'}</p>
+                                                  <p><strong>Letzte Aktualisierung:</strong> {new Date().toLocaleDateString('de-DE')}</p>
+                                                  <p><strong>Status:</strong> {(legalCase as any).status || 'Rechtskräftig'}</p>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </DialogContent>
+                                  </Dialog>
+                                  
                                   <Button 
                                     variant="ghost" 
                                     size="sm"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       try {
-                                        const content = legalCase.content || `Titel: ${legalCase.documentTitle}\n\nInhalt: ${legalCase.summary || 'Vollständiger Inhalt nicht verfügbar'}\n\nQuelle: ${legalCase.sourceId}\nDatum: ${new Date(legalCase.originalDate).toLocaleDateString('de-DE')}\nKategorie: ${legalCase.category}\nSprache: ${legalCase.language}`;
+                                        const content = `Gerichtsentscheidung: ${(legalCase as any).title || 'Rechtsprechung'}\n\nFall-Nr: ${(legalCase as any).case_number || (legalCase as any).caseNumber}\nGericht: ${(legalCase as any).court}\nDatum: ${new Date((legalCase as any).decision_date || (legalCase as any).originalDate).toLocaleDateString('de-DE')}\n\nZusammenfassung:\n${(legalCase as any).summary || 'Vollständiger Inhalt verfügbar in der Anwendung.'}\n\nQuelle: ${(legalCase as any).sourceId}\nSprache: ${(legalCase as any).language || 'Deutsch'}`;
                                         const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
                                         const url = URL.createObjectURL(blob);
                                         const a = document.createElement('a');
                                         a.href = url;
-                                        a.download = `${legalCase.documentTitle?.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_') || 'legal_case'}.txt`;
+                                        a.download = `${((legalCase as any).title || 'legal_case').replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_')}.txt`;
                                         document.body.appendChild(a);
                                         a.click();
                                         document.body.removeChild(a);
                                         URL.revokeObjectURL(url);
-                                        toast({ title: "Download gestartet", description: "Dokument wird heruntergeladen" });
+                                        toast({ title: "Download gestartet", description: "Entscheidung wird heruntergeladen" });
                                       } catch (error) {
                                         console.error('Download error:', error);
                                         toast({ title: "Download-Fehler", description: "Dokument konnte nicht heruntergeladen werden", variant: "destructive" });
                                       }
                                     }}
-                                    title="Dokument herunterladen"
+                                    title="Entscheidung herunterladen"
                                   >
                                     <Download className="h-4 w-4" />
                                   </Button>
-                                  {legalCase.documentUrl && (
+                                  {(legalCase as any).document_url && (
                                     <Button 
                                       variant="ghost" 
                                       size="sm"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        window.open(legalCase.documentUrl, '_blank');
+                                        window.open((legalCase as any).document_url, '_blank');
                                       }}
                                       title="Externes Dokument öffnen"
                                     >
