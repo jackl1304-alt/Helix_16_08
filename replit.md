@@ -1,8 +1,8 @@
-# Helix MedTech Regulatory Intelligence Platform
+# AI-Powered Dropshipping Automation Platform
 
 ## Overview
 
-Helix is a comprehensive regulatory intelligence platform designed for the MedTech industry. It provides real-time monitoring of global regulatory landscapes, automated data collection from regulatory bodies, AI-powered content categorization, and streamlined approval workflows. The platform serves as a centralized hub for tracking regulatory updates, managing newsletters, and maintaining institutional knowledge.
+Eine vollständig automatisierte KI-gesteuerte Dropshipping-Plattform, die jeden Aspekt des E-Commerce-Geschäfts automatisiert. Das System übernimmt Produktmanagement, Lieferantenintegration, Kundenbetreuung, Bestellabwicklung, Marketing und Analyse vollständig autonom.
 
 ## User Preferences
 
