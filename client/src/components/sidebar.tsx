@@ -49,7 +49,7 @@ const navigation = [
     description: "Datenanalyse und Berichte"
   },
   {
-    name: "🤖 KI-Approval Demo",
+    name: "🤖 AI APPROVAL DEMO",
     href: "/ai-approval",
     icon: Bot,
     current: false,
