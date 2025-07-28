@@ -11,7 +11,7 @@ import GlobalSources from "@/pages/global-sources";
 import Analytics from "@/pages/analytics";
 import RegulatoryUpdates from "@/pages/regulatory-updates-fixed";
 import NewsletterManager from "@/pages/newsletter-manager";
-import ApprovalWorkflow from "@/pages/approval-workflow";
+import ApprovalWorkflowFixed from "@/pages/approval-workflow-fixed";
 import UserManagement from "@/pages/user-management";
 import SystemSettings from "@/pages/system-settings";
 import AuditLogs from "@/pages/audit-logs";
@@ -36,7 +36,7 @@ function Router() {
       <Route path="/regulatory-updates" component={RegulatoryUpdates} />
       <Route path="/sync-manager" component={SyncManager} />
       <Route path="/newsletter-manager" component={NewsletterManager} />
-      <Route path="/approval-workflow" component={ApprovalWorkflow} />
+      <Route path="/approval-workflow" component={ApprovalWorkflowFixed} />
       <Route path="/user-management" component={UserManagement} />
       <Route path="/system-settings" component={SystemSettings} />
       <Route path="/audit-logs" component={AuditLogs} />

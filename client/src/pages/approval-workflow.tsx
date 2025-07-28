@@ -148,7 +148,7 @@ export default function ApprovalWorkflow() {
                           {getStatusBadge(approval.status)}
                           <span className="text-sm text-gray-500">
                             <Clock className="inline h-4 w-4 mr-1" />
-                            {new Date(approval.created_at).toLocaleDateString('de-DE')}
+                            {approval.created_at ? new Date(approval.created_at).toLocaleDateString('de-DE') : 'Unbekannt'}
                           </span>
                           <span className="text-sm text-gray-500">
                             <FileText className="inline h-4 w-4 mr-1" />
