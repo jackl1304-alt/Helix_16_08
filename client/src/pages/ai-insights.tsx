@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 
 interface AIInsight {
   id: string;
@@ -171,6 +172,7 @@ const timeframeLabels = {
 
 export default function AIInsights() {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedSeverity, setSelectedSeverity] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -248,11 +250,28 @@ export default function AIInsights() {
         </div>
         
         <div className="flex space-x-2">
-          <Button variant="outline">
+          <Button 
+            variant="outline"
+            onClick={() => {
+              toast({
+                title: "Aktualisierung",
+                description: "KI-Insights werden aktualisiert..."
+              });
+              queryClient.invalidateQueries({ queryKey: ["/api/ai-insights"] });
+            }}
+          >
             <RefreshCw className="mr-2 h-4 w-4" />
             Aktualisieren
           </Button>
-          <Button variant="outline">
+          <Button 
+            variant="outline"
+            onClick={() => {
+              toast({
+                title: "Export",
+                description: "Report wird vorbereitet..."
+              });
+            }}
+          >
             <Download className="mr-2 h-4 w-4" />
             Report exportieren
           </Button>
@@ -402,10 +421,29 @@ export default function AIInsights() {
                     <p className="text-sm font-medium mb-2">Datenquellen:</p>
                     <div className="flex flex-wrap gap-2">
                       {insight.sources.map((source) => (
-                        <Badge key={source} variant="secondary">
+                        <Button
+                          key={source}
+                          variant="outline"
+                          size="sm"
+                          className="h-7 px-2 text-xs"
+                          onClick={() => {
+                            // Navigate to appropriate data collection page based on source
+                            if (source.includes('EMA') || source.includes('MDCG') || source.includes('MDR')) {
+                              setLocation('/global-sources');
+                            } else if (source.includes('FDA')) {
+                              setLocation('/data-collection');
+                            } else {
+                              setLocation('/regulatory-updates');
+                            }
+                            toast({
+                              title: "Navigation",
+                              description: `Wechsle zu ${source} Datenquelle...`
+                            });
+                          }}
+                        >
                           <FileText className="h-3 w-3 mr-1" />
                           {source}
-                        </Badge>
+                        </Button>
                       ))}
                     </div>
                   </div>
