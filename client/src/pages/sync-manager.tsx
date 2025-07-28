@@ -34,20 +34,18 @@ export default function SyncManager() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: dataSources, isLoading } = useQuery({
+  const { data: dataSources = [], isLoading } = useQuery<DataSource[]>({
     queryKey: ['/api/data-sources'],
   });
 
-  const { data: syncStats } = useQuery({
+  const { data: syncStats = {} } = useQuery({
     queryKey: ['/api/sync/stats'],
     refetchInterval: 5000, // Aktualisiere alle 5 Sekunden
   });
 
   const syncMutation = useMutation({
     mutationFn: async (sourceId: string) => {
-      return apiRequest(`/api/data-sources/${sourceId}/sync`, {
-        method: 'POST',
-      });
+      return apiRequest(`/api/data-sources/${sourceId}/sync`, 'POST');
     },
     onSuccess: (data, sourceId) => {
       toast({
@@ -57,7 +55,7 @@ export default function SyncManager() {
       queryClient.invalidateQueries({ queryKey: ['/api/data-sources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
     },
-    onError: (error, sourceId) => {
+    onError: (error: any, sourceId) => {
       toast({
         title: "Synchronisation fehlgeschlagen",
         description: `Fehler bei Datenquelle ${sourceId}: ${error.message}`,
@@ -68,16 +66,38 @@ export default function SyncManager() {
 
   const syncAllMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest('/api/sync/all', {
-        method: 'POST',
-      });
+      // Synchronisiere alle aktiven Datenquellen nacheinander
+      const activeSources = dataSources.filter(source => source.isActive);
+      const results = [];
+      
+      for (const source of activeSources) {
+        console.log(`Starting bulk sync for: ${source.id}`);
+        try {
+          const result = await apiRequest(`/api/data-sources/${source.id}/sync`, 'POST');
+          results.push({ id: source.id, status: 'success', result });
+        } catch (error) {
+          console.error(`Bulk sync failed for ${source.id}:`, error);
+          results.push({ id: source.id, status: 'error', error });
+        }
+      }
+      
+      return { results, total: activeSources.length };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      const successCount = data.results.filter(r => r.status === 'success').length;
       toast({
-        title: "Komplett-Synchronisation gestartet",
-        description: "Alle aktiven Datenquellen werden synchronisiert",
+        title: "Komplett-Synchronisation abgeschlossen",
+        description: `${successCount} von ${data.total} Datenquellen erfolgreich synchronisiert`,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/data-sources'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/sync/stats'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Komplett-Synchronisation fehlgeschlagen",
+        description: `Fehler beim Synchronisieren: ${error.message}`,
+        variant: "destructive",
+      });
     }
   });
 
@@ -145,58 +165,56 @@ export default function SyncManager() {
       </div>
 
       {/* Sync Statistics */}
-      {syncStats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-                <div>
-                  <p className="text-sm text-gray-600">Letzte Synchronisation</p>
-                  <p className="font-semibold">{syncStats.lastSync || 'Nie'}</p>
-                </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              <div>
+                <p className="text-sm text-gray-600">Letzte Synchronisation</p>
+                <p className="font-semibold">{(syncStats as any)?.lastSync || 'Nie'}</p>
               </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <Database className="h-5 w-5 text-blue-600" />
-                <div>
-                  <p className="text-sm text-gray-600">Aktive Quellen</p>
-                  <p className="font-semibold">{syncStats.activeSources || 0}</p>
-                </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Database className="h-5 w-5 text-blue-600" />
+              <div>
+                <p className="text-sm text-gray-600">Aktive Quellen</p>
+                <p className="font-semibold">{(syncStats as any)?.activeSources || dataSources.filter(s => s.isActive).length}</p>
               </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <Download className="h-5 w-5 text-purple-600" />
-                <div>
-                  <p className="text-sm text-gray-600">Neue Updates</p>
-                  <p className="font-semibold">{syncStats.newUpdates || 0}</p>
-                </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Download className="h-5 w-5 text-purple-600" />
+              <div>
+                <p className="text-sm text-gray-600">Neue Updates</p>
+                <p className="font-semibold">{(syncStats as any)?.newUpdates || 0}</p>
               </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <Clock className="h-5 w-5 text-orange-600" />
-                <div>
-                  <p className="text-sm text-gray-600">Laufende Syncs</p>
-                  <p className="font-semibold">{syncStats.runningSyncs || 0}</p>
-                </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Clock className="h-5 w-5 text-orange-600" />
+              <div>
+                <p className="text-sm text-gray-600">Laufende Syncs</p>
+                <p className="font-semibold">{syncAllMutation.isPending ? dataSources.filter(s => s.isActive).length : 0}</p>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Data Sources Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {dataSources?.map((source: DataSource) => {
+        {dataSources.map((source: DataSource) => {
           const Icon = getSourceIcon(source.type);
           const isCurrentlySyncing = syncMutation.isPending && syncMutation.variables === source.id;
           
