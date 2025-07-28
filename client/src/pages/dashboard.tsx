@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { 
   FileText, 
   Database, 
@@ -15,7 +16,9 @@ import {
 } from "lucide-react";
 
 export default function Dashboard() {
-  const { data: stats, isLoading } = useQuery({
+  const [, setLocation] = useLocation();
+  
+  const { data: stats = {}, isLoading } = useQuery({
     queryKey: ['/api/dashboard/stats'],
   });
 
@@ -28,6 +31,12 @@ export default function Dashboard() {
     queryKey: ['/api/approvals/pending'],
     queryFn: () => fetch('/api/approvals/pending').then(res => res.json()),
   });
+
+  // Quick Action Handlers
+  const handleDataSourcesSync = () => setLocation('/sync-manager');
+  const handleKnowledgeBase = () => setLocation('/knowledge-base');
+  const handleNewsletter = () => setLocation('/newsletter-manager');
+  const handleAnalytics = () => setLocation('/analytics');
 
   if (isLoading) {
     return (
@@ -239,9 +248,10 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Button 
               variant="outline" 
-              className="flex items-center gap-2 h-20"
+              className="flex items-center gap-2 h-20 hover:bg-blue-50 hover:border-blue-200 transition-colors"
+              onClick={handleDataSourcesSync}
             >
-              <Database className="h-5 w-5" />
+              <Database className="h-5 w-5 text-blue-600" />
               <div className="text-left">
                 <div className="font-medium">Datenquellen sync</div>
                 <div className="text-xs text-gray-500">FDA, EMA, BfArM Updates</div>
@@ -250,9 +260,10 @@ export default function Dashboard() {
             
             <Button 
               variant="outline" 
-              className="flex items-center gap-2 h-20"
+              className="flex items-center gap-2 h-20 hover:bg-green-50 hover:border-green-200 transition-colors"
+              onClick={handleKnowledgeBase}
             >
-              <BookOpen className="h-5 w-5" />
+              <BookOpen className="h-5 w-5 text-green-600" />
               <div className="text-left">
                 <div className="font-medium">Knowledge Base</div>
                 <div className="text-xs text-gray-500">Artikel durchsuchen</div>
@@ -261,9 +272,10 @@ export default function Dashboard() {
 
             <Button 
               variant="outline" 
-              className="flex items-center gap-2 h-20"
+              className="flex items-center gap-2 h-20 hover:bg-purple-50 hover:border-purple-200 transition-colors"
+              onClick={handleNewsletter}
             >
-              <Mail className="h-5 w-5" />
+              <Mail className="h-5 w-5 text-purple-600" />
               <div className="text-left">
                 <div className="font-medium">Newsletter</div>
                 <div className="text-xs text-gray-500">Neue Ausgabe erstellen</div>
@@ -272,9 +284,10 @@ export default function Dashboard() {
 
             <Button 
               variant="outline" 
-              className="flex items-center gap-2 h-20"
+              className="flex items-center gap-2 h-20 hover:bg-orange-50 hover:border-orange-200 transition-colors"
+              onClick={handleAnalytics}
             >
-              <TrendingUp className="h-5 w-5" />
+              <TrendingUp className="h-5 w-5 text-orange-600" />
               <div className="text-left">
                 <div className="font-medium">Analytics</div>
                 <div className="text-xs text-gray-500">Compliance Trends</div>
