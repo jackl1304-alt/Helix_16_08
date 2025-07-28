@@ -65,44 +65,80 @@ export default function RegulatoryUpdatesFixed() {
 
   const downloadUpdate = (update: RegulatoryUpdate) => {
     try {
-      const content = `
-REGULATORY UPDATE - VOLLSTÄNDIGER EXPORT
-========================================
-
-Titel: ${update.title}
-Beschreibung: ${update.description}
-
-GRUNDINFORMATIONEN:
-- ID: ${update.id}
-- Quelle: ${update.source_id}
-- Region: ${update.region}
-- Priorität: ${update.priority}
-- Typ: ${update.update_type}
-- Veröffentlichungsdatum: ${new Date(update.published_at).toLocaleDateString('de-DE')}
-- Erstellt am: ${new Date(update.created_at).toLocaleDateString('de-DE')}
-
-GERÄTEKLASSEN:
-${update.device_classes?.length ? update.device_classes.join(', ') : 'Nicht spezifiziert'}
-
-KATEGORIEN:
-${update.categories ? JSON.stringify(update.categories, null, 2) : 'Keine Kategorien verfügbar'}
-
-QUELLE-URL:
-${update.source_url || 'Nicht verfügbar'}
-
-VOLLSTÄNDIGE ROHDATEN:
-${JSON.stringify(update.raw_data, null, 2)}
-
-========================================
-Export erstellt am: ${new Date().toLocaleDateString('de-DE')} um ${new Date().toLocaleTimeString('de-DE')}
-Helix Regulatory Intelligence Platform
+      // Create HTML content for PDF conversion
+      const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Helix Regulatory Update - ${update.title}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        .header { background: #1e40af; color: white; padding: 20px; margin-bottom: 20px; }
+        .section { margin-bottom: 20px; }
+        .label { font-weight: bold; color: #374151; }
+        .badge { background: #e5e7eb; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .badge-high { background: #fef2f2; color: #991b1b; }
+        .badge-medium { background: #fffbeb; color: #92400e; }
+        .badge-low { background: #f0f9ff; color: #1e40af; }
+        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .footer { margin-top: 40px; text-align: center; color: #6b7280; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Regulatory Update Export</h1>
+        <p>Helix Regulatory Intelligence Platform</p>
+    </div>
+    
+    <div class="section">
+        <h2>${update.title}</h2>
+        <p><span class="label">Beschreibung:</span> ${update.description}</p>
+    </div>
+    
+    <div class="section">
+        <h3>Grundinformationen</h3>
+        <div class="data-grid">
+            <div><span class="label">Region:</span> ${update.region}</div>
+            <div><span class="label">Priorität:</span> 
+                <span class="badge ${update.priority === 'high' ? 'badge-high' : update.priority === 'medium' ? 'badge-medium' : 'badge-low'}">${update.priority}</span>
+            </div>
+            <div><span class="label">Typ:</span> ${update.update_type}</div>
+            <div><span class="label">Veröffentlicht:</span> ${new Date(update.published_at).toLocaleDateString('de-DE')}</div>
+        </div>
+    </div>
+    
+    ${update.raw_data?.applicant ? `
+    <div class="section">
+        <h3>Detaillierte Informationen</h3>
+        ${update.raw_data.applicant ? `<p><span class="label">Antragsteller:</span> ${update.raw_data.applicant}</p>` : ''}
+        ${update.raw_data.device_name ? `<p><span class="label">Gerätename:</span> ${update.raw_data.device_name}</p>` : ''}
+        ${update.raw_data.k_number ? `<p><span class="label">K-Nummer:</span> ${update.raw_data.k_number}</p>` : ''}
+        ${update.raw_data.decision_description ? `<p><span class="label">Entscheidung:</span> ${update.raw_data.decision_description}</p>` : ''}
+        ${update.raw_data.clearance_type ? `<p><span class="label">Freigabe-Typ:</span> ${update.raw_data.clearance_type}</p>` : ''}
+    </div>
+    ` : ''}
+    
+    <div class="section">
+        <h3>Quelle</h3>
+        <p><span class="label">Quelle-URL:</span> ${update.source_url || 'Nicht verfügbar'}</p>
+        <p><span class="label">Quelle-ID:</span> ${update.source_id}</p>
+    </div>
+    
+    <div class="footer">
+        <p>Export erstellt am ${new Date().toLocaleDateString('de-DE')} um ${new Date().toLocaleTimeString('de-DE')}</p>
+        <p>Helix Regulatory Intelligence Platform</p>
+    </div>
+</body>
+</html>
       `;
       
-      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      // Create blob and download as HTML (which browsers can save as PDF)
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `HELIX_${update.title.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_')}_${update.id.slice(0, 8)}.txt`;
+      a.download = `HELIX_${update.title.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_')}_${update.id.slice(0, 8)}.html`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -110,7 +146,7 @@ Helix Regulatory Intelligence Platform
       
       toast({
         title: "Download gestartet",
-        description: `Vollständiges Regulatory Update "${update.title}" wurde heruntergeladen.`
+        description: `HTML-Dokument heruntergeladen. Öffnen Sie es und drucken Sie als PDF oder verwenden Sie "Als PDF speichern".`
       });
     } catch (error) {
       console.error('Download error:', error);
