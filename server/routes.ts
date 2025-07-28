@@ -933,84 +933,220 @@ Für technische Fragen:
       
       if (fileName.includes('MDR_Checklist')) {
         contentType = 'application/pdf';
-        content = `# MDR Compliance Checklist für Klasse III Medizinprodukte
+        // Create proper PDF-like content for text file that can be saved as PDF
+        content = `%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
 
-## Vollständige Checkliste zur EU MDR 2017/745 Implementierung
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
 
-### 1. Technische Dokumentation
-☐ Produktbeschreibung und Zweckbestimmung vollständig
-☐ Risikoanalyse nach ISO 14971 durchgeführt
-☐ Klinische Bewertung nach MEDDEV 2.7/1 Rev. 4
-☐ Gebrauchsanweisung nach EN 62304 erstellt
-☐ Kennzeichnung nach MDR Anhang I erstellt
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 612 792]
+/Contents 4 0 R
+>>
+endobj
 
-### 2. Qualitätsmanagementsystem
-☐ QMS nach ISO 13485:2016 implementiert
-☐ Benannte Stelle für Konformitätsbewertung ausgewählt
-☐ Post-Market Surveillance System etabliert
-☐ EUDAMED Registrierung vorbereitet
-☐ Vigilance-System nach MDR Art. 87-92 eingerichtet
+4 0 obj
+<<
+/Length 2000
+>>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(MDR Compliance Checklist für Klasse III Medizinprodukte) Tj
+0 -30 Td
+/F1 12 Tf
+(Vollständige Checkliste zur EU MDR 2017/745 Implementierung) Tj
+0 -40 Td
+(1. Technische Dokumentation) Tj
+0 -20 Td
+(☐ Produktbeschreibung und Zweckbestimmung vollständig) Tj
+0 -15 Td
+(☐ Risikoanalyse nach ISO 14971 durchgeführt) Tj
+0 -15 Td
+(☐ Klinische Bewertung nach MEDDEV 2.7/1 Rev. 4) Tj
+0 -15 Td
+(☐ Gebrauchsanweisung nach EN 62304 erstellt) Tj
+0 -15 Td
+(☐ Kennzeichnung nach MDR Anhang I erstellt) Tj
+0 -30 Td
+(2. Qualitätsmanagementsystem) Tj
+0 -20 Td
+(☐ QMS nach ISO 13485:2016 implementiert) Tj
+0 -15 Td
+(☐ Benannte Stelle für Konformitätsbewertung ausgewählt) Tj
+0 -15 Td
+(☐ Post-Market Surveillance System etabliert) Tj
+0 -15 Td
+(☐ EUDAMED Registrierung vorbereitet) Tj
+0 -15 Td
+(☐ Vigilance-System nach MDR Art. 87-92 eingerichtet) Tj
+ET
+endstream
+endobj
 
-### 3. Klinische Studien (falls erforderlich)
-☐ Klinischer Prüfplan erstellt
-☐ Ethikkommission Zustimmung eingeholt
-☐ Sponsorregistrierung bei Behörden
-☐ Good Clinical Practice (GCP) Compliance sichergestellt
-☐ Klinischer Studienbericht nach ICH E3 verfasst
-
-### 4. Regulatorische Einreichung
-☐ CE-Kennzeichnungsverfahren eingeleitet
-☐ EU-Bevollmächtigter benannt
-☐ Konformitätserklärung vorbereitet
-☐ EUDAMED Actor und Device Registrierung
-☐ UDI (Unique Device Identification) System implementiert
-
-### 5. Post-Market Überwachung
-☐ Post-Market Clinical Follow-up (PMCF) Plan erstellt
-☐ Periodic Safety Update Report (PSUR) Prozess etabliert
-☐ Corrective and Preventive Actions (CAPA) System
-☐ Market Surveillance Cooperation mit Behörden
-☐ Incident Reporting nach MDR Art. 87 vorbereitet
-
----
-Erstellt von: Helix MedTech Regulatory Intelligence Platform
-Letzte Aktualisierung: ${new Date().toLocaleDateString('de-DE')}`;
+xref
+0 5
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000206 00000 n 
+trailer
+<<
+/Size 5
+/Root 1 0 R
+>>
+startxref
+2256
+%%EOF`;
       } else if (fileName.includes('Timeline_Template')) {
         contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-        content = `MDR Implementierung Timeline Template
+        // Create Excel-like content structure
+        content = `PK\x03\x04\x14\x00\x06\x00\x08\x00\x00\x00!\x00MDR Implementierung Timeline Template
 
-Phase 1: Vorbereitung (Monate 1-3)
-- Woche 1-2: Gap-Analyse durchführen
-- Woche 3-4: Projektteam zusammenstellen
-- Woche 5-8: QMS-Update planen
-- Woche 9-12: Benannte Stelle auswählen
+Tabellenblatt: MDR_Timeline
 
-Phase 2: Dokumentation (Monate 4-8)
-- Woche 13-16: Technische Dokumentation überarbeiten
-- Woche 17-20: Risikoanalyse aktualisieren
-- Woche 21-24: Klinische Bewertung durchführen
-- Woche 25-32: Post-Market Surveillance Plan erstellen
+A1: Phase
+B1: Zeitraum
+C1: Aktivitäten
+D1: Verantwortlich
+E1: Status
 
-Phase 3: Zertifizierung (Monate 9-12)
-- Woche 33-36: Benannte Stelle Audit vorbereiten
-- Woche 37-40: Konformitätsbewertung durchführen
-- Woche 41-44: CE-Kennzeichnung beantragen
-- Woche 45-48: EUDAMED Registrierung abschließen
+A2: Vorbereitung
+B2: Monate 1-3
+C2: Gap-Analyse durchführen
+D2: Projektteam
+E2: Geplant
 
-Phase 4: Markteinführung (Monate 13-15)
-- Woche 49-52: Marktüberwachung implementieren
-- Woche 53-56: Vigilance System aktivieren
-- Woche 57-60: Post-Market Clinical Follow-up starten
+A3: Dokumentation
+B3: Monate 4-8
+C3: Technische Dokumentation überarbeiten
+D3: Technical Writer
+E3: In Bearbeitung
+
+A4: Zertifizierung
+B4: Monate 9-12
+C4: Benannte Stelle Audit
+D4: QA Manager
+E4: Ausstehend
+
+A5: Markteinführung
+B5: Monate 13-15
+C5: Marktüberwachung implementieren
+D5: Regulatory Affairs
+E5: Geplant
 
 Kritische Meilensteine:
-✓ Gap-Analyse abgeschlossen (Monat 1)
-✓ QMS-Update implementiert (Monat 4)
-✓ Technische Dokumentation fertig (Monat 8)
-✓ CE-Kennzeichnung erhalten (Monat 12)
-✓ Markteinführung (Monat 15)
+- Gap-Analyse abgeschlossen (Monat 1)
+- QMS-Update implementiert (Monat 4)
+- Technische Dokumentation fertig (Monat 8)
+- CE-Kennzeichnung erhalten (Monat 12)
+- Markteinführung (Monat 15)
 
-Diese Timeline ist ein Richtwert und kann je nach Produktkomplexität variieren.
-Erstellt mit Helix MedTech Regulatory Intelligence Platform`;
+Erstellt mit Helix MedTech Regulatory Intelligence Platform
+Datum: ${new Date().toLocaleDateString('de-DE')}`;
+      } else if (fileName.includes('510k_Submission_Template')) {
+        contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        content = `FDA 510(k) Submission Template
+
+DEVICE DESCRIPTION
+Product Name: [Enter Device Name]
+510(k) Number: [K######]
+Classification: [Device Classification]
+Product Code: [XXX]
+
+INDICATIONS FOR USE
+The [device name] is indicated for [specific medical indication and intended patient population].
+
+SUBSTANTIAL EQUIVALENCE COMPARISON
+Predicate Device: [Name and 510(k) number]
+Comparison Table:
+- Intended Use: Substantially equivalent
+- Technology: Same/Similar
+- Materials: Biocompatible materials per ISO 10993
+- Safety Profile: Equivalent risk profile
+
+PERFORMANCE DATA
+- Bench Testing: [Summary of test results]
+- Biocompatibility: ISO 10993 testing complete
+- Software Validation: IEC 62304 compliance
+- Clinical Data: [If required]
+
+REGULATORY PATHWAY
+Submission Type: Traditional 510(k)
+Review Timeline: 90 days standard review
+FDA Contact: [ODE contact information]
+
+LABELING
+- Instructions for Use (IFU)
+- Product Labels
+- Packaging Labels
+
+QUALITY SYSTEM
+ISO 13485:2016 Certificate Number: [Certificate]
+Facility Registration: [FDA Registration Number]
+
+Prepared by: Helix MedTech Regulatory Intelligence Platform
+Date: ${new Date().toLocaleDateString('de-DE')}`;
+      } else if (fileName.includes('Cybersecurity_Framework')) {
+        contentType = 'application/pdf';
+        content = `%PDF-1.4
+Medical Device Cybersecurity Framework
+
+EXECUTIVE SUMMARY
+This framework provides comprehensive cybersecurity guidance for medical device manufacturers based on FDA, EU MDR, and international standards.
+
+THREAT LANDSCAPE
+- Network-based attacks
+- Malware and ransomware
+- Insider threats
+- Supply chain vulnerabilities
+- Legacy system risks
+
+CYBERSECURITY CONTROLS
+1. Identity and Access Management
+2. Data Protection and Encryption
+3. Network Security
+4. Vulnerability Management
+5. Incident Response
+6. Software Bill of Materials (SBOM)
+
+REGULATORY REQUIREMENTS
+- FDA Cybersecurity Guidance (2022)
+- EU MDR Cybersecurity Requirements
+- IEC 62304 Software Lifecycle
+- ISO/IEC 27001 Information Security
+
+IMPLEMENTATION ROADMAP
+Phase 1: Risk Assessment (Months 1-2)
+Phase 2: Control Implementation (Months 3-6)
+Phase 3: Testing and Validation (Months 7-8)
+Phase 4: Documentation and Submission (Months 9-10)
+
+POST-MARKET SURVEILLANCE
+- Continuous monitoring
+- Vulnerability scanning
+- Patch management
+- Incident reporting
+
+Developed by: Helix MedTech Regulatory Intelligence Platform
+Version: 2.1
+Date: ${new Date().toLocaleDateString('de-DE')}`;
       }
       
       // Set download headers
