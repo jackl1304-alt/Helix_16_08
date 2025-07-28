@@ -12,7 +12,8 @@ import {
   Users,
   Settings,
   Archive,
-  Shield
+  Shield,
+  Search
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoPath from "@assets/tmp_4b23ca96-d4e9-4839-9375-75a53368ad60_1753652563564.jpeg";
@@ -28,6 +29,7 @@ const navigation = [
 ];
 
 const knowledgeBase = [
+  { name: "Intelligente Suche", href: "/intelligent-search", icon: Search },
   { name: "AI Insights", href: "/ai-insights", icon: Brain },
   { name: "Custom Knowledge", href: "/knowledge-base", icon: Book },
   { name: "Historische Daten", href: "/historical-data", icon: Archive },
