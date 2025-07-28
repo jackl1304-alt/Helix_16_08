@@ -15,7 +15,8 @@ import {
   Calendar,
   Scale,
   Home,
-  Activity
+  Activity,
+  Bot
 } from "lucide-react";
 
 const navigation = [
@@ -67,6 +68,13 @@ const navigation = [
     icon: CheckCircle,
     current: false,
     description: "Freigabeprozesse"
+  },
+  {
+    name: "KI-Approval Demo",
+    href: "/ai-approval",
+    icon: Bot,
+    current: false,
+    description: "KI-basierte Genehmigungen"
   },
   {
     name: "Historische Daten",

@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage-morning";
+import { aiApprovalService } from "./services/ai-approval-service";
 import { 
   insertUserSchema, 
   insertDataSourceSchema, 
@@ -466,6 +467,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Historical sync error:", error);
       res.status(500).json({ message: "Sync failed" });
+    }
+  });
+
+  // KI-basierte Approval-Routen
+  app.post("/api/approvals/ai-process", async (req, res) => {
+    try {
+      console.log('🤖 Starte KI-basierte Approval-Verarbeitung...');
+      await aiApprovalService.processPendingItems();
+      res.json({ 
+        success: true, 
+        message: "KI Approval-Verarbeitung abgeschlossen" 
+      });
+    } catch (error) {
+      console.error("KI Approval Fehler:", error);
+      res.status(500).json({ message: "KI Approval-Verarbeitung fehlgeschlagen" });
+    }
+  });
+
+  app.post("/api/approvals/ai-evaluate/:itemType/:itemId", async (req, res) => {
+    try {
+      const { itemType, itemId } = req.params;
+      console.log(`🤖 KI evaluiert ${itemType} mit ID ${itemId}`);
+      
+      await aiApprovalService.processAutoApproval(itemType, itemId);
+      res.json({ 
+        success: true, 
+        message: `KI Evaluation für ${itemType} abgeschlossen` 
+      });
+    } catch (error) {
+      console.error("KI Evaluation Fehler:", error);
+      res.status(500).json({ message: "KI Evaluation fehlgeschlagen" });
     }
   });
 
