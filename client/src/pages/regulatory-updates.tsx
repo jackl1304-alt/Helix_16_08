@@ -316,6 +316,22 @@ Helix Regulatory Intelligence Platform
                     <p className="mt-1 text-sm">{update.description}</p>
                   </div>
                   
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Vollständiger Inhalt</label>
+                    <div className="mt-1 text-sm bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+                      <p><strong>Titel:</strong> {update.title}</p>
+                      <p><strong>Beschreibung:</strong> {update.description}</p>
+                      <p><strong>Quelle ID:</strong> {update.source_id || update.sourceId}</p>
+                      <p><strong>Region:</strong> {update.region}</p>
+                      <p><strong>Priorität:</strong> {priorityLabels[update.priority]}</p>
+                      <p><strong>Typ:</strong> {update.updateType || update.update_type}</p>
+                      <p><strong>Veröffentlicht am:</strong> {new Date(update.publishedAt || update.published_at).toLocaleDateString('de-DE')}</p>
+                      {(update.sourceUrl || update.source_url) && (
+                        <p><strong>Quelle-URL:</strong> {update.sourceUrl || update.source_url}</p>
+                      )}
+                    </div>
+                  </div>
+                  
                   {(update.deviceClasses?.length > 0 || update.device_classes?.length > 0) && (
                     <div>
                       <label className="text-sm font-medium text-gray-500">Geräteklassen</label>
@@ -353,9 +369,23 @@ Helix Regulatory Intelligence Platform
                     {(update.sourceUrl || update.source_url) && (
                       <Button onClick={() => {
                         const sourceUrl = update.sourceUrl || update.source_url;
-                        const fullUrl = sourceUrl.startsWith('http') 
-                          ? sourceUrl 
-                          : `https://www.accessdata.fda.gov${sourceUrl}`;
+                        let fullUrl = sourceUrl;
+                        
+                        // Erstelle vollständige URLs für verschiedene Quellen
+                        if (!sourceUrl.startsWith('http')) {
+                          if (sourceUrl.startsWith('/regulatory-updates/')) {
+                            fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
+                          } else if (update.region === 'EU') {
+                            fullUrl = `https://www.ema.europa.eu${sourceUrl}`;
+                          } else if (update.region === 'DE') {
+                            fullUrl = `https://www.bfarm.de${sourceUrl}`;
+                          } else if (update.region === 'CH') {
+                            fullUrl = `https://www.swissmedic.ch${sourceUrl}`;
+                          } else {
+                            fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
+                          }
+                        }
+                        
                         window.open(fullUrl, '_blank');
                       }} variant="outline">
                         <ExternalLink className="h-4 w-4 mr-2" />
@@ -378,13 +408,24 @@ Helix Regulatory Intelligence Platform
               variant="ghost" 
               size="sm"
               onClick={() => {
-                // Verwende die source_url aus den Daten  
                 const sourceUrl = update.sourceUrl || update.source_url;
                 if (sourceUrl && sourceUrl !== 'Nicht verfügbar') {
-                  // Erstelle vollständige URLs für relative Pfade
-                  const fullUrl = sourceUrl.startsWith('http') 
-                    ? sourceUrl 
-                    : `https://www.accessdata.fda.gov${sourceUrl}`;
+                  let fullUrl = sourceUrl;
+                  
+                  if (!sourceUrl.startsWith('http')) {
+                    if (sourceUrl.startsWith('/regulatory-updates/')) {
+                      fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
+                    } else if (update.region === 'EU') {
+                      fullUrl = `https://www.ema.europa.eu${sourceUrl}`;
+                    } else if (update.region === 'DE') {
+                      fullUrl = `https://www.bfarm.de${sourceUrl}`;
+                    } else if (update.region === 'CH') {
+                      fullUrl = `https://www.swissmedic.ch${sourceUrl}`;
+                    } else {
+                      fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
+                    }
+                  }
+                  
                   window.open(fullUrl, '_blank');
                 } else {
                   toast({
