@@ -303,19 +303,108 @@ Helix Regulatory Intelligence Platform
           
           {update.categories && (
             <div>
-              <label className="text-sm font-medium text-gray-500">Kategorien</label>
-              <pre className="mt-1 text-xs bg-gray-100 dark:bg-gray-800 p-3 rounded overflow-x-auto">
-                {JSON.stringify(update.categories, null, 2)}
-              </pre>
+              <label className="text-sm font-medium text-gray-500">KI-Analyse & Kategorisierung</label>
+              <div className="mt-1 bg-gray-50 dark:bg-gray-900 p-4 rounded-lg space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">Risikolevel:</span>
+                  <Badge className={
+                    update.categories.riskLevel === 'high' ? 'bg-red-100 text-red-800' :
+                    update.categories.riskLevel === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-green-100 text-green-800'
+                  }>
+                    {update.categories.riskLevel}
+                  </Badge>
+                </div>
+                {update.categories.categories && (
+                  <div className="flex flex-wrap gap-1">
+                    <span className="font-medium">Kategorien:</span>
+                    {update.categories.categories.map((cat: string, idx: number) => (
+                      <Badge key={idx} variant="outline">{cat}</Badge>
+                    ))}
+                  </div>
+                )}
+                {update.categories.deviceTypes && (
+                  <div className="flex flex-wrap gap-1">
+                    <span className="font-medium">Gerätetypen:</span>
+                    {update.categories.deviceTypes.map((type: string, idx: number) => (
+                      <Badge key={idx} variant="secondary">{type}</Badge>
+                    ))}
+                  </div>
+                )}
+                {update.categories.confidence && (
+                  <div>
+                    <span className="font-medium">KI-Konfidenz:</span>
+                    <span className="ml-2">{Math.round(update.categories.confidence * 100)}%</span>
+                  </div>
+                )}
+              </div>
             </div>
           )}
           
           {update.raw_data && (
             <div>
-              <label className="text-sm font-medium text-gray-500">Vollständige Rohdaten</label>
-              <pre className="mt-1 text-xs bg-gray-100 dark:bg-gray-800 p-3 rounded overflow-x-auto max-h-60">
-                {JSON.stringify(update.raw_data, null, 2)}
-              </pre>
+              <label className="text-sm font-medium text-gray-500">Detaillierte Informationen</label>
+              <div className="mt-1 bg-gray-50 dark:bg-gray-900 p-4 rounded-lg space-y-3">
+                {update.raw_data.applicant && (
+                  <div>
+                    <span className="font-medium">Antragsteller:</span>
+                    <span className="ml-2">{update.raw_data.applicant}</span>
+                  </div>
+                )}
+                {update.raw_data.device_name && (
+                  <div>
+                    <span className="font-medium">Gerätename:</span>
+                    <span className="ml-2">{update.raw_data.device_name}</span>
+                  </div>
+                )}
+                {update.raw_data.k_number && (
+                  <div>
+                    <span className="font-medium">K-Nummer:</span>
+                    <span className="ml-2">{update.raw_data.k_number}</span>
+                  </div>
+                )}
+                {update.raw_data.decision_description && (
+                  <div>
+                    <span className="font-medium">Entscheidung:</span>
+                    <span className="ml-2">{update.raw_data.decision_description}</span>
+                  </div>
+                )}
+                {update.raw_data.clearance_type && (
+                  <div>
+                    <span className="font-medium">Freigabe-Typ:</span>
+                    <span className="ml-2">{update.raw_data.clearance_type}</span>
+                  </div>
+                )}
+                {update.raw_data.date_received && (
+                  <div>
+                    <span className="font-medium">Eingangsdatum:</span>
+                    <span className="ml-2">{new Date(update.raw_data.date_received).toLocaleDateString('de-DE')}</span>
+                  </div>
+                )}
+                {update.raw_data.decision_date && (
+                  <div>
+                    <span className="font-medium">Entscheidungsdatum:</span>
+                    <span className="ml-2">{new Date(update.raw_data.decision_date).toLocaleDateString('de-DE')}</span>
+                  </div>
+                )}
+                {(update.raw_data.address_1 || update.raw_data.city || update.raw_data.state) && (
+                  <div>
+                    <span className="font-medium">Adresse:</span>
+                    <div className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                      {update.raw_data.address_1 && <div>{update.raw_data.address_1}</div>}
+                      {(update.raw_data.city || update.raw_data.state) && (
+                        <div>{update.raw_data.city}{update.raw_data.state && `, ${update.raw_data.state}`}</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {update.raw_data.contact && (
+                  <div>
+                    <span className="font-medium">Kontakt:</span>
+                    <span className="ml-2">{update.raw_data.contact}</span>
+                  </div>
+                )}
+              </div>
             </div>
           )}
           
