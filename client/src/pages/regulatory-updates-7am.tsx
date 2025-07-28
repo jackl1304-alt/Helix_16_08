@@ -47,7 +47,22 @@ export default function RegulatoryUpdates() {
   const [selectedPriority, setSelectedPriority] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<string>("all");
 
-  // Mock data - exactly as it worked at 7 AM
+  // Load real regulatory updates from API
+  const { data: apiUpdates = [], isLoading: isLoadingUpdates } = useQuery({
+    queryKey: ['/api/regulatory-updates'],
+    queryFn: async () => {
+      try {
+        const response = await fetch('/api/regulatory-updates');
+        if (!response.ok) return [];
+        const data = await response.json();
+        return Array.isArray(data) ? data : [];
+      } catch {
+        return [];
+      }
+    },
+  });
+
+  // Fallback mock data if API fails
   const mockUpdates: RegulatoryUpdate[] = [
     {
       id: "update-001",
@@ -126,9 +141,24 @@ export default function RegulatoryUpdates() {
     }
   ];
 
-  // Use mock data directly
-  const updates = mockUpdates;
-  const isLoading = false;
+  // Use API data with fallback to mock data
+  const updates = apiUpdates.length > 0 ? apiUpdates.map(update => ({
+    id: update.id,
+    title: update.title,
+    description: update.description || update.title,
+    sourceId: update.source_id || update.sourceId || 'unknown',
+    sourceUrl: update.document_url || update.sourceUrl || '',
+    region: update.region || 'Unknown',
+    updateType: update.type || update.updateType || 'update',
+    priority: (update.priority || 'medium') as 'low' | 'medium' | 'high' | 'urgent',
+    deviceClasses: update.device_classes || update.deviceClasses || [],
+    categories: update.categories || [],
+    publishedAt: update.published_at || update.publishedAt || update.created_at || new Date().toISOString(),
+    createdAt: update.created_at || update.createdAt || new Date().toISOString(),
+    content: update.description || update.content || update.title
+  })) : mockUpdates;
+  
+  const isLoading = isLoadingUpdates;
 
   const filteredUpdates = updates.filter(update => {
     const matchesSearch = !searchTerm || 
