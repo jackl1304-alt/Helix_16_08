@@ -22,6 +22,15 @@ export interface IStorage {
   getAllDataSources(): Promise<any[]>;
   getRecentRegulatoryUpdates(limit?: number): Promise<any[]>;
   getPendingApprovals(): Promise<any[]>;
+  updateDataSource(id: string, updates: any): Promise<any>;
+  getHistoricalDataSources(): Promise<any[]>;
+  getAllRegulatoryUpdates(): Promise<any[]>;
+  createDataSource(data: any): Promise<any>;
+  createRegulatoryUpdate(data: any): Promise<any>;
+  getAllLegalCases(): Promise<any[]>;
+  getLegalCasesByJurisdiction(jurisdiction: string): Promise<any[]>;
+  createLegalCase(data: any): Promise<any>;
+  getAllKnowledgeArticles(): Promise<any[]>;
 }
 
 // PostgreSQL Storage Implementation mit echten Daten
@@ -105,6 +114,67 @@ class PostgresStorage implements IStorage {
       console.error("Pending approvals error:", error);
       return [];
     }
+  }
+
+  // Alle fehlenden Storage-Methoden implementieren
+  async getActiveDataSources() {
+    return await db.select().from(schema.dataSources).where(eq(schema.dataSources.isActive, true));
+  }
+
+  async getHistoricalDataSources() {
+    return await db.select().from(schema.dataSources);
+  }
+
+  async getAllRegulatoryUpdates() {
+    return await db.select().from(schema.regulatoryUpdates).orderBy(desc(schema.regulatoryUpdates.publishedDate));
+  }
+
+  async createDataSource(data: any) {
+    const [created] = await db.insert(schema.dataSources).values(data).returning();
+    return created;
+  }
+
+  async updateDataSource(id: string, updates: any) {
+    const [updated] = await db.update(schema.dataSources).set(updates).where(eq(schema.dataSources.id, id)).returning();
+    return updated;
+  }
+
+  async createRegulatoryUpdate(data: any) {
+    const [created] = await db.insert(schema.regulatoryUpdates).values(data).returning();
+    return created;
+  }
+
+  async getAllLegalCases() {
+    return await db.select().from(schema.legalCases);
+  }
+
+  async getLegalCasesByJurisdiction(jurisdiction: string) {
+    return await db.select().from(schema.legalCases).where(eq(schema.legalCases.jurisdiction, jurisdiction));
+  }
+
+  async createLegalCase(data: any) {
+    const [created] = await db.insert(schema.legalCases).values(data).returning();
+    return created;
+  }
+
+  async getAllKnowledgeArticles() {
+    return await db.select().from(schema.knowledgeArticles);
+  }
+
+  async getPublishedKnowledgeArticles() {
+    return await db.select().from(schema.knowledgeArticles).where(eq(schema.knowledgeArticles.isPublished, true));
+  }
+
+  async getAllNewsletters() {
+    return await db.select().from(schema.newsletters);
+  }
+
+  async getAllSubscribers() {
+    return await db.select().from(schema.subscribers);
+  }
+
+  async getAllUsers() {
+    return await db.select().from(schema.users);
   }
 }
 
