@@ -19,7 +19,7 @@ import AIInsights from "@/pages/ai-insights";
 import KnowledgeBase from "@/pages/knowledge-base";
 import AIApprovalDemo from "@/pages/ai-approval-demo";
 import HistoricalData from "@/pages/historical-data-7am";
-import LegalCases from "@/pages/legal-cases-7am";
+import LegalCases from "@/pages/legal-cases";
 import IntelligentSearch from "@/pages/intelligent-search";
 import DocumentViewer from "@/pages/document-viewer";
 import SyncManager from "@/pages/sync-manager";
