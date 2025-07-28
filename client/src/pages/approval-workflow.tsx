@@ -13,13 +13,13 @@ import { apiRequest } from "@/lib/queryClient";
 
 interface Approval {
   id: string;
-  itemType: string;
-  itemId: string;
+  item_type: string;
+  item_id: string;
   status: 'pending' | 'approved' | 'rejected';
   comments?: string;
-  reviewerId?: string;
-  reviewedAt?: string;
-  createdAt: string;
+  reviewer_id?: string;
+  reviewed_at?: string;
+  created_at: string;
   itemTitle?: string;
   itemDescription?: string;
 }
@@ -32,7 +32,7 @@ export default function ApprovalWorkflow() {
   const [statusFilter, setStatusFilter] = useState<string>('pending');
 
   const { data: approvals, isLoading } = useQuery<Approval[]>({
-    queryKey: ["/api/approvals", { status: statusFilter === 'all' ? undefined : statusFilter }],
+    queryKey: statusFilter === 'pending' ? ["/api/approvals/pending"] : ["/api/approvals"],
   });
 
   const updateApprovalMutation = useMutation({
@@ -142,17 +142,17 @@ export default function ApprovalWorkflow() {
                     <div className="flex items-start justify-between">
                       <div>
                         <h3 className="text-lg font-semibold">
-                          {approval.itemTitle || `${approval.itemType} #${approval.itemId}`}
+                          {approval.itemTitle || `${approval.item_type} #${approval.item_id.slice(0, 8)}`}
                         </h3>
                         <div className="flex items-center space-x-4 mt-2">
                           {getStatusBadge(approval.status)}
                           <span className="text-sm text-gray-500">
                             <Clock className="inline h-4 w-4 mr-1" />
-                            {new Date(approval.createdAt).toLocaleDateString()}
+                            {new Date(approval.created_at).toLocaleDateString('de-DE')}
                           </span>
                           <span className="text-sm text-gray-500">
                             <FileText className="inline h-4 w-4 mr-1" />
-                            {approval.itemType}
+                            {approval.item_type}
                           </span>
                         </div>
                       </div>
@@ -213,7 +213,7 @@ export default function ApprovalWorkflow() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-gray-600 line-clamp-3">
-                      {approval.itemDescription || 'No description available'}
+                      {approval.comments || 'Keine KI-Kommentare verfügbar'}
                     </p>
                   </CardContent>
                 </Card>
