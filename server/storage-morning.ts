@@ -30,32 +30,35 @@ class MorningStorage implements IStorage {
         sql`SELECT COUNT(*) as count FROM approvals WHERE status = 'pending'`
       ]);
 
-      // Get real legal cases count
-      const [legalCases] = await Promise.all([
-        sql`SELECT COUNT(*) as count FROM legal_cases`
+      // Get real counts from database 
+      const [legalCases, newsletters, subscribers, articles] = await Promise.all([
+        sql`SELECT COUNT(*) as count FROM legal_cases`,
+        sql`SELECT COUNT(*) as count FROM newsletters`,
+        sql`SELECT COUNT(*) as count FROM subscribers WHERE is_active = true`,
+        sql`SELECT COUNT(*) as count FROM knowledge_base`
       ]);
 
       return {
-        totalUpdates: parseInt(updates[0]?.count || '6'),
-        totalLegalCases: parseInt(legalCases[0]?.count || '1825'),
-        totalArticles: 247,
-        totalSubscribers: 1244,
-        pendingApprovals: parseInt(approvals[0]?.count || '12'),
-        activeDataSources: parseInt(sources[0]?.count || '3'),
-        recentUpdates: parseInt(updates[0]?.count || '6'),
-        totalNewsletters: 47,
+        totalUpdates: parseInt(updates[0]?.count || '0'),
+        totalLegalCases: parseInt(legalCases[0]?.count || '0'),
+        totalArticles: parseInt(articles[0]?.count || '0'),
+        totalSubscribers: parseInt(subscribers[0]?.count || '0'),
+        pendingApprovals: parseInt(approvals[0]?.count || '0'),
+        activeDataSources: parseInt(sources[0]?.count || '0'),
+        recentUpdates: parseInt(updates[0]?.count || '0'),
+        totalNewsletters: parseInt(newsletters[0]?.count || '0'),
       };
     } catch (error) {
       console.error("Dashboard stats error:", error);
       return {
-        totalUpdates: 6,
-        totalLegalCases: 2025, // Updated with real count from database
-        totalArticles: 247,
-        totalSubscribers: 1244,
-        pendingApprovals: 12,
-        activeDataSources: 3,
-        recentUpdates: 6,
-        totalNewsletters: 47,
+        totalUpdates: 0,
+        totalLegalCases: 0,
+        totalArticles: 0,
+        totalSubscribers: 0,
+        pendingApprovals: 0,
+        activeDataSources: 0,
+        recentUpdates: 0,
+        totalNewsletters: 0,
       };
     }
   }
