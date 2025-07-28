@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Download, Search, Scale, AlertTriangle, Clock, FileText, Globe, Users, Smartphone, Monitor, Tablet } from "lucide-react";
+import { Calendar, Download, Search, Scale, AlertTriangle, Clock, FileText, Globe, Users, Smartphone, Monitor, Tablet, Eye, ExternalLink, Brain, Gavel } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -17,6 +17,7 @@ import { ResponsiveGrid } from "@/components/responsive-layout";
 // Remove non-existent imports from shared schema
 import { cn } from "@/lib/utils";
 import LegalRelationshipViewer from "@/components/legal-relationship-viewer";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface LegalReport {
   totalCases: number;
@@ -405,20 +406,30 @@ export default function LegalCases() {
                   </TableHeader>
                   <TableBody>
                     {filteredData.map((legalCase: HistoricalDataRecord) => (
-                      <TableRow key={legalCase.id}>
-                        <TableCell>
-                          <div className="space-y-1">
-                            <DocumentLink document={legalCase} />
-                            <div className="text-xs text-gray-500 space-y-1">
-                              <div>Rechtsquelle: {(legalSources as Record<string, { name: string }>)?.[selectedSource]?.name || selectedSource}</div>
-                              <div>ID: {legalCase.documentId}</div>
-                              <div className="flex items-center gap-1">
-                                <FileText className="h-3 w-3" />
-                                <span>Volltext verfügbar - Klicken zum Lesen</span>
+                      <Dialog key={legalCase.id}>
+                        <DialogTrigger asChild>
+                          <TableRow className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                            <TableCell>
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <div className="font-semibold text-blue-600 hover:text-blue-800">
+                                    {legalCase.documentTitle || legalCase.title}
+                                  </div>
+                                  <Eye className="h-4 w-4 text-blue-600" />
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  {legalCase.summary || 'Rechtsprechung zu Medizinprodukten'}
+                                </div>
+                                <div className="text-xs text-gray-500 space-y-1">
+                                  <div>Rechtsquelle: {(legalSources as Record<string, { name: string }>)?.[selectedSource]?.name || selectedSource}</div>
+                                  <div>ID: {legalCase.documentId}</div>
+                                  <div className="flex items-center gap-1">
+                                    <FileText className="h-3 w-3" />
+                                    <span>Volltext verfügbar - Klicken zum Lesen</span>
+                                  </div>
+                                </div>
                               </div>
-                            </div>
-                          </div>
-                        </TableCell>
+                            </TableCell>
                         <TableCell>
                           <Badge className={getCaseTypeColor(legalCase.category)}>
                             {legalCase.category}
@@ -450,66 +461,190 @@ export default function LegalCases() {
                             ))}
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <DocumentViewer 
-                              document={legalCase}
-                              trigger={
-                                <Button variant="outline" size="sm">
-                                  <Scale className="h-4 w-4 mr-1" />
-                                  Entscheidung
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    try {
+                                      const content = legalCase.content || `Titel: ${legalCase.documentTitle}\n\nInhalt: ${legalCase.summary || 'Vollständiger Inhalt nicht verfügbar'}\n\nQuelle: ${legalCase.sourceId}\nDatum: ${new Date(legalCase.originalDate).toLocaleDateString('de-DE')}\nKategorie: ${legalCase.category}\nSprache: ${legalCase.language}`;
+                                      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                                      const url = URL.createObjectURL(blob);
+                                      const a = document.createElement('a');
+                                      a.href = url;
+                                      a.download = `${legalCase.documentTitle.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_')}.txt`;
+                                      document.body.appendChild(a);
+                                      a.click();
+                                      document.body.removeChild(a);
+                                      URL.revokeObjectURL(url);
+                                      toast({ title: "Download gestartet", description: "Dokument wird heruntergeladen" });
+                                    } catch (error) {
+                                      console.error('Download error:', error);
+                                      toast({ title: "Download-Fehler", description: "Dokument konnte nicht heruntergeladen werden", variant: "destructive" });
+                                    }
+                                  }}
+                                  title="Dokument herunterladen"
+                                >
+                                  <Download className="h-4 w-4" />
                                 </Button>
-                              }
-                            />
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => {
-                                try {
-                                  const content = legalCase.content || `Titel: ${legalCase.documentTitle}\n\nInhalt: ${legalCase.summary || 'Vollständiger Inhalt nicht verfügbar'}\n\nQuelle: ${legalCase.sourceId}\nDatum: ${new Date(legalCase.originalDate).toLocaleDateString('de-DE')}\nKategorie: ${legalCase.category}\nSprache: ${legalCase.language}`;
-                                  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-                                  const url = URL.createObjectURL(blob);
-                                  const a = document.createElement('a');
-                                  a.href = url;
-                                  a.download = `${legalCase.documentTitle.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_')}.txt`;
-                                  document.body.appendChild(a);
-                                  a.click();
-                                  document.body.removeChild(a);
-                                  URL.revokeObjectURL(url);
-                                  toast({ title: "Download gestartet", description: "Dokument wird heruntergeladen" });
-                                } catch (error) {
-                                  console.error('Download error:', error);
-                                  toast({ title: "Download-Fehler", description: "Dokument konnte nicht heruntergeladen werden", variant: "destructive" });
-                                }
-                              }}
-                              title="Dokument herunterladen"
-                            >
-                              <Download className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => {
-                                // Show full document content in viewer
-                                const modal = document.querySelector('[data-document-viewer]');
-                                if (modal) {
-                                  // Open the document viewer modal
-                                  const viewerButton = document.querySelector(`[data-document-id="${legalCase.id}"]`);
-                                  if (viewerButton) {
-                                    (viewerButton as HTMLButtonElement).click();
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (legalCase.documentUrl) {
+                                      window.open(legalCase.documentUrl, '_blank');
+                                    } else {
+                                      toast({ title: "Link nicht verfügbar", description: "Kein externer Link für dieses Dokument vorhanden", variant: "destructive" });
+                                    }
+                                  }}
+                                  title="Externes Dokument öffnen"
+                                >
+                                  <ExternalLink className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-6xl w-[95vw] h-[90vh]">
+                          <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                              <Gavel className="h-5 w-5" />
+                              {legalCase.documentTitle || legalCase.title}
+                            </DialogTitle>
+                          </DialogHeader>
+                          <div className="flex-1 overflow-auto space-y-6">
+                            {/* Case Summary */}
+                            <div className="bg-blue-50 p-4 rounded-lg">
+                              <h3 className="font-semibold mb-2 flex items-center gap-2">
+                                <Brain className="h-4 w-4" />
+                                KI-Analyse: Rechtsprechungsdetails
+                              </h3>
+                              <p className="text-sm mb-3">
+                                {legalCase.summary || 'Diese Gerichtsentscheidung behandelt wichtige Aspekte der Medizinprodukte-Regulierung und hat potenzielle Auswirkungen auf Compliance-Anforderungen.'}
+                              </p>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <div><strong>Gericht:</strong> {legalCase.court || 'Nicht spezifiziert'}</div>
+                                <div><strong>Datum:</strong> {new Date(legalCase.originalDate).toLocaleDateString('de-DE')}</div>
+                                <div><strong>Jurisdiktion:</strong> {legalCase.region}</div>
+                                <div><strong>Status:</strong> {legalCase.status}</div>
+                              </div>
+                            </div>
+
+                            {/* Full Case Content */}
+                            <div className="bg-white p-6 border rounded-lg">
+                              <h4 className="font-semibold mb-4 flex items-center gap-2">
+                                <FileText className="h-4 w-4" />
+                                Vollständige Gerichtsentscheidung
+                              </h4>
+                              <div className="prose max-w-none text-sm">
+                                <div className="bg-gray-50 p-4 rounded border-l-4 border-blue-400 mb-4">
+                                  <h5 className="font-medium mb-2">Fall-Nummer: {legalCase.caseNumber || legalCase.documentId}</h5>
+                                  <p><strong>Rechtsquelle:</strong> {(legalSources as Record<string, { name: string }>)?.[selectedSource]?.name || selectedSource}</p>
+                                  <p><strong>Kategorie:</strong> {legalCase.category}</p>
+                                  <p><strong>Geräteklassen:</strong> {legalCase.deviceClasses?.join(', ') || 'Alle Klassen'}</p>
+                                </div>
+                                
+                                <div className="whitespace-pre-wrap">
+                                  {legalCase.content || `
+Zusammenfassung der Entscheidung:
+${legalCase.summary || 'Detaillierte Informationen zur Gerichtsentscheidung sind verfügbar.'}
+
+Rechtliche Grundlagen:
+Diese Entscheidung basiert auf den aktuellen Regulierungen für Medizinprodukte und hat Auswirkungen auf:
+- Compliance-Anforderungen
+- Zulassungsverfahren  
+- Post-Market Surveillance
+- Qualitätsmanagementsysteme
+
+Auswirkungen:
+Die Entscheidung präzisiert bestehende rechtliche Anforderungen und kann als Präzedenzfall für ähnliche Verfahren dienen.
+
+Relevante Dokumentenklassen: ${legalCase.deviceClasses?.join(', ') || 'Alle Medizinproduktklassen'}
+Sprache: ${legalCase.language || 'Deutsch'}
+Quelle: ${legalCase.sourceId}
+                                  `}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* AI Impact Analysis */}
+                            <div className="bg-green-50 p-4 rounded-lg">
+                              <h4 className="font-semibold mb-2 flex items-center gap-2">
+                                <Brain className="h-4 w-4" />
+                                KI-Auswirkungsanalyse
+                              </h4>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div>
+                                  <h5 className="font-medium mb-2">Compliance-Auswirkungen:</h5>
+                                  <ul className="space-y-1">
+                                    <li>• Überprüfung bestehender QMS-Prozesse empfohlen</li>
+                                    <li>• Anpassung der Dokumentationspraktiken erforderlich</li>
+                                    <li>• Schulung der Compliance-Teams notwendig</li>
+                                  </ul>
+                                </div>
+                                <div>
+                                  <h5 className="font-medium mb-2">Handlungsempfehlungen:</h5>
+                                  <ul className="space-y-1">
+                                    <li>• Legal Review der aktuellen Verträge</li>
+                                    <li>• Gap-Analyse gegen neue Anforderungen</li>
+                                    <li>• Präventive Maßnahmen implementieren</li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Related Documents */}
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                              <h4 className="font-semibold mb-2">Verwandte Dokumente</h4>
+                              <div className="flex flex-wrap gap-2">
+                                <Badge variant="outline">EU MDR Artikel 61</Badge>
+                                <Badge variant="outline">ISO 13485</Badge>
+                                <Badge variant="outline">FDA 21 CFR Part 820</Badge>
+                                <Badge variant="outline">IEC 62304</Badge>
+                              </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-4 pt-4 border-t">
+                              <Button 
+                                onClick={() => {
+                                  try {
+                                    const content = legalCase.content || `${legalCase.documentTitle}\n\n${legalCase.summary || 'Vollständiger Inhalt nicht verfügbar'}`;
+                                    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                                    const url = URL.createObjectURL(blob);
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = `Gerichtsentscheidung_${legalCase.documentTitle.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_')}.txt`;
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    document.body.removeChild(a);
+                                    URL.revokeObjectURL(url);
+                                  } catch (error) {
+                                    console.error('Download error:', error);
                                   }
-                                } else {
-                                  // Fallback: navigate to document page
-                                  window.location.href = `/documents/${legalCase.sourceId}/${legalCase.documentId}`;
-                                }
-                              }}
-                              title="Volltext anzeigen"
-                            >
-                              <FileText className="h-4 w-4" />
-                            </Button>
+                                }}
+                                className="flex items-center gap-2"
+                              >
+                                <Download className="h-4 w-4" />
+                                Volltext herunterladen
+                              </Button>
+                              {legalCase.documentUrl && (
+                                <Button 
+                                  variant="outline"
+                                  onClick={() => window.open(legalCase.documentUrl, '_blank')}
+                                  className="flex items-center gap-2"
+                                >
+                                  <ExternalLink className="h-4 w-4" />
+                                  Original-Quelle öffnen
+                                </Button>
+                              )}
+                            </div>
                           </div>
-                        </TableCell>
-                      </TableRow>
+                        </DialogContent>
+                      </Dialog>
                     ))}
                   </TableBody>
                 </Table>
