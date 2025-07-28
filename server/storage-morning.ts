@@ -205,7 +205,7 @@ class MorningStorage implements IStorage {
 
   async getAllKnowledgeArticles() {
     try {
-      const result = await sql`SELECT * FROM knowledge_articles WHERE is_published = true ORDER BY created_at DESC`;
+      const result = await sql`SELECT * FROM knowledge_base ORDER BY created_at DESC`;
       return result;
     } catch (error) {
       console.error("All knowledge articles error:", error);
