@@ -69,15 +69,7 @@ export default function RegulatoryUpdates() {
     return matchesSearch && matchesRegion && matchesPriority && matchesType;
   });
 
-  // Calculate statistics from actual data
-  const totalUpdates = updates?.length || 0;
-  const filteredCount = filteredUpdates.length;
-  const highPriorityCount = (updates || []).filter(u => u.priority === 'high' || u.priority === 'urgent').length;
-  const todayCount = (updates || []).filter(u => {
-    const updateDate = new Date(u.publishedAt).toDateString();
-    const today = new Date().toDateString();
-    return updateDate === today;
-  }).length;
+
 
   const downloadUpdate = async (update: RegulatoryUpdate) => {
     try {
@@ -213,16 +205,26 @@ export default function RegulatoryUpdates() {
     }
   ];
 
+  // Calculate statistics
+  const totalUpdates = updates?.length || 0;
+  const filteredCount = filteredUpdates.length;
+  const highPriorityCount = (updates || []).filter(u => u.priority === 'high' || u.priority === 'urgent').length;
+  const todayCount = (updates || []).filter(u => {
+    const today = new Date().toDateString();
+    const updateDate = new Date(u.publishedAt).toDateString();
+    return updateDate === today;
+  }).length;
+
   return (
     <PageLayout
       title="Regulatory Updates"
       description="Aktuelle regulatorische Änderungen und Ankündigungen von globalen Gesundheitsbehörden"
       icon={Bell}
       stats={[
-        { label: "Gesamt Updates", value: (updates || []).length },
-        { label: "Gefilterte Updates", value: filteredUpdates.length },
-        { label: "Hohe Priorität", value: filteredUpdates.filter(u => u.priority === 'high' || u.priority === 'urgent').length },
-        { label: "Heute", value: filteredUpdates.filter(u => new Date(u.publishedAt).toDateString() === new Date().toDateString()).length }
+        { label: "Gesamt Updates", value: totalUpdates },
+        { label: "Gefilterte Updates", value: filteredCount },
+        { label: "Hohe Priorität", value: highPriorityCount },
+        { label: "Heute", value: todayCount }
       ]}
     >
       <FilterBar
