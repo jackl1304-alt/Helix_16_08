@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useQuery } from "@tanstack/react-query";
 import { 
-  ShoppingCart, 
+  FileText, 
+  Database, 
+  BookOpen, 
   Users, 
-  Package, 
-  Euro, 
   AlertTriangle, 
-  Bot, 
+  CheckCircle, 
   TrendingUp,
-  MessageSquare
+  Mail
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -19,14 +19,14 @@ export default function Dashboard() {
     queryKey: ['/api/dashboard/stats'],
   });
 
-  const { data: aiTasks } = useQuery({
-    queryKey: ['/api/ai-tasks', 'pending'],
-    queryFn: () => fetch('/api/ai-tasks/pending').then(res => res.json()),
+  const { data: recentUpdates } = useQuery({
+    queryKey: ['/api/regulatory-updates/recent'],
+    queryFn: () => fetch('/api/regulatory-updates/recent?limit=5').then(res => res.json()),
   });
 
-  const { data: recentOrders } = useQuery({
-    queryKey: ['/api/orders/pending'],
-    queryFn: () => fetch('/api/orders/pending').then(res => res.json()),
+  const { data: pendingApprovals } = useQuery({
+    queryKey: ['/api/approvals/pending'],
+    queryFn: () => fetch('/api/approvals/pending').then(res => res.json()),
   });
 
   if (isLoading) {
@@ -48,60 +48,53 @@ export default function Dashboard() {
 
   const dashboardCards = [
     {
-      title: "Gesamtumsatz",
-      value: `€${stats?.totalRevenue?.toLocaleString('de-DE') || '0'}`,
-      description: "In diesem Monat",
-      icon: Euro,
-      color: "text-green-600",
-    },
-    {
-      title: "Aktive Bestellungen",
-      value: stats?.totalOrders || 0,
-      description: `${stats?.pendingOrders || 0} wartend`,
-      icon: ShoppingCart,
+      title: "Regulatory Updates",
+      value: stats?.totalUpdates || 0,
+      description: `${stats?.recentUpdates || 0} in den letzten 30 Tagen`,
+      icon: FileText,
       color: "text-blue-600",
     },
     {
-      title: "Kunden",
-      value: stats?.totalCustomers || 0,
-      description: "Registrierte Kunden",
-      icon: Users,
+      title: "Legal Cases",
+      value: stats?.totalLegalCases || 0,
+      description: "Rechtsprechungsdatenbank",
+      icon: Database,
       color: "text-purple-600",
     },
     {
-      title: "Produkte",
-      value: stats?.totalProducts || 0,
-      description: `${stats?.lowStockProducts || 0} niedrig auf Lager`,
-      icon: Package,
+      title: "Knowledge Articles",
+      value: stats?.totalArticles || 0,
+      description: "Wissensdatenbank",
+      icon: BookOpen,
+      color: "text-green-600",
+    },
+    {
+      title: "Subscribers",
+      value: stats?.totalSubscribers || 0,
+      description: "Newsletter-Abonnenten",
+      icon: Users,
       color: "text-orange-600",
     },
     {
-      title: "KI-Aufgaben",
-      value: aiTasks?.length || 0,
-      description: "Wartende Automatisierung",
-      icon: Bot,
+      title: "Pending Approvals",
+      value: stats?.pendingApprovals || 0,
+      description: "Wartende Genehmigungen",
+      icon: CheckCircle,
       color: "text-indigo-600",
     },
     {
-      title: "Aktive Lieferanten",
-      value: stats?.activeSuppliers || 0,
-      description: "Verfügbare Lieferanten",
+      title: "Active Data Sources",
+      value: stats?.activeDataSources || 0,
+      description: "Aktive Datenquellen",
       icon: TrendingUp,
       color: "text-teal-600",
     },
     {
-      title: "Offene Gespräche",
-      value: stats?.openConversations || 0,
-      description: "Kundensupport",
-      icon: MessageSquare,
+      title: "Newsletters",
+      value: stats?.totalNewsletters || 0,
+      description: "Newsletter versendet",
+      icon: Mail,
       color: "text-red-600",
-    },
-    {
-      title: "Warnung",
-      value: stats?.lowStockProducts || 0,
-      description: "Produkte mit niedrigem Lagerbestand",
-      icon: AlertTriangle,
-      color: "text-yellow-600",
     },
   ];
 
@@ -111,14 +104,14 @@ export default function Dashboard() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            KI Dropshipping Dashboard
+            Helix Regulatory Intelligence Dashboard
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mt-2">
-            Überblick über Ihr vollautomatisiertes Dropshipping-Geschäft
+            Überblick über globale MedTech-Regulierung und Compliance
           </p>
         </div>
-        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-          🤖 KI Aktiv
+        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+          🏥 Medical Devices
         </Badge>
       </div>
 
@@ -150,99 +143,84 @@ export default function Dashboard() {
       {/* Main Content Area */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        {/* AI Automation Status */}
+        {/* Recent Regulatory Updates */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Bot className="h-5 w-5 text-indigo-600" />
-              KI-Automatisierung
+              <FileText className="h-5 w-5 text-blue-600" />
+              Aktuelle Regulatory Updates
             </CardTitle>
             <CardDescription>
-              Aktuelle KI-Aufgaben und Automatisierungsstatus
+              Neueste Vorschriften und Richtlinien
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {aiTasks && aiTasks.length > 0 ? (
-              aiTasks.slice(0, 5).map((task: any, index: number) => (
+            {recentUpdates && recentUpdates.length > 0 ? (
+              recentUpdates.slice(0, 5).map((update: any, index: number) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div>
-                    <p className="font-medium text-sm">
-                      {task.type === 'product_optimization' && 'Produktoptimierung'}
-                      {task.type === 'order_processing' && 'Bestellungsabwicklung'}
-                      {task.type === 'customer_service' && 'Kundendienst'}
-                      {task.type === 'marketing' && 'Marketing-Kampagne'}
-                    </p>
+                    <p className="font-medium text-sm">{update.title}</p>
                     <p className="text-xs text-gray-500">
-                      Priorität: {task.priority === 'high' ? 'Hoch' : task.priority === 'medium' ? 'Mittel' : 'Niedrig'}
+                      {update.jurisdiction} • {update.type}
                     </p>
                   </div>
-                  <Badge variant={task.status === 'pending' ? 'secondary' : 'default'}>
-                    {task.status === 'pending' ? 'Wartend' : 'Verarbeitung'}
+                  <Badge variant="outline">
+                    {new Date(update.publishedDate).toLocaleDateString('de-DE')}
                   </Badge>
                 </div>
               ))
             ) : (
               <div className="text-center py-8">
-                <Bot className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">Keine ausstehenden KI-Aufgaben</p>
-                <p className="text-sm text-gray-400">Die KI arbeitet effizient im Hintergrund</p>
+                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">Keine neuen Updates</p>
+                <p className="text-sm text-gray-400">Updates werden automatisch synchronisiert</p>
               </div>
             )}
             
             <div className="pt-4 border-t">
               <div className="flex justify-between text-sm text-gray-600 mb-2">
-                <span>KI-Automatisierung</span>
-                <span>95% aktiv</span>
+                <span>Synchronisierung</span>
+                <span>Aktiv</span>
               </div>
-              <Progress value={95} className="w-full" />
+              <Progress value={100} className="w-full" />
             </div>
           </CardContent>
         </Card>
 
-        {/* Recent Orders */}
+        {/* Pending Approvals */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <ShoppingCart className="h-5 w-5 text-blue-600" />
-              Aktuelle Bestellungen
+              <CheckCircle className="h-5 w-5 text-indigo-600" />
+              Wartende Genehmigungen
             </CardTitle>
             <CardDescription>
-              Neueste Bestellungen und KI-Verarbeitungsstatus
+              Newsletter und Artikel zur Freigabe
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {recentOrders && recentOrders.length > 0 ? (
-              recentOrders.slice(0, 5).map((order: any, index: number) => (
+            {pendingApprovals && pendingApprovals.length > 0 ? (
+              pendingApprovals.slice(0, 5).map((approval: any, index: number) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div>
-                    <p className="font-medium text-sm">{order.orderNumber}</p>
+                    <p className="font-medium text-sm">
+                      {approval.itemType === 'newsletter' ? 'Newsletter' : 
+                       approval.itemType === 'article' ? 'Knowledge Article' : approval.itemType}
+                    </p>
                     <p className="text-xs text-gray-500">
-                      €{parseFloat(order.totalAmount).toLocaleString('de-DE')}
+                      Angefragt: {new Date(approval.requestedAt).toLocaleDateString('de-DE')}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <Badge 
-                      variant={
-                        order.status === 'pending' ? 'secondary' :
-                        order.status === 'processing' ? 'default' :
-                        order.status === 'shipped' ? 'default' : 'secondary'
-                      }
-                    >
-                      {order.status === 'pending' ? 'Wartend' :
-                       order.status === 'processing' ? 'Verarbeitung' :
-                       order.status === 'shipped' ? 'Versendet' : order.status}
-                    </Badge>
-                    {order.aiProcessed && (
-                      <p className="text-xs text-green-600 mt-1">🤖 KI verarbeitet</p>
-                    )}
-                  </div>
+                  <Badge variant="secondary">
+                    Wartend
+                  </Badge>
                 </div>
               ))
             ) : (
               <div className="text-center py-8">
-                <ShoppingCart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">Keine ausstehenden Bestellungen</p>
-                <p className="text-sm text-gray-400">Neue Bestellungen werden hier angezeigt</p>
+                <CheckCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">Keine wartenden Genehmigungen</p>
+                <p className="text-sm text-gray-400">Alle Inhalte sind genehmigt</p>
               </div>
             )}
           </CardContent>
@@ -254,7 +232,7 @@ export default function Dashboard() {
         <CardHeader>
           <CardTitle>Schnelle Aktionen</CardTitle>
           <CardDescription>
-            Häufig verwendete KI-Automatisierungsfunktionen
+            Häufig verwendete Helix-Funktionen
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -262,72 +240,44 @@ export default function Dashboard() {
             <Button 
               variant="outline" 
               className="flex items-center gap-2 h-20"
-              onClick={() => {
-                fetch('/api/ai/optimize-product', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ allProducts: true })
-                });
-              }}
             >
-              <Package className="h-5 w-5" />
+              <Database className="h-5 w-5" />
               <div className="text-left">
-                <div className="font-medium">Produkte optimieren</div>
-                <div className="text-xs text-gray-500">KI-gestützte Verbesserung</div>
+                <div className="font-medium">Datenquellen sync</div>
+                <div className="text-xs text-gray-500">FDA, EMA, BfArM Updates</div>
               </div>
             </Button>
             
             <Button 
               variant="outline" 
               className="flex items-center gap-2 h-20"
-              onClick={() => {
-                fetch('/api/ai/generate-marketing', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ campaignType: 'social_media', budget: 500 })
-                });
-              }}
+            >
+              <BookOpen className="h-5 w-5" />
+              <div className="text-left">
+                <div className="font-medium">Knowledge Base</div>
+                <div className="text-xs text-gray-500">Artikel durchsuchen</div>
+              </div>
+            </Button>
+
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2 h-20"
+            >
+              <Mail className="h-5 w-5" />
+              <div className="text-left">
+                <div className="font-medium">Newsletter</div>
+                <div className="text-xs text-gray-500">Neue Ausgabe erstellen</div>
+              </div>
+            </Button>
+
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2 h-20"
             >
               <TrendingUp className="h-5 w-5" />
               <div className="text-left">
-                <div className="font-medium">Marketing generieren</div>
-                <div className="text-xs text-gray-500">Automatische Kampagnen</div>
-              </div>
-            </Button>
-
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2 h-20"
-              onClick={() => {
-                fetch('/api/ai-tasks', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ type: 'inventory_optimization', priority: 'medium' })
-                });
-              }}
-            >
-              <AlertTriangle className="h-5 w-5" />
-              <div className="text-left">
-                <div className="font-medium">Lager optimieren</div>
-                <div className="text-xs text-gray-500">Bestandsverwaltung</div>
-              </div>
-            </Button>
-
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2 h-20"
-              onClick={() => {
-                fetch('/api/ai-tasks', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ type: 'customer_segmentation', priority: 'low' })
-                });
-              }}
-            >
-              <Users className="h-5 w-5" />
-              <div className="text-left">
-                <div className="font-medium">Kunden analysieren</div>
-                <div className="text-xs text-gray-500">Segmentierung</div>
+                <div className="font-medium">Analytics</div>
+                <div className="text-xs text-gray-500">Compliance Trends</div>
               </div>
             </Button>
           </div>
