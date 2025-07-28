@@ -23,10 +23,8 @@ import {
   Lock,
   Unlock,
   AlertTriangle,
-  CheckCircle,
-  Bot
+  CheckCircle
 } from "lucide-react";
-import { useLocation } from "wouter";
 
 interface AuditLog {
   id: string;
@@ -204,7 +202,6 @@ export default function AuditLogs() {
   const [dateFrom, setDateFrom] = useState<Date | undefined>();
   const [dateTo, setDateTo] = useState<Date | undefined>();
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
-  const [, navigate] = useLocation();
 
   const { data: auditLogs = mockAuditLogs, isLoading } = useQuery<AuditLog[]>({
     queryKey: ["/api/audit-logs", {
@@ -279,20 +276,11 @@ export default function AuditLogs() {
   return (
     <div className="container mx-auto py-8">
       <div className="flex justify-between items-center mb-8">
-        <div className="flex items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Audit-Protokolle</h1>
-            <p className="text-muted-foreground">
-              Vollständige Aufzeichnung aller Systemaktivitäten und Änderungen
-            </p>
-          </div>
-          
-          {/* Verstecktes KI-Icon - nur für Wissende */}
-          <Bot 
-            className="h-6 w-6 text-gray-400 hover:text-blue-600 cursor-pointer transition-colors opacity-50 hover:opacity-100" 
-            onClick={() => navigate('/ai-approval-demo')}
-            title="KI System"
-          />
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Audit-Protokolle</h1>
+          <p className="text-muted-foreground">
+            Vollständige Aufzeichnung aller Systemaktivitäten und Änderungen
+          </p>
         </div>
         
         <Button onClick={exportLogs}>

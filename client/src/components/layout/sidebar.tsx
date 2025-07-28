@@ -14,7 +14,8 @@ import {
   Archive,
   Shield,
   Search,
-  RefreshCw
+  RefreshCw,
+  Bot
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoPath from "@assets/ICON Helix_1753735921077.jpg";
@@ -143,6 +144,24 @@ export function Sidebar() {
                 </Link>
               );
             })}
+            
+            {/* Verstecktes KI-Icon - nur für Wissende */}
+            <Link href="/ai-approval-demo">
+              <div
+                className={cn(
+                  "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer mt-2",
+                  location === "/ai-approval-demo"
+                    ? "text-primary bg-primary/10 border border-primary/20"
+                    : "text-gray-400 hover:text-blue-600 hover:bg-blue-50 opacity-60 hover:opacity-100"
+                )}
+                title="Advanced System"
+              >
+                <Bot className={cn(
+                  "mr-3 h-5 w-5",
+                  location === "/ai-approval-demo" ? "text-primary" : "text-gray-400 hover:text-blue-600"
+                )} />
+              </div>
+            </Link>
           </div>
         </div>
       </nav>
