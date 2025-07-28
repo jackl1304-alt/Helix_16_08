@@ -154,7 +154,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         synced: 2,
         timestamp: new Date().toISOString()
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Sync error:", error);
       res.status(500).json({ 
         message: "Synchronisation fehlgeschlagen", 
@@ -173,7 +173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "3 von 3 Quellen erfolgreich synchronisiert",
         results: ['fda-510k', 'ema-medicines', 'bfarm-guidelines']
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Bulk sync error:", error);
       res.status(500).json({ 
         message: "Bulk-Synchronisation fehlgeschlagen", 
