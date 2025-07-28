@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
-import Dashboard from "@/pages/dashboard";
+import DashboardFixed from "@/pages/dashboard-fixed";
 import DataCollection from "@/pages/data-collection";
 import GlobalSources from "@/pages/global-sources";
 import Analytics from "@/pages/analytics";
@@ -29,7 +29,7 @@ function Router() {
   return (
     <Switch>
       {/* Pages with Sidebar */}
-      <Route path="/" component={Dashboard} />
+      <Route path="/" component={DashboardFixed} />
       <Route path="/data-collection" component={DataCollection} />
       <Route path="/global-sources" component={GlobalSources} />
       <Route path="/analytics" component={Analytics} />
