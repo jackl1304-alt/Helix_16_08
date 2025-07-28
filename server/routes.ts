@@ -162,6 +162,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get specific regulatory update by ID
+  app.get("/api/regulatory-updates/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log(`Fetching regulatory update with ID: ${id}`);
+      
+      const update = await storage.getRegulatoryUpdateById(id);
+      if (!update) {
+        return res.status(404).json({ error: 'Regulatory update not found' });
+      }
+      
+      console.log(`Found regulatory update: ${update.title}`);
+      res.json(update);
+    } catch (error) {
+      console.error('Error fetching regulatory update by ID:', error);
+      res.status(500).json({ error: 'Failed to fetch regulatory update' });
+    }
+  });
+
   app.post("/api/regulatory-updates", async (req, res) => {
     try {
       const validatedData = insertRegulatoryUpdateSchema.parse(req.body);
