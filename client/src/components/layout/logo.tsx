@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import logoPath from "@assets/grafik_1753735681272.png";
+import logoPath from "@assets/ICON Helix_1753735753843.jpg";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -12,15 +12,15 @@ interface LogoProps {
 
 export function Logo({ 
   size = "medium", 
-  showText = true, 
+  showText = false, 
   showSubtext = false, 
   className,
   linkTo = "/" 
 }: LogoProps) {
   const sizeClasses = {
-    small: "h-8 w-auto",
-    medium: "h-10 w-auto", 
-    large: "h-16 w-auto"
+    small: "h-8 w-8",
+    medium: "h-10 w-10", 
+    large: "h-12 w-12"
   };
 
   const textSizeClasses = {
@@ -36,8 +36,7 @@ export function Logo({
         alt="Helix Logo" 
         className={cn(
           sizeClasses[size],
-          "object-contain",
-          showText && "mr-3"
+          "object-cover rounded-lg"
         )}
       />
       {showText && (
@@ -76,7 +75,7 @@ export function HeaderLogo() {
   return (
     <Logo 
       size="medium" 
-      showText={true} 
+      showText={false} 
       showSubtext={false}
       className="hover:opacity-80 transition-opacity"
     />
@@ -87,8 +86,8 @@ export function SidebarLogo() {
   return (
     <Logo 
       size="medium" 
-      showText={true} 
-      showSubtext={true}
+      showText={false} 
+      showSubtext={false}
       className="p-2"
     />
   );
@@ -108,8 +107,8 @@ export function FullLogo() {
   return (
     <Logo 
       size="large" 
-      showText={true} 
-      showSubtext={true}
+      showText={false} 
+      showSubtext={false}
       className="text-center"
     />
   );
