@@ -357,7 +357,25 @@ export default function HistoricalData() {
                         <TableCell>
                           <div className="flex items-center space-x-1">
                             <Calendar className="h-4 w-4" />
-                            <span>{new Date(doc.originalDate).toLocaleDateString('de-DE')}</span>
+                            <span>
+                              {doc.originalDate && doc.originalDate !== 'Invalid Date' 
+                                ? (() => {
+                                    try {
+                                      const date = new Date(doc.originalDate);
+                                      return isNaN(date.getTime()) 
+                                        ? doc.originalDate.split('T')[0] || 'unbekannt'
+                                        : date.toLocaleDateString('de-DE', {
+                                            year: 'numeric',
+                                            month: '2-digit',
+                                            day: '2-digit'
+                                          });
+                                    } catch {
+                                      return 'unbekannt';
+                                    }
+                                  })()
+                                : 'unbekannt'
+                              }
+                            </span>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -390,7 +408,18 @@ export default function HistoricalData() {
                               size="sm"
                               onClick={() => {
                                 try {
-                                  const content = doc.content || `Titel: ${doc.documentTitle}\n\nInhalt: Vollständiger Inhalt nicht verfügbar\n\nQuelle: ${doc.sourceId}\nDatum: ${new Date(doc.originalDate).toLocaleDateString('de-DE')}\nKategorie: ${doc.category}\nSprache: ${doc.language}`;
+                                  const formatDate = (dateStr: string) => {
+                                    try {
+                                      const date = new Date(dateStr);
+                                      return isNaN(date.getTime()) 
+                                        ? dateStr.split('T')[0] || 'unbekannt'
+                                        : date.toLocaleDateString('de-DE');
+                                    } catch {
+                                      return 'unbekannt';
+                                    }
+                                  };
+                                  
+                                  const content = doc.content || `Titel: ${doc.documentTitle}\n\nInhalt: Vollständiger Inhalt nicht verfügbar\n\nQuelle: ${doc.sourceId}\nDatum: ${formatDate(doc.originalDate)}\nKategorie: ${doc.category}\nSprache: ${doc.language}`;
                                   const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
                                   const url = URL.createObjectURL(blob);
                                   const a = document.createElement('a');
