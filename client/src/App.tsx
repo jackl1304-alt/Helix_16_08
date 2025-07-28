@@ -45,7 +45,7 @@ function Router() {
       <Route path="/historical-data" component={HistoricalData} />
       <Route path="/legal-cases" component={LegalCases} />
       <Route path="/intelligent-search" component={IntelligentSearch} />
-      <Route path="/ai-approval" component={AIApprovalDemo} />
+      <Route path="/ai-approval-demo" component={AIApprovalDemo} />
       <Route path="/documents/:sourceType/:documentId" component={DocumentViewer} />
       
       {/* Fallback to 404 */}
