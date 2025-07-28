@@ -17,7 +17,7 @@ import {
   RefreshCw
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logoPath from "@assets/tmp_4b23ca96-d4e9-4839-9375-75a53368ad60_1753652563564.jpeg";
+import logoPath from "@assets/ICON Helix_1753735921077.jpg";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
@@ -52,12 +52,13 @@ export function Sidebar() {
       {/* Logo Header */}
       <div className="p-6 border-b border-gray-200">
         <Link href="/">
-          <div className="flex items-center cursor-pointer">
-            <Shield className="h-8 w-8 text-blue-600 mr-3" />
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">Helix</h1>
-              <p className="text-xs text-gray-500">MedTech Intelligence</p>
-            </div>
+          <div className="flex flex-col items-center cursor-pointer space-y-2">
+            <img 
+              src={logoPath} 
+              alt="Helix Logo" 
+              className="h-12 w-12 object-cover rounded-lg"
+            />
+            <p className="text-sm font-medium text-gray-700">MedTech Intelligence</p>
           </div>
         </Link>
       </div>

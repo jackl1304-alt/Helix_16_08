@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import logoPath from "@assets/ICON Helix_1753735753843.jpg";
+import logoPath from "@assets/ICON Helix_1753735921077.jpg";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {

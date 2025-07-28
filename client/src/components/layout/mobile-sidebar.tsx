@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import logoPath from "@assets/tmp_4b23ca96-d4e9-4839-9375-75a53368ad60_1753652563564.jpeg";
+import logoPath from "@assets/ICON Helix_1753735921077.jpg";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
@@ -77,13 +77,13 @@ export function MobileSidebar() {
       {/* Mobile Header */}
       <div className="sticky top-0 z-40 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
         <Link href="/">
-          <div className="flex items-center cursor-pointer">
+          <div className="flex flex-col items-center cursor-pointer">
             <img 
               src={logoPath} 
               alt="Helix Logo" 
-              className="h-8 w-8 rounded object-cover mr-2"
+              className="h-8 w-8 rounded-lg object-cover"
             />
-            <h1 className="text-lg font-bold text-gray-900">Helix</h1>
+            <span className="text-xs font-medium text-gray-700 mt-1">MedTech Intelligence</span>
           </div>
         </Link>
         
@@ -101,16 +101,13 @@ export function MobileSidebar() {
           >
             {/* Header */}
             <div className="p-4 border-b border-gray-200">
-              <div className="flex items-center">
+              <div className="flex flex-col items-center">
                 <img 
                   src={logoPath} 
                   alt="Helix Logo" 
-                  className="h-8 w-8 rounded object-cover mr-2"
+                  className="h-10 w-10 rounded-lg object-cover mb-2"
                 />
-                <div>
-                  <div className="font-semibold text-gray-900">Helix</div>
-                  <div className="text-xs text-gray-500">MedTech Intelligence</div>
-                </div>
+                <div className="text-sm font-medium text-gray-700">MedTech Intelligence</div>
               </div>
             </div>
 
