@@ -479,122 +479,105 @@ export default function LegalCases() {
                   <span>Keine Rechtsfälle für die gewählten Filter gefunden.</span>
                 </div>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Fall / Entscheidung</TableHead>
-                      <TableHead>Art des Falls</TableHead>
-                      <TableHead>Jurisdiktion</TableHead>
-                      <TableHead>Datum</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Geräteklassen</TableHead>
-                      <TableHead>Aktionen</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredData.map((legalCase: LegalDataRecord) => (
-                      <Dialog key={legalCase.id}>
-                        <DialogTrigger asChild>
-                          <TableRow className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                            <TableCell>
-                              <div className="space-y-1">
-                                <div className="flex items-center gap-2">
-                                  <div className="font-semibold text-blue-600 hover:text-blue-800">
-                                    {legalCase.documentTitle || legalCase.title}
-                                  </div>
+                <div className="space-y-4">
+                  {filteredData.map((legalCase: LegalDataRecord) => (
+                    <Dialog key={legalCase.id}>
+                      <DialogTrigger asChild>
+                        <Card className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 hover:shadow-md">
+                          <CardContent className="p-6">
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                              <div className="lg:col-span-2">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Gavel className="h-5 w-5 text-blue-600" />
+                                  <h3 className="font-semibold text-lg text-blue-600 hover:text-blue-800">
+                                    {legalCase.documentTitle || legalCase.title || 'Unbekannter Fall'}
+                                  </h3>
                                   <Eye className="h-4 w-4 text-blue-600" />
                                 </div>
-                                <div className="text-sm text-gray-600">
+                                <p className="text-sm text-gray-600 mb-3">
                                   {legalCase.summary || 'Rechtsprechung zu Medizinprodukten'}
-                                </div>
-                                <div className="text-xs text-gray-500 space-y-1">
-                                  <div>Rechtsquelle: {Array.isArray(legalSources) ? legalSources.find(s => s.id === selectedSource)?.name || selectedSource : selectedSource}</div>
-                                  <div>ID: {legalCase.documentId}</div>
-                                  <div className="flex items-center gap-1">
-                                    <FileText className="h-3 w-3" />
-                                    <span>Volltext verfügbar - Klicken zum Lesen</span>
-                                  </div>
+                                </p>
+                                <div className="flex flex-wrap gap-2 text-xs text-gray-500">
+                                  <span><strong>Gericht:</strong> {legalCase.court || 'Nicht spezifiziert'}</span>
+                                  <span><strong>Fall-Nr:</strong> {legalCase.caseNumber || legalCase.documentId}</span>
+                                  <span><strong>Quelle:</strong> {Array.isArray(legalSources) ? legalSources.find(s => s.id === selectedSource)?.name || selectedSource : selectedSource}</span>
                                 </div>
                               </div>
-                            </TableCell>
-                        <TableCell>
-                          <Badge className={getCaseTypeColor(legalCase.category)}>
-                            {legalCase.category}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Globe className="h-4 w-4 text-gray-500" />
-                            <span>{legalCase.region}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center space-x-1">
-                            <Calendar className="h-4 w-4" />
-                            <span>{new Date(legalCase.originalDate).toLocaleDateString('de-DE')}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={getStatusColor(legalCase.status)}>
-                            {legalCase.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap gap-1">
-                            {legalCase.deviceClasses?.map((cls: string, index: number) => (
-                              <Badge key={`${legalCase.id}-device-${index}`} variant="outline" className="text-xs">
-                                {cls}
-                              </Badge>
-                            ))}
-                          </div>
-                        </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    try {
-                                      const content = legalCase.content || `Titel: ${legalCase.documentTitle}\n\nInhalt: ${legalCase.summary || 'Vollständiger Inhalt nicht verfügbar'}\n\nQuelle: ${legalCase.sourceId}\nDatum: ${new Date(legalCase.originalDate).toLocaleDateString('de-DE')}\nKategorie: ${legalCase.category}\nSprache: ${legalCase.language}`;
-                                      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-                                      const url = URL.createObjectURL(blob);
-                                      const a = document.createElement('a');
-                                      a.href = url;
-                                      a.download = `${legalCase.documentTitle.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_')}.txt`;
-                                      document.body.appendChild(a);
-                                      a.click();
-                                      document.body.removeChild(a);
-                                      URL.revokeObjectURL(url);
-                                      toast({ title: "Download gestartet", description: "Dokument wird heruntergeladen" });
-                                    } catch (error) {
-                                      console.error('Download error:', error);
-                                      toast({ title: "Download-Fehler", description: "Dokument konnte nicht heruntergeladen werden", variant: "destructive" });
-                                    }
-                                  }}
-                                  title="Dokument herunterladen"
-                                >
-                                  <Download className="h-4 w-4" />
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (legalCase.documentUrl) {
-                                      window.open(legalCase.documentUrl, '_blank');
-                                    } else {
-                                      toast({ title: "Link nicht verfügbar", description: "Kein externer Link für dieses Dokument vorhanden", variant: "destructive" });
-                                    }
-                                  }}
-                                  title="Externes Dokument öffnen"
-                                >
-                                  <ExternalLink className="h-4 w-4" />
-                                </Button>
+                              <div className="space-y-3">
+                                <div className="flex items-center gap-2">
+                                  <Calendar className="h-4 w-4 text-gray-400" />
+                                  <span className="text-sm">{new Date(legalCase.originalDate).toLocaleDateString('de-DE')}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Globe className="h-4 w-4 text-gray-400" />
+                                  <span className="text-sm">{legalCase.region}</span>
+                                </div>
+                                <div className="flex flex-wrap gap-1">
+                                  <Badge className={getCaseTypeColor(legalCase.category)}>
+                                    {legalCase.category}
+                                  </Badge>
+                                  <Badge className={getStatusColor(legalCase.status)}>
+                                    {legalCase.status}
+                                  </Badge>
+                                </div>
+                                <div className="flex flex-wrap gap-1">
+                                  {legalCase.deviceClasses?.slice(0, 3).map((cls: string, index: number) => (
+                                    <Badge key={`device-${legalCase.id}-${index}-${cls}`} variant="outline" className="text-xs">
+                                      {cls}
+                                    </Badge>
+                                  ))}
+                                  {legalCase.deviceClasses && legalCase.deviceClasses.length > 3 && (
+                                    <Badge variant="outline" className="text-xs">
+                                      +{legalCase.deviceClasses.length - 3} mehr
+                                    </Badge>
+                                  )}
+                                </div>
+                                <div className="flex gap-2 pt-2">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      try {
+                                        const content = legalCase.content || `Titel: ${legalCase.documentTitle}\n\nInhalt: ${legalCase.summary || 'Vollständiger Inhalt nicht verfügbar'}\n\nQuelle: ${legalCase.sourceId}\nDatum: ${new Date(legalCase.originalDate).toLocaleDateString('de-DE')}\nKategorie: ${legalCase.category}\nSprache: ${legalCase.language}`;
+                                        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                                        const url = URL.createObjectURL(blob);
+                                        const a = document.createElement('a');
+                                        a.href = url;
+                                        a.download = `${legalCase.documentTitle?.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_') || 'legal_case'}.txt`;
+                                        document.body.appendChild(a);
+                                        a.click();
+                                        document.body.removeChild(a);
+                                        URL.revokeObjectURL(url);
+                                        toast({ title: "Download gestartet", description: "Dokument wird heruntergeladen" });
+                                      } catch (error) {
+                                        console.error('Download error:', error);
+                                        toast({ title: "Download-Fehler", description: "Dokument konnte nicht heruntergeladen werden", variant: "destructive" });
+                                      }
+                                    }}
+                                    title="Dokument herunterladen"
+                                  >
+                                    <Download className="h-4 w-4" />
+                                  </Button>
+                                  {legalCase.documentUrl && (
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        window.open(legalCase.documentUrl, '_blank');
+                                      }}
+                                      title="Externes Dokument öffnen"
+                                    >
+                                      <ExternalLink className="h-4 w-4" />
+                                    </Button>
+                                  )}
+                                </div>
                               </div>
-                            </TableCell>
-                          </TableRow>
-                        </DialogTrigger>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </DialogTrigger>
                         <DialogContent className="max-w-6xl w-[95vw] h-[90vh]">
                           <DialogHeader>
                             <DialogTitle className="flex items-center gap-2">
@@ -733,8 +716,7 @@ Quelle: ${legalCase.sourceId}
                         </DialogContent>
                       </Dialog>
                     ))}
-                  </TableBody>
-                </Table>
+                </div>
               )}
             </CardContent>
           </Card>
