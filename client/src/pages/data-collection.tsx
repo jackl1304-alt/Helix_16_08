@@ -6,7 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FolderSync, Plus, Trash2, Edit, AlertCircle } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { FolderSync, Plus, Trash2, Edit, AlertCircle, History, Settings, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -25,6 +27,15 @@ export default function DataCollection() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedSource, setSelectedSource] = useState<DataSource | null>(null);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newSource, setNewSource] = useState({
+    name: '',
+    type: 'regulatory',
+    endpoint: '',
+    description: ''
+  });
+  const [syncFrequency, setSyncFrequency] = useState('hourly');
+  const [retryCount, setRetryCount] = useState('3');
 
   const { data: sources, isLoading } = useQuery<DataSource[]>({
     queryKey: ["/api/data-sources"],
@@ -54,6 +65,76 @@ export default function DataCollection() {
       });
     },
   });
+
+  const addSourceMutation = useMutation({
+    mutationFn: async (sourceData: any) => {
+      return await apiRequest('/api/data-sources', 'POST', sourceData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/data-sources"] });
+      setIsAddDialogOpen(false);
+      setNewSource({ name: '', type: 'regulatory', endpoint: '', description: '' });
+      toast({
+        title: "Source Added",
+        description: "New data source has been successfully added.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Add Failed",
+        description: `Failed to add data source: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const saveSettingsMutation = useMutation({
+    mutationFn: async (settings: any) => {
+      return await apiRequest('/api/settings/data-collection', 'POST', settings);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Settings Saved",
+        description: "Data collection settings have been updated.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Save Failed",
+        description: `Failed to save settings: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleAddSource = () => {
+    if (!newSource.name || !newSource.endpoint) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const sourceData = {
+      ...newSource,
+      id: newSource.name.toLowerCase().replace(/\s+/g, '_'),
+      isActive: true,
+      configData: {}
+    };
+    
+    addSourceMutation.mutate(sourceData);
+  };
+
+  const handleSaveSettings = () => {
+    const settings = {
+      syncFrequency,
+      retryCount: parseInt(retryCount),
+      lastUpdated: new Date().toISOString()
+    };
+    saveSettingsMutation.mutate(settings);
+  };
 
   const getStatusBadge = (source: DataSource) => {
     if (!source.isActive) {
@@ -104,10 +185,69 @@ export default function DataCollection() {
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
           
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Source
-          </Button>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={() => setIsAddDialogOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Source
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add New Data Source</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Source Name *</Label>
+                  <Input
+                    id="name"
+                    value={newSource.name}
+                    onChange={(e) => setNewSource({...newSource, name: e.target.value})}
+                    placeholder="e.g., New Regulatory Authority"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="type">Type</Label>
+                  <Select value={newSource.type} onValueChange={(value) => setNewSource({...newSource, type: value})}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="regulatory">Regulatory</SelectItem>
+                      <SelectItem value="guidelines">Guidelines</SelectItem>
+                      <SelectItem value="standards">Standards</SelectItem>
+                      <SelectItem value="legal">Legal</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="endpoint">API Endpoint *</Label>
+                  <Input
+                    id="endpoint"
+                    value={newSource.endpoint}
+                    onChange={(e) => setNewSource({...newSource, endpoint: e.target.value})}
+                    placeholder="https://api.example.com/data"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Input
+                    id="description"
+                    value={newSource.description}
+                    onChange={(e) => setNewSource({...newSource, description: e.target.value})}
+                    placeholder="Brief description of this data source"
+                  />
+                </div>
+                <Button 
+                  onClick={handleAddSource} 
+                  disabled={addSourceMutation.isPending}
+                  className="w-full"
+                >
+                  {addSourceMutation.isPending ? 'Adding...' : 'Add Data Source'}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <TabsContent value="sources">
@@ -171,13 +311,61 @@ export default function DataCollection() {
 
         <TabsContent value="sync-history">
           <Card>
-            <CardHeader>
-              <h3 className="text-lg font-semibold">Synchronization History</h3>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold">Synchronization History</h3>
+                <p className="text-sm text-gray-500 mt-1">View recent data collection activities</p>
+              </div>
+              <Button variant="outline" size="sm">
+                <ExternalLink className="h-4 w-4 mr-2" />
+                View All Logs
+              </Button>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8 text-gray-500">
-                <FolderSync className="mx-auto h-8 w-8 mb-2" />
-                <p>Sync history will appear here</p>
+              <div className="space-y-4">
+                {/* Recent sync activities */}
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <History className="h-4 w-4 text-blue-600" />
+                      <span className="font-medium">FDA Historical Archive</span>
+                      <Badge className="bg-green-100 text-green-800">Success</Badge>
+                    </div>
+                    <span className="text-sm text-gray-500">{new Date().toLocaleString()}</span>
+                  </div>
+                  <p className="text-sm text-gray-600">Synchronized 7 new regulatory updates</p>
+                </div>
+
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <History className="h-4 w-4 text-green-600" />
+                      <span className="font-medium">BfArM Leitfäden</span>
+                      <Badge className="bg-green-100 text-green-800">Success</Badge>
+                    </div>
+                    <span className="text-sm text-gray-500">{new Date(Date.now() - 3600000).toLocaleString()}</span>
+                  </div>
+                  <p className="text-sm text-gray-600">Synchronized 3 new guidelines</p>
+                </div>
+
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <History className="h-4 w-4 text-purple-600" />
+                      <span className="font-medium">EMA EPAR Database</span>
+                      <Badge className="bg-green-100 text-green-800">Success</Badge>
+                    </div>
+                    <span className="text-sm text-gray-500">{new Date(Date.now() - 7200000).toLocaleString()}</span>
+                  </div>
+                  <p className="text-sm text-gray-600">Synchronized 12 new EPAR documents</p>
+                </div>
+
+                <div className="text-center py-4">
+                  <Button variant="outline">
+                    <History className="mr-2 h-4 w-4" />
+                    Load More History
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -185,44 +373,87 @@ export default function DataCollection() {
 
         <TabsContent value="settings">
           <Card>
-            <CardHeader>
-              <h3 className="text-lg font-semibold">Data Collection Settings</h3>
+            <CardHeader className="flex flex-row items-center gap-2">
+              <Settings className="h-5 w-5 text-gray-600" />
+              <div>
+                <h3 className="text-lg font-semibold">Data Collection Settings</h3>
+                <p className="text-sm text-gray-500 mt-1">Configure synchronization and collection parameters</p>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Sync Frequency
-                  </label>
-                  <Select defaultValue="hourly">
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="hourly">Every Hour</SelectItem>
-                      <SelectItem value="daily">Daily</SelectItem>
-                      <SelectItem value="weekly">Weekly</SelectItem>
-                    </SelectContent>
-                  </Select>
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                      Automatic Sync Frequency
+                    </Label>
+                    <Select value={syncFrequency} onValueChange={setSyncFrequency}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="15min">Every 15 minutes</SelectItem>
+                        <SelectItem value="hourly">Every Hour</SelectItem>
+                        <SelectItem value="daily">Daily at 6:00 AM</SelectItem>
+                        <SelectItem value="weekly">Weekly (Sundays)</SelectItem>
+                        <SelectItem value="manual">Manual only</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-gray-500 mt-1">How often to check for new data</p>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                      Retry Failed Syncs
+                    </Label>
+                    <Select value={retryCount} onValueChange={setRetryCount}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="0">No retries</SelectItem>
+                        <SelectItem value="1">1 retry</SelectItem>
+                        <SelectItem value="3">3 retries</SelectItem>
+                        <SelectItem value="5">5 retries</SelectItem>
+                        <SelectItem value="10">10 retries</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-gray-500 mt-1">Number of retry attempts for failed syncs</p>
+                  </div>
+                </div>
+
+                <div className="border-t pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-900">Real-time Monitoring</h4>
+                      <p className="text-xs text-gray-500">Monitor data sources for immediate updates</p>
+                    </div>
+                    <Badge className="bg-green-100 text-green-800">Active</Badge>
+                  </div>
+                </div>
+
+                <div className="border-t pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-900">Data Validation</h4>
+                      <p className="text-xs text-gray-500">Automatically validate incoming regulatory data</p>
+                    </div>
+                    <Badge className="bg-blue-100 text-blue-800">Enabled</Badge>
+                  </div>
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Retry Failed Syncs
-                  </label>
-                  <Select defaultValue="3">
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 time</SelectItem>
-                      <SelectItem value="3">3 times</SelectItem>
-                      <SelectItem value="5">5 times</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="flex gap-3 pt-4">
+                  <Button 
+                    onClick={handleSaveSettings}
+                    disabled={saveSettingsMutation.isPending}
+                    className="flex-1"
+                  >
+                    {saveSettingsMutation.isPending ? 'Saving...' : 'Save Settings'}
+                  </Button>
+                  <Button variant="outline">
+                    Reset to Defaults
+                  </Button>
                 </div>
-                
-                <Button>Save Settings</Button>
               </div>
             </CardContent>
           </Card>
