@@ -54,12 +54,15 @@ export default function Dashboard() {
 
   const handleSyncAllSources = async () => {
     try {
+      console.log("Starting sync of all data sources...");
       // Trigger sync for all active data sources
-      await apiRequest("POST", "/api/data-sources/sync-all");
+      await apiRequest("/api/data-sources/sync-all", "POST");
+      console.log("Sync completed successfully");
       // Refresh dashboard data
       window.location.reload();
     } catch (error) {
       console.error("Failed to sync data sources:", error);
+      alert("Sync fehlgeschlagen. Bitte versuchen Sie es erneut.");
     }
   };
 

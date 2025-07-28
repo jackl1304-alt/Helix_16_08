@@ -34,7 +34,7 @@ export function DataCollectionStatus() {
 
   const syncMutation = useMutation({
     mutationFn: async (sourceId: string) => {
-      await apiRequest("POST", `/api/data-sources/${sourceId}/sync`);
+      await apiRequest(`/api/data-sources/${sourceId}/sync`, "POST");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/data-sources"] });
@@ -55,7 +55,7 @@ export function DataCollectionStatus() {
   const toggleActiveMutation = useMutation({
     mutationFn: async ({ sourceId, isActive }: { sourceId: string; isActive: boolean }) => {
       console.log(`Toggle für ${sourceId} auf ${isActive}`);
-      const response = await apiRequest("PATCH", `/api/data-sources/${sourceId}`, { isActive });
+      const response = await apiRequest(`/api/data-sources/${sourceId}`, "PATCH", { isActive });
       console.log('Toggle Response:', response);
       return response;
     },
