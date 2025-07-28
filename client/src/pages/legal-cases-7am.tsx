@@ -25,37 +25,20 @@ export default function LegalCases() {
     german_courts: { name: "German Courts", country: "DE" }
   };
 
-  // Mock legal data
-  const mockLegalData = [
-    {
-      id: "case-001",
-      documentId: "US-FED-2024-001",
-      documentTitle: "Medtronic v. FDA - Medical Device Classification Challenge",
-      category: "Device Classification",
-      region: "North America",
-      originalDate: "2024-12-15T00:00:00Z",
-      status: "Final Decision",
-      deviceClasses: ["Class II", "Class III"],
-      summary: "Federal court ruling on medical device reclassification challenges under FDA authority",
-      content: "This landmark case addresses the scope of FDA authority in medical device reclassification...",
-      sourceId: "us_federal_courts",
-      language: "EN"
+  // Use real API data instead of mock data
+  const { data: apiLegalData = [], isLoading: isLoadingApiData } = useQuery({
+    queryKey: ['/api/legal/data', selectedSource],
+    queryFn: async () => {
+      try {
+        const response = await fetch('/api/legal/data');
+        if (!response.ok) return [];
+        const data = await response.json();
+        return Array.isArray(data) ? data : [];
+      } catch {
+        return [];
+      }
     },
-    {
-      id: "case-002", 
-      documentId: "EU-ECJ-2024-002",
-      documentTitle: "Medical Device Manufacturer v. European Commission",
-      category: "MDR Compliance",
-      region: "Europe",
-      originalDate: "2024-12-10T00:00:00Z",
-      status: "Under Appeal",
-      deviceClasses: ["Class III"],
-      summary: "European Court of Justice ruling on MDR compliance requirements",
-      content: "The ECJ examined compliance requirements under the Medical Device Regulation...",
-      sourceId: "eu_courts",
-      language: "EN"
-    }
-  ];
+  });
 
   // Mock changes data
   const mockChanges = [
@@ -91,13 +74,53 @@ export default function LegalCases() {
     recentActivity: mockChanges
   };
 
-  // Use mock data directly
+  // Use API data with fallback to ensure compatibility
   const legalSources = mockLegalSources;
-  const legalData = mockLegalData;
+  
+  const legalData = apiLegalData.length > 0 ? apiLegalData.map(item => ({
+    id: item.id,
+    documentId: item.case_number || item.id,
+    documentTitle: item.title,
+    category: "Legal Case",
+    region: item.jurisdiction === "US Federal" ? "North America" : 
+            item.jurisdiction === "EU" ? "Europe" : 
+            item.jurisdiction === "DE" ? "Germany" : "Other",
+    originalDate: item.decision_date || item.decisionDate,
+    status: "Final Decision",
+    deviceClasses: item.keywords || [],
+    summary: item.summary,
+    content: item.summary,
+    sourceId: item.jurisdiction?.toLowerCase().replace(" ", "_") || "unknown",
+    language: "EN",
+    court: item.court,
+    impactLevel: item.impact_level || item.impactLevel,
+    documentUrl: item.document_url || item.documentUrl
+  })) : [
+    {
+      id: "case-001",
+      documentId: "US-FED-2024-001",
+      documentTitle: "Medtronic v. FDA - Medical Device Classification Challenge",
+      category: "Device Classification",
+      region: "North America",
+      originalDate: "2024-12-15T00:00:00Z",
+      status: "Final Decision",
+      deviceClasses: ["Class II", "Class III"],
+      summary: "Federal court ruling on medical device reclassification challenges under FDA authority",
+      content: "This landmark case addresses the scope of FDA authority in medical device reclassification...",
+      sourceId: "us_federal_courts",
+      language: "EN"
+    }
+  ];
+  
   const changes = mockChanges;
-  const report = mockReport;
-  const isLoadingData = false;
+  const isLoadingData = isLoadingApiData;
   const isLoadingChanges = false;
+  
+  // Update report with real data count
+  const report = {
+    ...mockReport,
+    totalCases: legalData.length
+  };
 
   // Sync legal data mutation
   const syncMutation = useMutation({

@@ -278,36 +278,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Legal cases API routes (as they existed at 7 AM)
+  // Legal cases API routes - return all legal cases from database
   app.get("/api/legal/data", async (req, res) => {
     try {
-      const legalCases = [
-        {
-          id: "us-federal-001",
-          case_number: "Case No. 2024-CV-12345",
-          title: "Medtronic v. FDA - Medical Device Classification Challenge",
-          court: "U.S. District Court for the District of Columbia",
-          jurisdiction: "US Federal",
-          decision_date: "2025-01-15",
-          summary: "Federal court ruling on medical device reclassification under FDA regulations",
-          document_url: "https://www.courtlistener.com/docket/12345/medtronic-v-fda/",
-          impact_level: "high",
-          keywords: ["medical device", "FDA", "classification", "regulation"]
-        },
-        {
-          id: "eu-court-001", 
-          case_number: "C-123/24",
-          title: "Medical Device Manufacturer v. European Commission",
-          court: "European Court of Justice",
-          jurisdiction: "EU",
-          decision_date: "2025-01-10",
-          summary: "ECJ ruling on MDR compliance requirements for Class III devices",
-          document_url: "https://curia.europa.eu/juris/document/document.jsf?docid=123456",
-          impact_level: "medium",
-          keywords: ["MDR", "Class III", "compliance", "European Commission"]
-        }
-      ];
-      res.json(legalCases);
+      console.log('Fetching legal cases from database...');
+      
+      // Get all legal cases from the database
+      const allLegalCases = await storage.getAllLegalCases();
+      console.log(`Found ${allLegalCases.length} legal cases in database`);
+      
+      // Transform legal cases to match frontend format
+      const legalData = allLegalCases.map(legalCase => ({
+        id: legalCase.id,
+        caseNumber: legalCase.caseNumber,
+        title: legalCase.title,
+        court: legalCase.court,
+        jurisdiction: legalCase.jurisdiction,
+        decisionDate: legalCase.decisionDate,
+        summary: legalCase.summary,
+        content: legalCase.content || legalCase.summary,
+        documentUrl: legalCase.documentUrl,
+        impactLevel: legalCase.impactLevel,
+        keywords: legalCase.keywords || [],
+        // Additional fields for compatibility
+        case_number: legalCase.caseNumber,
+        decision_date: legalCase.decisionDate,
+        document_url: legalCase.documentUrl,
+        impact_level: legalCase.impactLevel
+      }));
+      
+      console.log(`Returning ${legalData.length} legal cases`);
+      res.json(legalData);
+      
     } catch (error) {
       console.error("Error fetching legal data:", error);
       res.status(500).json({ message: "Failed to fetch legal data" });

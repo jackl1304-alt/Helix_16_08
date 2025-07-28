@@ -171,8 +171,21 @@ class MorningStorage implements IStorage {
 
   async getAllLegalCases() {
     try {
-      // Legal cases don't exist in current DB - return empty for now
-      return [];
+      const result = await sql`SELECT * FROM legal_cases ORDER BY decision_date DESC`;
+      console.log(`Fetched ${result.length} legal cases from database`);
+      return result.map(row => ({
+        id: row.id,
+        caseNumber: row.case_number,
+        title: row.title,
+        court: row.court,
+        jurisdiction: row.jurisdiction,
+        decisionDate: row.decision_date,
+        summary: row.summary,
+        content: row.content || row.summary,
+        documentUrl: row.document_url,
+        impactLevel: row.impact_level,
+        keywords: row.keywords || []
+      }));
     } catch (error) {
       console.error("All legal cases error:", error);
       return [];
