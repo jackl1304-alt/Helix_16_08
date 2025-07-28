@@ -9,7 +9,7 @@ import Dashboard from "@/pages/dashboard";
 import DataCollection from "@/pages/data-collection";
 import GlobalSources from "@/pages/global-sources";
 import Analytics from "@/pages/analytics";
-import RegulatoryUpdates from "@/pages/regulatory-updates-7am";
+import RegulatoryUpdates from "@/pages/regulatory-updates-fixed";
 import NewsletterManager from "@/pages/newsletter-manager";
 import ApprovalWorkflow from "@/pages/approval-workflow";
 import UserManagement from "@/pages/user-management";
