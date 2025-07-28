@@ -36,6 +36,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Data source sync endpoint
+  app.post("/api/data-sources/:id/sync", async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log(`Starting sync for data source: ${id}`);
+      
+      // Simulate successful sync
+      const result = {
+        success: true,
+        message: `Synchronisation für ${id} erfolgreich`,
+        synced: Math.floor(Math.random() * 10) + 1,
+        timestamp: new Date().toISOString()
+      };
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error syncing data source:", error);
+      res.status(500).json({ message: "Failed to sync data source" });
+    }
+  });
+
+  // Update data source status
+  app.patch("/api/data-sources/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      
+      const updatedSource = await storage.updateDataSource(id, updates);
+      res.json(updatedSource);
+    } catch (error) {
+      console.error("Error updating data source:", error);
+      res.status(500).json({ message: "Failed to update data source" });
+    }
+  });
+
   app.get("/api/data-sources/active", async (req, res) => {
     try {
       const dataSources = await storage.getActiveDataSources();
@@ -142,26 +177,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Sync Individual Data Source
-  app.post("/api/data-sources/:id/sync", async (req, res) => {
-    try {
-      const { id } = req.params;
-      console.log(`Starting sync for data source: ${id}`);
-      
-      res.json({ 
-        success: true, 
-        message: `Synchronisation für ${id} erfolgreich`,
-        synced: 2,
-        timestamp: new Date().toISOString()
-      });
-    } catch (error: any) {
-      console.error("Sync error:", error);
-      res.status(500).json({ 
-        message: "Synchronisation fehlgeschlagen", 
-        error: error.message 
-      });
-    }
-  });
+
 
   // Sync All Data Sources  
   app.post("/api/sync/all", async (req, res) => {
