@@ -60,7 +60,9 @@ export default function RegulatoryUpdates() {
         }
         const data = await response.json();
         console.log('API returned', Array.isArray(data) ? data.length : 0, 'updates');
-        console.log('First update:', data[0]);
+        if (data && data.length > 0) {
+          console.log('First update sample:', data[0]);
+        }
         return Array.isArray(data) ? data : [];
       } catch (error) {
         console.error('API fetch error:', error);
@@ -196,6 +198,8 @@ export default function RegulatoryUpdates() {
     const updateDate = new Date(u.publishedAt).toDateString();
     return updateDate === today;
   }).length;
+  
+  console.log('Statistics - Total:', totalUpdates, 'Filtered:', filteredCount, 'High Priority:', highPriorityCount);
 
   const downloadUpdate = async (update: RegulatoryUpdate) => {
     try {
@@ -250,7 +254,7 @@ export default function RegulatoryUpdates() {
             <div className="flex items-center space-x-2">
               <Bell className="h-8 w-8 text-blue-600" />
               <div>
-                <p className="text-2xl font-bold">{totalUpdates}</p>
+                <p className="text-2xl font-bold">{isLoading ? '...' : totalUpdates.toLocaleString()}</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Gesamt Updates</p>
               </div>
             </div>
@@ -262,7 +266,7 @@ export default function RegulatoryUpdates() {
             <div className="flex items-center space-x-2">
               <FileText className="h-8 w-8 text-green-600" />
               <div>
-                <p className="text-2xl font-bold">{filteredCount}</p>
+                <p className="text-2xl font-bold">{isLoading ? '...' : filteredCount.toLocaleString()}</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Gefilterte Updates</p>
               </div>
             </div>
@@ -385,9 +389,10 @@ export default function RegulatoryUpdates() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="ml-2">Lade Updates...</span>
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+              <span className="text-lg font-medium">Lade 5.443 Regulatory Updates...</span>
+              <span className="text-sm text-gray-500 mt-2">Dies kann 5-10 Sekunden dauern</span>
             </div>
           ) : filteredUpdates.length === 0 ? (
             <div className="flex items-center justify-center py-8 text-gray-500">
