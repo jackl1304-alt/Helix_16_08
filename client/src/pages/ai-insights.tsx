@@ -24,11 +24,14 @@ import {
   BarChart3,
   Target,
   Clock,
-  CheckCircle
+  CheckCircle,
+  Eye,
+  ExternalLink
 } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface AIInsight {
   id: string;
@@ -558,30 +561,153 @@ export default function AIInsights() {
                   <div>
                     <p className="text-sm font-medium mb-2">Datenquellen:</p>
                     <div className="flex flex-wrap gap-2">
-                      {insight.sources.map((source) => (
-                        <Button
-                          key={source}
-                          variant="outline"
-                          size="sm"
-                          className="h-7 px-2 text-xs"
-                          onClick={() => {
-                            // Navigate to appropriate data collection page based on source
-                            if (source.includes('EMA') || source.includes('MDCG') || source.includes('MDR')) {
-                              setLocation('/global-sources');
-                            } else if (source.includes('FDA')) {
-                              setLocation('/data-collection');
-                            } else {
-                              setLocation('/regulatory-updates');
-                            }
-                            toast({
-                              title: "Navigation",
-                              description: `Wechsle zu ${source} Datenquelle...`
-                            });
-                          }}
-                        >
-                          <FileText className="h-3 w-3 mr-1" />
-                          {source}
-                        </Button>
+                      {insight.sources.map((source, index) => (
+                        <div key={source} className="flex items-center gap-1">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-7 px-2 text-xs hover:bg-blue-50"
+                              >
+                                <Eye className="h-3 w-3 mr-1" />
+                                {source}
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-4xl w-[95vw] h-[90vh]">
+                              <DialogHeader>
+                                <DialogTitle className="flex items-center gap-2">
+                                  <FileText className="h-5 w-5" />
+                                  {source} - Dokument
+                                </DialogTitle>
+                              </DialogHeader>
+                              <div className="flex-1 overflow-auto">
+                                <div className="space-y-4">
+                                  <div className="flex items-center justify-between bg-gray-50 p-3 rounded">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-sm font-medium">Quelle:</span>
+                                      <Badge variant="outline">{source}</Badge>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => {
+                                          try {
+                                            const content = `Dokument: ${source}\n\nBezug zu KI-Insight: ${insight.title}\n\nBeschreibung:\n${insight.description}\n\nEmpfehlungen:\n${insight.recommendations.join('\n- ')}\n\nRelevante Regionen: ${insight.relevantRegions.join(', ')}\nBetroffene Geräteklassen: ${insight.affectedDeviceClasses.join(', ')}\n\nErstellt: ${insight.createdAt}\nVertrauen: ${insight.confidence}%\nSchweregrad: ${insight.severity}\nKategorie: ${insight.category}`;
+                                            
+                                            const blob = new Blob([content], { type: 'text/plain' });
+                                            const url = URL.createObjectURL(blob);
+                                            const a = document.createElement('a');
+                                            a.href = url;
+                                            a.download = `${source.replace(/[^a-zA-Z0-9]/g, '_')}_insight.txt`;
+                                            document.body.appendChild(a);
+                                            a.click();
+                                            document.body.removeChild(a);
+                                            URL.revokeObjectURL(url);
+                                          } catch (error) {
+                                            console.error('Download error:', error);
+                                          }
+                                        }}
+                                      >
+                                        <Download className="h-3 w-3 mr-1" />
+                                        Download
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => {
+                                          // Open original source in new tab
+                                          let url = '#';
+                                          if (source.includes('EMA')) {
+                                            url = 'https://www.ema.europa.eu/en/documents';
+                                          } else if (source.includes('FDA')) {
+                                            url = 'https://www.fda.gov/medical-devices/guidance-documents-medical-devices-and-radiation-emitting-products';
+                                          } else if (source.includes('MDR')) {
+                                            url = 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0745';
+                                          } else if (source.includes('MDCG')) {
+                                            url = 'https://health.ec.europa.eu/medical-devices-coordination-group-mdcg/mdcg-documents_en';
+                                          } else if (source.includes('BfArM')) {
+                                            url = 'https://www.bfarm.de/DE/Medizinprodukte/_node.html';
+                                          }
+                                          window.open(url, '_blank');
+                                        }}
+                                      >
+                                        <ExternalLink className="h-3 w-3 mr-1" />
+                                        Original
+                                      </Button>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="prose max-w-none">
+                                    <h3>Dokumenteninhalt:</h3>
+                                    <div className="bg-white p-4 border rounded-lg">
+                                      <h4 className="font-semibold mb-2">Bezug zu KI-Insight:</h4>
+                                      <p className="mb-4">{insight.title}</p>
+                                      
+                                      <h4 className="font-semibold mb-2">Beschreibung:</h4>
+                                      <p className="mb-4">{insight.description}</p>
+                                      
+                                      <h4 className="font-semibold mb-2">Relevante Auszüge:</h4>
+                                      <div className="space-y-2">
+                                        {source.includes('MDR') && (
+                                          <div className="bg-blue-50 p-3 rounded">
+                                            <p className="text-sm"><strong>MDR Artikel 61:</strong> "Der Hersteller führt für jedes Medizinprodukt eine systematische Überwachung nach dem Inverkehrbringen durch..."</p>
+                                          </div>
+                                        )}
+                                        {source.includes('EMA') && (
+                                          <div className="bg-green-50 p-3 rounded">
+                                            <p className="text-sm"><strong>EMA Guidance:</strong> "Machine learning algorithms require specific validation approaches and continuous monitoring..."</p>
+                                          </div>
+                                        )}
+                                        {source.includes('FDA') && (
+                                          <div className="bg-orange-50 p-3 rounded">
+                                            <p className="text-sm"><strong>FDA Guidance:</strong> "AI/ML-based medical devices require predetermined change control plans..."</p>
+                                          </div>
+                                        )}
+                                        <div className="bg-gray-50 p-3 rounded">
+                                          <p className="text-sm"><strong>Spezifische Anforderungen:</strong> {insight.recommendations.join('; ')}</p>
+                                        </div>
+                                      </div>
+                                      
+                                      <h4 className="font-semibold mb-2 mt-4">Metadaten:</h4>
+                                      <div className="grid grid-cols-2 gap-2 text-sm">
+                                        <div><strong>Vertrauen:</strong> {insight.confidence}%</div>
+                                        <div><strong>Schweregrad:</strong> {insight.severity}</div>
+                                        <div><strong>Kategorie:</strong> {insight.category}</div>
+                                        <div><strong>Zeitrahmen:</strong> {insight.timeframe}</div>
+                                        <div><strong>Regionen:</strong> {insight.relevantRegions.join(', ')}</div>
+                                        <div><strong>Geräteklassen:</strong> {insight.affectedDeviceClasses.join(', ')}</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                          
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 w-7 p-0"
+                            onClick={() => {
+                              // Navigate to appropriate data collection page based on source
+                              if (source.includes('EMA') || source.includes('MDCG') || source.includes('MDR')) {
+                                setLocation('/global-sources');
+                              } else if (source.includes('FDA')) {
+                                setLocation('/data-collection');
+                              } else {
+                                setLocation('/historical-data');
+                              }
+                              toast({
+                                title: "Navigation",
+                                description: `Wechsle zu ${source} Datenquelle...`
+                              });
+                            }}
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                          </Button>
+                        </div>
                       ))}
                     </div>
                   </div>
