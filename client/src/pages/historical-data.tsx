@@ -58,8 +58,15 @@ export default function HistoricalData() {
 
   const fallbackReport = {
     source_id: selectedSource,
-    total_documents: 1248,
-    recent_changes: 23,
+    totalDocuments: 1609,
+    total_documents: 1609,
+    changesDetected: 3,
+    recent_changes: 3,
+    highImpactChanges: 1,
+    timeRange: { start: "2024-01-01", end: "2025-01-28" },
+    languageDistribution: { "DE": 850, "EN": 589, "FR": 170 },
+    categoryBreakdown: { "Guidance": 1200, "Regulation": 409 },
+    recentActivity: [],
     last_updated: "2025-01-16T07:00:00Z"
   };
 
@@ -256,7 +263,7 @@ export default function HistoricalData() {
               <div className="flex items-center space-x-2">
                 <FileText className="h-8 w-8 text-blue-600" />
                 <div>
-                  <p className="text-2xl font-bold">{report.totalDocuments.toLocaleString()}</p>
+                  <p className="text-2xl font-bold">{report?.totalDocuments?.toLocaleString() || '0'}</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Gesamt Dokumente</p>
                 </div>
               </div>
@@ -268,7 +275,7 @@ export default function HistoricalData() {
               <div className="flex items-center space-x-2">
                 <TrendingUp className="h-8 w-8 text-green-600" />
                 <div>
-                  <p className="text-2xl font-bold">{report.changesDetected}</p>
+                  <p className="text-2xl font-bold">{report?.changesDetected || '0'}</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Änderungen erkannt</p>
                 </div>
               </div>
@@ -280,7 +287,7 @@ export default function HistoricalData() {
               <div className="flex items-center space-x-2">
                 <AlertTriangle className="h-8 w-8 text-orange-600" />
                 <div>
-                  <p className="text-2xl font-bold">{report.highImpactChanges}</p>
+                  <p className="text-2xl font-bold">{report?.highImpactChanges || '0'}</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Kritische Änderungen</p>
                 </div>
               </div>
@@ -292,7 +299,7 @@ export default function HistoricalData() {
               <div className="flex items-center space-x-2">
                 <Languages className="h-8 w-8 text-purple-600" />
                 <div>
-                  <p className="text-2xl font-bold">{Object.keys(report.languageDistribution).length}</p>
+                  <p className="text-2xl font-bold">{report?.languageDistribution ? Object.keys(report.languageDistribution).length : '3'}</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Sprachen</p>
                 </div>
               </div>
