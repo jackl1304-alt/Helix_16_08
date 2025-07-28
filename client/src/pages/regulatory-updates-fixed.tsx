@@ -325,29 +325,81 @@ Helix Regulatory Intelligence Platform
               Download
             </Button>
             {update.source_url && (
-              <Button onClick={() => {
-                const sourceUrl = update.source_url;
-                let fullUrl = sourceUrl;
-                
-                if (!sourceUrl.startsWith('http')) {
-                  if (sourceUrl.startsWith('/regulatory-updates/')) {
-                    fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
-                  } else if (update.region === 'EU') {
-                    fullUrl = `https://www.ema.europa.eu${sourceUrl}`;
-                  } else if (update.region === 'DE') {
-                    fullUrl = `https://www.bfarm.de${sourceUrl}`;
-                  } else if (update.region === 'CH') {
-                    fullUrl = `https://www.swissmedic.ch${sourceUrl}`;
-                  } else {
-                    fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
+              <>
+                <Button onClick={() => {
+                  const sourceUrl = update.source_url;
+                  let fullUrl = sourceUrl;
+                  
+                  if (!sourceUrl.startsWith('http')) {
+                    if (sourceUrl.startsWith('/regulatory-updates/')) {
+                      fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
+                    } else if (update.region === 'EU') {
+                      fullUrl = `https://www.ema.europa.eu${sourceUrl}`;
+                    } else if (update.region === 'DE') {
+                      fullUrl = `https://www.bfarm.de${sourceUrl}`;
+                    } else if (update.region === 'CH') {
+                      fullUrl = `https://www.swissmedic.ch${sourceUrl}`;
+                    } else {
+                      fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
+                    }
                   }
-                }
+                  
+                  window.open(fullUrl, '_blank');
+                }} variant="outline">
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Original-Quelle
+                </Button>
                 
-                window.open(fullUrl, '_blank');
-              }} variant="outline">
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Quelle öffnen
-              </Button>
+                <Button onClick={() => {
+                  const sourceUrl = update.source_url;
+                  let fullUrl = sourceUrl;
+                  
+                  if (!sourceUrl.startsWith('http')) {
+                    if (sourceUrl.startsWith('/regulatory-updates/')) {
+                      fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
+                    } else if (update.region === 'EU') {
+                      fullUrl = `https://www.ema.europa.eu${sourceUrl}`;
+                    } else if (update.region === 'DE') {
+                      fullUrl = `https://www.bfarm.de${sourceUrl}`;
+                    } else if (update.region === 'CH') {
+                      fullUrl = `https://www.swissmedic.ch${sourceUrl}`;
+                    } else {
+                      fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
+                    }
+                  }
+                  
+                  // Wayback Machine Archive
+                  const waybackUrl = `https://web.archive.org/web/*/${fullUrl}`;
+                  window.open(waybackUrl, '_blank');
+                }} variant="outline" size="sm" title="Archivierte Versionen in Wayback Machine">
+                  🕰️ Archiv
+                </Button>
+                
+                <Button onClick={() => {
+                  const sourceUrl = update.source_url;
+                  let fullUrl = sourceUrl;
+                  
+                  if (!sourceUrl.startsWith('http')) {
+                    if (sourceUrl.startsWith('/regulatory-updates/')) {
+                      fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
+                    } else if (update.region === 'EU') {
+                      fullUrl = `https://www.ema.europa.eu${sourceUrl}`;
+                    } else if (update.region === 'DE') {
+                      fullUrl = `https://www.bfarm.de${sourceUrl}`;
+                    } else if (update.region === 'CH') {
+                      fullUrl = `https://www.swissmedic.ch${sourceUrl}`;
+                    } else {
+                      fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
+                    }
+                  }
+                  
+                  // Google Cache
+                  const googleCacheUrl = `https://webcache.googleusercontent.com/search?q=cache:${encodeURIComponent(fullUrl)}`;
+                  window.open(googleCacheUrl, '_blank');
+                }} variant="outline" size="sm" title="Google Cache Suche">
+                  🔍 Cache
+                </Button>
+              </>
             )}
           </div>
         </div>
@@ -399,41 +451,76 @@ Helix Regulatory Intelligence Platform
             >
               <Download className="h-4 w-4" />
             </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => {
-                const sourceUrl = update.source_url;
-                if (sourceUrl && sourceUrl !== 'Nicht verfügbar') {
-                  let fullUrl = sourceUrl;
-                  
-                  if (!sourceUrl.startsWith('http')) {
-                    if (sourceUrl.startsWith('/regulatory-updates/')) {
-                      fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
-                    } else if (update.region === 'EU') {
-                      fullUrl = `https://www.ema.europa.eu${sourceUrl}`;
-                    } else if (update.region === 'DE') {
-                      fullUrl = `https://www.bfarm.de${sourceUrl}`;
-                    } else if (update.region === 'CH') {
-                      fullUrl = `https://www.swissmedic.ch${sourceUrl}`;
-                    } else {
-                      fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
+            <div className="flex gap-1">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => {
+                  const sourceUrl = update.source_url;
+                  if (sourceUrl && sourceUrl !== 'Nicht verfügbar') {
+                    let fullUrl = sourceUrl;
+                    
+                    if (!sourceUrl.startsWith('http')) {
+                      if (sourceUrl.startsWith('/regulatory-updates/')) {
+                        fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
+                      } else if (update.region === 'EU') {
+                        fullUrl = `https://www.ema.europa.eu${sourceUrl}`;
+                      } else if (update.region === 'DE') {
+                        fullUrl = `https://www.bfarm.de${sourceUrl}`;
+                      } else if (update.region === 'CH') {
+                        fullUrl = `https://www.swissmedic.ch${sourceUrl}`;
+                      } else {
+                        fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
+                      }
                     }
+                    
+                    window.open(fullUrl, '_blank');
+                  } else {
+                    toast({
+                      title: "Link nicht verfügbar",
+                      description: "Für dieses Update ist kein externer Link verfügbar.",
+                      variant: "destructive"
+                    });
                   }
-                  
-                  window.open(fullUrl, '_blank');
-                } else {
-                  toast({
-                    title: "Link nicht verfügbar",
-                    description: "Für dieses Update ist kein externer Link verfügbar.",
-                    variant: "destructive"
-                  });
-                }
-              }}
-              title="Quelle in neuem Fenster öffnen"
-            >
-              <ExternalLink className="h-4 w-4" />
-            </Button>
+                }}
+                title="Original-Quelle öffnen"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </Button>
+              
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => {
+                  const sourceUrl = update.source_url;
+                  if (sourceUrl && sourceUrl !== 'Nicht verfügbar') {
+                    let fullUrl = sourceUrl;
+                    
+                    if (!sourceUrl.startsWith('http')) {
+                      if (sourceUrl.startsWith('/regulatory-updates/')) {
+                        fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
+                      } else if (update.region === 'EU') {
+                        fullUrl = `https://www.ema.europa.eu${sourceUrl}`;
+                      } else if (update.region === 'DE') {
+                        fullUrl = `https://www.bfarm.de${sourceUrl}`;
+                      } else if (update.region === 'CH') {
+                        fullUrl = `https://www.swissmedic.ch${sourceUrl}`;
+                      } else {
+                        fullUrl = `https://www.accessdata.fda.gov${sourceUrl}`;
+                      }
+                    }
+                    
+                    // Wayback Machine
+                    const waybackUrl = `https://web.archive.org/web/*/${fullUrl}`;
+                    window.open(waybackUrl, '_blank');
+                  }
+                }}
+                title="Archivierte Versionen finden"
+                className="text-xs"
+              >
+                🕰️
+              </Button>
+            </div>
           </>
         )}
       />
