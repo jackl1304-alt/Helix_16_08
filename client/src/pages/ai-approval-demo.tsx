@@ -10,12 +10,12 @@ import { apiRequest } from "@/lib/queryClient";
 
 interface Approval {
   id: string;
-  itemType: string;
-  itemId: string;
+  item_type: string;
+  item_id: string;
   status: 'pending' | 'approved' | 'rejected';
   comments?: string;
-  reviewedAt?: string;
-  createdAt: string;
+  reviewed_at?: string;
+  created_at: string;
 }
 
 export default function AIApprovalDemo() {
@@ -111,9 +111,12 @@ export default function AIApprovalDemo() {
     }
   };
 
+  // Berechne Statistiken
+  const totalApprovals = approvals.length;
   const pendingCount = approvals.filter(a => a.status === 'pending').length;
   const approvedCount = approvals.filter(a => a.status === 'approved').length;
   const rejectedCount = approvals.filter(a => a.status === 'rejected').length;
+  const aiProcessedCount = approvals.filter(a => a.comments?.includes('KI Auto')).length;
 
   if (isLoading) {
     return (
@@ -253,10 +256,10 @@ export default function AIApprovalDemo() {
                       {getStatusIcon(approval.status)}
                       <div>
                         <p className="font-medium">
-                          {approval.itemType.replace('_', ' ').toUpperCase()} - {approval.itemId.slice(0, 8)}
+                          {approval.item_type.replace('_', ' ').toUpperCase()} - {approval.item_id.slice(0, 8)}
                         </p>
                         <p className="text-sm text-gray-600">
-                          Erstellt: {new Date(approval.createdAt).toLocaleDateString('de-DE')}
+                          Erstellt: {new Date(approval.created_at).toLocaleDateString('de-DE')}
                         </p>
                       </div>
                     </div>
@@ -266,7 +269,7 @@ export default function AIApprovalDemo() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleEvaluateItem(approval.itemType, approval.itemId)}
+                          onClick={() => handleEvaluateItem(approval.item_type, approval.item_id)}
                           disabled={evaluateItemMutation.isPending}
                           className="flex items-center gap-1"
                         >
@@ -287,9 +290,9 @@ export default function AIApprovalDemo() {
                     </>
                   )}
                   
-                  {approval.reviewedAt && (
+                  {approval.reviewed_at && (
                     <div className="text-xs text-gray-500 mt-2">
-                      Bewertet: {new Date(approval.reviewedAt).toLocaleString('de-DE')}
+                      Bewertet: {new Date(approval.reviewed_at).toLocaleString('de-DE')}
                     </div>
                   )}
                 </div>
