@@ -68,7 +68,8 @@ export default function Dashboard() {
       }, 1000);
     } catch (error) {
       console.error("Failed to sync data sources:", error);
-      alert(`Sync fehlgeschlagen: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unbekannter Fehler';
+      alert(`Sync fehlgeschlagen: ${errorMessage}`);
     }
   };
 
