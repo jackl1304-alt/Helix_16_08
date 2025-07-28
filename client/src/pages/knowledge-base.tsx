@@ -517,7 +517,23 @@ export default function KnowledgeBase() {
                             <FileText className="h-4 w-4 text-muted-foreground" />
                             <span>{attachment.name}</span>
                             <span className="text-muted-foreground">({formatFileSize(attachment.size)})</span>
-                            <Button variant="ghost" size="sm">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => {
+                                const downloadUrl = `/api/knowledge-base/attachments/${attachment.name}`;
+                                const link = document.createElement('a');
+                                link.href = downloadUrl;
+                                link.download = attachment.name;
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                toast({
+                                  title: "Download gestartet",
+                                  description: `${attachment.name} wird heruntergeladen...`
+                                });
+                              }}
+                            >
                               <Download className="h-3 w-3" />
                             </Button>
                           </div>
@@ -664,7 +680,23 @@ export default function KnowledgeBase() {
                             <p className="text-sm text-muted-foreground">{formatFileSize(attachment.size)}</p>
                           </div>
                         </div>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            const downloadUrl = `/api/knowledge-base/attachments/${attachment.name}`;
+                            const link = document.createElement('a');
+                            link.href = downloadUrl;
+                            link.download = attachment.name;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            toast({
+                              title: "Download gestartet",
+                              description: `${attachment.name} wird heruntergeladen...`
+                            });
+                          }}
+                        >
                           <Download className="h-4 w-4 mr-2" />
                           Download
                         </Button>
