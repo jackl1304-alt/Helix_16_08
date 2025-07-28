@@ -17,7 +17,7 @@ import SystemSettings from "@/pages/system-settings";
 import AuditLogs from "@/pages/audit-logs";
 import AIInsights from "@/pages/ai-insights";
 import KnowledgeBase from "@/pages/knowledge-base";
-import HistoricalData from "@/pages/historical-data";
+import HistoricalData from "@/pages/historical-data-fixed";
 import LegalCases from "@/pages/legal-cases-fixed";
 import IntelligentSearch from "@/pages/intelligent-search";
 import DocumentViewer from "@/pages/document-viewer";
