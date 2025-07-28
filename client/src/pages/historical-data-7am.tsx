@@ -25,8 +25,48 @@ export default function HistoricalData() {
     { id: "swissmedic_guidance", name: "Swissmedic Guidelines", region: "Schweiz" }
   ];
 
-  // Mock historical data - exactly as it was at 7 AM
-  const mockHistoricalData = [
+  // Use real API data instead of mock data
+  const { data: apiHistoricalData = [], isLoading: isLoadingApiData } = useQuery({
+    queryKey: ['/api/historical/data', selectedSource],
+    queryFn: async () => {
+      try {
+        const response = await fetch('/api/historical/data');
+        if (!response.ok) return [];
+        const data = await response.json();
+        return Array.isArray(data) ? data : [];
+      } catch {
+        return [];
+      }
+    },
+  });
+
+  // Mock changes data
+  const mockChanges = [
+    {
+      id: "change-001",
+      document_id: "hist-001",
+      change_type: "content_update",
+      description: "Updated clinical evaluation requirements section",
+      detected_at: "2024-12-15T08:30:00Z",
+      impact_level: "medium",
+      old_version: "v2.0",
+      new_version: "v2.1"
+    }
+  ];
+
+  // Mock report data
+  const mockReport = {
+    totalDocuments: 1609,
+    changesDetected: 3,
+    highImpactChanges: 1,
+    timeRange: { start: "2024-01-01", end: "2024-12-31" },
+    languageDistribution: { "EN": 850, "DE": 589, "FR": 170 },
+    categoryBreakdown: { "Guidance": 1200, "Regulation": 409 },
+    recentActivity: mockChanges
+  };
+
+  // Use API data with fallback
+  const historicalData = apiHistoricalData.length > 0 ? apiHistoricalData : [
     {
       id: "hist-001",
       documentId: "FDA-GUID-2024-001",
@@ -58,38 +98,16 @@ export default function HistoricalData() {
       content: "This guideline establishes the regulatory framework for medical device software..."
     }
   ];
-
-  // Mock changes data
-  const mockChanges = [
-    {
-      id: "change-001",
-      document_id: "hist-001",
-      change_type: "content_update",
-      description: "Updated clinical evaluation requirements section",
-      detected_at: "2024-12-15T08:30:00Z",
-      impact_level: "medium",
-      old_version: "v2.0",
-      new_version: "v2.1"
-    }
-  ];
-
-  // Mock report data
-  const mockReport = {
-    totalDocuments: 1609,
-    changesDetected: 3,
-    highImpactChanges: 1,
-    timeRange: { start: "2024-01-01", end: "2024-12-31" },
-    languageDistribution: { "EN": 850, "DE": 589, "FR": 170 },
-    categoryBreakdown: { "Guidance": 1200, "Regulation": 409 },
-    recentActivity: mockChanges
-  };
-
-  // Use mock data directly
-  const historicalData = mockHistoricalData;
+  
   const changes = mockChanges;
-  const report = mockReport;
-  const isLoadingData = false;
+  const isLoadingData = isLoadingApiData;
   const isLoadingChanges = false;
+  
+  // Update report with real data count
+  const report = {
+    ...mockReport,
+    totalDocuments: historicalData.length
+  };
 
   // Sync mutation
   const syncMutation = useMutation({

@@ -366,20 +366,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Historical data API routes (as they existed at 7 AM)
   app.get("/api/historical/data", async (req, res) => {
     try {
-      const historicalData = [
-        {
-          id: "hist-001",
-          source_id: "fda_guidance",
-          title: "FDA Guidance: Software as Medical Device (SaMD)",
-          description: "Clinical evaluation guidelines for software-based medical devices",
-          document_url: "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/software-medical-device-samd-clinical-evaluation",
-          published_at: "2025-01-10T00:00:00Z",
-          archived_at: "2025-01-15T08:00:00Z",
-          change_type: "updated",
-          version: "v2.1"
-        }
-      ];
+      console.log('Fetching historical data from regulatory updates...');
+      
+      // Get all regulatory updates from the database
+      const allUpdates = await storage.getAllRegulatoryUpdates();
+      console.log(`Found ${allUpdates.length} regulatory updates for historical data`);
+      
+      // Transform regulatory updates to historical document format
+      const historicalData = allUpdates.map(update => ({
+        id: `hist-${update.id}`,
+        documentId: update.id,
+        documentTitle: update.title,
+        summary: update.description,
+        sourceId: update.sourceId,
+        originalDate: update.publishedAt,
+        archivedDate: update.createdAt,
+        changeType: "archived",
+        version: "v1.0",
+        category: update.updateType || "Guidance",
+        language: "EN",
+        region: update.region,
+        content: update.content || update.description,
+        document_url: update.sourceUrl,
+        priority: update.priority,
+        deviceClasses: update.deviceClasses || [],
+        categories: update.categories || []
+      }));
+      
+      console.log(`Returning ${historicalData.length} historical documents`);
       res.json(historicalData);
+      
     } catch (error) {
       console.error("Error fetching historical data:", error);
       res.status(500).json({ message: "Failed to fetch historical data" });
