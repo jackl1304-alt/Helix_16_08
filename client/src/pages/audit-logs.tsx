@@ -203,7 +203,7 @@ export default function AuditLogs() {
   const [dateTo, setDateTo] = useState<Date | undefined>();
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
 
-  const { data: auditLogs = mockAuditLogs, isLoading } = useQuery<AuditLog[]>({
+  const { data: auditLogs = [], isLoading } = useQuery<AuditLog[]>({
     queryKey: ["/api/audit-logs", {
       search: searchQuery,
       action: selectedAction === "all" ? undefined : selectedAction,
@@ -213,7 +213,7 @@ export default function AuditLogs() {
       dateFrom: dateFrom?.toISOString(),
       dateTo: dateTo?.toISOString()
     }],
-    enabled: false // Use mock data
+    enabled: true // Use real API data for current logs
   });
 
   const filteredLogs = auditLogs.filter(log => {

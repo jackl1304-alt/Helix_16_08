@@ -21,7 +21,7 @@ interface Approval {
 }
 
 interface AIReasoningDetail {
-  action: 'approve' | 'reject' | 'pending';
+  action: 'approved' | 'rejected' | 'pending';
   confidence: number;
   reasoning: string;
   detailedAnalysis: {
