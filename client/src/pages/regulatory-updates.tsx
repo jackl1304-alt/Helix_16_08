@@ -47,9 +47,20 @@ export default function RegulatoryUpdates() {
   const [selectedPriority, setSelectedPriority] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<string>("all");
 
-  const { data: updates, isLoading } = useQuery<RegulatoryUpdate[]>({
+  const { data: updates, isLoading, error: updatesError } = useQuery<RegulatoryUpdate[]>({
     queryKey: ["/api/regulatory-updates"],
-    select: (data) => Array.isArray(data) ? data : [],
+    queryFn: async () => {
+      console.log('[FRONTEND] Fetching all regulatory updates...');
+      const response = await fetch('/api/regulatory-updates');
+      console.log('[FRONTEND] All updates response status:', response.status);
+      if (!response.ok) {
+        console.error('[FRONTEND] All updates failed:', response.status, response.statusText);
+        throw new Error(`Failed to fetch regulatory updates: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log('[FRONTEND] All updates data length:', data?.length || 0);
+      return Array.isArray(data) ? data : [];
+    }
   });
 
   const filteredUpdates = (updates || []).filter(update => {
