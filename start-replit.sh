@@ -1,16 +1,16 @@
 #!/bin/bash
-# Replit startup script with all cache fixes applied
+# Replit.com Hosting Start Script - Das echte Problem gelöst
 
-echo "🚀 Starting Helix Regulatory Platform with Replit cache fixes..."
+echo "🚀 Replit.com Hosting Start - Mit allen Fixes"
 
-# Apply pre-build fixes
-echo "🔧 Applying pre-build cache fixes..."
-source pre-build-replit.sh
+# Cache-Fixes anwenden
+source enhanced-pre-build.sh
 
-# Set production environment
-export NODE_ENV=production
-export NODE_OPTIONS="--max-old-space-size=4096 --max-semi-space-size=1024"
+# Build mit Cache-Fixes
+vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
 
-# Start the application
-echo "🌟 Starting production server..."
-exec node dist/index.js
+# Static Files für Hosting kopieren
+bash replit-hosting-complete-fix.sh
+
+# Production Server starten
+NODE_ENV=production node dist/index.js
