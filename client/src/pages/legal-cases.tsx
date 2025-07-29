@@ -66,6 +66,45 @@ export default function LegalCases() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Manual sync mutation for Live deployment
+  const syncMutation = useMutation({
+    mutationFn: async () => {
+      console.log("🔄 MANUAL SYNC: Triggering force synchronization...");
+      const response = await fetch('/api/admin/force-sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Sync failed: ${response.status}`);
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      console.log("✅ SYNC SUCCESS:", data);
+      toast({
+        title: "Synchronisation erfolgreich",
+        description: `${data.data.legalCases} Legal Cases und ${data.data.regulatoryUpdates} Updates geladen`,
+      });
+      
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/legal/data'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/legal-cases'] });
+      
+      // Refresh the page to show new data
+      setTimeout(() => window.location.reload(), 1000);
+    },
+    onError: (error) => {
+      console.error("❌ SYNC ERROR:", error);
+      toast({
+        title: "Synchronisation fehlgeschlagen",
+        description: error instanceof Error ? error.message : "Unbekannter Fehler",
+        variant: "destructive",
+      });
+    }
+  });
+
   // Fallback sources
   const fallbackSources = [
     { id: "us_federal_courts", name: "US Federal Courts", jurisdiction: "USA", active: true },
@@ -220,34 +259,7 @@ export default function LegalCases() {
     enabled: !!selectedSource,
   });
 
-  // Sync legal data mutation
-  const syncMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch('/api/legal/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
-      });
-      if (!response.ok) {
-        throw new Error(`Sync failed: ${response.status}`);
-      }
-      return response.json();
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "Rechtssprechungsdaten aktualisiert",
-        description: `Alle Gerichtsentscheidungen wurden erfolgreich synchronisiert (${data.timestamp}).`,
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/legal'] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Synchronisationsfehler",
-        description: `Fehler beim Aktualisieren der Rechtssprechungsdaten: ${error.message}`,
-        variant: "destructive",
-      });
-    },
-  });
+  // Legal cases filtering and search logic
 
   // Filter legal data based on search term
   const filteredData = legalData.filter((record) => {
