@@ -1,31 +1,42 @@
 #!/usr/bin/env node
+// Replit-optimierter Server-Start für Produktionsumgebung
 
-// Production start script for Render.com deployment
-// This ensures proper environment setup and graceful startup
+import { spawn } from 'child_process';
 
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import { createRequire } from 'module';
+console.log('🚀 Replit Server Start mit Cache-Optimierungen...');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const require = createRequire(import.meta.url);
+// Replit-Produktions-Umgebungsvariablen
+process.env.NODE_ENV = 'production';
+process.env.NPM_CONFIG_CACHE = '/tmp/.npm-cache-replit';
+process.env.NODE_OPTIONS = '--max-old-space-size=4096';
+process.env.PORT = process.env.PORT || '5000';
 
-// Set production environment
-process.env.NODE_ENV = process.env.NODE_ENV || 'production';
-process.env.PORT = process.env.PORT || 5000;
+console.log('✅ Produktions-Umgebung konfiguriert');
+console.log(`🌐 Server startet auf Port ${process.env.PORT}`);
 
-// Log startup info
-console.log('🚀 Starting Helix Regulatory Platform...');
-console.log(`📍 Environment: ${process.env.NODE_ENV}`);
-console.log(`🔌 Port: ${process.env.PORT}`);
-console.log(`🗄️  Database: ${process.env.DATABASE_URL ? 'Connected' : 'No DATABASE_URL found'}`);
+// Server-Prozess starten
+const serverProcess = spawn('node', ['dist/index.js'], {
+  stdio: 'inherit',
+  env: process.env
+});
 
-// Import and start the main application
-try {
-  await import('./dist/index.js');
-  console.log('✅ Helix Platform started successfully');
-} catch (error) {
-  console.error('❌ Failed to start Helix Platform:', error);
+serverProcess.on('close', (code) => {
+  console.log(`Server beendet mit Code ${code}`);
+  process.exit(code);
+});
+
+serverProcess.on('error', (err) => {
+  console.error('Server-Fehler:', err);
   process.exit(1);
-}
+});
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+  console.log('\n🛑 Server wird heruntergefahren...');
+  serverProcess.kill('SIGINT');
+});
+
+process.on('SIGTERM', () => {
+  console.log('\n🛑 Server wird beendet...');
+  serverProcess.kill('SIGTERM');
+});
