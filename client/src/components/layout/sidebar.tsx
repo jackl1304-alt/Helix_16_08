@@ -49,7 +49,7 @@ export function Sidebar() {
   const [location] = useLocation();
 
   return (
-    <aside className="fixed left-0 top-0 h-full w-64 bg-white shadow-sm border-r border-gray-200 z-50">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-white shadow-sm border-r border-gray-200 z-50 overflow-y-auto">
       {/* Logo Header */}
       <div className="p-6 border-b border-gray-200">
         <Link href="/">
@@ -64,7 +64,7 @@ export function Sidebar() {
         </Link>
       </div>
       
-      <nav className="mt-4">
+      <nav className="mt-4 pb-8 flex-1 overflow-y-auto">
         <div className="px-4 space-y-2">
           {navigation.map((item) => {
             const isActive = location === item.href;

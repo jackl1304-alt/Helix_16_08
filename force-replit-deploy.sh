@@ -1,13 +1,27 @@
 #!/bin/bash
-echo "🔄 FORCING REPLIT DEPLOYMENT UPDATE"
-echo "=================================="
+echo "🚀 FORCE REPLIT PRODUCTION DEPLOYMENT"
+echo "===================================="
 
-# Force rebuild
+# Ensure production build
+echo "Building production version..."
 npm run build
+
+# Copy static files
+echo "Copying static files to server/public/..."
 cp -r dist/public/* server/public/
 
-# Create deployment marker
-echo "$(date): Production deployment ready" > .deployment-ready
+# Check if files exist
+echo "Verifying production files:"
+ls -la server/public/
+ls -la dist/
 
-echo "✅ Deployment forced. The Deploy button should now use the new version."
-echo "👉 Click Deploy in the top-right corner to update the hosted version."
+# Show current environment variables (safe parts)
+echo "Environment check:"
+echo "DATABASE_URL configured: ${DATABASE_URL:+YES}"
+echo "NODE_ENV: $NODE_ENV"
+
+echo ""
+echo "✅ PRODUCTION BUILD COMPLETE"
+echo "Ready for Replit deployment!"
+echo ""
+echo "🔥 CLICK DEPLOY BUTTON NOW!"
