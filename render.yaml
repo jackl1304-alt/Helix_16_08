@@ -2,7 +2,7 @@ services:
   - type: web
     name: helix-regulatory-platform
     env: node
-    plan: starter
+    plan: free
     buildCommand: npm install && npm run build
     startCommand: npm start
     envVars:
@@ -18,4 +18,4 @@ databases:
   - name: helix-postgres
     databaseName: helix_db
     user: helix_user
-    plan: starter
+    plan: free

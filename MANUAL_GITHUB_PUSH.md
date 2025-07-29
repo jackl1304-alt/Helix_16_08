@@ -10,9 +10,9 @@ rm -f .git/config.lock
 
 ## Schritt 2: Git Repository konfigurieren
 ```bash
-# Remote mit Token setzen
+# Remote mit Token setzen (Token durch Ihren echten Token ersetzen)
 git remote remove origin 2>/dev/null || true
-git remote add origin https://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@github.com/jackl1304/helix-regulatory-platform.git
+git remote add origin https://IHR_GITHUB_TOKEN@github.com/jackl1304/helix-regulatory-platform.git
 
 # User konfigurieren
 git config user.email "deltawaysnewsletter@gmail.com"

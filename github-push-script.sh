@@ -7,9 +7,10 @@ echo "🧬 Helix GitHub Push Script"
 echo "=========================="
 echo ""
 
-# Repository URL mit korrektem Token
+# Repository URL (Token wird bei Ausführung abgefragt)
 GITHUB_USERNAME="jackl1304"
-GITHUB_TOKEN="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"
+echo "🔑 Geben Sie Ihren GitHub Personal Access Token ein:"
+read -s GITHUB_TOKEN
 REPO_URL="https://${GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/helix-regulatory-platform.git"
 
 echo ""
