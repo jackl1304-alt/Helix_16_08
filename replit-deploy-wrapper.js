@@ -101,8 +101,22 @@ const buildProcess = spawn('npm', ['run', 'build'], {
 
 buildProcess.on('close', (code) => {
   if (code === 0) {
-    console.log('✅ Replit-Build erfolgreich abgeschlossen!');
-    process.exit(0);
+    console.log('✅ Build abgeschlossen, kopiere statische Dateien...');
+    
+    // Copy static files to correct location for serveStatic
+    const copyProcess = spawn('cp', ['-r', 'dist/public/.', 'server/public/'], {
+      stdio: 'inherit'
+    });
+    
+    copyProcess.on('close', (copyCode) => {
+      if (copyCode === 0) {
+        console.log('✅ Replit-Deployment vollständig bereit!');
+        process.exit(0);
+      } else {
+        console.error('❌ Fehler beim Kopieren der statischen Dateien');
+        process.exit(copyCode);
+      }
+    });
   } else {
     console.error('❌ Build-Fehler aufgetreten');
     process.exit(code);
