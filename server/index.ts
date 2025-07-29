@@ -68,10 +68,14 @@ app.use((req, res, next) => {
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
+  // Force production mode when NODE_ENV is production OR when not in development
+  const isProduction = process.env.NODE_ENV === "production" || app.get("env") !== "development";
+  
   console.log(`Environment: ${app.get("env")}`);
   console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+  console.log(`Using production mode: ${isProduction}`);
   
-  if (app.get("env") === "development") {
+  if (!isProduction) {
     console.log("Setting up Vite development server");
     await setupVite(app, server);
   } else {
