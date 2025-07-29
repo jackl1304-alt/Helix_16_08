@@ -306,8 +306,8 @@ class MorningStorage implements IStorage {
   async createDataSource(data: any) {
     try {
       const result = await sql`
-        INSERT INTO data_sources (id, name, description, url, country, type, is_active)
-        VALUES (${data.id}, ${data.name}, ${data.description}, ${data.url}, ${data.country}, ${data.type}, ${data.isActive})
+        INSERT INTO data_sources (id, name, endpoint, country, region, type, category, is_active)
+        VALUES (${data.id}, ${data.name}, ${data.endpoint || data.url}, ${data.country}, ${data.region || 'Global'}, ${data.type}, ${data.category || 'general'}, ${data.isActive})
         RETURNING *
       `;
       return result[0];
