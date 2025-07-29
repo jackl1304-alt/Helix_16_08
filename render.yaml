@@ -1,21 +1,47 @@
+# Render.com deployment configuration with cache fixes
 services:
   - type: web
     name: helix-regulatory-platform
     env: node
+    region: frankfurt
     plan: free
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    buildCommand: |
+      # Apply cache fixes before build
+      export NPM_CONFIG_CACHE=/tmp/.npm
+      export DISABLE_NPM_CACHE=true
+      export DISABLE_OPENCOLLECTIVE=true
+      export NODE_OPTIONS="--max-old-space-size=4096"
+      
+      # Clear cached files
+      rm -rf node_modules/.cache
+      rm -rf .cache
+      npm cache clean --force
+      
+      # Create npm cache directory with proper permissions
+      mkdir -p /tmp/.npm
+      chmod 755 /tmp/.npm
+      
+      # Build with cache disabled
+      npm install --no-cache
+      npm run build
+    startCommand: |
+      # Start with production environment variables
+      export NPM_CONFIG_CACHE=/tmp/.npm
+      export NODE_OPTIONS="--max-old-space-size=4096"
+      export NODE_ENV=production
+      npm run start
     envVars:
+      - key: NPM_CONFIG_CACHE
+        value: /tmp/.npm
+      - key: DISABLE_NPM_CACHE
+        value: true
+      - key: DISABLE_OPENCOLLECTIVE
+        value: true
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=4096
+      - key: KEEP_DEV_DEPENDENCIES
+        value: true
       - key: NODE_ENV
         value: production
-      - key: DATABASE_URL
-        fromDatabase:
-          name: helix-postgres
-          property: connectionString
-    autoDeploy: true
-
-databases:
-  - name: helix-postgres
-    databaseName: helix_db
-    user: helix_user
-    plan: free
+      - key: PORT
+        value: 5000
