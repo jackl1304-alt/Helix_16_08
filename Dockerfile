@@ -7,6 +7,11 @@ ENV DISABLE_NPM_CACHE=true
 ENV DISABLE_OPENCOLLECTIVE=true
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 ENV KEEP_DEV_DEPENDENCIES=true
+ENV NPM_CONFIG_PROGRESS=false
+ENV NPM_CONFIG_LOGLEVEL=warn
+ENV NPM_CONFIG_AUDIT=false
+ENV NPM_CONFIG_FUND=false
+ENV NPM_CONFIG_UPDATE_NOTIFIER=false
 
 # Arbeitsverzeichnis
 WORKDIR /app
@@ -18,7 +23,7 @@ RUN mkdir -p /tmp/.npm && chmod 755 /tmp/.npm
 COPY package*.json ./
 
 # Clear any existing cache and install dependencies with cache disabled
-RUN npm cache clean --force && npm ci --no-cache
+RUN rm -rf ~/.npm && npm cache clean --force && npm ci --no-cache
 
 # Source Code kopieren
 COPY . .
