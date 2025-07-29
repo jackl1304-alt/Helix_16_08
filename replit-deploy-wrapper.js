@@ -7,10 +7,12 @@ import path from 'path';
 
 console.log('🔧 Replit Deployment Wrapper gestartet...');
 
-// Replit-spezifische Umgebungsvariablen setzen
-process.env.NPM_CONFIG_CACHE = '/tmp/.npm-cache-replit';
+// Deployment-optimierte Umgebungsvariablen setzen
+process.env.NPM_CONFIG_CACHE = '/tmp/.npm-deployment-cache';
 process.env.NPM_CONFIG_TMP = '/tmp';
-process.env.NPM_CONFIG_INIT_CACHE = '/tmp/.npm-init-replit';
+process.env.NPM_CONFIG_INIT_CACHE = '/tmp/.npm-deployment-init';
+process.env.NPM_CONFIG_GLOBALCONFIG = '/tmp/.npmrc-deployment-global';
+process.env.NPM_CONFIG_USERCONFIG = '/tmp/.npmrc-deployment-user';
 process.env.DISABLE_NPM_CACHE = 'true';
 process.env.NODE_OPTIONS = '--max-old-space-size=4096';
 process.env.NPM_CONFIG_PROGRESS = 'false';
@@ -20,12 +22,12 @@ process.env.NPM_CONFIG_UPDATE_NOTIFIER = 'false';
 
 console.log('✅ Replit-Cache-Variablen gesetzt');
 
-// Cache-Verzeichnisse für Replit erstellen
+// Cache-Verzeichnisse für Deployment erstellen
 const cacheDirectories = [
-  '/tmp/.npm-cache-replit',
-  '/tmp/.npm-init-replit',
-  '/tmp/.npm-global-replit',
-  '/tmp/.npm-user-replit'
+  '/tmp/.npm-deployment-cache',
+  '/tmp/.npm-deployment-init',
+  '/tmp/.npm-deployment-global',
+  '/tmp/.npm-deployment-user'
 ];
 
 cacheDirectories.forEach(dir => {
@@ -35,10 +37,10 @@ cacheDirectories.forEach(dir => {
   }
 });
 
-// Replit-optimierte .npmrc erstellen
-const npmrcContent = `cache=/tmp/.npm-cache-replit
+// Deployment-optimierte .npmrc erstellen
+const npmrcContent = `cache=/tmp/.npm-deployment-cache
 tmp=/tmp
-init-cache=/tmp/.npm-init-replit
+init-cache=/tmp/.npm-deployment-init
 fund=false
 audit=false
 update-notifier=false
@@ -51,12 +53,12 @@ cache-max=0
 cache-min=0
 package-lock=false
 shrinkwrap=false
-globalconfig=/tmp/.npmrc-global-replit
-userconfig=/tmp/.npmrc-user-replit`;
+globalconfig=/tmp/.npmrc-deployment-global
+userconfig=/tmp/.npmrc-deployment-user`;
 
-fs.writeFileSync('/tmp/.npmrc-replit', npmrcContent);
-fs.writeFileSync('/tmp/.npmrc-global-replit', 'cache=/tmp/.npm-cache-replit\ntmp=/tmp\nfund=false');
-fs.writeFileSync('/tmp/.npmrc-user-replit', 'cache=/tmp/.npm-cache-replit\ntmp=/tmp');
+fs.writeFileSync('/tmp/.npmrc-deployment', npmrcContent);
+fs.writeFileSync('/tmp/.npmrc-deployment-global', 'cache=/tmp/.npm-deployment-cache\ntmp=/tmp\nfund=false');
+fs.writeFileSync('/tmp/.npmrc-deployment-user', 'cache=/tmp/.npm-deployment-cache\ntmp=/tmp');
 
 console.log('✅ Replit-NPM-Konfiguration erstellt');
 
@@ -80,7 +82,8 @@ const buildProcess = spawn('npm', ['run', 'build'], {
   stdio: 'inherit',
   env: {
     ...process.env,
-    NPM_CONFIG_USERCONFIG: '/tmp/.npmrc-replit'
+    NPM_CONFIG_USERCONFIG: '/tmp/.npmrc-deployment',
+    NPM_CONFIG_GLOBALCONFIG: '/tmp/.npmrc-deployment-global'
   }
 });
 

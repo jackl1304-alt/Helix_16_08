@@ -5,11 +5,13 @@ import { spawn } from 'child_process';
 
 console.log('🚀 Replit Server Start mit Cache-Optimierungen...');
 
-// Replit-Produktions-Umgebungsvariablen
+// Deployment-optimierte Produktions-Umgebungsvariablen
 process.env.NODE_ENV = 'production';
-process.env.NPM_CONFIG_CACHE = '/tmp/.npm-cache-replit';
+process.env.NPM_CONFIG_CACHE = '/tmp/.npm-deployment-cache';
 process.env.NODE_OPTIONS = '--max-old-space-size=4096';
 process.env.PORT = process.env.PORT || '5000';
+process.env.NPM_CONFIG_GLOBALCONFIG = '/tmp/.npmrc-deployment-global';
+process.env.NPM_CONFIG_USERCONFIG = '/tmp/.npmrc-deployment-user';
 
 console.log('✅ Produktions-Umgebung konfiguriert');
 console.log(`🌐 Server startet auf Port ${process.env.PORT}`);
