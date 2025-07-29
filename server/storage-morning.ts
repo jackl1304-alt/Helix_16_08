@@ -319,16 +319,47 @@ class MorningStorage implements IStorage {
 
   async createRegulatoryUpdate(data: any) {
     try {
+      // Korrigierte SQL ohne 'type' Spalte und mit korrekten Spaltennamen
       const result = await sql`
-        INSERT INTO regulatory_updates (title, description, type, source_id, document_url, published_at, priority)
-        VALUES (${data.title}, ${data.description}, ${data.type}, ${data.sourceId}, ${data.documentUrl}, ${data.publishedAt}, ${data.priority})
+        INSERT INTO regulatory_updates (title, description, source_id, source_url, region, update_type, priority, device_classes, categories, raw_data, published_at)
+        VALUES (
+          ${data.title}, 
+          ${data.description}, 
+          ${data.sourceId}, 
+          ${data.sourceUrl || data.documentUrl || ''}, 
+          ${data.region || 'US'},
+          ${data.updateType || 'approval'}::update_type,
+          ${this.mapPriorityToEnum(data.priority)}::priority,
+          ${JSON.stringify(data.deviceClasses || [])},
+          ${JSON.stringify(data.categories || {})},
+          ${JSON.stringify(data.rawData || {})},
+          ${data.publishedAt || new Date()}
+        )
         RETURNING *
       `;
+      console.log(`[DB] Successfully created regulatory update: ${data.title}`);
       return result[0];
-    } catch (error) {
+    } catch (error: any) {
       console.error("Create regulatory update error:", error);
+      console.error("Data that failed:", JSON.stringify(data, null, 2));
       throw error;
     }
+  }
+
+  private mapPriorityToEnum(priority: string | number): string {
+    // Mapping von String-Prioritäten zu Enum-Werten
+    if (typeof priority === 'number') {
+      if (priority >= 4) return 'urgent';
+      if (priority >= 3) return 'high';
+      if (priority >= 2) return 'medium';
+      return 'low';
+    }
+    
+    const priorityStr = priority?.toLowerCase() || 'medium';
+    if (['urgent', 'high', 'medium', 'low'].includes(priorityStr)) {
+      return priorityStr;
+    }
+    return 'medium'; // default
   }
 
   async getAllLegalCases() {
