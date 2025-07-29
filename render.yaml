@@ -6,10 +6,12 @@ services:
     region: frankfurt
     plan: free
     buildCommand: |
-      # Apply comprehensive cache fixes before build
+      # Apply complete deployment cache permission fixes
       export NPM_CONFIG_CACHE=/tmp/.npm
       export NPM_CONFIG_TMP=/tmp
       export NPM_CONFIG_INIT_CACHE=/tmp/.npm-init
+      export NPM_CONFIG_GLOBALCONFIG=/tmp/.npmrc-global
+      export NPM_CONFIG_USERCONFIG=/tmp/.npmrc-user
       export DISABLE_NPM_CACHE=true
       export DISABLE_OPENCOLLECTIVE=true
       export NODE_OPTIONS="--max-old-space-size=4096 --max-semi-space-size=1024"
@@ -20,26 +22,27 @@ services:
       export NPM_CONFIG_AUDIT=false
       export NPM_CONFIG_FUND=false
       export NPM_CONFIG_UPDATE_NOTIFIER=false
+      export NPM_CONFIG_PACKAGE_LOCK=false
+      export NPM_CONFIG_SHRINKWRAP=false
       
       # Clear cache and create writable directories before building
-      rm -rf node_modules/.cache
-      rm -rf ~/.npm/_cacache
-      rm -rf /tmp/.npm
-      rm -rf /tmp/.npm-init
+      rm -rf node_modules/.cache || true
+      rm -rf ~/.npm || true
+      rm -rf /tmp/.npm* || true
       
-      # Create writable directories with proper permissions
-      mkdir -p /tmp/.npm
-      mkdir -p /tmp/.npm-init
-      chmod 755 /tmp/.npm
-      chmod 755 /tmp/.npm-init
+      # Create all writable directories with proper permissions
+      mkdir -p /tmp/.npm /tmp/.npm-init /tmp/.npm-global /tmp/.npm-user
+      chmod -R 755 /tmp/.npm*
       
-      # Verify directory creation
-      echo "Created cache directories:"
-      ls -la /tmp/.npm /tmp/.npm-init
-      echo "Current workspace: $(pwd)"
+      # Create npm config files in writable locations
+      echo "cache=/tmp/.npm" > /tmp/.npmrc-global
+      echo "tmp=/tmp" >> /tmp/.npmrc-global
+      echo "fund=false" >> /tmp/.npmrc-global
+      echo "audit=false" >> /tmp/.npmrc-global
       
-      # Install and build with enhanced cache settings
-      npm install --cache=/tmp/.npm --tmp=/tmp --no-audit --no-fund --loglevel=warn --include=dev
+      # Clear npm cache safely and install
+      npm cache clean --force || true
+      npm install --cache=/tmp/.npm --tmp=/tmp --no-audit --no-fund --loglevel=warn --userconfig=/tmp/.npmrc-user --globalconfig=/tmp/.npmrc-global --include=dev
       npm run build
     startCommand: |
       # Start with production environment variables
@@ -54,6 +57,10 @@ services:
         value: /tmp
       - key: NPM_CONFIG_INIT_CACHE
         value: /tmp/.npm-init
+      - key: NPM_CONFIG_GLOBALCONFIG
+        value: /tmp/.npmrc-global
+      - key: NPM_CONFIG_USERCONFIG
+        value: /tmp/.npmrc-user
       - key: DISABLE_NPM_CACHE
         value: true
       - key: DISABLE_OPENCOLLECTIVE
@@ -73,6 +80,10 @@ services:
       - key: NPM_CONFIG_FUND
         value: false
       - key: NPM_CONFIG_UPDATE_NOTIFIER
+        value: false
+      - key: NPM_CONFIG_PACKAGE_LOCK
+        value: false
+      - key: NPM_CONFIG_SHRINKWRAP
         value: false
       - key: NODE_ENV
         value: production
