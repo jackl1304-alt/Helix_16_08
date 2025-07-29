@@ -33,6 +33,10 @@ export interface IStorage {
   getLegalCasesByJurisdiction(jurisdiction: string): Promise<any[]>;
   createLegalCase(data: any): Promise<any>;
   getAllKnowledgeArticles(): Promise<any[]>;
+  updateDataSourceLastSync(id: string, lastSync: Date): Promise<any>;
+  getDataSourceById(id: string): Promise<any>;
+  getDataSources(): Promise<any[]>;
+  getDataSourceByType(type: string): Promise<any>;
 }
 
 // Direct SQL Storage Implementation for 7AM Morning State
@@ -107,7 +111,7 @@ class MorningStorage implements IStorage {
       
       // Always return the database result, even if empty
       return result;
-    } catch (error) {
+    } catch (error: any) {
       console.error('[DB] getAllDataSources SQL error:', error);
       console.log('[DB] Error details:', error.message);
       // Return empty array on error instead of fallback data
@@ -377,6 +381,81 @@ class MorningStorage implements IStorage {
     } catch (error) {
       console.error("All knowledge articles error:", error);
       return [];
+    }
+  }
+
+  async updateDataSourceLastSync(id: string, lastSync: Date) {
+    try {
+      console.log(`[DB] Updating last sync for data source ${id} to ${lastSync.toISOString()}`);
+      const result = await sql`
+        UPDATE data_sources 
+        SET last_sync_at = ${lastSync.toISOString()}
+        WHERE id = ${id}
+        RETURNING *
+      `;
+      
+      if (result.length === 0) {
+        console.warn(`[DB] No data source found with id: ${id}`);
+        return null;
+      }
+      
+      console.log(`[DB] Successfully updated last sync for ${id}`);
+      return result[0];
+    } catch (error: any) {
+      console.error(`[DB] Error updating last sync for ${id}:`, error);
+      throw error;
+    }
+  }
+
+  async getDataSourceById(id: string) {
+    try {
+      console.log(`[DB] Getting data source by id: ${id}`);
+      const result = await sql`SELECT * FROM data_sources WHERE id = ${id}`;
+      
+      if (result.length === 0) {
+        console.warn(`[DB] No data source found with id: ${id}`);
+        return null;
+      }
+      
+      return {
+        id: result[0].id,
+        name: result[0].name,
+        type: result[0].type,
+        endpoint: result[0].endpoint,
+        isActive: result[0].is_active,
+        lastSync: result[0].last_sync_at
+      };
+    } catch (error: any) {
+      console.error(`[DB] Error getting data source by id ${id}:`, error);
+      throw error;
+    }
+  }
+
+  async getDataSources() {
+    return this.getAllDataSources();
+  }
+
+  async getDataSourceByType(type: string) {
+    try {
+      console.log(`[DB] Getting data source by type: ${type}`);
+      const result = await sql`SELECT * FROM data_sources WHERE type = ${type} LIMIT 1`;
+      
+      if (result.length === 0) {
+        console.warn(`[DB] No data source found with type: ${type}`);
+        return null;
+      }
+      
+      return {
+        id: result[0].id,
+        name: result[0].name,
+        type: result[0].type,
+        endpoint: result[0].endpoint,
+        isActive: result[0].is_active,
+        lastSync: result[0].last_sync_at
+      };
+    } catch (error: any) {
+      console.error(`[DB] Error getting data source by type ${type}:`, error);
+      throw error;
     }
   }
 }

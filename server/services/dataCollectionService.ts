@@ -1,6 +1,5 @@
-import { storage } from "../storage";
-import { InsertRegulatoryUpdate } from "../shared/schema";
-import { db } from "../storage";
+import { storage } from "../storage-morning";
+import { InsertRegulatoryUpdate } from "../../shared/schema";
 
 // Dynamic import to avoid module resolution issues during compilation
 async function getNlpService() {
@@ -485,8 +484,8 @@ class DataCollectionService {
     if (!source) {
       console.error(`Data source not found: ${sourceId}`);
       // Try to get all sources for debugging
-      const allSources = await storage.getDataSources();
-      console.log(`Available sources: ${allSources.map(s => s.id).join(', ')}`);
+      const allSources = await storage.getAllDataSources();
+      console.log(`Available sources: ${allSources.map((s: any) => s.id).join(', ')}`);
       throw new Error("Data source not found");
     }
     console.log(`Found source: ${source.name} (type: ${source.type})`);
@@ -516,8 +515,6 @@ class DataCollectionService {
         await new Promise(resolve => setTimeout(resolve, 500));
         break;
     }
-
-    await storage.updateDataSourceLastSync(sourceId, new Date());
   }
 
   async syncAllSources(): Promise<void> {
@@ -576,3 +573,4 @@ class DataCollectionService {
 }
 
 export const dataCollectionService = new DataCollectionService();
+export { DataCollectionService };
