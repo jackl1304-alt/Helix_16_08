@@ -13,24 +13,17 @@ interface RegulatoryUpdate {
   id: string;
   title: string;
   description: string;
-  source_id: string;
-  sourceId: string;
-  source_url: string;
-  sourceUrl: string;
+  source_id: string;        // Nur snake_case, wie in der Datenbank
+  source_url: string;       
   region: string;
-  update_type: string;
-  updateType: string;
+  update_type: string;      // Nur snake_case, wie in der Datenbank
   priority: 'low' | 'medium' | 'high' | 'urgent';
-  device_classes: string[];
-  deviceClasses: string[];
-  categories: any;
-  published_at: string;
-  publishedAt: string;
-  created_at: string;
-  createdAt: string;
-  content: string;
-  raw_data?: any;
-  rawData?: any;
+  device_classes: any[];    // JSONB array aus der Datenbank
+  categories: any;          // JSONB aus der Datenbank
+  published_at: string;     // Nur snake_case, wie in der Datenbank
+  created_at: string;       // Nur snake_case, wie in der Datenbank
+  content?: string;
+  raw_data?: any;           // Nur snake_case, wie in der Datenbank
 }
 
 const priorityColors = {
@@ -66,7 +59,7 @@ export default function RegulatoryUpdates() {
     
     const matchesRegion = selectedRegion === 'all' || update.region === selectedRegion;
     const matchesPriority = selectedPriority === 'all' || update.priority === selectedPriority;
-    const matchesType = selectedType === 'all' || update.updateType === selectedType || update.update_type === selectedType;
+    const matchesType = selectedType === 'all' || update.update_type === selectedType;
     
     return matchesSearch && matchesRegion && matchesPriority && matchesType;
   });
@@ -84,24 +77,24 @@ Beschreibung: ${update.description}
 
 GRUNDINFORMATIONEN:
 - ID: ${update.id}
-- Quelle: ${update.sourceId}
+- Quelle: ${update.source_id}
 - Region: ${update.region}
 - Priorität: ${update.priority}
-- Typ: ${update.updateType}
-- Veröffentlichungsdatum: ${update.publishedAt ? new Date(update.publishedAt).toLocaleDateString('de-DE') : 'Unbekannt'}
-- Erstellt am: ${update.createdAt ? new Date(update.createdAt).toLocaleDateString('de-DE') : 'Unbekannt'}
+- Typ: ${update.update_type}
+- Veröffentlichungsdatum: ${update.published_at ? new Date(update.published_at).toLocaleDateString('de-DE') : 'Unbekannt'}
+- Erstellt am: ${update.created_at ? new Date(update.created_at).toLocaleDateString('de-DE') : 'Unbekannt'}
 
 GERÄTEKLASSEN:
-${update.deviceClasses?.length ? update.deviceClasses.join(', ') : 'Nicht spezifiziert'}
+${update.device_classes?.length ? update.device_classes.join(', ') : 'Nicht spezifiziert'}
 
 KATEGORIEN:
 ${update.categories ? JSON.stringify(update.categories, null, 2) : 'Keine Kategorien verfügbar'}
 
 QUELLE-URL:
-${update.sourceUrl || update.source_url || 'Nicht verfügbar'}
+${update.source_url || 'Nicht verfügbar'}
 
 VOLLSTÄNDIGE ROHDATEN:
-${JSON.stringify(update.rawData || update.raw_data, null, 2)}
+${JSON.stringify(update.raw_data, null, 2)}
 
 ========================================
 Export erstellt am: ${new Date().toLocaleDateString('de-DE')} um ${new Date().toLocaleTimeString('de-DE')}
@@ -148,8 +141,8 @@ Helix Regulatory Intelligence Platform
           <p className="font-medium text-slate-900 dark:text-slate-100">{update.title}</p>
           <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">{update.description}</p>
           <div className="flex flex-wrap gap-1">
-            {update.deviceClasses?.map(deviceClass => (
-              <Badge key={deviceClass} variant="secondary" className="text-xs">
+            {update.device_classes?.map((deviceClass, idx) => (
+              <Badge key={idx} variant="secondary" className="text-xs">
                 {deviceClass}
               </Badge>
             ))}
@@ -169,7 +162,7 @@ Helix Regulatory Intelligence Platform
       header: "Typ",
       render: (update: RegulatoryUpdate) => (
         <Badge variant="outline" className="capitalize">
-          {update.updateType || update.update_type}
+          {update.update_type}
         </Badge>
       )
     },
@@ -187,9 +180,9 @@ Helix Regulatory Intelligence Platform
       header: "Datum",
       render: (update: RegulatoryUpdate) => (
         <div className="text-sm">
-          <div>{new Date(update.publishedAt).toLocaleDateString('de-DE')}</div>
+          <div>{new Date(update.published_at).toLocaleDateString('de-DE')}</div>
           <div className="text-slate-500 dark:text-slate-400">
-            {new Date(update.publishedAt).toLocaleTimeString('de-DE')}
+            {new Date(update.published_at).toLocaleTimeString('de-DE')}
           </div>
         </div>
       )
@@ -242,7 +235,7 @@ Helix Regulatory Intelligence Platform
   const highPriorityCount = (updates || []).filter(u => u.priority === 'high' || u.priority === 'urgent').length;
   const todayCount = (updates || []).filter(u => {
     const today = new Date().toDateString();
-    const updateDate = new Date(u.publishedAt || u.published_at).toDateString();
+    const updateDate = new Date(u.published_at).toDateString();
     return updateDate === today;
   }).length;
 
@@ -303,11 +296,11 @@ Helix Regulatory Intelligence Platform
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">Typ</label>
-                      <Badge variant="outline">{update.updateType || update.update_type}</Badge>
+                      <Badge variant="outline">{update.update_type}</Badge>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">Datum</label>
-                      <p className="text-sm">{new Date(update.publishedAt || update.published_at).toLocaleDateString('de-DE')}</p>
+                      <p className="text-sm">{new Date(update.published_at).toLocaleDateString('de-DE')}</p>
                     </div>
                   </div>
                   
@@ -321,22 +314,22 @@ Helix Regulatory Intelligence Platform
                     <div className="mt-1 text-sm bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
                       <p><strong>Titel:</strong> {update.title}</p>
                       <p><strong>Beschreibung:</strong> {update.description}</p>
-                      <p><strong>Quelle ID:</strong> {update.source_id || update.sourceId}</p>
+                      <p><strong>Quelle ID:</strong> {update.source_id}</p>
                       <p><strong>Region:</strong> {update.region}</p>
                       <p><strong>Priorität:</strong> {priorityLabels[update.priority]}</p>
-                      <p><strong>Typ:</strong> {update.updateType || update.update_type}</p>
-                      <p><strong>Veröffentlicht am:</strong> {new Date(update.publishedAt || update.published_at).toLocaleDateString('de-DE')}</p>
-                      {(update.sourceUrl || update.source_url) && (
-                        <p><strong>Quelle-URL:</strong> {update.sourceUrl || update.source_url}</p>
+                      <p><strong>Typ:</strong> {update.update_type}</p>
+                      <p><strong>Veröffentlicht am:</strong> {new Date(update.published_at).toLocaleDateString('de-DE')}</p>
+                      {update.source_url && (
+                        <p><strong>Quelle-URL:</strong> {update.source_url}</p>
                       )}
                     </div>
                   </div>
                   
-                  {(update.deviceClasses?.length > 0 || update.device_classes?.length > 0) && (
+                  {(update.device_classes?.length > 0) && (
                     <div>
                       <label className="text-sm font-medium text-gray-500">Geräteklassen</label>
                       <div className="mt-1 flex flex-wrap gap-1">
-                        {(update.deviceClasses || update.device_classes || []).map((deviceClass, idx) => (
+                        {(update.device_classes || []).map((deviceClass: string, idx: number) => (
                           <Badge key={idx} variant="secondary">{deviceClass}</Badge>
                         ))}
                       </div>
@@ -352,11 +345,11 @@ Helix Regulatory Intelligence Platform
                     </div>
                   )}
                   
-                  {(update.rawData || update.raw_data) && (
+                  {update.raw_data && (
                     <div>
                       <label className="text-sm font-medium text-gray-500">Vollständige Rohdaten</label>
                       <pre className="mt-1 text-xs bg-gray-100 dark:bg-gray-800 p-3 rounded overflow-x-auto max-h-60">
-                        {JSON.stringify(update.rawData || update.raw_data, null, 2)}
+                        {JSON.stringify(update.raw_data, null, 2)}
                       </pre>
                     </div>
                   )}
@@ -366,9 +359,9 @@ Helix Regulatory Intelligence Platform
                       <Download className="h-4 w-4 mr-2" />
                       Download
                     </Button>
-                    {(update.sourceUrl || update.source_url) && (
+                    {update.source_url && (
                       <Button onClick={() => {
-                        const sourceUrl = update.sourceUrl || update.source_url;
+                        const sourceUrl = update.source_url;
                         let fullUrl = sourceUrl;
                         
                         // Erstelle vollständige URLs für verschiedene Quellen
@@ -408,7 +401,7 @@ Helix Regulatory Intelligence Platform
               variant="ghost" 
               size="sm"
               onClick={() => {
-                const sourceUrl = update.sourceUrl || update.source_url;
+                const sourceUrl = update.source_url;
                 if (sourceUrl && sourceUrl !== 'Nicht verfügbar') {
                   let fullUrl = sourceUrl;
                   
