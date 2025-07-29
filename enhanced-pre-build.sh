@@ -126,7 +126,7 @@ for path in "${SAFE_CLEANUP_PATHS[@]}"; do
   fi
 done
 
-# Only clean /tmp cache directories we created
+# Only clean /tmp cache directories we created - never touch system directories
 if [ -d "/tmp/.npm" ]; then
   rm -rf "/tmp/.npm" 2>/dev/null || true
   echo "✅ Cleaned: /tmp/.npm"
@@ -136,6 +136,9 @@ if [ -d "/tmp/.cache" ]; then
   rm -rf "/tmp/.cache" 2>/dev/null || true
   echo "✅ Cleaned: /tmp/.cache"
 fi
+
+# NEVER touch .cache/replit/modules - completely avoid
+echo "⚠️ Skipping ALL .cache/replit/modules directories (system protected)"
 
 # Clear npm cache with enhanced configuration
 npm cache clean --force --userconfig=/tmp/.npmrc-deployment-user --globalconfig=/tmp/.npmrc-deployment-global 2>/dev/null || true

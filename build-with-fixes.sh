@@ -3,8 +3,8 @@
 
 echo "🔧 Build mit Replit.com Hosting Fixes"
 
-# Cache-Fixes anwenden
-source enhanced-pre-build.sh
+# Radikale Cache-Isolation anwenden
+source replit-cache-init.sh
 
 # Normale Build-Prozess
 vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
