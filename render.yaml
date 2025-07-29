@@ -6,23 +6,34 @@ services:
     region: frankfurt
     plan: free
     buildCommand: |
-      # Apply cache fixes before build
+      # Apply comprehensive cache fixes before build
       export NPM_CONFIG_CACHE=/tmp/.npm
       export DISABLE_NPM_CACHE=true
       export DISABLE_OPENCOLLECTIVE=true
       export NODE_OPTIONS="--max-old-space-size=4096"
+      export NPM_CONFIG_PROGRESS=false
+      export NPM_CONFIG_LOGLEVEL=warn
+      export NPM_CONFIG_AUDIT=false
+      export NPM_CONFIG_FUND=false
+      export NPM_CONFIG_UPDATE_NOTIFIER=false
       
-      # Clear cached files
+      # Clear all cached files and directories
       rm -rf node_modules/.cache
       rm -rf .cache
+      rm -rf ~/.npm
+      rm -rf /tmp/.npm
       npm cache clean --force
       
       # Create npm cache directory with proper permissions
       mkdir -p /tmp/.npm
       chmod 755 /tmp/.npm
       
-      # Build with cache disabled
-      npm install --no-cache
+      # Verify directory permissions
+      echo "Cache directory permissions:"
+      ls -la /tmp/.npm
+      
+      # Build with cache disabled and verbose logging
+      npm install --no-cache --verbose
       npm run build
     startCommand: |
       # Start with production environment variables
@@ -41,6 +52,16 @@ services:
         value: --max-old-space-size=4096
       - key: KEEP_DEV_DEPENDENCIES
         value: true
+      - key: NPM_CONFIG_PROGRESS
+        value: false
+      - key: NPM_CONFIG_LOGLEVEL
+        value: warn
+      - key: NPM_CONFIG_AUDIT
+        value: false
+      - key: NPM_CONFIG_FUND
+        value: false
+      - key: NPM_CONFIG_UPDATE_NOTIFIER
+        value: false
       - key: NODE_ENV
         value: production
       - key: PORT
