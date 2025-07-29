@@ -11,6 +11,7 @@ services:
       export DISABLE_NPM_CACHE=true
       export DISABLE_OPENCOLLECTIVE=true
       export NODE_OPTIONS="--max-old-space-size=4096"
+      export KEEP_DEV_DEPENDENCIES=true
       export NPM_CONFIG_PROGRESS=false
       export NPM_CONFIG_LOGLEVEL=warn
       export NPM_CONFIG_AUDIT=false
@@ -28,12 +29,13 @@ services:
       mkdir -p /tmp/.npm
       chmod 755 /tmp/.npm
       
-      # Verify directory permissions
+      # Verify directory permissions and workspace path
       echo "Cache directory permissions:"
       ls -la /tmp/.npm
+      echo "Current workspace: $(pwd)"
       
-      # Build with cache disabled and verbose logging
-      npm install --no-cache --verbose
+      # Build with cache disabled, keep dev dependencies, and verbose logging
+      npm install --no-cache --verbose --include=dev
       npm run build
     startCommand: |
       # Start with production environment variables
