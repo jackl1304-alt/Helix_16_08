@@ -305,14 +305,48 @@ class MorningStorage implements IStorage {
 
   async createDataSource(data: any) {
     try {
+      // CRITICAL FIX: Ensure ID is never null or undefined
+      let sourceId = data.id;
+      if (!sourceId || sourceId === null || sourceId === undefined || sourceId === '') {
+        sourceId = `source_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        console.log(`[DB] Generated new ID for data source: ${sourceId}`);
+      }
+      
+      console.log(`[DB] Creating data source with ID: ${sourceId}, Name: ${data.name}`);
+      
+      // First try to INSERT, if conflict use ON CONFLICT DO UPDATE
       const result = await sql`
-        INSERT INTO data_sources (id, name, endpoint, country, region, type, category, is_active)
-        VALUES (${data.id}, ${data.name}, ${data.endpoint || data.url}, ${data.country}, ${data.region || 'Global'}, ${data.type}, ${data.category || 'general'}, ${data.isActive})
+        INSERT INTO data_sources (id, name, endpoint, country, region, type, category, is_active, sync_frequency, last_sync_at, created_at)
+        VALUES (
+          ${sourceId}, 
+          ${data.name || 'Unnamed Source'}, 
+          ${data.endpoint || data.url || ''}, 
+          ${data.country || 'INTL'}, 
+          ${data.region || 'Global'}, 
+          ${data.type || 'unknown'}, 
+          ${data.category || 'general'}, 
+          ${data.isActive !== undefined ? data.isActive : true},
+          ${data.syncFrequency || 'daily'},
+          ${data.lastSync || new Date().toISOString()},
+          ${new Date().toISOString()}
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          name = EXCLUDED.name,
+          endpoint = EXCLUDED.endpoint,
+          country = EXCLUDED.country,
+          region = EXCLUDED.region,
+          type = EXCLUDED.type,
+          category = EXCLUDED.category,
+          is_active = EXCLUDED.is_active,
+          sync_frequency = EXCLUDED.sync_frequency,
+          last_sync_at = EXCLUDED.last_sync_at
         RETURNING *
       `;
+      
+      console.log(`[DB] Successfully created/updated data source: ${sourceId}`);
       return result[0];
     } catch (error) {
-      console.error("Create data source error:", error);
+      console.error("Create data source error:", error, "Data:", data);
       throw error;
     }
   }
