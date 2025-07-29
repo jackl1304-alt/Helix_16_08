@@ -165,31 +165,26 @@ export default function LegalCases() {
   const { data: legalData = [], isLoading: isLoadingData, error: legalDataError } = useQuery<LegalDataRecord[]>({
     queryKey: ['/api/legal-cases'],
     queryFn: async () => {
+      console.log("🔍 FETCHING Legal Cases from /api/legal-cases...");
       try {
         const response = await fetch('/api/legal-cases');
+        console.log("📡 Legal Cases API Response Status:", response.status);
+        
         if (!response.ok) {
-          return fallbackLegalData.map(item => ({
-            id: item.id,
-            documentTitle: item.title,
-            title: item.title,
-            documentId: item.case_number,
-            summary: item.summary,
-            content: `Fall: ${item.title}\n\nGericht: ${item.court}\nDatum: ${item.decision_date}\n\n${item.summary}`,
-            category: item.impact_level,
-            region: item.jurisdiction,
-            originalDate: item.decision_date,
-            status: 'Final Decision',
-            deviceClasses: item.keywords,
-            sourceId: item.jurisdiction,
-            language: 'de',
-            documentUrl: item.document_url,
-            caseNumber: item.case_number,
-            court: item.court
-          }));
+          console.error("❌ Legal Cases API Error:", response.status, response.statusText);
+          throw new Error(`API Error: ${response.status}`);
         }
+        
         const data = await response.json();
         console.log("📊 LEGAL CASES LOADED:", data.length);
-        return Array.isArray(data) ? data.map(item => ({
+        
+        if (!Array.isArray(data)) {
+          console.error("❌ Legal Cases API returned non-array:", typeof data);
+          return [];
+        }
+        
+        // Transform data to expected format
+        return data.map((item: any) => ({
           id: item.id,
           documentTitle: item.caseTitle || item.title || `Legal Case ${item.id}`,
           title: item.caseTitle || item.title || `Legal Case ${item.id}`,
@@ -206,7 +201,7 @@ export default function LegalCases() {
           documentUrl: item.documentUrl || '#',
           caseNumber: item.caseNumber || item.id,
           court: item.court || 'Court'
-        })) : [];
+        }));
       } catch (error) {
         console.error("❌ LEGAL CASES API FAILED:", error);
         throw error;
