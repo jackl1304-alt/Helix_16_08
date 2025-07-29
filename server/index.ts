@@ -58,59 +58,39 @@ app.use((req, res, next) => {
   console.log("Initializing email service...");
   await emailService.verifyConnection();
   
-  // Initialize data sources for production deployment
-  console.log("Initializing data sources...");
+  // CRITICAL: Force initialize data sources for production deployment
+  console.log("PRODUCTION DEPLOYMENT: Initializing data sources...");
   const { storage } = await import("./storage-morning.js");
   
   try {
     const existingSources = await storage.getAllDataSources();
     console.log(`Found ${existingSources.length} existing data sources`);
     
-    if (existingSources.length === 0) {
-      console.log("Creating default data sources for production...");
-      
-      const defaultSources = [
-        {
-          id: 'fda_510k',
-          name: 'FDA 510(k) Database',
-          endpoint: 'https://api.fda.gov/device/510k.json',
-          country: 'US',
-          region: 'North America',
-          type: 'regulatory',
-          category: 'approvals',
-          isActive: true
-        },
-        {
-          id: 'ema_epar',
-          name: 'EMA EPAR',
-          endpoint: 'https://www.ema.europa.eu/en/medicines',
-          country: 'EU',
-          region: 'Europe',
-          type: 'regulatory',
-          category: 'approvals', 
-          isActive: true
-        },
-        {
-          id: 'bfarm_guidelines',
-          name: 'BfArM Leitfäden',
-          endpoint: 'https://www.bfarm.de',
-          country: 'DE',
-          region: 'Europe',
-          type: 'guidelines',
-          category: 'guidelines',
-          isActive: true
-        }
-      ];
-      
-      for (const source of defaultSources) {
+    // ALWAYS ensure minimum data sources exist for production
+    const requiredSources = [
+      { id: 'fda_510k', name: 'FDA 510(k) Database', endpoint: 'https://api.fda.gov/device/510k.json', country: 'US', region: 'North America', type: 'regulatory', category: 'approvals', isActive: true },
+      { id: 'ema_epar', name: 'EMA EPAR', endpoint: 'https://www.ema.europa.eu/en/medicines', country: 'EU', region: 'Europe', type: 'regulatory', category: 'approvals', isActive: true },
+      { id: 'bfarm_guidelines', name: 'BfArM Leitfäden', endpoint: 'https://www.bfarm.de', country: 'DE', region: 'Europe', type: 'guidelines', category: 'guidelines', isActive: true },
+      { id: 'swissmedic_guidelines', name: 'Swissmedic Guidelines', endpoint: 'https://www.swissmedic.ch', country: 'CH', region: 'Europe', type: 'guidelines', category: 'guidelines', isActive: true },
+      { id: 'mhra_guidance', name: 'MHRA Guidance', endpoint: 'https://www.gov.uk/mhra', country: 'UK', region: 'Europe', type: 'guidance', category: 'guidelines', isActive: true },
+      { id: 'health_canada', name: 'Health Canada', endpoint: 'https://www.canada.ca/en/health-canada', country: 'CA', region: 'North America', type: 'regulatory', category: 'approvals', isActive: true },
+      { id: 'tga_australia', name: 'TGA Australia', endpoint: 'https://www.tga.gov.au', country: 'AU', region: 'Asia-Pacific', type: 'regulatory', category: 'approvals', isActive: true }
+    ];
+    
+    for (const source of requiredSources) {
+      try {
         await storage.createDataSource(source);
-        console.log(`Created data source: ${source.name}`);
+        console.log(`✓ Created/Updated data source: ${source.name}`);
+      } catch (err) {
+        console.log(`ℹ Data source ${source.name} already exists or error: ${err.message}`);
       }
-      
-      console.log("Default data sources created successfully");
     }
+    
+    const finalCount = await storage.getAllDataSources();
+    console.log(`PRODUCTION READY: ${finalCount.length} data sources available`);
+    
   } catch (error) {
-    console.error("Error initializing data sources:", error);
+    console.error("CRITICAL: Error initializing data sources:", error);
   }
 
   // Initialize historical data service
