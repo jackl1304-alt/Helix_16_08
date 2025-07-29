@@ -178,7 +178,7 @@ class DataCollectionService {
           `${item.device_name} ${item.summary || ''} ${item.medical_specialty_description || ''}`
         );
 
-        const updateData: InsertRegulatoryUpdate = {
+        const updateData = {
           title: `FDA 510(k): ${item.device_name}`,
           description: item.summary || item.decision_description || 'FDA 510(k) clearance',
           sourceId: await this.getFDASourceId(),
@@ -239,7 +239,7 @@ class DataCollectionService {
           `${item.product_description} ${item.reason_for_recall || ''}`
         );
 
-        const updateData: InsertRegulatoryUpdate = {
+        const updateData = {
           title: `FDA Recall: ${item.product_description}`,
           description: item.reason_for_recall || 'FDA device recall',
           sourceId: await this.getFDASourceId(),
@@ -288,7 +288,7 @@ class DataCollectionService {
           `${item.name} ${item.therapeutic_area || ''} ${item.condition_indication || ''}`
         );
 
-        const updateData: InsertRegulatoryUpdate = {
+        const updateData = {
           title: `EMA: ${item.name}`,
           description: item.condition_indication || 'EMA centrally authorized medicine',
           sourceId: await this.getEMASourceId(),
