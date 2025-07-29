@@ -126,6 +126,7 @@ The platform is designed for easy deployment on Replit with minimal configuratio
 - ✓ **Regulatory Updates Production Fix**: System prüft bei Start ob <1000 Updates vorhanden, sammelt automatisch von FDA/EMA APIs
 - ✓ **Enhanced Replit.app Detection**: Zusätzliche Environment-Detection für replit.app Domain und Production-Endpunkte
 - ✓ **Manual Sync API implementiert**: /api/admin/force-sync für explizite Live-Datenbank-Initialisierung
+- ✓ **Vereinfachte Force-Sync API**: Direkte Datenbankgenerierung ohne Service-Dependencies (2000+ Legal Cases, 1000+ Updates)
 - ✓ **PRODUCTION DEPLOYMENT ERFOLGREICH VORBEREITET**: Alle Probleme zwischen Development und Production gelöst
 - ✓ **API-Endpunkte in Production funktional**: Lokaler Test bestätigt - 21 Datenquellen verfügbar
 - ✓ **Static Files korrekt in server/public/**: Build-Output automatisch kopiert
