@@ -244,9 +244,7 @@ export default function DataCollection() {
 
         <TabsContent value="sources">
           <div className="grid gap-4">
-            <div className="mb-4 p-4 bg-blue-50 rounded">
-              <p>Debug Info: {sources ? `${sources.length} sources loaded` : 'No sources'} | Loading: {isLoading ? 'Yes' : 'No'}</p>
-            </div>
+
             {sources && Array.isArray(sources) && sources.length > 0 ? (
               sources.map((source) => (
                 <Card key={source.id}>
