@@ -1,73 +1,33 @@
 #!/bin/bash
-# Initialize Replit-safe cache directories with proper permissions
+# Radikale Cache-Umgehung für Replit Deployment
 
-echo "📁 Initializing Replit-safe cache directories..."
+echo "🛡️ Radikale Cache-Umgehung - Keine System-Verzeichnisse"
 
-# Create all necessary cache directories in /tmp (writable on Replit)
-CACHE_DIRS=(
-  "/tmp/.npm-replit-cache"
-  "/tmp/.npm-replit-init"
-  "/tmp/.npm-replit-prefix"
-  "/tmp/.npm-replit-store"
-  "/tmp/.npm-replit-global"
-  "/tmp/.npm-replit-user"
-  "/tmp/.cache-replit"
-)
+# Setze alle Cache-Pfade auf vollständig isolierte /tmp Verzeichnisse
+export NPM_CONFIG_CACHE="/tmp/npm-isolated-cache"
+export NPM_CONFIG_TMP="/tmp"
+export NPM_CONFIG_PREFIX="/tmp/npm-isolated-prefix"
+export NPM_CONFIG_STORE_DIR="/tmp/npm-isolated-store"
+export NPM_CONFIG_INIT_CACHE="/tmp/npm-isolated-init"
 
-for dir in "${CACHE_DIRS[@]}"; do
-  if mkdir -p "$dir" 2>/dev/null; then
-    chmod 755 "$dir" 2>/dev/null || true
-    echo "✅ Created: $dir"
-  else
-    echo "⚠️ Could not create: $dir"
-  fi
-done
+# Erstelle isolierte Cache-Verzeichnisse
+mkdir -p /tmp/npm-isolated-cache /tmp/npm-isolated-prefix /tmp/npm-isolated-store /tmp/npm-isolated-init
+chmod 777 /tmp/npm-isolated-* 2>/dev/null || true
 
-# Create npm configuration files in writable locations
-echo "📝 Creating npm configuration files..."
-
-# Global npm config for Replit
-cat > /tmp/.npmrc-replit-global << 'EOF'
-cache=/tmp/.npm-replit-cache
+# Erstelle .npmrc die System-Cache komplett umgeht
+cat > .npmrc << 'EOF'
+cache=/tmp/npm-isolated-cache
 tmp=/tmp
-prefix=/tmp/.npm-replit-prefix
-store-dir=/tmp/.npm-replit-store
-init-cache=/tmp/.npm-replit-init
+prefix=/tmp/npm-isolated-prefix
+store-dir=/tmp/npm-isolated-store
+init-cache=/tmp/npm-isolated-init
 fund=false
 audit=false
 update-notifier=false
 disable-opencollective=true
 progress=false
-loglevel=warn
 package-lock=false
 shrinkwrap=false
-prefer-online=true
-unsafe-perm=true
-cache-max=0
-cache-min=0
-ignore-scripts=false
 EOF
 
-# User npm config for Replit
-cat > /tmp/.npmrc-replit-user << 'EOF'
-cache=/tmp/.npm-replit-cache
-tmp=/tmp
-fund=false
-audit=false
-update-notifier=false
-progress=false
-EOF
-
-echo "✅ NPM configuration files created"
-
-# Test cache directory access
-echo "🧪 Testing cache directory access..."
-if [ -w "/tmp/.npm-replit-cache" ]; then
-  echo "✅ Cache directory is writable"
-  touch "/tmp/.npm-replit-cache/.test" && rm "/tmp/.npm-replit-cache/.test" 2>/dev/null
-  echo "✅ Cache directory write test passed"
-else
-  echo "❌ Cache directory is not writable"
-fi
-
-echo "🚀 Cache initialization complete"
+echo "✅ Cache vollständig isoliert - keine System-Verzeichnisse mehr"
