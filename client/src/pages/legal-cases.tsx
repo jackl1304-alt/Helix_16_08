@@ -161,12 +161,12 @@ export default function LegalCases() {
     }
   ];
 
-  // Fetch legal cases
-  const { data: legalData = fallbackLegalData, isLoading: isLoadingData, error: legalDataError } = useQuery<LegalDataRecord[]>({
-    queryKey: ['/api/legal/data', selectedSource, dateRange.start, dateRange.end],
+  // Fetch legal cases - DIRECT API call
+  const { data: legalData = [], isLoading: isLoadingData, error: legalDataError } = useQuery<LegalDataRecord[]>({
+    queryKey: ['/api/legal-cases'],
     queryFn: async () => {
       try {
-        const response = await fetch('/api/legal/data');
+        const response = await fetch('/api/legal-cases');
         if (!response.ok) {
           return fallbackLegalData.map(item => ({
             id: item.id,
@@ -188,61 +188,28 @@ export default function LegalCases() {
           }));
         }
         const data = await response.json();
+        console.log("📊 LEGAL CASES LOADED:", data.length);
         return Array.isArray(data) ? data.map(item => ({
           id: item.id,
-          documentTitle: item.title || item.documentTitle,
-          title: item.title || item.documentTitle,
-          documentId: item.caseNumber || item.documentId,
-          summary: item.summary,
-          content: item.content || item.summary,
-          category: item.category || item.impactLevel || 'Legal Case',
-          region: item.jurisdiction || item.region,
-          originalDate: item.decisionDate || item.originalDate,
-          status: item.status || 'Final Decision',
-          deviceClasses: item.keywords || item.deviceClasses || ['medical device'],
-          sourceId: item.jurisdiction || item.sourceId,
-          language: item.language || 'de',
-          documentUrl: item.documentUrl,
-          caseNumber: item.caseNumber,
-          court: item.court
-        })) : fallbackLegalData.map(item => ({
-          id: item.id,
-          documentTitle: item.title,
-          title: item.title,
-          documentId: item.case_number,
-          summary: item.summary,
-          content: `Fall: ${item.title}\n\nGericht: ${item.court}\nDatum: ${item.decision_date}\n\n${item.summary}`,
-          category: item.impact_level,
-          region: item.jurisdiction,
-          originalDate: item.decision_date,
+          documentTitle: item.caseTitle || item.title || `Legal Case ${item.id}`,
+          title: item.caseTitle || item.title || `Legal Case ${item.id}`,
+          documentId: item.caseNumber || item.id,
+          summary: item.summary || 'Legal case summary',
+          content: item.summary || 'Legal case content',
+          category: 'Legal Case',
+          region: item.jurisdiction || 'International',
+          originalDate: item.decisionDate || new Date().toISOString().split('T')[0],
           status: 'Final Decision',
-          deviceClasses: item.keywords,
-          sourceId: item.jurisdiction,
+          deviceClasses: item.deviceTypes || ['medical device'],
+          sourceId: item.jurisdiction || 'legal',
           language: 'de',
-          documentUrl: item.document_url,
-          caseNumber: item.case_number,
-          court: item.court
-        }));
+          documentUrl: item.documentUrl || '#',
+          caseNumber: item.caseNumber || item.id,
+          court: item.court || 'Court'
+        })) : [];
       } catch (error) {
-        console.error("Legal data error:", error);
-        return fallbackLegalData.map(item => ({
-          id: item.id,
-          documentTitle: item.title,
-          title: item.title,
-          documentId: item.case_number,
-          summary: item.summary,
-          content: `Fall: ${item.title}\n\nGericht: ${item.court}\nDatum: ${item.decision_date}\n\n${item.summary}`,
-          category: item.impact_level,
-          region: item.jurisdiction,
-          originalDate: item.decision_date,
-          status: 'Final Decision',
-          deviceClasses: item.keywords,
-          sourceId: item.jurisdiction,
-          language: 'de',
-          documentUrl: item.document_url,
-          caseNumber: item.case_number,
-          court: item.court
-        }));
+        console.error("❌ LEGAL CASES API FAILED:", error);
+        throw error;
       }
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
