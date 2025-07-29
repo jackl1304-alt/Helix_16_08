@@ -910,6 +910,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // MANUAL SYNCHRONIZATION API for Live Deployment
+  app.post('/api/admin/force-sync', async (req, res) => {
+    try {
+      console.log("🚨 MANUAL SYNC TRIGGERED: Force initializing all data...");
+      
+      // Import services
+      const { legalAnalysisService } = await import("./services/legalAnalysisService.js");
+      const { dataCollectionService } = await import("./services/dataCollectionService.js");
+      
+      // Force Legal Cases initialization
+      console.log("🔄 Forcing Legal Cases initialization...");
+      await legalAnalysisService.initializeLegalData();
+      const legalCount = await storage.getAllLegalCases();
+      console.log(`✅ Legal Cases: ${legalCount.length} initialized`);
+      
+      // Force Regulatory Updates initialization  
+      console.log("🔄 Forcing Regulatory Updates collection...");
+      await dataCollectionService.performInitialDataCollection();
+      const updatesCount = await storage.getAllRegulatoryUpdates();
+      console.log(`✅ Regulatory Updates: ${updatesCount.length} collected`);
+      
+      res.json({
+        success: true,
+        message: "Manual synchronization completed",
+        data: {
+          legalCases: legalCount.length,
+          regulatoryUpdates: updatesCount.length,
+          timestamp: new Date().toISOString()
+        }
+      });
+      
+    } catch (error) {
+      console.error("Manual sync error:", error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+        message: "Manual synchronization failed"
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -138,6 +138,7 @@ app.use((req, res, next) => {
   // Additional Production detection for replit.app domain
   const isReplitApp = process.env.REPLIT_DEPLOYMENT === "1" || 
                       process.env.DATABASE_URL?.includes("@ep-") ||
+                      process.env.DATABASE_URL?.includes(".replit.app") ||
                       typeof process !== 'undefined' && process.env.HOSTNAME?.includes("replit");
   
   console.log(`ENVIRONMENT DETECTION: isProductionDB=${isProductionDB}`);
@@ -149,8 +150,20 @@ app.use((req, res, next) => {
     const currentLegalCases = await storage.getAllLegalCases();
     console.log(`Current legal cases in database: ${currentLegalCases.length}`);
     
+    // CRITICAL: More aggressive detection for replit.app live deployment
+    const isLiveDeployment = process.env.DATABASE_URL?.includes("neondb") || 
+                           process.env.DATABASE_URL?.includes("@ep-") ||
+                           process.env.DATABASE_URL?.includes(".replit.app") ||
+                           !process.env.DATABASE_URL?.includes("localhost");
+
     // Force initialization if production OR if insufficient data
-    if ((isProductionDB || isReplitApp) && currentLegalCases.length < 500) {
+    if ((isProductionDB || isReplitApp || isLiveDeployment) && currentLegalCases.length === 0) {
+      console.log("🚨 LIVE DEPLOYMENT DETECTED: ZERO legal cases, triggering IMMEDIATE initialization...");
+      await legalDataService.initializeLegalData();
+      
+      const updatedLegalCount = await storage.getAllLegalCases();
+      console.log(`✅ LIVE DEPLOYMENT: After forced initialization: ${updatedLegalCount.length} legal cases`);
+    } else if (currentLegalCases.length < 500) {
       console.log("PRODUCTION/REPLIT DETECTED: Insufficient legal cases, triggering FORCED initialization...");
       await legalDataService.initializeLegalData();
       
@@ -181,8 +194,14 @@ app.use((req, res, next) => {
     const currentUpdates = await storage.getAllRegulatoryUpdates();
     console.log(`Current regulatory updates in database: ${currentUpdates.length}`);
     
-    // Force initialization if production OR if insufficient data
-    if ((isProductionDB || isReplitApp) && currentUpdates.length < 1000) {
+    // Force initialization if production OR if insufficient data  
+    if ((isProductionDB || isReplitApp || isLiveDeployment) && currentUpdates.length === 0) {
+      console.log("🚨 LIVE DEPLOYMENT DETECTED: ZERO regulatory updates, triggering IMMEDIATE collection...");
+      await dataCollectionService.performInitialDataCollection();
+      
+      const updatedCount = await storage.getAllRegulatoryUpdates();
+      console.log(`✅ LIVE DEPLOYMENT: After forced collection: ${updatedCount.length} regulatory updates`);
+    } else if (currentUpdates.length < 1000) {
       console.log("PRODUCTION/REPLIT DETECTED: Insufficient regulatory updates, triggering FORCED collection...");
       await dataCollectionService.performInitialDataCollection();
       
