@@ -66,7 +66,7 @@ export default function RegulatoryUpdates() {
     
     const matchesRegion = selectedRegion === 'all' || update.region === selectedRegion;
     const matchesPriority = selectedPriority === 'all' || update.priority === selectedPriority;
-    const matchesType = selectedType === 'all' || update.updateType === selectedType;
+    const matchesType = selectedType === 'all' || update.updateType === selectedType || update.update_type === selectedType;
     
     return matchesSearch && matchesRegion && matchesPriority && matchesType;
   });
@@ -169,7 +169,7 @@ Helix Regulatory Intelligence Platform
       header: "Typ",
       render: (update: RegulatoryUpdate) => (
         <Badge variant="outline" className="capitalize">
-          {update.updateType}
+          {update.updateType || update.update_type}
         </Badge>
       )
     },
@@ -242,7 +242,7 @@ Helix Regulatory Intelligence Platform
   const highPriorityCount = (updates || []).filter(u => u.priority === 'high' || u.priority === 'urgent').length;
   const todayCount = (updates || []).filter(u => {
     const today = new Date().toDateString();
-    const updateDate = new Date(u.publishedAt).toDateString();
+    const updateDate = new Date(u.publishedAt || u.published_at).toDateString();
     return updateDate === today;
   }).length;
 
