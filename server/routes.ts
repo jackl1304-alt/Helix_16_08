@@ -120,7 +120,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Data sources routes
   app.get("/api/data-sources", async (req, res) => {
     try {
-      const dataSources = await storage.getAllDataSources();
+      const dataSources = await storage.getActiveDataSources();
+      console.log(`Fetched data sources: ${dataSources.length}`);
+      console.log(`Active sources: ${dataSources.filter(s => s.isActive).length}`);
       res.json(dataSources);
     } catch (error) {
       console.error("Error fetching data sources:", error);

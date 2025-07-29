@@ -11,21 +11,7 @@ import { Label } from "@/components/ui/label";
 import { FolderSync, Plus, Trash2, Edit, AlertCircle, History, Settings, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-
-interface DataSource {
-  id: string;
-  name: string;
-  type: string;
-  endpoint?: string;
-  is_active: boolean;
-  last_sync_at: string | null;
-  config_data?: any;
-  created_at?: string;
-  region?: string;
-  language?: string;
-  category?: string;
-  frequency?: string;
-}
+import type { DataSource } from "@shared/schema";
 
 export default function DataCollection() {
   const { toast } = useToast();
@@ -143,13 +129,13 @@ export default function DataCollection() {
   };
 
   const getStatusBadge = (source: DataSource) => {
-    if (!source.is_active) {
+    if (!source.isActive) {
       return <Badge variant="secondary">Inactive</Badge>;
     }
-    if (!source.last_sync_at) {
+    if (!source.lastSync) {
       return <Badge variant="outline">Never Synced</Badge>;
     }
-    const lastSync = new Date(source.last_sync_at);
+    const lastSync = new Date(source.lastSync);
     const now = new Date();
     const hoursSinceSync = (now.getTime() - lastSync.getTime()) / (1000 * 60 * 60);
     
@@ -258,7 +244,10 @@ export default function DataCollection() {
 
         <TabsContent value="sources">
           <div className="grid gap-4">
-            {(sources && sources.length > 0) ? (
+            <div className="mb-4 p-4 bg-blue-50 rounded">
+              <p>Debug Info: {sources ? `${sources.length} sources loaded` : 'No sources'} | Loading: {isLoading ? 'Yes' : 'No'}</p>
+            </div>
+            {sources && Array.isArray(sources) && sources.length > 0 ? (
               sources.map((source) => (
                 <Card key={source.id}>
                   <CardHeader>
@@ -270,9 +259,9 @@ export default function DataCollection() {
                           <span className="text-sm text-gray-500">
                             Type: {source.type}
                           </span>
-                          {source.last_sync_at && (
+                          {source.lastSync && (
                             <span className="text-sm text-gray-500">
-                              Last sync: {new Date(source.last_sync_at).toLocaleString()}
+                              Last sync: {new Date(source.lastSync).toLocaleString()}
                             </span>
                           )}
                         </div>
