@@ -4,6 +4,8 @@ import { setupVite, serveStatic, log } from "./vite";
 import { emailService } from "./services/emailService";
 import { historicalDataService } from "./services/historicalDataService";
 import { legalDataService } from "./services/legalDataService";
+import fs from "fs";
+import path from "path";
 
 const app = express();
 app.use(express.json());
@@ -66,9 +68,20 @@ app.use((req, res, next) => {
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
+  console.log(`Environment: ${app.get("env")}`);
+  console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+  
   if (app.get("env") === "development") {
+    console.log("Setting up Vite development server");
     await setupVite(app, server);
   } else {
+    console.log("Setting up static file serving for production");
+    const distPath = path.resolve(import.meta.dirname, "public");
+    console.log(`Static files path: ${distPath}`);
+    console.log(`Static files exist: ${fs.existsSync(distPath)}`);
+    if (fs.existsSync(distPath)) {
+      console.log(`Static files content: ${fs.readdirSync(distPath)}`);
+    }
     serveStatic(app);
   }
 
