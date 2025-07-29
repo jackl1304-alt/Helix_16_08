@@ -1,3 +1,9 @@
+// DEBUG ENVIRONMENT VARIABLES AT STARTUP
+console.log(`[ENV DEBUG] NODE_ENV: ${process.env.NODE_ENV}`);
+console.log(`[ENV DEBUG] DATABASE_URL exists: ${!!process.env.DATABASE_URL}`);
+console.log(`[ENV DEBUG] DATABASE_URL first 30 chars: ${process.env.DATABASE_URL?.substring(0, 30)}`);
+console.log(`[ENV DEBUG] REPLIT_DEPLOYMENT: ${process.env.REPLIT_DEPLOYMENT}`);
+
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
