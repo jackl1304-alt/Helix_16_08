@@ -5,9 +5,11 @@ import { neon } from "@neondatabase/serverless";
 const DATABASE_URL = process.env.DATABASE_URL;
 console.log('[DB] Database URL configured:', DATABASE_URL ? 'YES' : 'NO');
 console.log('[DB] Environment:', process.env.NODE_ENV || 'development');
+console.log('[DB] Full DATABASE_URL check:', !!DATABASE_URL);
 
 if (!DATABASE_URL) {
   console.error('[DB ERROR] DATABASE_URL environment variable is not set!');
+  console.error('[DB ERROR] Available env vars:', Object.keys(process.env).filter(k => k.includes('DB') || k.includes('DATA')));
   throw new Error('DATABASE_URL environment variable is required');
 }
 
