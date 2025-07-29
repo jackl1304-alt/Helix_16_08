@@ -129,28 +129,46 @@ app.use((req, res, next) => {
   // Initialize legal/jurisprudence data
   console.log("Initializing legal jurisprudence database...");
   
-  // CRITICAL: Check if production database needs legal data initialization
+  // CRITICAL: Force Production database initialization based on environment
+  const isProductionDB = process.env.REPLIT_DEPLOYMENT === "1" || 
+                         process.env.NODE_ENV === "production" ||
+                         process.env.DATABASE_URL?.includes("neondb") ||
+                         !process.env.DATABASE_URL?.includes("localhost");
+  
+  console.log(`ENVIRONMENT DETECTION: isProductionDB=${isProductionDB}`);
+  console.log(`REPLIT_DEPLOYMENT: ${process.env.REPLIT_DEPLOYMENT}`);
+  console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+  console.log(`DATABASE_URL type: ${process.env.DATABASE_URL?.includes("neondb") ? "Production Neon" : "Development"}`);
+  
   try {
     const currentLegalCases = await storage.getAllLegalCases();
     console.log(`Current legal cases in database: ${currentLegalCases.length}`);
     
-    if (currentLegalCases.length < 100) {
-      console.log("PRODUCTION: Database has insufficient legal cases, triggering full initialization...");
+    // Force initialization if production OR if insufficient data
+    if (isProductionDB && currentLegalCases.length === 0) {
+      console.log("PRODUCTION DETECTED: Empty database, triggering FORCED legal data initialization...");
       await legalDataService.initializeLegalData();
       
       const updatedLegalCount = await storage.getAllLegalCases();
-      console.log(`PRODUCTION: After legal data initialization: ${updatedLegalCount.length} legal cases`);
+      console.log(`PRODUCTION: After forced initialization: ${updatedLegalCount.length} legal cases`);
+    } else if (currentLegalCases.length < 100) {
+      console.log("DEVELOPMENT: Database has insufficient legal cases, triggering initialization...");
+      await legalDataService.initializeLegalData();
+      
+      const updatedLegalCount = await storage.getAllLegalCases();
+      console.log(`DEVELOPMENT: After initialization: ${updatedLegalCount.length} legal cases`);
     } else {
-      console.log(`PRODUCTION: Database already contains ${currentLegalCases.length} legal cases - skipping initialization`);
+      console.log(`DATABASE STATUS: Contains ${currentLegalCases.length} legal cases - skipping initialization`);
     }
   } catch (error) {
-    console.error("CRITICAL: Error checking/initializing legal data for production:", error);
-    // Fallback: Always try to initialize if error occurs
+    console.error("CRITICAL: Error with legal data initialization:", error);
+    // Force initialization on any error
+    console.log("FALLBACK: Forcing legal data initialization due to error...");
     await legalDataService.initializeLegalData();
   }
   
-  // CRITICAL: Force initialize regulatory updates for production
-  console.log("PRODUCTION: Force initializing regulatory updates...");
+  // CRITICAL: Force initialize regulatory updates for production  
+  console.log("CHECKING REGULATORY UPDATES for Production/Development...");
   try {
     const { dataCollectionService } = await import("./services/dataCollectionService.js");
     
@@ -158,19 +176,33 @@ app.use((req, res, next) => {
     const currentUpdates = await storage.getAllRegulatoryUpdates();
     console.log(`Current regulatory updates in database: ${currentUpdates.length}`);
     
-    // If empty or less than 100 updates, force initial data collection
-    if (currentUpdates.length < 100) {
-      console.log("PRODUCTION: Database has insufficient data, triggering initial data collection...");
+    // Force initialization if production OR if insufficient data
+    if (isProductionDB && currentUpdates.length === 0) {
+      console.log("PRODUCTION DETECTED: Empty database, triggering FORCED regulatory data collection...");
       await dataCollectionService.performInitialDataCollection();
       
       const updatedCount = await storage.getAllRegulatoryUpdates();
-      console.log(`PRODUCTION: After initial collection: ${updatedCount.length} regulatory updates`);
+      console.log(`PRODUCTION: After forced collection: ${updatedCount.length} regulatory updates`);
+    } else if (currentUpdates.length < 100) {
+      console.log("DEVELOPMENT: Database has insufficient updates, triggering data collection...");
+      await dataCollectionService.performInitialDataCollection();
+      
+      const updatedCount = await storage.getAllRegulatoryUpdates();
+      console.log(`DEVELOPMENT: After collection: ${updatedCount.length} regulatory updates`);
     } else {
-      console.log(`PRODUCTION: Database already contains ${currentUpdates.length} regulatory updates - skipping initial collection`);
+      console.log(`DATABASE STATUS: Contains ${currentUpdates.length} regulatory updates - skipping collection`);
     }
     
   } catch (error) {
-    console.error("CRITICAL: Error initializing regulatory updates for production:", error);
+    console.error("CRITICAL: Error with regulatory updates initialization:", error);
+    // Force collection on any error
+    console.log("FALLBACK: Forcing regulatory data collection due to error...");
+    try {
+      const { dataCollectionService } = await import("./services/dataCollectionService.js");
+      await dataCollectionService.performInitialDataCollection();
+    } catch (fallbackError) {
+      console.error("FALLBACK FAILED:", fallbackError);
+    }
   }
   
   const server = await registerRoutes(app);
