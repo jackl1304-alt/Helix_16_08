@@ -134,6 +134,11 @@ app.use((req, res, next) => {
                          process.env.NODE_ENV === "production" ||
                          process.env.DATABASE_URL?.includes("neondb") ||
                          !process.env.DATABASE_URL?.includes("localhost");
+                         
+  // Additional Production detection for replit.app domain
+  const isReplitApp = process.env.REPLIT_DEPLOYMENT === "1" || 
+                      process.env.DATABASE_URL?.includes("@ep-") ||
+                      typeof process !== 'undefined' && process.env.HOSTNAME?.includes("replit");
   
   console.log(`ENVIRONMENT DETECTION: isProductionDB=${isProductionDB}`);
   console.log(`REPLIT_DEPLOYMENT: ${process.env.REPLIT_DEPLOYMENT}`);
@@ -145,8 +150,8 @@ app.use((req, res, next) => {
     console.log(`Current legal cases in database: ${currentLegalCases.length}`);
     
     // Force initialization if production OR if insufficient data
-    if (isProductionDB && currentLegalCases.length === 0) {
-      console.log("PRODUCTION DETECTED: Empty database, triggering FORCED legal data initialization...");
+    if ((isProductionDB || isReplitApp) && currentLegalCases.length < 500) {
+      console.log("PRODUCTION/REPLIT DETECTED: Insufficient legal cases, triggering FORCED initialization...");
       await legalDataService.initializeLegalData();
       
       const updatedLegalCount = await storage.getAllLegalCases();
@@ -177,8 +182,8 @@ app.use((req, res, next) => {
     console.log(`Current regulatory updates in database: ${currentUpdates.length}`);
     
     // Force initialization if production OR if insufficient data
-    if (isProductionDB && currentUpdates.length === 0) {
-      console.log("PRODUCTION DETECTED: Empty database, triggering FORCED regulatory data collection...");
+    if ((isProductionDB || isReplitApp) && currentUpdates.length < 1000) {
+      console.log("PRODUCTION/REPLIT DETECTED: Insufficient regulatory updates, triggering FORCED collection...");
       await dataCollectionService.performInitialDataCollection();
       
       const updatedCount = await storage.getAllRegulatoryUpdates();
