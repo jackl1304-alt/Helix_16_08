@@ -17,10 +17,14 @@ interface DataSource {
   name: string;
   type: string;
   endpoint?: string;
-  isActive: boolean;
-  lastSyncAt: string | null;
-  configData?: any;
-  createdAt: string;
+  is_active: boolean;
+  last_sync_at: string | null;
+  config_data?: any;
+  created_at?: string;
+  region?: string;
+  language?: string;
+  category?: string;
+  frequency?: string;
 }
 
 export default function DataCollection() {
@@ -137,13 +141,13 @@ export default function DataCollection() {
   };
 
   const getStatusBadge = (source: DataSource) => {
-    if (!source.isActive) {
+    if (!source.is_active) {
       return <Badge variant="secondary">Inactive</Badge>;
     }
-    if (!source.lastSyncAt) {
+    if (!source.last_sync_at) {
       return <Badge variant="outline">Never Synced</Badge>;
     }
-    const lastSync = new Date(source.lastSyncAt);
+    const lastSync = new Date(source.last_sync_at);
     const now = new Date();
     const hoursSinceSync = (now.getTime() - lastSync.getTime()) / (1000 * 60 * 60);
     
@@ -264,9 +268,9 @@ export default function DataCollection() {
                           <span className="text-sm text-gray-500">
                             Type: {source.type}
                           </span>
-                          {source.lastSyncAt && (
+                          {source.last_sync_at && (
                             <span className="text-sm text-gray-500">
-                              Last sync: {new Date(source.lastSyncAt).toLocaleString()}
+                              Last sync: {new Date(source.last_sync_at).toLocaleString()}
                             </span>
                           )}
                         </div>
