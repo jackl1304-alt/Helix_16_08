@@ -45,6 +45,8 @@ export default function DataCollection() {
     queryKey: ["/api/data-sources"],
   });
 
+
+
   const syncMutation = useMutation({
     mutationFn: async (sourceId: string) => {
       console.log(`Frontend: Starting sync for source ${sourceId}`);
@@ -256,7 +258,7 @@ export default function DataCollection() {
 
         <TabsContent value="sources">
           <div className="grid gap-4">
-            {sources && sources.length > 0 ? (
+            {(sources && sources.length > 0) ? (
               sources.map((source) => (
                 <Card key={source.id}>
                   <CardHeader>
