@@ -8,9 +8,12 @@ services:
     buildCommand: |
       # Apply comprehensive cache fixes before build
       export NPM_CONFIG_CACHE=/tmp/.npm
+      export NPM_CONFIG_TMP=/tmp
+      export NPM_CONFIG_INIT_CACHE=/tmp/.npm-init
       export DISABLE_NPM_CACHE=true
       export DISABLE_OPENCOLLECTIVE=true
-      export NODE_OPTIONS="--max-old-space-size=4096"
+      export NODE_OPTIONS="--max-old-space-size=4096 --max-semi-space-size=1024"
+      export PORT=5000
       export KEEP_DEV_DEPENDENCIES=true
       export NPM_CONFIG_PROGRESS=false
       export NPM_CONFIG_LOGLEVEL=warn
@@ -18,24 +21,25 @@ services:
       export NPM_CONFIG_FUND=false
       export NPM_CONFIG_UPDATE_NOTIFIER=false
       
-      # Clear all cached files and directories
+      # Clear cache and create writable directories before building
       rm -rf node_modules/.cache
-      rm -rf .cache
-      rm -rf ~/.npm
+      rm -rf ~/.npm/_cacache
       rm -rf /tmp/.npm
-      npm cache clean --force
+      rm -rf /tmp/.npm-init
       
-      # Create npm cache directory with proper permissions
+      # Create writable directories with proper permissions
       mkdir -p /tmp/.npm
+      mkdir -p /tmp/.npm-init
       chmod 755 /tmp/.npm
+      chmod 755 /tmp/.npm-init
       
-      # Verify directory permissions and workspace path
-      echo "Cache directory permissions:"
-      ls -la /tmp/.npm
+      # Verify directory creation
+      echo "Created cache directories:"
+      ls -la /tmp/.npm /tmp/.npm-init
       echo "Current workspace: $(pwd)"
       
-      # Build with cache disabled, keep dev dependencies, and verbose logging
-      npm install --no-cache --verbose --include=dev
+      # Install and build with enhanced cache settings
+      npm install --cache=/tmp/.npm --tmp=/tmp --no-audit --no-fund --loglevel=warn --include=dev
       npm run build
     startCommand: |
       # Start with production environment variables
@@ -46,12 +50,18 @@ services:
     envVars:
       - key: NPM_CONFIG_CACHE
         value: /tmp/.npm
+      - key: NPM_CONFIG_TMP
+        value: /tmp
+      - key: NPM_CONFIG_INIT_CACHE
+        value: /tmp/.npm-init
       - key: DISABLE_NPM_CACHE
         value: true
       - key: DISABLE_OPENCOLLECTIVE
         value: true
       - key: NODE_OPTIONS
-        value: --max-old-space-size=4096
+        value: --max-old-space-size=4096 --max-semi-space-size=1024
+      - key: PORT
+        value: 5000
       - key: KEEP_DEV_DEPENDENCIES
         value: true
       - key: NPM_CONFIG_PROGRESS
@@ -66,5 +76,3 @@ services:
         value: false
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 5000
