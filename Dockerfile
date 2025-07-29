@@ -2,7 +2,7 @@
 FROM node:20-alpine
 
 # Set environment variables to fix cache permission issues
-ENV NPM_CONFIG_CACHE=/tmp/.npm
+ENV NPM_CONFIG_CACHE=/tmp/.npm-cache
 ENV NPM_CONFIG_TMP=/tmp
 ENV NPM_CONFIG_INIT_CACHE=/tmp/.npm-init
 ENV NPM_CONFIG_GLOBALCONFIG=/tmp/.npmrc-global
@@ -31,11 +31,11 @@ COPY package*.json ./
 
 # Clear any existing cache and install dependencies with complete cache settings
 RUN rm -rf ~/.npm && \
-    echo "cache=/tmp/.npm" > /tmp/.npmrc-global && \
+    echo "cache=/tmp/.npm-cache" > /tmp/.npmrc-global && \
     echo "tmp=/tmp" >> /tmp/.npmrc-global && \
     echo "fund=false" >> /tmp/.npmrc-global && \
     echo "audit=false" >> /tmp/.npmrc-global && \
-    npm ci --cache=/tmp/.npm --tmp=/tmp --no-audit --no-fund --userconfig=/tmp/.npmrc-user --globalconfig=/tmp/.npmrc-global
+    npm ci --cache=/tmp/.npm-cache --tmp=/tmp --no-audit --no-fund --userconfig=/tmp/.npmrc-user --globalconfig=/tmp/.npmrc-global
 
 # Source Code kopieren
 COPY . .

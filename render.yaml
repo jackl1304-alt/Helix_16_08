@@ -7,7 +7,7 @@ services:
     plan: free
     buildCommand: |
       # Apply complete deployment cache permission fixes
-      export NPM_CONFIG_CACHE=/tmp/.npm
+      export NPM_CONFIG_CACHE=/tmp/.npm-cache
       export NPM_CONFIG_TMP=/tmp
       export NPM_CONFIG_INIT_CACHE=/tmp/.npm-init
       export NPM_CONFIG_GLOBALCONFIG=/tmp/.npmrc-global
@@ -35,24 +35,24 @@ services:
       chmod -R 755 /tmp/.npm*
       
       # Create npm config files in writable locations
-      echo "cache=/tmp/.npm" > /tmp/.npmrc-global
+      echo "cache=/tmp/.npm-cache" > /tmp/.npmrc-global
       echo "tmp=/tmp" >> /tmp/.npmrc-global
       echo "fund=false" >> /tmp/.npmrc-global
       echo "audit=false" >> /tmp/.npmrc-global
       
       # Clear npm cache safely and install
       npm cache clean --force || true
-      npm install --cache=/tmp/.npm --tmp=/tmp --no-audit --no-fund --loglevel=warn --userconfig=/tmp/.npmrc-user --globalconfig=/tmp/.npmrc-global --include=dev
+      npm install --cache=/tmp/.npm-cache --tmp=/tmp --no-audit --no-fund --loglevel=warn --userconfig=/tmp/.npmrc-user --globalconfig=/tmp/.npmrc-global --include=dev
       npm run build
     startCommand: |
       # Start with production environment variables
-      export NPM_CONFIG_CACHE=/tmp/.npm
+      export NPM_CONFIG_CACHE=/tmp/.npm-cache
       export NODE_OPTIONS="--max-old-space-size=4096"
       export NODE_ENV=production
       npm run start
     envVars:
       - key: NPM_CONFIG_CACHE
-        value: /tmp/.npm
+        value: /tmp/.npm-cache
       - key: NPM_CONFIG_TMP
         value: /tmp
       - key: NPM_CONFIG_INIT_CACHE
