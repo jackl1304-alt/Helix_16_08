@@ -66,15 +66,42 @@ app.use((req, res, next) => {
     const existingSources = await storage.getAllDataSources();
     console.log(`Found ${existingSources.length} existing data sources`);
     
-    // ALWAYS ensure minimum data sources exist for production
+    // ALWAYS ensure minimum 21+ data sources exist for production
     const requiredSources = [
+      // North America - FDA & Health Canada
       { id: 'fda_510k', name: 'FDA 510(k) Database', endpoint: 'https://api.fda.gov/device/510k.json', country: 'US', region: 'North America', type: 'regulatory', category: 'approvals', isActive: true },
-      { id: 'ema_epar', name: 'EMA EPAR', endpoint: 'https://www.ema.europa.eu/en/medicines', country: 'EU', region: 'Europe', type: 'regulatory', category: 'approvals', isActive: true },
-      { id: 'bfarm_guidelines', name: 'BfArM Leitfäden', endpoint: 'https://www.bfarm.de', country: 'DE', region: 'Europe', type: 'guidelines', category: 'guidelines', isActive: true },
-      { id: 'swissmedic_guidelines', name: 'Swissmedic Guidelines', endpoint: 'https://www.swissmedic.ch', country: 'CH', region: 'Europe', type: 'guidelines', category: 'guidelines', isActive: true },
-      { id: 'mhra_guidance', name: 'MHRA Guidance', endpoint: 'https://www.gov.uk/mhra', country: 'UK', region: 'Europe', type: 'guidance', category: 'guidelines', isActive: true },
+      { id: 'fda_pma', name: 'FDA PMA Database', endpoint: 'https://api.fda.gov/device/pma.json', country: 'US', region: 'North America', type: 'regulatory', category: 'approvals', isActive: true },
+      { id: 'fda_recalls', name: 'FDA Device Recalls', endpoint: 'https://api.fda.gov/device/recall.json', country: 'US', region: 'North America', type: 'safety', category: 'recalls', isActive: true },
+      { id: 'fda_guidance', name: 'FDA Guidance Documents', endpoint: 'https://www.fda.gov/medical-devices/guidance-documents-medical-devices-and-radiation-emitting-products', country: 'US', region: 'North America', type: 'guidance', category: 'guidelines', isActive: true },
       { id: 'health_canada', name: 'Health Canada', endpoint: 'https://www.canada.ca/en/health-canada', country: 'CA', region: 'North America', type: 'regulatory', category: 'approvals', isActive: true },
-      { id: 'tga_australia', name: 'TGA Australia', endpoint: 'https://www.tga.gov.au', country: 'AU', region: 'Asia-Pacific', type: 'regulatory', category: 'approvals', isActive: true }
+      { id: 'health_canada_recalls', name: 'Health Canada Recalls', endpoint: 'https://recalls-rappels.canada.ca/en/search/site', country: 'CA', region: 'North America', type: 'safety', category: 'recalls', isActive: true },
+      
+      // Europe - EMA & National Authorities
+      { id: 'ema_epar', name: 'EMA EPAR', endpoint: 'https://www.ema.europa.eu/en/medicines', country: 'EU', region: 'Europe', type: 'regulatory', category: 'approvals', isActive: true },
+      { id: 'ema_guidelines', name: 'EMA Guidelines', endpoint: 'https://www.ema.europa.eu/en/human-regulatory/research-development/scientific-guidelines', country: 'EU', region: 'Europe', type: 'guidance', category: 'guidelines', isActive: true },
+      { id: 'bfarm_guidelines', name: 'BfArM Leitfäden', endpoint: 'https://www.bfarm.de', country: 'DE', region: 'Europe', type: 'guidelines', category: 'guidelines', isActive: true },
+      { id: 'bfarm_approvals', name: 'BfArM Zulassungen', endpoint: 'https://www.bfarm.de/DE/Medizinprodukte/_node.html', country: 'DE', region: 'Europe', type: 'regulatory', category: 'approvals', isActive: true },
+      { id: 'swissmedic_guidelines', name: 'Swissmedic Guidelines', endpoint: 'https://www.swissmedic.ch', country: 'CH', region: 'Europe', type: 'guidelines', category: 'guidelines', isActive: true },
+      { id: 'swissmedic_approvals', name: 'Swissmedic Approvals', endpoint: 'https://www.swissmedic.ch/swissmedic/en/home/medical-devices', country: 'CH', region: 'Europe', type: 'regulatory', category: 'approvals', isActive: true },
+      { id: 'mhra_guidance', name: 'MHRA Guidance', endpoint: 'https://www.gov.uk/mhra', country: 'UK', region: 'Europe', type: 'guidance', category: 'guidelines', isActive: true },
+      { id: 'mhra_alerts', name: 'MHRA Safety Alerts', endpoint: 'https://www.gov.uk/drug-device-alerts', country: 'UK', region: 'Europe', type: 'safety', category: 'alerts', isActive: true },
+      { id: 'ansm_france', name: 'ANSM France', endpoint: 'https://ansm.sante.fr/Produits-de-sante/Dispositifs-medicaux-et-dispositifs-medicaux-de-diagnostic-in-vitro', country: 'FR', region: 'Europe', type: 'regulatory', category: 'approvals', isActive: true },
+      
+      // Asia-Pacific
+      { id: 'tga_australia', name: 'TGA Australia', endpoint: 'https://www.tga.gov.au', country: 'AU', region: 'Asia-Pacific', type: 'regulatory', category: 'approvals', isActive: true },
+      { id: 'pmda_japan', name: 'PMDA Japan', endpoint: 'https://www.pmda.go.jp/english/review-services/outline/devices/0002.html', country: 'JP', region: 'Asia-Pacific', type: 'regulatory', category: 'approvals', isActive: true },
+      { id: 'nmpa_china', name: 'NMPA China', endpoint: 'https://www.nmpa.gov.cn/datasearch/search-info.html', country: 'CN', region: 'Asia-Pacific', type: 'regulatory', category: 'approvals', isActive: true },
+      { id: 'cdsco_india', name: 'CDSCO India', endpoint: 'https://cdsco.gov.in/opencms/opencms/en/Home/', country: 'IN', region: 'Asia-Pacific', type: 'regulatory', category: 'approvals', isActive: true },
+      { id: 'hsa_singapore', name: 'HSA Singapore', endpoint: 'https://www.hsa.gov.sg/medical-devices', country: 'SG', region: 'Asia-Pacific', type: 'regulatory', category: 'approvals', isActive: true },
+      
+      // South America
+      { id: 'anvisa_brazil', name: 'ANVISA Brazil', endpoint: 'https://www.gov.br/anvisa/pt-br', country: 'BR', region: 'South America', type: 'regulatory', category: 'approvals', isActive: true },
+      { id: 'anmat_argentina', name: 'ANMAT Argentina', endpoint: 'https://www.argentina.gob.ar/anmat', country: 'AR', region: 'South America', type: 'regulatory', category: 'approvals', isActive: true },
+      
+      // International Standards & Others
+      { id: 'iso_standards', name: 'ISO Medical Device Standards', endpoint: 'https://www.iso.org/committee/54892.html', country: 'INTL', region: 'International', type: 'standards', category: 'standards', isActive: true },
+      { id: 'iec_standards', name: 'IEC Medical Standards', endpoint: 'https://www.iec.ch/dyn/www/f?p=103:7:0::::FSP_ORG_ID:1316', country: 'INTL', region: 'International', type: 'standards', category: 'standards', isActive: true },
+      { id: 'who_prequalification', name: 'WHO Prequalification', endpoint: 'https://extranet.who.int/pqweb/medical-devices', country: 'INTL', region: 'International', type: 'qualification', category: 'approvals', isActive: true }
     ];
     
     for (const source of requiredSources) {
