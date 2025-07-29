@@ -58,6 +58,58 @@ app.use((req, res, next) => {
   console.log("Initializing email service...");
   await emailService.verifyConnection();
   
+  // Initialize data sources for production deployment
+  console.log("Initializing data sources...");
+  const { storage } = await import("./storage-morning.js");
+  
+  try {
+    const existingSources = await storage.getAllDataSources();
+    console.log(`Found ${existingSources.length} existing data sources`);
+    
+    if (existingSources.length === 0) {
+      console.log("Creating default data sources for production...");
+      
+      const defaultSources = [
+        {
+          id: 'fda_510k',
+          name: 'FDA 510(k) Database',
+          description: 'FDA 510(k) medical device clearances',
+          url: 'https://api.fda.gov/device/510k.json',
+          country: 'US',
+          type: 'regulatory',
+          isActive: true
+        },
+        {
+          id: 'ema_epar',
+          name: 'EMA EPAR',
+          description: 'European Medicines Agency EPAR database',
+          url: 'https://www.ema.europa.eu/en/medicines',
+          country: 'EU',
+          type: 'regulatory', 
+          isActive: true
+        },
+        {
+          id: 'bfarm_guidelines',
+          name: 'BfArM Leitfäden',
+          description: 'German BfArM medical device guidelines',
+          url: 'https://www.bfarm.de',
+          country: 'DE',
+          type: 'guidelines',
+          isActive: true
+        }
+      ];
+      
+      for (const source of defaultSources) {
+        await storage.createDataSource(source);
+        console.log(`Created data source: ${source.name}`);
+      }
+      
+      console.log("Default data sources created successfully");
+    }
+  } catch (error) {
+    console.error("Error initializing data sources:", error);
+  }
+
   // Initialize historical data service
   console.log("Initializing historical data collection...");
   await historicalDataService.initializeHistoricalDownload();
