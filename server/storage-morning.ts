@@ -1,7 +1,17 @@
 // Direct PostgreSQL storage for Helix 7AM morning state
 import { neon } from "@neondatabase/serverless";
 
-const sql = neon(process.env.DATABASE_URL!);
+// Enhanced database connection with debug logging
+const DATABASE_URL = process.env.DATABASE_URL;
+console.log('[DB] Database URL configured:', DATABASE_URL ? 'YES' : 'NO');
+console.log('[DB] Environment:', process.env.NODE_ENV || 'development');
+
+if (!DATABASE_URL) {
+  console.error('[DB ERROR] DATABASE_URL environment variable is not set!');
+  throw new Error('DATABASE_URL environment variable is required');
+}
+
+const sql = neon(DATABASE_URL);
 
 export interface IStorage {
   getDashboardStats(): Promise<any>;
