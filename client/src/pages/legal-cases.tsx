@@ -88,12 +88,14 @@ export default function LegalCases() {
         description: `${data.data.legalCases} Legal Cases und ${data.data.regulatoryUpdates} Updates geladen`,
       });
       
-      // Invalidate queries to refresh data
+      // Force refresh all legal data queries
+      queryClient.invalidateQueries({ queryKey: ['/api/legal'] });
       queryClient.invalidateQueries({ queryKey: ['/api/legal/data'] });
       queryClient.invalidateQueries({ queryKey: ['/api/legal-cases'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
       
-      // Refresh the page to show new data
-      setTimeout(() => window.location.reload(), 1000);
+      // Force reload to ensure fresh data from server
+      window.location.reload();
     },
     onError: (error) => {
       console.error("❌ SYNC ERROR:", error);
@@ -388,7 +390,7 @@ export default function LegalCases() {
                 <Scale className="h-8 w-8 text-blue-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Gesamte Fälle</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{report?.totalCases || 0}</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{legalData?.length || 0}</p>
                 </div>
               </div>
             </CardContent>
