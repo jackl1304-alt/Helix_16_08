@@ -188,7 +188,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Sync statistics endpoint
   app.get("/api/sync/stats", async (req, res) => {
     try {
-      const dataSources = await storage.getAllDataSources();
+      const dataSources = await storage.getActiveDataSources();
       const activeCount = dataSources.filter(source => source.isActive).length;
       
       // Get latest sync time from last_sync_at field
@@ -209,6 +209,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching sync stats:", error);
       res.status(500).json({ message: "Failed to fetch sync stats" });
+    }
+  });
+
+  // Dashboard statistics endpoint
+  app.get("/api/dashboard/stats", async (req, res) => {
+    try {
+      const [regulatoryUpdates, legalCases, dataSources] = await Promise.all([
+        storage.getAllRegulatoryUpdates(),
+        storage.getAllLegalCases(), 
+        storage.getActiveDataSources()
+      ]);
+
+      const stats = {
+        totalUpdates: regulatoryUpdates.length,
+        totalLegalCases: legalCases.length,
+        totalDataSources: dataSources.length,
+        activeDataSources: dataSources.filter(s => s.isActive).length,
+        recentUpdates: regulatoryUpdates.filter(u => {
+          const updateDate = new Date(u.publishedAt || u.createdAt);
+          const thirtyDaysAgo = new Date();
+          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+          return updateDate > thirtyDaysAgo;
+        }).length,
+        totalArticles: 42, // Placeholder for knowledge articles
+        totalSubscribers: 156, // Placeholder for newsletter subscribers
+        pendingApprovals: 8 // Placeholder for pending approvals
+      };
+
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      res.status(500).json({ message: "Failed to fetch dashboard stats" });
     }
   });
 

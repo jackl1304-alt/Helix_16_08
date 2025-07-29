@@ -15,7 +15,7 @@ interface DataSource {
   type: string;
   category: string; // "current" or "historical"
   isActive: boolean;
-  lastSyncAt: string | null;
+  lastSync: string | null;
   region: string;
   language: string;
   frequency: string;
@@ -91,9 +91,9 @@ export function DataCollectionStatus() {
 
   const getStatusText = (source: DataSource): string => {
     if (!source.isActive) return "Inactive";
-    if (!source.lastSyncAt) return "Never synced";
+    if (!source.lastSync) return "Never synced";
     
-    const lastSync = new Date(source.lastSyncAt);
+    const lastSync = new Date(source.lastSync);
     const now = new Date();
     const hoursSinceSync = (now.getTime() - lastSync.getTime()) / (1000 * 60 * 60);
     
@@ -103,9 +103,9 @@ export function DataCollectionStatus() {
   };
 
   const getLastSyncText = (source: DataSource): string => {
-    if (!source.lastSyncAt) return "Never";
+    if (!source.lastSync) return "Never";
     
-    const lastSync = new Date(source.lastSyncAt);
+    const lastSync = new Date(source.lastSync);
     const now = new Date();
     const diffInMinutes = Math.floor((now.getTime() - lastSync.getTime()) / (1000 * 60));
     

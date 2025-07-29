@@ -31,12 +31,7 @@ export default function DataCollection() {
     queryKey: ["/api/data-sources"],
   });
 
-  console.log("Data Collection - Query state:", { 
-    sources: sources?.length || 0, 
-    isLoading, 
-    error: error?.message,
-    rawSources: sources 
-  });
+
 
 
 
@@ -251,9 +246,7 @@ export default function DataCollection() {
 
         <TabsContent value="sources">
           <div className="grid gap-4">
-            <div className="mb-4 p-4 bg-blue-50 rounded">
-              <p>Debug: {sources ? `${sources.length} sources loaded` : 'No sources'} | Loading: {isLoading ? 'Yes' : 'No'} | Error: {error?.message || 'None'}</p>
-            </div>
+
             {sources && Array.isArray(sources) && sources.length > 0 ? (
               sources.map((source) => (
                 <Card key={source.id}>
