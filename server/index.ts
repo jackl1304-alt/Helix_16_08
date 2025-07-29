@@ -128,7 +128,26 @@ app.use((req, res, next) => {
   
   // Initialize legal/jurisprudence data
   console.log("Initializing legal jurisprudence database...");
-  await legalDataService.initializeLegalData();
+  
+  // CRITICAL: Check if production database needs legal data initialization
+  try {
+    const currentLegalCases = await storage.getAllLegalCases();
+    console.log(`Current legal cases in database: ${currentLegalCases.length}`);
+    
+    if (currentLegalCases.length < 100) {
+      console.log("PRODUCTION: Database has insufficient legal cases, triggering full initialization...");
+      await legalDataService.initializeLegalData();
+      
+      const updatedLegalCount = await storage.getAllLegalCases();
+      console.log(`PRODUCTION: After legal data initialization: ${updatedLegalCount.length} legal cases`);
+    } else {
+      console.log(`PRODUCTION: Database already contains ${currentLegalCases.length} legal cases - skipping initialization`);
+    }
+  } catch (error) {
+    console.error("CRITICAL: Error checking/initializing legal data for production:", error);
+    // Fallback: Always try to initialize if error occurs
+    await legalDataService.initializeLegalData();
+  }
   
   // CRITICAL: Force initialize regulatory updates for production
   console.log("PRODUCTION: Force initializing regulatory updates...");
