@@ -5,6 +5,8 @@ FROM node:20-alpine
 ENV NPM_CONFIG_CACHE=/tmp/.npm
 ENV NPM_CONFIG_TMP=/tmp
 ENV NPM_CONFIG_INIT_CACHE=/tmp/.npm-init
+ENV NPM_CONFIG_GLOBALCONFIG=/tmp/.npmrc-global
+ENV NPM_CONFIG_USERCONFIG=/tmp/.npmrc-user
 ENV DISABLE_NPM_CACHE=true
 ENV DISABLE_OPENCOLLECTIVE=true
 ENV NODE_OPTIONS="--max-old-space-size=4096 --max-semi-space-size=1024"
@@ -15,18 +17,25 @@ ENV NPM_CONFIG_LOGLEVEL=warn
 ENV NPM_CONFIG_AUDIT=false
 ENV NPM_CONFIG_FUND=false
 ENV NPM_CONFIG_UPDATE_NOTIFIER=false
+ENV NPM_CONFIG_PACKAGE_LOCK=false
+ENV NPM_CONFIG_SHRINKWRAP=false
 
 # Arbeitsverzeichnis
 WORKDIR /app
 
-# Create npm cache directories with proper permissions
-RUN mkdir -p /tmp/.npm /tmp/.npm-init && chmod 755 /tmp/.npm /tmp/.npm-init
+# Create all npm cache directories with proper permissions
+RUN mkdir -p /tmp/.npm /tmp/.npm-init /tmp/.npm-global /tmp/.npm-user && chmod -R 755 /tmp/.npm*
 
 # Package.json kopieren und Dependencies installieren
 COPY package*.json ./
 
-# Clear any existing cache and install dependencies with enhanced cache settings
-RUN rm -rf ~/.npm/_cacache && npm ci --cache=/tmp/.npm --tmp=/tmp --no-audit --no-fund
+# Clear any existing cache and install dependencies with complete cache settings
+RUN rm -rf ~/.npm && \
+    echo "cache=/tmp/.npm" > /tmp/.npmrc-global && \
+    echo "tmp=/tmp" >> /tmp/.npmrc-global && \
+    echo "fund=false" >> /tmp/.npmrc-global && \
+    echo "audit=false" >> /tmp/.npmrc-global && \
+    npm ci --cache=/tmp/.npm --tmp=/tmp --no-audit --no-fund --userconfig=/tmp/.npmrc-user --globalconfig=/tmp/.npmrc-global
 
 # Source Code kopieren
 COPY . .
