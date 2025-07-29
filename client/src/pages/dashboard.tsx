@@ -18,18 +18,52 @@ import {
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   
-  const { data: stats = {}, isLoading } = useQuery({
+  const { data: stats = {}, isLoading, error: statsError } = useQuery({
     queryKey: ['/api/dashboard/stats'],
+    queryFn: async () => {
+      console.log('[FRONTEND] Fetching dashboard stats...');
+      const response = await fetch('/api/dashboard/stats');
+      console.log('[FRONTEND] Dashboard stats response status:', response.status);
+      if (!response.ok) {
+        console.error('[FRONTEND] Dashboard stats failed:', response.status, response.statusText);
+        throw new Error(`Failed to fetch stats: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log('[FRONTEND] Dashboard stats data:', data);
+      return data;
+    }
   });
 
-  const { data: recentUpdates } = useQuery({
+  const { data: recentUpdates, error: updatesError } = useQuery({
     queryKey: ['/api/regulatory-updates/recent'],
-    queryFn: () => fetch('/api/regulatory-updates/recent?limit=5').then(res => res.json()),
+    queryFn: async () => {
+      console.log('[FRONTEND] Fetching recent updates...');
+      const response = await fetch('/api/regulatory-updates/recent?limit=5');
+      console.log('[FRONTEND] Recent updates response status:', response.status);
+      if (!response.ok) {
+        console.error('[FRONTEND] Recent updates failed:', response.status, response.statusText);
+        throw new Error(`Failed to fetch updates: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log('[FRONTEND] Recent updates data length:', data?.length || 0);
+      return data;
+    }
   });
 
-  const { data: pendingApprovals } = useQuery({
+  const { data: pendingApprovals, error: approvalsError } = useQuery({
     queryKey: ['/api/approvals/pending'],
-    queryFn: () => fetch('/api/approvals/pending').then(res => res.json()),
+    queryFn: async () => {
+      console.log('[FRONTEND] Fetching pending approvals...');
+      const response = await fetch('/api/approvals/pending');
+      console.log('[FRONTEND] Approvals response status:', response.status);
+      if (!response.ok) {
+        console.error('[FRONTEND] Approvals failed:', response.status, response.statusText);
+        throw new Error(`Failed to fetch approvals: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log('[FRONTEND] Approvals data length:', data?.length || 0);
+      return data;
+    }
   });
 
   // Quick Action Handlers
@@ -38,9 +72,23 @@ export default function Dashboard() {
   const handleNewsletter = () => setLocation('/newsletter-manager');
   const handleAnalytics = () => setLocation('/analytics');
 
+  // Debug logging für Frontend-Fehler
+  if (statsError) {
+    console.error('[FRONTEND] Stats error:', statsError);
+  }
+  if (updatesError) {
+    console.error('[FRONTEND] Updates error:', updatesError);
+  }
+  if (approvalsError) {
+    console.error('[FRONTEND] Approvals error:', approvalsError);
+  }
+
   if (isLoading) {
     return (
       <div className="p-6 space-y-6">
+        <div className="text-center mb-4">
+          <p className="text-gray-600">Lade Dashboard-Daten...</p>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(8)].map((_, i) => (
             <Card key={i} className="animate-pulse">
@@ -50,6 +98,21 @@ export default function Dashboard() {
               </CardHeader>
             </Card>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Error state für besseres Debugging
+  if (statsError) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h3 className="text-red-800 font-semibold">Fehler beim Laden der Dashboard-Daten</h3>
+          <p className="text-red-600">Fehler: {statsError.message}</p>
+          <p className="text-sm text-gray-600 mt-2">
+            Backend-Status prüfen oder Seite neu laden.
+          </p>
         </div>
       </div>
     );
