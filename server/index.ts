@@ -82,7 +82,8 @@ app.use((req, res, next) => {
         await storage.createDataSource(source);
         console.log(`✓ Created/Updated data source: ${source.name}`);
       } catch (err) {
-        console.log(`ℹ Data source ${source.name} already exists or error: ${err.message}`);
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        console.log(`ℹ Data source ${source.name} already exists or error: ${errorMessage}`);
       }
     }
     
