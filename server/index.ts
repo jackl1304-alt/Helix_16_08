@@ -73,28 +73,31 @@ app.use((req, res, next) => {
         {
           id: 'fda_510k',
           name: 'FDA 510(k) Database',
-          description: 'FDA 510(k) medical device clearances',
-          url: 'https://api.fda.gov/device/510k.json',
+          endpoint: 'https://api.fda.gov/device/510k.json',
           country: 'US',
+          region: 'North America',
           type: 'regulatory',
+          category: 'approvals',
           isActive: true
         },
         {
           id: 'ema_epar',
           name: 'EMA EPAR',
-          description: 'European Medicines Agency EPAR database',
-          url: 'https://www.ema.europa.eu/en/medicines',
+          endpoint: 'https://www.ema.europa.eu/en/medicines',
           country: 'EU',
-          type: 'regulatory', 
+          region: 'Europe',
+          type: 'regulatory',
+          category: 'approvals', 
           isActive: true
         },
         {
           id: 'bfarm_guidelines',
           name: 'BfArM Leitfäden',
-          description: 'German BfArM medical device guidelines',
-          url: 'https://www.bfarm.de',
+          endpoint: 'https://www.bfarm.de',
           country: 'DE',
+          region: 'Europe',
           type: 'guidelines',
+          category: 'guidelines',
           isActive: true
         }
       ];
