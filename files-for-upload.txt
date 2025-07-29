@@ -1,0 +1,40 @@
+# Helix - Dateien für GitHub Upload
+
+## Wichtige Dateien die hochgeladen werden müssen:
+
+### 📁 Hauptordner (komplett uploaden):
+- client/ (kompletter Ordner mit allen Unterordnern)
+- server/ (kompletter Ordner mit allen Unterordnern)  
+- shared/ (kompletter Ordner mit allen Unterordnern)
+
+### 📄 Konfigurationsdateien:
+- package.json
+- package-lock.json
+- tsconfig.json
+- vite.config.ts
+- tailwind.config.ts
+- drizzle.config.ts
+- render.yaml
+- Dockerfile
+- .env.example
+- .gitignore
+- components.json
+- postcss.config.js
+
+### 📖 Dokumentation:
+- README_GITHUB.md
+- DEPLOYMENT_RENDER.md
+- RENDER_FREE_DEPLOYMENT.md
+
+## NICHT uploaden:
+- node_modules/ (wird automatisch installiert)
+- dist/ (wird beim Build erstellt)
+- .git/ (Git-spezifische Dateien)
+- attached_assets/ (Screenshots und temporäre Dateien)
+- helix-export-* (Export-Archive)
+- *.sql (Datenbank-Backups)
+
+## Upload-Methode:
+1. GitHub Repository → "uploading an existing file"
+2. Drag & Drop alle oben genannten Dateien/Ordner
+3. Commit mit Message: "Helix Platform - Production Ready"
