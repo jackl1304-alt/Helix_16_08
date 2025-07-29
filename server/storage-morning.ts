@@ -6,10 +6,19 @@ const DATABASE_URL = process.env.DATABASE_URL;
 console.log('[DB] Database URL configured:', DATABASE_URL ? 'YES' : 'NO');
 console.log('[DB] Environment:', process.env.NODE_ENV || 'development');
 console.log('[DB] Full DATABASE_URL check:', !!DATABASE_URL);
+console.log('[DB] REPLIT_DEPLOYMENT:', process.env.REPLIT_DEPLOYMENT || 'not set');
 
 if (!DATABASE_URL) {
   console.error('[DB ERROR] DATABASE_URL environment variable is not set!');
-  console.error('[DB ERROR] Available env vars:', Object.keys(process.env).filter(k => k.includes('DB') || k.includes('DATA')));
+  console.error('[DB ERROR] Available env vars:', Object.keys(process.env).filter(k => k.toLowerCase().includes('db') || k.toLowerCase().includes('data') || k.toLowerCase().includes('postgres')));
+  console.error('[DB ERROR] This will cause empty data arrays in production!');
+  
+  // In production, if DATABASE_URL is missing, we need to handle gracefully
+  if (process.env.NODE_ENV === 'production' || process.env.REPLIT_DEPLOYMENT) {
+    console.error('[DB ERROR] PRODUCTION DEPLOYMENT WITHOUT DATABASE_URL!');
+    console.error('[DB ERROR] All API endpoints will return empty arrays');
+  }
+  
   throw new Error('DATABASE_URL environment variable is required');
 }
 
