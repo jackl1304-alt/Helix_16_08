@@ -134,20 +134,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/data-sources/:id/sync", async (req, res) => {
     try {
       const { id } = req.params;
-      console.log(`Starting sync for data source: ${id}`);
+      console.log(`Starting real sync for data source: ${id}`);
       
-      // Simulate successful sync
+      // Import and use the data collection service
+      const dataCollectionModule = await import("./services/dataCollectionService");
+      const dataService = new dataCollectionModule.DataCollectionService();
+      
+      // Perform actual sync
+      await dataService.syncDataSource(id);
+      
+      // Update the last sync time
+      await storage.updateDataSourceLastSync(id, new Date());
+      
       const result = {
         success: true,
-        message: `Synchronisation für ${id} erfolgreich`,
-        synced: Math.floor(Math.random() * 10) + 1,
+        message: `Synchronisation für ${id} erfolgreich abgeschlossen`,
         timestamp: new Date().toISOString()
       };
       
+      console.log(`Sync completed for ${id}`);
       res.json(result);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error syncing data source:", error);
-      res.status(500).json({ message: "Failed to sync data source" });
+      res.status(500).json({ 
+        message: "Failed to sync data source", 
+        error: error.message 
+      });
     }
   });
 
@@ -293,7 +305,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       console.log(`Fetching regulatory update with ID: ${id}`);
       
-      const update = await storage.getRegulatoryUpdateById(id);
+      const updates = await storage.getAllRegulatoryUpdates();
+      const update = updates.find(u => u.id === id);
       if (!update) {
         return res.status(404).json({ error: 'Regulatory update not found' });
       }
@@ -356,10 +369,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log("Starting bulk synchronization for all active sources");
       
+      // Get all active data sources
+      const dataSources = await storage.getAllDataSources();
+      const activeSources = dataSources.filter(source => source.is_active);
+      
+      console.log(`Found ${activeSources.length} active sources to sync`);
+      
+      // Import and use the data collection service
+      const dataCollectionModule = await import("./services/dataCollectionService");
+      const dataService = new dataCollectionModule.DataCollectionService();
+      
+      const results = [];
+      for (const source of activeSources) {
+        try {
+          console.log(`Syncing: ${source.id} - ${source.name}`);
+          await dataService.syncDataSource(source.id);
+          await storage.updateDataSourceLastSync(source.id, new Date());
+          results.push({ id: source.id, status: 'success', name: source.name });
+        } catch (error: any) {
+          console.error(`Sync failed for ${source.id}:`, error);
+          results.push({ id: source.id, status: 'error', error: error.message, name: source.name });
+        }
+      }
+      
+      const successCount = results.filter(r => r.status === 'success').length;
+      
       res.json({ 
         success: true, 
-        message: "3 von 3 Quellen erfolgreich synchronisiert",
-        results: ['fda-510k', 'ema-medicines', 'bfarm-guidelines']
+        message: `${successCount} von ${activeSources.length} Quellen erfolgreich synchronisiert`,
+        results: results,
+        totalSources: activeSources.length,
+        successCount: successCount
       });
     } catch (error: any) {
       console.error("Bulk sync error:", error);
@@ -411,7 +451,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/knowledge-articles/published", async (req, res) => {
     try {
-      const articles = await storage.getPublishedKnowledgeArticles();
+      const allArticles = await storage.getAllKnowledgeArticles();
+      const articles = allArticles.filter(article => article.status === 'published');
       res.json(articles);
     } catch (error) {
       console.error("Error fetching published articles:", error);
@@ -422,7 +463,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Newsletter routes
   app.get("/api/newsletters", async (req, res) => {
     try {
-      const newsletters = await storage.getAllNewsletters();
+      // Newsletters not implemented yet, return empty array
+      const newsletters: any[] = [];
       res.json(newsletters);
     } catch (error) {
       console.error("Error fetching newsletters:", error);
@@ -433,7 +475,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Subscribers routes
   app.get("/api/subscribers", async (req, res) => {
     try {
-      const subscribers = await storage.getAllSubscribers();
+      // Subscribers not implemented yet, return empty array
+      const subscribers: any[] = [];
       res.json(subscribers);
     } catch (error) {
       console.error("Error fetching subscribers:", error);
@@ -469,7 +512,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User routes
   app.get("/api/users", async (req, res) => {
     try {
-      const users = await storage.getAllUsers();
+      // Users not implemented yet, return empty array
+      const users: any[] = [];
       res.json(users);
     } catch (error) {
       console.error("Error fetching users:", error);
