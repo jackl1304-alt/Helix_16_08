@@ -10,37 +10,13 @@ console.log('[DB] REPLIT_DEPLOYMENT:', process.env.REPLIT_DEPLOYMENT || 'not set
 
 if (!DATABASE_URL) {
   console.error('[DB ERROR] DATABASE_URL environment variable is not set!');
-  console.error('[DB ERROR] Available env vars:', Object.keys(process.env).filter(k => k.toLowerCase().includes('db') || k.toLowerCase().includes('data') || k.toLowerCase().includes('postgres')));
-  console.error('[DB ERROR] This will cause empty data arrays in production!');
-  
-  // Try alternative environment variable names that Replit might use
-  const alternatives = [
-    process.env.POSTGRES_URL,
-    process.env.DATABASE_CONNECTION_STRING,
-    process.env.DB_URL,
-    process.env.NEON_DATABASE_URL,
-    process.env.REPLIT_DB_URL
-  ];
-  
-  const foundUrl = alternatives.find(url => url);
-  if (foundUrl) {
-    console.log('[DB] Found alternative database URL, using it');
-  } else {
-    console.error('[DB ERROR] No database URL found in any format');
-    throw new Error('No database connection available');
-  }
+  console.error('[DB ERROR] This means Production/Development database difference!');
+  console.error('[DB ERROR] Production has different environment setup');
+  throw new Error('DATABASE_URL environment variable is required');
 }
 
-// Use DATABASE_URL or fallback to alternatives
-const dbUrl = DATABASE_URL || 
-              process.env.POSTGRES_URL || 
-              process.env.DATABASE_CONNECTION_STRING || 
-              process.env.DB_URL || 
-              process.env.NEON_DATABASE_URL || 
-              process.env.REPLIT_DB_URL;
-
-console.log('[DB] Final database URL source:', dbUrl ? 'FOUND' : 'NOT FOUND');
-const sql = neon(dbUrl!);
+console.log('[DB] Using DATABASE_URL for Production/Development');
+const sql = neon(DATABASE_URL);
 
 export interface IStorage {
   getDashboardStats(): Promise<any>;
@@ -124,20 +100,18 @@ class MorningStorage implements IStorage {
   async getAllDataSources() {
     try {
       console.log('[DB] getAllDataSources called');
-      const result = await sql`SELECT * FROM data_sources ORDER BY name`;
+      // Use correct column names from actual database schema
+      const result = await sql`SELECT id, name, type, category, region, created_at, is_active, endpoint, sync_frequency, last_sync_at FROM data_sources ORDER BY name`;
       console.log('[DB] getAllDataSources result count:', result.length);
+      console.log('[DB] First result sample:', result[0]);
       
-      // If no data in database, return the default sources structure
-      if (result.length === 0) {
-        console.log('[DB] No data sources in database, returning default structure');
-        return this.getDefaultDataSources();
-      }
-      
+      // Always return the database result, even if empty
       return result;
     } catch (error) {
-      console.error('[DB] getAllDataSources error:', error);
-      console.log('[DB] Returning default sources due to database error');
-      return this.getDefaultDataSources();
+      console.error('[DB] getAllDataSources SQL error:', error);
+      console.log('[DB] Error details:', error.message);
+      // Return empty array on error instead of fallback data
+      return [];
     }
   }
 
