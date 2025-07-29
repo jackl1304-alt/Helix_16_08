@@ -13,16 +13,34 @@ if (!DATABASE_URL) {
   console.error('[DB ERROR] Available env vars:', Object.keys(process.env).filter(k => k.toLowerCase().includes('db') || k.toLowerCase().includes('data') || k.toLowerCase().includes('postgres')));
   console.error('[DB ERROR] This will cause empty data arrays in production!');
   
-  // In production, if DATABASE_URL is missing, we need to handle gracefully
-  if (process.env.NODE_ENV === 'production' || process.env.REPLIT_DEPLOYMENT) {
-    console.error('[DB ERROR] PRODUCTION DEPLOYMENT WITHOUT DATABASE_URL!');
-    console.error('[DB ERROR] All API endpoints will return empty arrays');
-  }
+  // Try alternative environment variable names that Replit might use
+  const alternatives = [
+    process.env.POSTGRES_URL,
+    process.env.DATABASE_CONNECTION_STRING,
+    process.env.DB_URL,
+    process.env.NEON_DATABASE_URL,
+    process.env.REPLIT_DB_URL
+  ];
   
-  throw new Error('DATABASE_URL environment variable is required');
+  const foundUrl = alternatives.find(url => url);
+  if (foundUrl) {
+    console.log('[DB] Found alternative database URL, using it');
+  } else {
+    console.error('[DB ERROR] No database URL found in any format');
+    throw new Error('No database connection available');
+  }
 }
 
-const sql = neon(DATABASE_URL);
+// Use DATABASE_URL or fallback to alternatives
+const dbUrl = DATABASE_URL || 
+              process.env.POSTGRES_URL || 
+              process.env.DATABASE_CONNECTION_STRING || 
+              process.env.DB_URL || 
+              process.env.NEON_DATABASE_URL || 
+              process.env.REPLIT_DB_URL;
+
+console.log('[DB] Final database URL source:', dbUrl ? 'FOUND' : 'NOT FOUND');
+const sql = neon(dbUrl!);
 
 export interface IStorage {
   getDashboardStats(): Promise<any>;
