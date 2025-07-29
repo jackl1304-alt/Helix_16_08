@@ -42,6 +42,12 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Debug environment variables
+  console.log(`[ENV] NODE_ENV: ${process.env.NODE_ENV}`);
+  console.log(`[ENV] DATABASE_URL exists: ${!!process.env.DATABASE_URL}`);
+  console.log(`[ENV] PORT: ${process.env.PORT}`);
+  console.log(`[ENV] REPLIT_DEPLOYMENT: ${process.env.REPLIT_DEPLOYMENT}`);
+  
   // Initialize email service and verify connection
   console.log("Initializing email service...");
   await emailService.verifyConnection();
