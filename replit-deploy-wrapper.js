@@ -7,27 +7,35 @@ import path from 'path';
 
 console.log('🔧 Replit Deployment Wrapper gestartet...');
 
-// Deployment-optimierte Umgebungsvariablen setzen
-process.env.NPM_CONFIG_CACHE = '/tmp/.npm-deployment-cache';
+// Set NPM_CONFIG_CACHE environment variable and additional variables for Node.js module access
+process.env.NPM_CONFIG_CACHE = '/tmp/.npm-isolated-cache';
 process.env.NPM_CONFIG_TMP = '/tmp';
-process.env.NPM_CONFIG_INIT_CACHE = '/tmp/.npm-deployment-init';
-process.env.NPM_CONFIG_GLOBALCONFIG = '/tmp/.npmrc-deployment-global';
-process.env.NPM_CONFIG_USERCONFIG = '/tmp/.npmrc-deployment-user';
+process.env.NPM_CONFIG_INIT_CACHE = '/tmp/.npm-isolated-init';
+process.env.NPM_CONFIG_GLOBALCONFIG = '/tmp/.npmrc-isolated-global';
+process.env.NPM_CONFIG_USERCONFIG = '/tmp/.npmrc-isolated-user';
+process.env.NPM_CONFIG_PREFIX = '/tmp/.npm-isolated-prefix';
+process.env.NPM_CONFIG_STORE_DIR = '/tmp/.npm-isolated-store';
 process.env.DISABLE_NPM_CACHE = 'true';
-process.env.NODE_OPTIONS = '--max-old-space-size=4096';
+process.env.NODE_OPTIONS = '--max-old-space-size=4096 --max-semi-space-size=1024';
 process.env.NPM_CONFIG_PROGRESS = 'false';
 process.env.NPM_CONFIG_AUDIT = 'false';
 process.env.NPM_CONFIG_FUND = 'false';
 process.env.NPM_CONFIG_UPDATE_NOTIFIER = 'false';
+process.env.NODE_PATH = '';
+process.env.HOME_CACHE_DIR = '/tmp/.cache-isolated';
+process.env.XDG_CACHE_HOME = '/tmp/.cache-isolated';
 
 console.log('✅ Replit-Cache-Variablen gesetzt');
 
-// Cache-Verzeichnisse für Deployment erstellen
+// Clear cache and create completely writable directories before build
 const cacheDirectories = [
-  '/tmp/.npm-deployment-cache',
-  '/tmp/.npm-deployment-init',
-  '/tmp/.npm-deployment-global',
-  '/tmp/.npm-deployment-user'
+  '/tmp/.npm-isolated-cache',
+  '/tmp/.npm-isolated-init', 
+  '/tmp/.npm-isolated-global',
+  '/tmp/.npm-isolated-user',
+  '/tmp/.npm-isolated-prefix',
+  '/tmp/.npm-isolated-store',
+  '/tmp/.cache-isolated'
 ];
 
 cacheDirectories.forEach(dir => {
@@ -37,10 +45,12 @@ cacheDirectories.forEach(dir => {
   }
 });
 
-// Deployment-optimierte .npmrc erstellen
-const npmrcContent = `cache=/tmp/.npm-deployment-cache
+// Create isolated npmrc files in writable directory
+const npmrcContent = `cache=/tmp/.npm-isolated-cache
 tmp=/tmp
-init-cache=/tmp/.npm-deployment-init
+init-cache=/tmp/.npm-isolated-init
+prefix=/tmp/.npm-isolated-prefix
+store-dir=/tmp/.npm-isolated-store
 fund=false
 audit=false
 update-notifier=false
@@ -53,12 +63,14 @@ cache-max=0
 cache-min=0
 package-lock=false
 shrinkwrap=false
-globalconfig=/tmp/.npmrc-deployment-global
-userconfig=/tmp/.npmrc-deployment-user`;
+globalconfig=/tmp/.npmrc-isolated-global
+userconfig=/tmp/.npmrc-isolated-user
+prefer-online=true
+unsafe-perm=true`;
 
-fs.writeFileSync('/tmp/.npmrc-deployment', npmrcContent);
-fs.writeFileSync('/tmp/.npmrc-deployment-global', 'cache=/tmp/.npm-deployment-cache\ntmp=/tmp\nfund=false');
-fs.writeFileSync('/tmp/.npmrc-deployment-user', 'cache=/tmp/.npm-deployment-cache\ntmp=/tmp');
+fs.writeFileSync('/tmp/.npmrc-isolated', npmrcContent);
+fs.writeFileSync('/tmp/.npmrc-isolated-global', 'cache=/tmp/.npm-isolated-cache\ntmp=/tmp\nprefix=/tmp/.npm-isolated-prefix\nstore-dir=/tmp/.npm-isolated-store\nfund=false\naudit=false\nprefer-online=true\nunsafe-perm=true');
+fs.writeFileSync('/tmp/.npmrc-isolated-user', 'cache=/tmp/.npm-isolated-cache\ntmp=/tmp\nfund=false\naudit=false');
 
 console.log('✅ Replit-NPM-Konfiguration erstellt');
 
@@ -82,8 +94,8 @@ const buildProcess = spawn('npm', ['run', 'build'], {
   stdio: 'inherit',
   env: {
     ...process.env,
-    NPM_CONFIG_USERCONFIG: '/tmp/.npmrc-deployment',
-    NPM_CONFIG_GLOBALCONFIG: '/tmp/.npmrc-deployment-global'
+    NPM_CONFIG_USERCONFIG: '/tmp/.npmrc-isolated-user',
+    NPM_CONFIG_GLOBALCONFIG: '/tmp/.npmrc-isolated-global'
   }
 });
 
