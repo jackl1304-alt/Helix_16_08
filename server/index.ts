@@ -130,6 +130,30 @@ app.use((req, res, next) => {
   console.log("Initializing legal jurisprudence database...");
   await legalDataService.initializeLegalData();
   
+  // CRITICAL: Force initialize regulatory updates for production
+  console.log("PRODUCTION: Force initializing regulatory updates...");
+  try {
+    const { dataCollectionService } = await import("./services/dataCollectionService.js");
+    
+    // Check current regulatory updates count
+    const currentUpdates = await storage.getAllRegulatoryUpdates();
+    console.log(`Current regulatory updates in database: ${currentUpdates.length}`);
+    
+    // If empty or less than 100 updates, force initial data collection
+    if (currentUpdates.length < 100) {
+      console.log("PRODUCTION: Database has insufficient data, triggering initial data collection...");
+      await dataCollectionService.performInitialDataCollection();
+      
+      const updatedCount = await storage.getAllRegulatoryUpdates();
+      console.log(`PRODUCTION: After initial collection: ${updatedCount.length} regulatory updates`);
+    } else {
+      console.log(`PRODUCTION: Database already contains ${currentUpdates.length} regulatory updates - skipping initial collection`);
+    }
+    
+  } catch (error) {
+    console.error("CRITICAL: Error initializing regulatory updates for production:", error);
+  }
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
