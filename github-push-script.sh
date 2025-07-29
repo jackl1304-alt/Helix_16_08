@@ -1,31 +1,15 @@
 #!/bin/bash
 
-# Helix GitHub Push Script mit Personal Access Token
-# Automatisches Push zu GitHub Repository
+# Helix GitHub Push Script 
+# Für GitHub Repository: jackl1304/helix-regulatory-platform
 
 echo "🧬 Helix GitHub Push Script"
 echo "=========================="
 echo ""
 
-# User Input für Repository URL
-echo "📋 Bitte erstellen Sie zuerst ein GitHub Repository:"
-echo "   1. Gehen Sie zu: https://github.com/new"
-echo "   2. Name: helix-regulatory-platform" 
-echo "   3. Beschreibung: 🧬 Helix - AI-powered MedTech regulatory intelligence platform"
-echo "   4. Public (für Render.com Free Tier)"
-echo "   5. NICHT initialisieren (kein README, .gitignore)"
-echo "   6. 'Create repository' klicken"
-echo ""
-
-read -p "Geben Sie Ihren GitHub USERNAME ein: " GITHUB_USERNAME
-
-if [ -z "$GITHUB_USERNAME" ]; then
-    echo "❌ Kein Username eingegeben. Script beenden."
-    exit 1
-fi
-
-# Repository URL mit Token konstruieren
-GITHUB_TOKEN="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"
+# Repository URL mit korrektem Token
+GITHUB_USERNAME="jackl1304"
+GITHUB_TOKEN="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"
 REPO_URL="https://${GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/helix-regulatory-platform.git"
 
 echo ""
