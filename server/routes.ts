@@ -336,19 +336,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let cases = await storage.getAllLegalCases();
       console.log(`Fetched ${cases.length} legal cases from database`);
       
-      // EMERGENCY FIX: If 0 legal cases, try to initialize immediately
+      // AUTO-INITIALIZATION: If 0 legal cases, initialize automatically
       if (cases.length === 0) {
-        console.log("🚨 ZERO LEGAL CASES: Triggering emergency fix...");
+        console.log("Auto-initializing legal cases database...");
         
-        // Clean emergency fix without legacy imports
         const { productionService } = await import("./services/ProductionService.js");
         const result = await productionService.initializeProductionData();
-        const wasFixed = result.success;
         
-        if (wasFixed) {
-          // Re-fetch after fix
+        if (result.success) {
           cases = await storage.getAllLegalCases();
-          console.log(`✅ After emergency fix: ${cases.length} legal cases`);
+          console.log(`Initialized ${cases.length} legal cases`);
         }
       }
       
@@ -1124,101 +1121,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // FALLBACK: Basic Legal Cases Sync (Legacy)
-  app.post('/api/admin/force-legal-sync-basic', async (req, res) => {
-    try {
-      console.log("🚨 BASIC LEGAL SYNC: Force generating Legal Cases for Live Deployment...");
-      
-      // Force generate 2100 legal cases immediately
-      const jurisdictions = ["US", "EU", "DE", "UK", "CH", "FR"];
-      let totalGenerated = 0;
-      
-      for (const jurisdiction of jurisdictions) {
-        for (let i = 0; i < 350; i++) {
-          const legalCase = {
-            id: `emergency_legal_${jurisdiction.toLowerCase()}_${Date.now()}_${i}`,
-            caseTitle: `${jurisdiction} Medical Device Case ${i + 1}`,
-            caseNumber: `${jurisdiction}-2025-${String(i + 1).padStart(4, '0')}`,
-            court: jurisdiction === 'US' ? 'U.S. District Court' : 
-                   jurisdiction === 'EU' ? 'European Court of Justice' :
-                   jurisdiction === 'DE' ? 'Bundesgerichtshof' : 'High Court',
-            jurisdiction: jurisdiction,
-            decisionDate: new Date(2020 + Math.floor(Math.random() * 5), 
-                                 Math.floor(Math.random() * 12), 
-                                 Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
-            summary: `Medical device regulatory case involving ${jurisdiction} jurisdiction`,
-            keyIssues: ["medical device regulation", "regulatory compliance"],
-            deviceTypes: ["medical device"],
-            parties: {
-              plaintiff: "Plaintiff Name",
-              defendant: "Medical Device Company"
-            },
-            outcome: "Final decision rendered",
-            significance: "Medium",
-            precedentValue: "Medium",
-            relatedCases: [],
-            documentUrl: `https://legal-docs.example.com/${jurisdiction.toLowerCase()}/case_${i}`,
-            lastUpdated: new Date().toISOString()
-          };
-          
-          await storage.createLegalCase(legalCase);
-          totalGenerated++;
-        }
-      }
-      
-      const finalLegalCount = await storage.getAllLegalCases();
-      
-      res.json({
-        success: true,
-        message: "Emergency Legal Cases sync completed",
-        data: {
-          legalCases: finalLegalCount.length,
-          generated: totalGenerated,
-          timestamp: new Date().toISOString()
-        }
-      });
-      
-    } catch (error) {
-      console.error("❌ EMERGENCY LEGAL SYNC ERROR:", error);
-      res.status(500).json({ 
-        success: false, 
-        message: "Emergency Legal Cases sync failed",
-        error: error instanceof Error ? error.message : "Unknown error"
-      });
-    }
-  });
 
-  // PRODUCTION DATABASE DIRECT REPAIR - Guaranteed Fix
-  app.post('/api/admin/production-database-repair', async (req, res) => {
-    try {
-      console.log("🔧 PRODUCTION DATABASE DIRECT REPAIR: Starting guaranteed fix...");
-      
-      // Clean production repair without legacy imports
-      const { productionService } = await import("./services/ProductionService.js");
-      const result = await productionService.initializeProductionData();
-      
-      res.json({
-        success: result.success,
-        message: result.success ? "Production database repair completed successfully" : "Production database repair failed",
-        data: {
-          before: result.before,
-          after: result.after,
-          inserted: result.inserted,
-          timestamp: new Date().toISOString(),
-          repairType: "direct_database_repair"
-        },
-        error: result.error || null
-      });
-      
-    } catch (error) {
-      console.error("❌ Production database repair error:", error);
-      res.status(500).json({
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-        message: "Production database direct repair failed"
-      });
-    }
-  });
+
+
 
   // MANUAL SYNCHRONIZATION API for Live Deployment - SIMPLIFIED VERSION
   app.post('/api/admin/force-sync', async (req, res) => {
