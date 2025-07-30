@@ -110,6 +110,10 @@ export default function LegalCases() {
     refetchInterval: 30000,
   });
 
+  // Debug logging
+  console.log("🔍 LEGAL CASES Data loaded:", legalData.length);
+  console.log("📊 First legal case:", legalData[0]);
+
   // Fetch report data
   const { data: report } = useQuery<LegalReport>({
     queryKey: ['/api/legal/report'],
@@ -156,13 +160,31 @@ export default function LegalCases() {
       item.court?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.caseNumber?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesSource = selectedSource === "all" || item.jurisdiction === selectedSource;
+    const matchesSource = selectedSource === "all" || 
+      item.jurisdiction === selectedSource ||
+      item.jurisdiction?.toLowerCase().includes(selectedSource.toLowerCase()) ||
+      (selectedSource === "us_federal_courts" && item.jurisdiction?.includes("US")) ||
+      (selectedSource === "eu_courts" && item.jurisdiction?.includes("EU")) ||
+      (selectedSource === "german_courts" && item.jurisdiction?.includes("DE"));
 
     const matchesDateRange = !dateRange.start || !dateRange.end || 
       (new Date(item.decisionDate) >= new Date(dateRange.start) && 
        new Date(item.decisionDate) <= new Date(dateRange.end));
 
     return matchesSearch && matchesSource && matchesDateRange;
+  });
+
+  // Additional debug logging
+  console.log("🔄 Transformed data length:", transformedData.length);
+  console.log("🔍 Filtered data length:", filteredData.length);
+  console.log("📋 Search term:", searchTerm);
+  console.log("📅 Date range:", dateRange);
+  console.log("🏛️ Selected source:", selectedSource);
+  console.log("🔧 Filter debug:", {
+    hasSearchTerm: searchTerm !== "",
+    selectedSource,
+    hasDateRange: dateRange.start && dateRange.end,
+    sampleItem: transformedData[0]
   });
 
   return (
@@ -328,15 +350,30 @@ export default function LegalCases() {
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                   <span className="ml-2">Lade Rechtsfälle...</span>
                 </div>
-              ) : filteredData.length === 0 ? (
+              ) : transformedData.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-gray-500">Keine Rechtsfälle gefunden.</p>
+                  <p className="text-gray-500">Keine Rechtsfälle verfügbar.</p>
                   <Button 
                     onClick={() => syncMutation.mutate()}
                     disabled={syncMutation.isPending}
                     className="mt-4"
                   >
                     {syncMutation.isPending ? "Synchronisiere..." : "Enhanced Legal Database erstellen"}
+                  </Button>
+                </div>
+              ) : filteredData.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">Keine Rechtsfälle entsprechen den aktuellen Filterkriterien.</p>
+                  <Button 
+                    onClick={() => {
+                      setSelectedSource("all");
+                      setSearchTerm("");
+                      setDateRange({ start: "", end: "" });
+                    }}
+                    className="mt-4"
+                    variant="outline"
+                  >
+                    Filter zurücksetzen
                   </Button>
                 </div>
               ) : (
