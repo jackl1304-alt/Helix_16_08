@@ -40,6 +40,7 @@ Preferred communication style: German language - Simple, everyday language.
 - ✅ **LOKALES SYSTEM OPTIMAL**: 2025 Legal Cases, 5654 Updates, System Status "optimal"
 - ✅ **UI-STABILITÄT BEHOBEN**: Loading-Overlay verhindert weiße Seite während Synchronisation
 - ✅ **SYNC-API ROUTING REPARIERT**: Frontend nutzt korrekten Endpunkt /api/admin/sync-legal-cases
+- ✅ **PERFORMANCE OPTIMIERT**: API-Limits hinzugefügt (Regulatory Updates: 100, Legal Cases: 50)
 - ✅ **PRODUCTION-READY**: System bereit für Live-Deployment ohne veraltete Dependencies
 
 ## Key Components

@@ -295,7 +295,14 @@ class MorningStorage implements IStorage {
 
   async getAllRegulatoryUpdates() {
     try {
-      const result = await sql`SELECT * FROM regulatory_updates ORDER BY published_at DESC`;
+      console.log('[DB] getAllRegulatoryUpdates called (optimized with limit)');
+      // PERFORMANCE OPTIMIZATION: Limit to 100 most recent for faster loading
+      const result = await sql`
+        SELECT * FROM regulatory_updates 
+        ORDER BY published_at DESC 
+        LIMIT 100
+      `;
+      console.log(`[DB] getAllRegulatoryUpdates result count: ${result.length} (limited for performance)`);
       return result;
     } catch (error) {
       console.error("All regulatory updates error:", error);
@@ -398,8 +405,14 @@ class MorningStorage implements IStorage {
 
   async getAllLegalCases() {
     try {
-      const result = await sql`SELECT * FROM legal_cases ORDER BY decision_date DESC`;
-      console.log(`Fetched ${result.length} legal cases from database`);
+      console.log('[DB] getAllLegalCases called (optimized with limit)');
+      // PERFORMANCE OPTIMIZATION: Limit to 50 most recent for faster loading
+      const result = await sql`
+        SELECT * FROM legal_cases 
+        ORDER BY decision_date DESC 
+        LIMIT 50
+      `;
+      console.log(`Fetched ${result.length} legal cases from database (limited for performance)`);
       return result.map(row => ({
         id: row.id,
         caseNumber: row.case_number,
