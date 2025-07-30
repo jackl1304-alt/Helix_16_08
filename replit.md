@@ -39,6 +39,7 @@ Preferred communication style: German language - Simple, everyday language.
 - ✅ **IMPORT-FEHLER BEHOBEN**: Alle storage-morning Referenzen auf storage aktualisiert
 - ✅ **LOKALES SYSTEM OPTIMAL**: 2025 Legal Cases, 5654 Updates, System Status "optimal"
 - ✅ **UI-STABILITÄT BEHOBEN**: Loading-Overlay verhindert weiße Seite während Synchronisation
+- ✅ **SYNC-API ROUTING REPARIERT**: Frontend nutzt korrekten Endpunkt /api/admin/sync-legal-cases
 - ✅ **PRODUCTION-READY**: System bereit für Live-Deployment ohne veraltete Dependencies
 
 ## Key Components
