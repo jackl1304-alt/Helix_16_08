@@ -8,6 +8,11 @@ Helix is a comprehensive regulatory intelligence platform designed for the medic
 
 Preferred communication style: German language - Simple, everyday language.
 
+### Dokumentation
+- Detaillierte Aufgabenaufstellungen für alle Seiten gewünscht
+- Klare Priorisierung nach Implementierungsstand
+- Technische Schulden transparent dokumentieren
+
 ## System Architecture
 
 ### Frontend Architecture
