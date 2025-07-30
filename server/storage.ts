@@ -285,8 +285,19 @@ class MorningStorage implements IStorage {
 
   async getHistoricalDataSources() {
     try {
-      const result = await sql`SELECT * FROM data_sources ORDER BY created_at`;
-      return result;
+      console.log('[DB] getHistoricalDataSources called');
+      const result = await sql`SELECT * FROM data_sources ORDER BY created_at DESC LIMIT 100`;
+      console.log(`[DB] Found ${result.length} historical data sources`);
+      
+      // Transform to consistent format
+      const transformedResult = result.map(source => ({
+        ...source,
+        isActive: source.is_active,
+        lastSync: source.last_sync_at,
+        url: source.url || source.endpoint
+      }));
+      
+      return transformedResult;
     } catch (error) {
       console.error("Historical data sources error:", error);
       return [];
