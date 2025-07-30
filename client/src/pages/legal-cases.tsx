@@ -87,7 +87,7 @@ export default function LegalCases() {
     mutationFn: async () => {
       setIsSyncing(true);
       console.log("🔄 ENHANCED LEGAL SYNC: Triggering comprehensive legal database generation...");
-      const response = await fetch('/api/admin/force-legal-sync', {
+      const response = await fetch('/api/admin/sync-legal-cases', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
