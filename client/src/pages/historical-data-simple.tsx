@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, FileText, Database, TrendingUp } from "lucide-react";
+import { Calendar, FileText, Database, TrendingUp, Download, ExternalLink, Eye } from "lucide-react";
 
 interface HistoricalDataRecord {
   id: string;
@@ -24,6 +24,9 @@ interface HistoricalDataRecord {
   language?: string;
   priority?: string;
   deviceClasses?: string[];
+  content?: string;
+  summary?: string;
+  categories?: any;
 }
 
 export default function HistoricalData() {
@@ -168,49 +171,124 @@ export default function HistoricalData() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-300">
-                      <span className="flex items-center">
-                        <Calendar className="h-4 w-4 mr-1" />
-                        {(() => {
-                          try {
-                            const date = new Date(item.published_at || item.originalDate);
-                            return isNaN(date.getTime()) 
-                              ? (item.published_at || item.originalDate || 'Unbekannt').split('T')[0] 
-                              : date.toLocaleDateString('de-DE', {
-                                  year: 'numeric',
-                                  month: '2-digit', 
-                                  day: '2-digit'
-                                });
-                          } catch {
-                            return 'Unbekannt';
-                          }
-                        })()}
-                      </span>
-                      {item.change_type && (
-                        <Badge variant="secondary">{item.change_type}</Badge>
-                      )}
-                      {item.version && (
-                        <Badge variant="outline">v{item.version}</Badge>
-                      )}
-                      {item.language && (
-                        <Badge variant="outline">{item.language}</Badge>
-                      )}
-                      {item.deviceClasses && item.deviceClasses.length > 0 && (
-                        <span className="text-xs text-gray-500">
-                          Geräte: {item.deviceClasses.slice(0, 2).join(', ')}
-                          {item.deviceClasses.length > 2 && ` +${item.deviceClasses.length - 2} weitere`}
+                  <div className="space-y-4">
+                    {/* Datum und Meta-Informationen */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-300">
+                        <span className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-1" />
+                          {(() => {
+                            try {
+                              const date = new Date(item.published_at || item.originalDate);
+                              return isNaN(date.getTime()) 
+                                ? (item.published_at || item.originalDate || 'Unbekannt').split('T')[0] 
+                                : date.toLocaleDateString('de-DE', {
+                                    year: 'numeric',
+                                    month: '2-digit', 
+                                    day: '2-digit'
+                                  });
+                            } catch {
+                              return 'Unbekannt';
+                            }
+                          })()}
                         </span>
-                      )}
+                        {item.change_type && (
+                          <Badge variant="secondary">{item.change_type}</Badge>
+                        )}
+                        {item.version && (
+                          <Badge variant="outline">v{item.version}</Badge>
+                        )}
+                        {item.language && (
+                          <Badge variant="outline">{item.language}</Badge>
+                        )}
+                      </div>
                     </div>
-                    {item.document_url && (
-                      <Button variant="outline" size="sm" asChild>
-                        <a href={item.document_url} target="_blank" rel="noopener noreferrer">
-                          <FileText className="h-4 w-4 mr-1" />
-                          Anzeigen
-                        </a>
-                      </Button>
+
+                    {/* Vollständige Datenansicht */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      {/* Dokument-Informationen */}
+                      <div className="space-y-2">
+                        <h4 className="font-semibold text-gray-900 dark:text-gray-100">Dokument-Details</h4>
+                        {item.document_url && (
+                          <div><span className="font-medium">Quelle:</span> <span className="text-blue-600 truncate">{item.document_url}</span></div>
+                        )}
+                        {item.archived_at && (
+                          <div><span className="font-medium">Archiviert:</span> {new Date(item.archived_at).toLocaleDateString('de-DE')}</div>
+                        )}
+                        {item.source_type && (
+                          <div><span className="font-medium">Typ:</span> {item.source_type}</div>
+                        )}
+                        <div><span className="font-medium">Dokument-ID:</span> {item.id}</div>
+                      </div>
+
+                      {/* Technische Details */}
+                      <div className="space-y-2">
+                        <h4 className="font-semibold text-gray-900 dark:text-gray-100">Technische Daten</h4>
+                        {item.deviceClasses && item.deviceClasses.length > 0 && (
+                          <div><span className="font-medium">Geräteklassen:</span> {item.deviceClasses.join(', ')}</div>
+                        )}
+                        {item.categories && typeof item.categories === 'object' && Object.keys(item.categories).length > 0 && (
+                          <div><span className="font-medium">Kategorien:</span> {Object.entries(item.categories).map(([k,v]) => `${k}: ${v}`).join(', ')}</div>
+                        )}
+                        {item.priority && (
+                          <div><span className="font-medium">Priorität:</span> 
+                            <Badge variant={item.priority === 'high' ? 'destructive' : 'secondary'} className="ml-2">
+                              {item.priority}
+                            </Badge>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Vollständiger Inhalt */}
+                    {(item.content || item.summary) && (
+                      <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <h4 className="font-semibold mb-2">Vollständiger Inhalt</h4>
+                        <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap max-h-40 overflow-y-auto">
+                          {item.content || item.summary}
+                        </p>
+                      </div>
                     )}
+
+                    {/* Aktionen */}
+                    <div className="flex justify-between items-center pt-4 border-t">
+                      <div className="flex space-x-2">
+                        {item.document_url && (
+                          <Button variant="outline" size="sm" asChild>
+                            <a href={item.document_url} target="_blank" rel="noopener noreferrer" className="flex items-center">
+                              <ExternalLink className="h-4 w-4 mr-1" />
+                              Original
+                            </a>
+                          </Button>
+                        )}
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => window.open(`/api/historical/document/${item.id}/pdf`, '_blank')}
+                        >
+                          <Download className="h-4 w-4 mr-1" />
+                          PDF
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => window.open(`/api/historical/document/${item.id}/view`, '_blank')}
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          Vollansicht
+                        </Button>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => {
+                          navigator.clipboard.writeText(JSON.stringify(item, null, 2));
+                          alert('Alle Daten in Zwischenablage kopiert!');
+                        }}
+                      >
+                        Alle Daten kopieren
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
