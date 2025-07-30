@@ -365,8 +365,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`[API] Returning ${cases.length} legal cases`);
       res.json(cases);
     } catch (error) {
-      console.error("[API] Error in legal-cases endpoint:", error);
-      res.status(500).json({ message: "Failed to fetch legal cases", error: error.message });
+      console.error("[API] Error in legal-cases endpoint:", String(error));
+      res.status(500).json({ message: "Failed to fetch legal cases", error: String(error) });
     }
   });
 

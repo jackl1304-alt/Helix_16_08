@@ -101,6 +101,7 @@ interface GlobalDataSources {
 
 class DataCollectionService {
   private readonly FDA_BASE_URL = "https://api.fda.gov/device";
+  private readonly FDA_510K_URL = "https://api.fda.gov/device/510k.json";
   private readonly EMA_MEDICINES_URL = "https://www.ema.europa.eu/en/medicines/download-medicine-data";
   
   // Globale Datenquellen-URLs
@@ -533,7 +534,7 @@ class DataCollectionService {
   private async getFDASourceId(): Promise<string> {
     let source = await storage.getDataSourceByType('fda');
     if (!source) {
-      source = await storage.createDataSource({
+      const newSource = await storage.createDataSource({
         name: 'FDA OpenFDA',
         type: 'fda',
         region: 'US',
@@ -542,6 +543,7 @@ class DataCollectionService {
         isActive: true,
         metadata: { baseUrl: this.FDA_BASE_URL }
       });
+      return newSource.id;
     }
     return source.id;
   }
@@ -549,7 +551,7 @@ class DataCollectionService {
   private async getEMASourceId(): Promise<string> {
     let source = await storage.getDataSourceByType('ema');
     if (!source) {
-      source = await storage.createDataSource({
+      const newSource = await storage.createDataSource({
         name: 'EMA Database',
         type: 'ema',
         region: 'EU',
@@ -558,6 +560,7 @@ class DataCollectionService {
         isActive: true,
         metadata: { baseUrl: this.EMA_MEDICINES_URL }
       });
+      return newSource.id;
     }
     return source.id;
   }
@@ -632,7 +635,7 @@ class DataCollectionService {
             source_url: `/regulatory-updates/${item.k_number}`,
             region: 'US',
             update_type: 'approval',
-            priority: this.determinePriority(item.device_class),
+            priority: 2, // medium priority
             device_classes: item.device_class ? [item.device_class] : [],
             categories: {
               device_class: item.device_class,
@@ -682,7 +685,7 @@ class DataCollectionService {
             source_url: `https://www.ema.europa.eu/en/medicines/update-${i}`,
             region: 'EU',
             update_type: 'approval',
-            priority: 'medium',
+            priority: 2, // medium priority
             device_classes: ['medical-device'],
             categories: { type: 'ema-authorization' },
             published_at: new Date().toISOString(),

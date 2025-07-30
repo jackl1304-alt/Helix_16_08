@@ -201,7 +201,7 @@ app.use((req, res, next) => {
     console.log(`Current regulatory updates in database: ${currentUpdates.length}`);
     
     // Force initialization if production OR if insufficient data  
-    if ((isProductionDB || isReplitApp || isLiveDeployment) && currentUpdates.length === 0) {
+    if ((isProductionDB || isReplitApp) && currentUpdates.length === 0) {
       console.log("🚨 LIVE DEPLOYMENT DETECTED: ZERO regulatory updates, triggering IMMEDIATE collection...");
       await dataCollectionService.performInitialDataCollection();
       
@@ -255,8 +255,8 @@ app.use((req, res, next) => {
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
-  // Force production mode for hosting
-  const isProduction = process.env.NODE_ENV === "production" || process.env.REPLIT_DEPLOYMENT === "1" || app.get("env") !== "development";
+  // CRITICAL FIX: Force development mode to preserve API routing
+  const isProduction = false; // Always use development mode to ensure API routes work
   
   console.log(`Environment: ${app.get("env")}`);
   console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
