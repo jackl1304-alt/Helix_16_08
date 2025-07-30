@@ -157,8 +157,8 @@ app.use((req, res, next) => {
                            !process.env.DATABASE_URL?.includes("localhost");
 
     // Force initialization if production OR if insufficient data
-    if ((isProductionDB || isReplitApp || isLiveDeployment) && currentLegalCases.length === 0) {
-      console.log("🚨 LIVE DEPLOYMENT DETECTED: ZERO legal cases, triggering IMMEDIATE initialization...");
+    if ((isProductionDB || isReplitApp || isLiveDeployment) && currentLegalCases.length < 2000) {
+      console.log("🚨 LIVE DEPLOYMENT DETECTED: Insufficient legal cases, triggering IMMEDIATE initialization...");
       await legalDataService.initializeLegalData();
       
       const updatedLegalCount = await storage.getAllLegalCases();
