@@ -179,49 +179,56 @@ export default function LegalCases() {
     }
   ];
 
-  // Fetch legal cases - DIRECT API call
+  // Fetch enhanced legal cases with Gerichtsentscheidungen
   const { data: legalData = [], isLoading: isLoadingData, error: legalDataError } = useQuery({
-    queryKey: ['/api/legal-cases'],
+    queryKey: ['/api/legal-cases/enhanced', selectedSource],
     queryFn: async (): Promise<LegalDataRecord[]> => {
-      console.log("FETCHING Legal Cases from /api/legal-cases...");
+      console.log("FETCHING Enhanced Legal Cases with Gerichtsentscheidungen...");
       try {
-        const response = await fetch('/api/legal-cases');
-        console.log("Legal Cases API Response Status:", response.status);
+        const endpoint = selectedSource ? `/api/legal-cases/enhanced/${selectedSource}` : '/api/legal-cases/enhanced/german_court';
+        const response = await fetch(endpoint);
+        console.log("Enhanced Legal Cases API Response Status:", response.status);
         
         if (!response.ok) {
-          console.error("Legal Cases API Error:", response.status, response.statusText);
+          console.error("Enhanced Legal Cases API Error:", response.status, response.statusText);
           throw new Error(`API Error: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log("LEGAL CASES LOADED:", data.length);
+        console.log("ENHANCED LEGAL CASES LOADED with Gerichtsentscheidungen:", data.length);
         
         if (!Array.isArray(data)) {
-          console.error("Legal Cases API returned non-array:", typeof data);
+          console.error("Enhanced Legal Cases API returned non-array:", typeof data);
           return [];
         }
         
-        // Transform data to expected format
+        // Transform enhanced data with Gerichtsentscheidungen
         return data.map((item: any): LegalDataRecord => ({
           id: item.id,
-          title: item.title || `Legal Case ${item.id}`,
-          caseNumber: item.caseNumber || item.id,
-          court: item.court || 'Court',
-          jurisdiction: item.jurisdiction || 'International',
-          dateDecided: item.decisionDate || new Date().toISOString().split('T')[0],
-          summary: item.summary || 'Legal case summary',
-          fullText: item.content || item.summary || 'Legal case content',
-          outcome: 'Final Decision',
-          significance: item.impactLevel || 'medium',
-          deviceType: 'medical device',
-          legalIssues: item.keywords || [],
-          documentUrl: item.documentUrl || '#',
-          citations: [],
-          tags: item.keywords || [],
-          language: 'de'
+          title: item.title || `Gerichtsentscheidung ${item.id}`,
+          caseNumber: item.caseNumber || item.case_number || item.id,
+          court: item.court || 'Gericht',
+          jurisdiction: item.jurisdiction || 'Deutschland',
+          dateDecided: item.decisionDate || item.decision_date || new Date().toISOString().split('T')[0],
+          summary: item.summary || 'Zusammenfassung der Gerichtsentscheidung',
+          fullText: item.content || item.verdict || item.summary || 'Vollständiger Urteilstext',
+          outcome: item.verdict || 'Gerichtsentscheidung',
+          significance: item.impactLevel || item.impact_level || 'medium',
+          deviceType: item.deviceType || 'Medizinprodukt',
+          legalIssues: item.keywords || item.legal_issues || [],
+          documentUrl: item.documentUrl || item.document_url || '#',
+          citations: item.citations || [],
+          tags: item.keywords || item.tags || [],
+          language: 'de',
+          // Enhanced fields for Gerichtsentscheidungen
+          verdict: item.verdict,
+          damages: item.damages,
+          plaintiff: item.plaintiff,
+          defendant: item.defendant,
+          legalBasis: item.legalBasis || item.legal_basis
         }));
       } catch (error) {
-        console.error("LEGAL CASES API FAILED:", error);
+        console.error("ENHANCED LEGAL CASES API FAILED:", error);
         throw error;
       }
     },
