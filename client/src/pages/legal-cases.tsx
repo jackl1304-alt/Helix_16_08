@@ -178,48 +178,48 @@ export default function LegalCases() {
   ];
 
   // Fetch legal cases - DIRECT API call
-  const { data: legalData = [], isLoading: isLoadingData, error: legalDataError } = useQuery<LegalDataRecord[]>({
+  const { data: legalData = [], isLoading: isLoadingData, error: legalDataError } = useQuery({
     queryKey: ['/api/legal-cases'],
-    queryFn: async () => {
-      console.log("🔍 FETCHING Legal Cases from /api/legal-cases...");
+    queryFn: async (): Promise<LegalDataRecord[]> => {
+      console.log("FETCHING Legal Cases from /api/legal-cases...");
       try {
         const response = await fetch('/api/legal-cases');
-        console.log("📡 Legal Cases API Response Status:", response.status);
+        console.log("Legal Cases API Response Status:", response.status);
         
         if (!response.ok) {
-          console.error("❌ Legal Cases API Error:", response.status, response.statusText);
+          console.error("Legal Cases API Error:", response.status, response.statusText);
           throw new Error(`API Error: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log("📊 LEGAL CASES LOADED:", data.length);
+        console.log("LEGAL CASES LOADED:", data.length);
         
         if (!Array.isArray(data)) {
-          console.error("❌ Legal Cases API returned non-array:", typeof data);
+          console.error("Legal Cases API returned non-array:", typeof data);
           return [];
         }
         
         // Transform data to expected format
-        return data.map((item: any) => ({
+        return data.map((item: any): LegalDataRecord => ({
           id: item.id,
-          documentTitle: item.caseTitle || item.title || `Legal Case ${item.id}`,
-          title: item.caseTitle || item.title || `Legal Case ${item.id}`,
-          documentId: item.caseNumber || item.id,
-          summary: item.summary || 'Legal case summary',
-          content: item.summary || 'Legal case content',
-          category: 'Legal Case',
-          region: item.jurisdiction || 'International',
-          originalDate: item.decisionDate || new Date().toISOString().split('T')[0],
-          status: 'Final Decision',
-          deviceClasses: item.deviceTypes || ['medical device'],
-          sourceId: item.jurisdiction || 'legal',
-          language: 'de',
-          documentUrl: item.documentUrl || '#',
+          title: item.title || `Legal Case ${item.id}`,
           caseNumber: item.caseNumber || item.id,
-          court: item.court || 'Court'
+          court: item.court || 'Court',
+          jurisdiction: item.jurisdiction || 'International',
+          dateDecided: item.decisionDate || new Date().toISOString().split('T')[0],
+          summary: item.summary || 'Legal case summary',
+          fullText: item.content || item.summary || 'Legal case content',
+          outcome: 'Final Decision',
+          significance: item.impactLevel || 'medium',
+          deviceType: 'medical device',
+          legalIssues: item.keywords || [],
+          documentUrl: item.documentUrl || '#',
+          citations: [],
+          tags: item.keywords || [],
+          language: 'de'
         }));
       } catch (error) {
-        console.error("❌ LEGAL CASES API FAILED:", error);
+        console.error("LEGAL CASES API FAILED:", error);
         throw error;
       }
     },
@@ -247,10 +247,10 @@ export default function LegalCases() {
     
     const searchLower = searchTerm.toLowerCase();
     return (
-      record.documentTitle.toLowerCase().includes(searchLower) ||
-      record.documentId.toLowerCase().includes(searchLower) ||
-      record.category.toLowerCase().includes(searchLower) ||
-      record.content.toLowerCase().includes(searchLower)
+      record.title.toLowerCase().includes(searchLower) ||
+      record.caseNumber.toLowerCase().includes(searchLower) ||
+      'legal case'.toLowerCase().includes(searchLower) ||
+      (record.fullText || record.summary).toLowerCase().includes(searchLower)
     );
   });
 
