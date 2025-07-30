@@ -14,10 +14,10 @@ import { ChangeComparison } from "@/components/change-comparison";
 import { DocumentViewer, DocumentLink } from "@/components/document-viewer";
 import { useDevice } from "@/hooks/use-device";
 import { ResponsiveGrid } from "@/components/responsive-layout";
-// Remove non-existent imports from shared schema
 import { cn } from "@/lib/utils";
 import LegalRelationshipViewer from "@/components/legal-relationship-viewer";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { EnhancedLegalCard } from "@/components/enhanced-legal-card";
 
 // Define types
 interface ChangeDetection {
@@ -30,21 +30,35 @@ interface ChangeDetection {
 
 interface LegalDataRecord {
   id: string;
-  documentTitle?: string;
-  title?: string;
-  documentId: string;
-  summary?: string;
-  content?: string;
-  category: string;
-  region: string;
-  originalDate: string;
-  status: string;
-  deviceClasses: string[];
-  sourceId: string;
-  language?: string;
-  documentUrl?: string;
-  caseNumber?: string;
-  court?: string;
+  title: string;
+  caseNumber: string;
+  court: string;
+  jurisdiction: string;
+  dateDecided: string;
+  summary: string;
+  fullText?: string;
+  outcome: string;
+  significance: string;
+  deviceType: string;
+  legalIssues: string[];
+  documentUrl: string;
+  citations: string[];
+  tags: string[];
+  language: string;
+  metadata?: {
+    sourceDatabase: string;
+    sourceUrl: string;
+    originalLanguage: string;
+    translationAvailable: boolean;
+    judgeNames: string[];
+    legalPrecedent: string;
+    relatedCases: string[];
+    accessLevel: string;
+    citationFormat: string;
+    digitalArchiveId: string;
+    complianceTopics: string[];
+    lastVerified: string;
+  };
 }
 
 interface LegalReport {
@@ -66,26 +80,26 @@ export default function LegalCases() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Manual sync mutation for Live deployment
+  // Enhanced Legal Database Sync
   const syncMutation = useMutation({
     mutationFn: async () => {
-      console.log("🔄 MANUAL SYNC: Triggering force synchronization...");
-      const response = await fetch('/api/admin/force-sync', {
+      console.log("🔄 ENHANCED LEGAL SYNC: Triggering comprehensive legal database generation...");
+      const response = await fetch('/api/admin/force-legal-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
       
       if (!response.ok) {
-        throw new Error(`Sync failed: ${response.status}`);
+        throw new Error(`Enhanced sync failed: ${response.status}`);
       }
       
       return response.json();
     },
     onSuccess: (data) => {
-      console.log("✅ SYNC SUCCESS:", data);
+      console.log("✅ ENHANCED SYNC SUCCESS:", data);
       toast({
-        title: "Synchronisation erfolgreich",
-        description: `${data.data.legalCases} Legal Cases und ${data.data.regulatoryUpdates} Updates geladen`,
+        title: "Enhanced Legal Database Created",
+        description: `${data.data?.legalCases || 0} comprehensive legal cases with detailed sources generated.`,
       });
       
       // Force refresh all legal data queries
@@ -93,12 +107,9 @@ export default function LegalCases() {
       queryClient.invalidateQueries({ queryKey: ['/api/legal/data'] });
       queryClient.invalidateQueries({ queryKey: ['/api/legal-cases'] });
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
-      
-      // Force reload to ensure fresh data from server
-      window.location.reload();
     },
     onError: (error) => {
-      console.error("❌ SYNC ERROR:", error);
+      console.error("❌ ENHANCED SYNC ERROR:", error);
       toast({
         title: "Synchronisation fehlgeschlagen",
         description: error instanceof Error ? error.message : "Unbekannter Fehler",
@@ -533,9 +544,40 @@ export default function LegalCases() {
               {isLoadingData ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                  <span className="ml-2">Lade Rechtssprechungsdaten...</span>
+                  <span className="ml-2">Lade Rechtsfälle...</span>
                 </div>
-              ) : legalDataError ? (
+              ) : filteredData.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">Keine Rechtsfälle gefunden.</p>
+                  <Button 
+                    onClick={() => syncMutation.mutate()}
+                    disabled={syncMutation.isPending}
+                    className="mt-4"
+                  >
+                    {syncMutation.isPending ? "Synchronisiere..." : "Rechtsfälle laden"}
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredData.map((legalCase) => (
+                    <EnhancedLegalCard key={legalCase.id} case={legalCase} />
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="analysis">
+          <Card>
+            <CardHeader>
+              <CardTitle>Rechtssprechungsanalyse</CardTitle>
+              <CardDescription>
+                Tiefgehende Analyse der Rechtsentwicklungen
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {legalDataError ? (
                 <div className="flex flex-col items-center justify-center py-8 text-red-600 space-y-3">
                   <AlertTriangle className="h-8 w-8" />
                   <div className="text-center">
