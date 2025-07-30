@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-// import { DatePicker } from "@/components/ui/date-picker";
+
 import { 
   FileText, 
   Search, 
@@ -47,6 +47,7 @@ interface AuditLog {
   }[];
 }
 
+// Remove mock data and use API data instead
 const mockAuditLogs: AuditLog[] = [
   {
     id: "1",

@@ -47,32 +47,10 @@ export default function HistoricalData() {
     }
   ];
 
-  const fallbackChanges = [
-    {
-      id: "change-001",
-      document_id: "hist-001",
-      change_type: "content_update",
-      description: "Section 4.2 updated with new clinical evaluation requirements",
-      detected_at: "2025-01-15T08:30:00Z"
-    }
-  ];
 
-  const fallbackReport = {
-    source_id: selectedSource,
-    totalDocuments: 1609,
-    total_documents: 1609,
-    changesDetected: 3,
-    recent_changes: 3,
-    highImpactChanges: 1,
-    timeRange: { start: "2024-01-01", end: "2025-01-28" },
-    languageDistribution: { "DE": 850, "EN": 589, "FR": 170 },
-    categoryBreakdown: { "Guidance": 1200, "Regulation": 409 },
-    recentActivity: [],
-    last_updated: "2025-01-16T07:00:00Z"
-  };
 
   // Historical data query
-  const { data: historicalData = fallbackHistoricalData, isLoading: isLoadingData } = useQuery<any[]>({
+  const { data: historicalData = fallbackHistoricalData, isLoading: isLoadingData } = useQuery({
     queryKey: ['/api/historical/data', selectedSource, dateRange.start, dateRange.end],
     queryFn: async () => {
       try {
@@ -97,25 +75,25 @@ export default function HistoricalData() {
   });
 
   // Changes query
-  const { data: changes = fallbackChanges, isLoading: isLoadingChanges } = useQuery<any[]>({
+  const { data: changes = [], isLoading: isLoadingChanges } = useQuery({
     queryKey: ['/api/historical/changes'],
     queryFn: async () => {
       try {
         const response = await fetch('/api/historical/changes?limit=50');
         if (!response.ok) {
-          return fallbackChanges;
+          return [];
         }
         const data = await response.json();
-        return Array.isArray(data) ? data : fallbackChanges;
+        return Array.isArray(data) ? data : [];
       } catch (error) {
         console.error("Changes data error:", error);
-        return fallbackChanges;
+        return [];
       }
     }
   });
 
   // Historical report query
-  const { data: report = fallbackReport, isLoading: isLoadingReport } = useQuery<any>({
+  const { data: report, isLoading: isLoadingReport } = useQuery({
     queryKey: ['/api/historical/report', selectedSource],
     queryFn: async () => {
       try {
