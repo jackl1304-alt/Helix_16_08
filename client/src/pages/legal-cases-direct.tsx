@@ -33,6 +33,7 @@ interface ApiLegalCase {
 
 export default function LegalCasesDirect() {
   const [legalCases, setLegalCases] = useState<ApiLegalCase[]>([]);
+  const [forceUpdate, setForceUpdate] = useState(0);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -78,9 +79,15 @@ export default function LegalCasesDirect() {
       
       if (Array.isArray(data)) {
         console.log("📊 First Legal Case:", data[0]);
-        setLegalCases(data);
+        console.log("🔄 Setting state with", data.length, "legal cases...");
+        
+        // IMMEDIATE STATE UPDATE - NO TIMEOUT
+        setLegalCases([...data]); // Force new array reference
         setLastSync(new Date().toLocaleTimeString('de-DE'));
         setError(null);
+        setForceUpdate(prev => prev + 1); // Force re-render
+        console.log(`✅ STATE UPDATED: ${data.length} Legal Cases set in state`);
+        
         console.log(`✅ SUCCESS: ${data.length} Legal Cases loaded successfully`);
       } else {
         console.warn("⚠️ Data is not an array:", typeof data);
@@ -130,10 +137,16 @@ export default function LegalCasesDirect() {
     }
   };
 
-  // Initial load
+  // Initial load with debug
   useEffect(() => {
+    console.log("🔄 useEffect: Component mounted, fetching legal cases...");
     fetchLegalCases();
   }, []);
+
+  // Debug effect to monitor state changes
+  useEffect(() => {
+    console.log(`🔍 State changed - legalCases.length: ${legalCases.length}, forceUpdate: ${forceUpdate}`);
+  }, [legalCases, forceUpdate]);
 
   // EINFACHE SUCHE
   const filteredCases = legalCases.filter(item => {
@@ -179,7 +192,7 @@ export default function LegalCasesDirect() {
             <strong>API Status:</strong> {loading ? "Loading..." : "✅ Loaded"}
           </div>
           <div>
-            <strong>Total Cases:</strong> {legalCases.length}
+            <strong>Total Cases:</strong> {legalCases.length} ({typeof legalCases}) [Update #{forceUpdate}]
           </div>
           <div>
             <strong>Filtered Cases:</strong> {filteredCases.length}
@@ -194,14 +207,20 @@ export default function LegalCasesDirect() {
             <strong>Error:</strong> {error || "None"}
           </div>
         </div>
-        {legalCases.length > 0 && (
-          <div className="mt-4 p-2 bg-white rounded text-xs">
-            <strong>Sample Data:</strong><br/>
-            ID: {legalCases[0]?.id}<br/>
-            Title: {legalCases[0]?.title?.substring(0, 50)}...<br/>
-            Jurisdiction: {legalCases[0]?.jurisdiction}
-          </div>
-        )}
+        <div className="mt-4 p-2 bg-white rounded text-xs">
+          <strong>State Debug:</strong><br/>
+          Array Length: {legalCases.length}<br/>
+          Array Type: {typeof legalCases}<br/>
+          Is Array: {Array.isArray(legalCases) ? 'Yes' : 'No'}<br/>
+          {legalCases.length > 0 && (
+            <>
+              <strong>Sample Data:</strong><br/>
+              ID: {legalCases[0]?.id}<br/>
+              Title: {legalCases[0]?.title?.substring(0, 50)}...<br/>
+              Jurisdiction: {legalCases[0]?.jurisdiction}
+            </>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
