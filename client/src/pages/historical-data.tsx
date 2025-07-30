@@ -67,29 +67,36 @@ export default function HistoricalData() {
 
 
 
-  // Historical data query
-  const { data: historicalData = fallbackHistoricalData, isLoading: isLoadingData } = useQuery({
-    queryKey: ['/api/historical/data', selectedSource, dateRange.start, dateRange.end],
+  // Historical data query - SIMPLIFIED AND FIXED
+  const { data: historicalData = [], isLoading: isLoadingData } = useQuery({
+    queryKey: ['/api/historical/data'],
     queryFn: async () => {
-      try {
-        const params = new URLSearchParams();
-        if (selectedSource) params.append('sourceId', selectedSource);
-        if (dateRange.start) params.append('startDate', dateRange.start);
-        if (dateRange.end) params.append('endDate', dateRange.end);
-        params.append('limit', '100');
+      console.log("FETCHING Historical Data...");
+      try {        
+        const response = await fetch(`/api/historical/data?limit=100`);
+        console.log("Historical Data API Response Status:", response.status);
         
-        const response = await fetch(`/api/historical/data?${params}`);
         if (!response.ok) {
+          console.error("Historical Data API Error:", response.status, response.statusText);
           return fallbackHistoricalData;
         }
+        
         const data = await response.json();
-        return Array.isArray(data) ? data : fallbackHistoricalData;
+        console.log("HISTORICAL DATA LOADED:", data.length);
+        
+        if (!Array.isArray(data)) {
+          console.error("Historical Data API returned non-array:", typeof data);
+          return fallbackHistoricalData;
+        }
+        
+        return data.length > 0 ? data : fallbackHistoricalData;
       } catch (error) {
-        console.error("Historical data error:", error);
+        console.error("Historical data fetch failed:", error);
         return fallbackHistoricalData;
       }
     },
-    enabled: !!selectedSource
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 3,
   });
 
   // Changes query
@@ -725,7 +732,7 @@ export default function HistoricalData() {
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-wrap gap-1">
-                            {doc.deviceClasses.map(cls => (
+                            {doc.deviceClasses.map((cls: string) => (
                               <Badge key={cls} variant="outline" className="text-xs">
                                 {cls}
                               </Badge>
@@ -903,13 +910,13 @@ export default function HistoricalData() {
                       {report.recentActivity.slice(0, 5).map((activity: ChangeDetection, index: number) => (
                         <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                           <div>
-                            <p className="font-medium">{activity.documentId}</p>
+                            <p className="font-medium">{activity.document_id}</p>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                              {activity.changesSummary.join(', ')}
+                              {activity.description}
                             </p>
                           </div>
-                          <Badge className={getImpactColor(activity.impactAssessment)}>
-                            {activity.impactAssessment}
+                          <Badge className={getImpactColor(activity.change_type)}>
+                            {activity.change_type}
                           </Badge>
                         </div>
                       ))}
