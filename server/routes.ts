@@ -722,6 +722,169 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Historical Document PDF Download
+  app.get("/api/historical/document/:id/pdf", async (req, res) => {
+    try {
+      const documentId = req.params.id;
+      console.log(`[API] PDF-Download für historisches Dokument: ${documentId}`);
+      
+      // Hole Dokument-Details
+      const historicalData = await storage.getHistoricalDataSources();
+      const document = historicalData.find(doc => doc.id === documentId);
+      
+      if (!document) {
+        return res.status(404).json({ error: 'Dokument nicht gefunden' });
+      }
+
+      // Erzeuge PDF-Inhalt
+      const pdfContent = `
+HISTORISCHES DOKUMENT - VOLLSTÄNDIGE DATENANSICHT
+===============================================
+
+Titel: ${document.title || 'Unbekannt'}
+Dokument-ID: ${document.id}
+Quelle: ${document.source_id}
+Typ: ${document.source_type || 'Unbekannt'}
+
+DATUM & ARCHIVIERUNG:
+Veröffentlicht: ${document.published_at ? new Date(document.published_at).toLocaleDateString('de-DE') : 'Unbekannt'}
+Archiviert: ${document.archived_at ? new Date(document.archived_at).toLocaleDateString('de-DE') : 'Unbekannt'}
+
+INHALT:
+${document.description || document.summary || 'Keine Beschreibung verfügbar'}
+
+${document.content ? `
+VOLLSTÄNDIGER INHALT:
+${document.content}
+` : ''}
+
+TECHNISCHE DETAILS:
+${document.deviceClasses && document.deviceClasses.length > 0 ? `Geräteklassen: ${document.deviceClasses.join(', ')}` : ''}
+${document.priority ? `Priorität: ${document.priority}` : ''}
+${document.region ? `Region: ${document.region}` : ''}
+${document.category ? `Kategorie: ${document.category}` : ''}
+
+METADATEN:
+${document.categories ? `Kategorien: ${JSON.stringify(document.categories, null, 2)}` : ''}
+
+QUELLE & VERLINKUNG:
+${document.document_url ? `Original-URL: ${document.document_url}` : ''}
+
+---
+Generiert von Helix Regulatory Intelligence Platform
+Datum: ${new Date().toLocaleDateString('de-DE')}
+Status: Archiviertes historisches Dokument
+`;
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="historisches-dokument-${documentId}.pdf"`);
+      
+      // Simuliere PDF-Binary (für Demo - in Produktion würde echtes PDF generiert)
+      const pdfHeader = Buffer.from('%PDF-1.4\n');
+      const pdfBody = Buffer.from(pdfContent, 'utf-8');
+      const fullPdf = Buffer.concat([pdfHeader, pdfBody]);
+      
+      res.send(fullPdf);
+    } catch (error) {
+      console.error('[API] Fehler beim PDF-Download:', error);
+      res.status(500).json({ error: 'PDF-Generierung fehlgeschlagen' });
+    }
+  });
+
+  // Historical Document Full View
+  app.get("/api/historical/document/:id/view", async (req, res) => {
+    try {
+      const documentId = req.params.id;
+      console.log(`[API] Vollansicht für historisches Dokument: ${documentId}`);
+      
+      const historicalData = await storage.getHistoricalDataSources();
+      const document = historicalData.find(doc => doc.id === documentId);
+      
+      if (!document) {
+        return res.status(404).send('<h1>Dokument nicht gefunden</h1>');
+      }
+
+      // HTML-Vollansicht generieren
+      const htmlContent = `
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historisches Dokument - ${document.title}</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .header { border-bottom: 2px solid #333; margin-bottom: 20px; padding-bottom: 10px; }
+        .section { margin: 20px 0; }
+        .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        .meta-item { background: #f5f5f5; padding: 10px; border-radius: 5px; }
+        .content { background: #f9f9f9; padding: 15px; border-radius: 5px; white-space: pre-wrap; }
+        .actions { text-align: center; margin: 30px 0; }
+        .btn { background: #007cba; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 0 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>${document.title || 'Historisches Dokument'}</h1>
+        <p><strong>Dokument-ID:</strong> ${document.id} | <strong>Typ:</strong> ${document.source_type || 'Unbekannt'}</p>
+    </div>
+
+    <div class="meta-grid">
+        <div class="meta-item">
+            <h3>Datum & Archivierung</h3>
+            <p><strong>Veröffentlicht:</strong> ${document.published_at ? new Date(document.published_at).toLocaleDateString('de-DE') : 'Unbekannt'}</p>
+            <p><strong>Archiviert:</strong> ${document.archived_at ? new Date(document.archived_at).toLocaleDateString('de-DE') : 'Unbekannt'}</p>
+        </div>
+        
+        <div class="meta-item">
+            <h3>Quelle & Klassifikation</h3>
+            <p><strong>Quelle-ID:</strong> ${document.source_id}</p>
+            ${document.region ? `<p><strong>Region:</strong> ${document.region}</p>` : ''}
+            ${document.priority ? `<p><strong>Priorität:</strong> ${document.priority}</p>` : ''}
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Beschreibung</h3>
+        <div class="content">${document.description || document.summary || 'Keine Beschreibung verfügbar'}</div>
+    </div>
+
+    ${document.content ? `
+    <div class="section">
+        <h3>Vollständiger Inhalt</h3>
+        <div class="content">${document.content}</div>
+    </div>
+    ` : ''}
+
+    ${document.deviceClasses && document.deviceClasses.length > 0 ? `
+    <div class="section">
+        <h3>Geräteklassen</h3>
+        <p>${document.deviceClasses.join(', ')}</p>
+    </div>
+    ` : ''}
+
+    <div class="actions">
+        <a href="/api/historical/document/${document.id}/pdf" class="btn" target="_blank">PDF herunterladen</a>
+        ${document.document_url ? `<a href="${document.document_url}" class="btn" target="_blank">Original anzeigen</a>` : ''}
+        <a href="javascript:window.close()" class="btn">Schließen</a>
+    </div>
+
+    <div class="section">
+        <h3>Vollständige Metadaten (JSON)</h3>
+        <div class="content">${JSON.stringify(document, null, 2)}</div>
+    </div>
+</body>
+</html>
+      `;
+
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.send(htmlContent);
+    } catch (error) {
+      console.error('[API] Fehler bei Vollansicht:', error);
+      res.status(500).send('<h1>Fehler beim Laden der Vollansicht</h1>');
+    }
+  });
+
   app.get("/api/historical/changes", async (req, res) => {
     try {
       const changes = [
