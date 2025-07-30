@@ -156,8 +156,14 @@ app.use((req, res, next) => {
                            process.env.DATABASE_URL?.includes(".replit.app") ||
                            !process.env.DATABASE_URL?.includes("localhost");
 
-    // Force initialization if production OR if insufficient data
-    if ((isProductionDB || isReplitApp || isLiveDeployment) && currentLegalCases.length < 2000) {
+    // AGGRESSIVELY FORCE INITIALIZATION - ALWAYS initialize if 0 legal cases
+    if (currentLegalCases.length === 0) {
+      console.log("🚨 ZERO LEGAL CASES DETECTED: Triggering IMMEDIATE FORCE initialization...");
+      await legalDataService.initializeLegalData();
+      
+      const updatedLegalCount = await storage.getAllLegalCases();
+      console.log(`✅ ZERO CASE FIX: After forced initialization: ${updatedLegalCount.length} legal cases`);
+    } else if ((isProductionDB || isReplitApp || isLiveDeployment) && currentLegalCases.length < 2000) {
       console.log("🚨 LIVE DEPLOYMENT DETECTED: Insufficient legal cases, triggering IMMEDIATE initialization...");
       await legalDataService.initializeLegalData();
       
