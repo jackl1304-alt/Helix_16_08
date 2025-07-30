@@ -255,8 +255,8 @@ app.use((req, res, next) => {
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
-  // CRITICAL FIX: Force development mode to preserve API routing
-  const isProduction = false; // Always use development mode to ensure API routes work
+  // Test both modes: use actual environment detection
+  const isProduction = process.env.NODE_ENV === "production" || process.env.REPLIT_DEPLOYMENT === "1" || app.get("env") !== "development";
   
   console.log(`Environment: ${app.get("env")}`);
   console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -266,14 +266,27 @@ app.use((req, res, next) => {
     console.log("Setting up Vite development server");
     await setupVite(app, server);
   } else {
-    console.log("Setting up static file serving for production");
+    console.log("Setting up CUSTOM static file serving to preserve API routes");
     const distPath = path.resolve(import.meta.dirname, "public");
     console.log(`Static files path: ${distPath}`);
     console.log(`Static files exist: ${fs.existsSync(distPath)}`);
     if (fs.existsSync(distPath)) {
       console.log(`Static files content: ${fs.readdirSync(distPath)}`);
+      
+      // CRITICAL FIX: Serve static files WITHOUT overriding API routes
+      app.use(express.static(distPath));
+      
+      // ONLY fallback to index.html for NON-API routes
+      app.use((req, res, next) => {
+        if (req.path.startsWith('/api/')) {
+          return next(); // Let API routes handle themselves
+        }
+        // Fallback to SPA for all non-API routes
+        res.sendFile(path.resolve(distPath, "index.html"));
+      });
+    } else {
+      console.warn("Static files not found, serving API only");
     }
-    serveStatic(app);
   }
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
