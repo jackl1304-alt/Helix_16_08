@@ -58,6 +58,9 @@ Preferred communication style: German language - Simple, everyday language.
 - ✅ **PDF-GENERIERUNG KORRIGIERT**: Korrekte PDF-Formate mit application/pdf Headers
 - ✅ **DATENLIMITS ENTFERNT**: Vollständige Datenansicht mit 7764 Updates und 2025 Legal Cases
 - ✅ **ENHANCED LEGAL APIS**: Neue Endpunkte für Gerichtsentscheidungen mit Verdict & Damages Integration
+- ✅ **DATENBANK BEREINIGT**: 5.966 Duplikate aus Regulatory Updates entfernt (8.644 → 2.678)
+- ✅ **VOLLSTÄNDIGE ARCHIV-FUNKTIONEN**: Alle Dokumentdaten sichtbar mit PDF/HTML-Download
+- ✅ **DUPLIKATE-BEREINIGUNG**: Systematische Entfernung von Mehrfacheinträgen für korrekte Statistiken
 
 ## Key Components
 
