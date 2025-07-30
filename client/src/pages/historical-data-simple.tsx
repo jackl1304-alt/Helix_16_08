@@ -29,8 +29,8 @@ interface HistoricalDataRecord {
 export default function HistoricalData() {
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Simple historical data query
-  const { data: historicalData = [], isLoading, error } = useQuery({
+  // Simple historical data query with explicit typing
+  const { data: historicalData = [], isLoading, error } = useQuery<HistoricalDataRecord[]>({
     queryKey: ['/api/historical/data'],
     staleTime: 30000,
     gcTime: 60000,
