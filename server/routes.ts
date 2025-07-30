@@ -921,8 +921,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`Current counts: Legal=${currentLegal.length}, Updates=${currentUpdates.length}`);
       
-      // Force generate legal cases if count is low
-      if (currentLegal.length < 500) {
+      // CRITICAL: Force generate legal cases if count is low OR ZERO (for live deployment)
+      if (currentLegal.length < 2000) {
         console.log("🔄 FORCE GENERATING Legal Cases...");
         
         // Generate 2000+ comprehensive legal cases
