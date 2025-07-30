@@ -1045,36 +1045,120 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GUARANTEED PRODUCTION FIX - Final solution for live database
-  app.post('/api/admin/guaranteed-production-fix', async (req, res) => {
+  // PROFESSIONAL DATABASE MIGRATION SERVICE
+  app.post('/api/admin/professional-migration', async (req, res) => {
     try {
-      console.log("🔧 GUARANTEED PRODUCTION FIX: Starting final database repair...");
+      console.log("🚀 PROFESSIONAL MIGRATION: Starting database migration service...");
       
-      const { guaranteedProductionFix } = await import("./guaranteed-production-fix.js");
-      const result = await guaranteedProductionFix();
+      const { migrationService } = await import("./production-solutions/DatabaseMigrationService.js");
+      const result = await migrationService.migrateLegalCasesToProduction();
+      
+      const report = await migrationService.generateMigrationReport(result);
+      console.log("📊 Migration Report:\n", report);
       
       res.json({
         success: result.success,
         message: result.success ? 
-          `Guaranteed production fix completed - ${result.inserted} legal cases added` :
-          `Guaranteed production fix failed: ${result.error}`,
+          `Professional migration completed - ${result.migratedCount} legal cases migrated` :
+          `Professional migration failed`,
         data: {
-          before: result.before,
-          after: result.after,
-          inserted: result.inserted,
-          regulatoryUpdates: result.regulatoryUpdates,
-          timestamp: new Date().toISOString(),
-          fixType: "guaranteed_production_repair"
-        },
-        error: result.error || null
+          migratedCount: result.migratedCount,
+          duration: result.duration,
+          errors: result.errors,
+          timestamp: result.timestamp,
+          report: report
+        }
       });
       
     } catch (error) {
-      console.error("❌ Guaranteed production fix error:", error);
+      console.error("❌ Professional migration error:", error);
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
-        message: "Guaranteed production fix failed"
+        message: "Professional migration service failed"
+      });
+    }
+  });
+
+  // ENVIRONMENT SYNCHRONIZATION SERVICE
+  app.post('/api/admin/environment-sync', async (req, res) => {
+    try {
+      console.log("🔄 ENVIRONMENT SYNC: Starting synchronization service...");
+      
+      const { syncService } = await import("./production-solutions/EnvironmentSyncService.js");
+      const { mode = 'incremental' } = req.body;
+      
+      // Configure sync mode
+      syncService['config'].syncMode = mode;
+      
+      const result = await syncService.synchronizeEnvironments();
+      
+      res.json({
+        success: result.success,
+        message: result.success ? 
+          `Environment synchronization completed - ${result.synchronized} cases synchronized` :
+          `Environment synchronization failed`,
+        data: {
+          synchronized: result.synchronized,
+          skipped: result.skipped,
+          duration: result.duration,
+          errors: result.errors,
+          lastSyncTimestamp: result.lastSyncTimestamp,
+          mode: mode
+        }
+      });
+      
+    } catch (error) {
+      console.error("❌ Environment sync error:", error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+        message: "Environment synchronization service failed"
+      });
+    }
+  });
+
+  // PRODUCTION HEALTH CHECK
+  app.get('/api/admin/production-health', async (req, res) => {
+    try {
+      console.log("🏥 PRODUCTION HEALTH: Checking system status...");
+      
+      const { neon } = await import('@neondatabase/serverless');
+      const sql = neon(process.env.DATABASE_URL!);
+      
+      const [legalCasesResult, regulatoryUpdatesResult, dataSourcesResult] = await Promise.all([
+        sql`SELECT COUNT(*) as count FROM legal_cases`,
+        sql`SELECT COUNT(*) as count FROM regulatory_updates`,
+        sql`SELECT COUNT(*) as count FROM data_sources WHERE is_active = true`
+      ]);
+      
+      const health = {
+        legalCases: parseInt(legalCasesResult[0]?.count || '0'),
+        regulatoryUpdates: parseInt(regulatoryUpdatesResult[0]?.count || '0'),
+        activeDataSources: parseInt(dataSourcesResult[0]?.count || '0'),
+        status: 'healthy',
+        timestamp: new Date().toISOString()
+      };
+      
+      // Determine overall health status
+      if (health.legalCases === 0) {
+        health.status = 'degraded';
+      } else if (health.legalCases >= 2000 && health.regulatoryUpdates >= 5000) {
+        health.status = 'optimal';
+      }
+      
+      res.json({
+        success: true,
+        message: `Production health check completed - Status: ${health.status}`,
+        data: health
+      });
+      
+    } catch (error) {
+      console.error("❌ Production health check error:", error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+        message: "Production health check failed"
       });
     }
   });
