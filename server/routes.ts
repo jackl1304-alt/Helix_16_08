@@ -1045,7 +1045,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // DELETED - Duplicate route removed
+  // GUARANTEED PRODUCTION FIX - Final solution for live database
+  app.post('/api/admin/guaranteed-production-fix', async (req, res) => {
+    try {
+      console.log("🔧 GUARANTEED PRODUCTION FIX: Starting final database repair...");
+      
+      const { guaranteedProductionFix } = await import("./guaranteed-production-fix.js");
+      const result = await guaranteedProductionFix();
+      
+      res.json({
+        success: result.success,
+        message: result.success ? 
+          `Guaranteed production fix completed - ${result.inserted} legal cases added` :
+          `Guaranteed production fix failed: ${result.error}`,
+        data: {
+          before: result.before,
+          after: result.after,
+          inserted: result.inserted,
+          regulatoryUpdates: result.regulatoryUpdates,
+          timestamp: new Date().toISOString(),
+          fixType: "guaranteed_production_repair"
+        },
+        error: result.error || null
+      });
+      
+    } catch (error) {
+      console.error("❌ Guaranteed production fix error:", error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+        message: "Guaranteed production fix failed"
+      });
+    }
+  });
 
   // DATABASE SCHEMA DEBUG API
   app.get('/api/admin/debug-schema', async (req, res) => {
