@@ -50,15 +50,45 @@ export const getQueryFn: <T>(options: {
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      queryFn: getQueryFn({ on401: "throw" }),
+      // Use custom queryFn for better error handling
+      queryFn: async ({ queryKey }) => {
+        console.log(`[QUERY CLIENT] Fetching: ${queryKey.join("/")}`);
+        const response = await fetch(queryKey.join("/") as string, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          credentials: "include",
+        });
+
+        console.log(`[QUERY CLIENT] Response status: ${response.status} for ${queryKey.join("/")}`);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`[QUERY CLIENT] Error: ${response.status} - ${errorText}`);
+          throw new Error(`HTTP ${response.status}: ${errorText || response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log(`[QUERY CLIENT] Success: ${typeof data} data for ${queryKey.join("/")}`);
+        return data;
+      },
       refetchInterval: false,
       refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000, // 5 minutes instead of Infinity
-      retry: 3, // Enable retry for production stability
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      staleTime: 30000, // 30 seconds for live updates
+      retry: (failureCount, error) => {
+        console.log(`[QUERY CLIENT] Retry ${failureCount} for error:`, error);
+        return failureCount < 3;
+      },
+      retryDelay: (attemptIndex) => {
+        const delay = Math.min(1000 * 2 ** attemptIndex, 5000);
+        console.log(`[QUERY CLIENT] Retry delay: ${delay}ms`);
+        return delay;
+      },
     },
     mutations: {
-      retry: 2, // Enable retry for mutations
+      retry: 2,
     },
   },
 });

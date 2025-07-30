@@ -23,32 +23,9 @@ export default function HistoricalData() {
   // Simple historical data query
   const { data: historicalData = [], isLoading, error } = useQuery({
     queryKey: ['/api/historical/data'],
-    queryFn: async (): Promise<HistoricalDataRecord[]> => {
-      console.log("FETCHING Historical Data...");
-      try {        
-        const response = await fetch(`/api/historical/data?limit=100`);
-        console.log("Historical Data API Response Status:", response.status);
-        
-        if (!response.ok) {
-          throw new Error(`API Error: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log("HISTORICAL DATA LOADED:", data.length);
-        
-        if (!Array.isArray(data)) {
-          console.error("Historical Data API returned non-array:", typeof data);
-          return [];
-        }
-        
-        return data;
-      } catch (error) {
-        console.error("Historical data fetch failed:", error);
-        return [];
-      }
-    },
-    staleTime: 5 * 60 * 1000,
-    retry: 3,
+    staleTime: 30000,
+    gcTime: 60000,
+    refetchOnMount: true,
   });
 
   // Simple data display

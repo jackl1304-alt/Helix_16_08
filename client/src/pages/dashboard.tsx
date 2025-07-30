@@ -20,50 +20,22 @@ export default function Dashboard() {
   
   const { data: stats = {}, isLoading, error: statsError } = useQuery({
     queryKey: ['/api/dashboard/stats'],
-    queryFn: async () => {
-      console.log('[FRONTEND] Fetching dashboard stats...');
-      const response = await fetch('/api/dashboard/stats');
-      console.log('[FRONTEND] Dashboard stats response status:', response.status);
-      if (!response.ok) {
-        console.error('[FRONTEND] Dashboard stats failed:', response.status, response.statusText);
-        throw new Error(`Failed to fetch stats: ${response.status}`);
-      }
-      const data = await response.json();
-      console.log('[FRONTEND] Dashboard stats data:', data);
-      return data;
-    }
+    staleTime: 30000, // 30 seconds
+    gcTime: 60000, // 1 minute
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
   });
 
   const { data: recentUpdates, error: updatesError } = useQuery({
     queryKey: ['/api/regulatory-updates/recent'],
-    queryFn: async () => {
-      console.log('[FRONTEND] Fetching recent updates...');
-      const response = await fetch('/api/regulatory-updates/recent?limit=5');
-      console.log('[FRONTEND] Recent updates response status:', response.status);
-      if (!response.ok) {
-        console.error('[FRONTEND] Recent updates failed:', response.status, response.statusText);
-        throw new Error(`Failed to fetch updates: ${response.status}`);
-      }
-      const data = await response.json();
-      console.log('[FRONTEND] Recent updates data length:', data?.length || 0);
-      return data;
-    }
+    staleTime: 30000,
+    gcTime: 60000,
   });
 
   const { data: pendingApprovals, error: approvalsError } = useQuery({
     queryKey: ['/api/approvals/pending'],
-    queryFn: async () => {
-      console.log('[FRONTEND] Fetching pending approvals...');
-      const response = await fetch('/api/approvals/pending');
-      console.log('[FRONTEND] Approvals response status:', response.status);
-      if (!response.ok) {
-        console.error('[FRONTEND] Approvals failed:', response.status, response.statusText);
-        throw new Error(`Failed to fetch approvals: ${response.status}`);
-      }
-      const data = await response.json();
-      console.log('[FRONTEND] Approvals data length:', data?.length || 0);
-      return data;
-    }
+    staleTime: 30000,
+    gcTime: 60000,
   });
 
   // Quick Action Handlers
