@@ -330,10 +330,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Legal cases routes
+  // Legal cases routes - EXPLICIT JSON RESPONSE
   app.get("/api/legal-cases", async (req, res) => {
     try {
       console.log("[API] Legal cases endpoint called");
+      
+      // FORCE JSON headers explicitly
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Cache-Control', 'no-cache');
+      
       let cases = await storage.getAllLegalCases();
       console.log(`[API] Fetched ${cases.length} legal cases from database`);
       
