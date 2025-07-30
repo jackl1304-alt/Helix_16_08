@@ -333,7 +333,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Legal cases routes
   app.get("/api/legal-cases", async (req, res) => {
     try {
-      const cases = await storage.getAllLegalCases();
+      let cases = await storage.getAllLegalCases();
+      console.log(`Fetched ${cases.length} legal cases from database`);
+      
+      // EMERGENCY FIX: If 0 legal cases, try to initialize immediately
+      if (cases.length === 0) {
+        console.log("🚨 ZERO LEGAL CASES: Triggering emergency fix...");
+        
+        const { emergencyLiveFix } = await import("./emergency-live-fix.js");
+        const wasFixed = await emergencyLiveFix();
+        
+        if (wasFixed) {
+          // Re-fetch after fix
+          cases = await storage.getAllLegalCases();
+          console.log(`✅ After emergency fix: ${cases.length} legal cases`);
+        }
+      }
+      
       res.json(cases);
     } catch (error) {
       console.error("Error fetching legal cases:", error);
