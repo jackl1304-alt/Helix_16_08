@@ -76,15 +76,16 @@ export default function LegalCasesDirect() {
       console.log("✅ Is Array:", Array.isArray(data));
       console.log("✅ Data Length:", data?.length || 0);
       
-      if (Array.isArray(data) && data.length > 0) {
+      if (Array.isArray(data)) {
         console.log("📊 First Legal Case:", data[0]);
         setLegalCases(data);
         setLastSync(new Date().toLocaleTimeString('de-DE'));
         setError(null);
+        console.log(`✅ SUCCESS: ${data.length} Legal Cases loaded successfully`);
       } else {
-        console.warn("⚠️ No legal cases in response");
+        console.warn("⚠️ Data is not an array:", typeof data);
         setLegalCases([]);
-        setError("Keine Legal Cases in der API-Antwort gefunden");
+        setError("API-Antwort ist kein Array");
       }
     } catch (err) {
       console.error("❌ Fetch Error:", err);
