@@ -282,7 +282,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Regulatory updates routes
   app.get("/api/regulatory-updates", async (req, res) => {
     try {
+      console.log("API: Fetching all regulatory updates...");
       const updates = await storage.getAllRegulatoryUpdates();
+      console.log(`API: Returning ${updates.length} regulatory updates`);
+      
+      // Ensure JSON response header
+      res.setHeader('Content-Type', 'application/json');
       res.json(updates);
     } catch (error) {
       console.error("Error fetching regulatory updates:", error);
