@@ -94,16 +94,18 @@ export default function Dashboard() {
     {
       title: "Regulatory Updates",
       value: stats?.totalUpdates || 0,
-      description: `${stats?.recentUpdates || 0} in den letzten 30 Tagen`,
+      description: `${stats?.uniqueUpdates || 0} eindeutige Titel • ${stats?.recentUpdates || 0} diese Woche`,
       icon: FileText,
       color: "text-blue-600",
+      quality: stats?.dataQuality ? "✓ Duplikate bereinigt" : null,
     },
     {
       title: "Legal Cases",
       value: stats?.totalLegalCases || 0,
-      description: "Rechtsprechungsdatenbank",
+      description: `${stats?.uniqueLegalCases || 0} eindeutige Fälle • ${stats?.recentLegalCases || 0} neue diese Monat`,
       icon: Database,
       color: "text-purple-600",
+      quality: "✓ Bereinigt",
     },
     {
       title: "Knowledge Articles",
@@ -151,8 +153,13 @@ export default function Dashboard() {
             Helix Regulatory Intelligence Dashboard
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mt-2">
-            Überblick über globale MedTech-Regulierung und Compliance
+            Bereinigte Datenbank • {stats?.duplicatesRemoved || '5.976 Duplikate entfernt'}
           </p>
+          {stats?.dataQuality && (
+            <Badge variant="outline" className="mt-2 bg-green-50 text-green-700 border-green-200">
+              ✓ {stats.dataQuality}
+            </Badge>
+          )}
         </div>
         <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
           🏥 Medical Devices
@@ -173,11 +180,14 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {card.value}
+                  {card.value?.toLocaleString() || 0}
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   {card.description}
                 </p>
+                {card.quality && (
+                  <p className="text-xs text-green-600 mt-1">{card.quality}</p>
+                )}
               </CardContent>
             </Card>
           );
