@@ -677,9 +677,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const allUpdates = await storage.getAllRegulatoryUpdates();
       console.log(`Found ${allUpdates.length} regulatory updates for historical data`);
       
-      // Transform regulatory updates to historical document format
+      // Transform regulatory updates to historical document format with CORRECT field names
       const historicalData = allUpdates.map(update => ({
         id: `hist-${update.id}`,
+        source_id: update.sourceId || 'fda_510k',
+        title: update.title,
+        description: update.description,
+        document_url: update.sourceUrl,
+        published_at: update.publishedAt || update.createdAt,
+        archived_at: update.createdAt,
+        change_type: "archived",
+        version: "v1.0",
+        // Legacy fields for compatibility
         documentId: update.id,
         documentTitle: update.title,
         summary: update.description,
@@ -687,12 +696,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         originalDate: update.publishedAt,
         archivedDate: update.createdAt,
         changeType: "archived",
-        version: "v1.0",
         category: update.updateType || "Guidance",
         language: "EN",
         region: update.region,
         content: update.content || update.description,
-        document_url: update.sourceUrl,
         priority: update.priority,
         deviceClasses: update.deviceClasses || [],
         categories: update.categories || []
