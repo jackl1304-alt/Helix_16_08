@@ -1,4 +1,4 @@
-import { storage } from "../storage-morning";
+import { storage } from "../storage";
 import { InsertRegulatoryUpdate } from "../../shared/schema";
 
 // Dynamic import to avoid module resolution issues during compilation

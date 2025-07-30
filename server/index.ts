@@ -60,7 +60,7 @@ app.use((req, res, next) => {
   
   // CRITICAL: Force initialize data sources for production deployment
   console.log("PRODUCTION DEPLOYMENT: Initializing data sources...");
-  const { storage } = await import("./storage-morning.js");
+  const { storage } = await import("./storage.js");
   
   try {
     const existingSources = await storage.getAllDataSources();
