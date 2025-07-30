@@ -1004,10 +1004,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // CRITICAL: Emergency Legal Cases Sync for Live Deployment
+  // ENHANCED: Emergency Legal Cases Sync with Detailed Sources
   app.post('/api/admin/force-legal-sync', async (req, res) => {
     try {
-      console.log("🚨 EMERGENCY LEGAL SYNC: Force generating Legal Cases for Live Deployment...");
+      console.log("🚨 ENHANCED LEGAL SYNC: Generating comprehensive legal cases with detailed sources...");
+      
+      // Import and use enhanced legal data service
+      const { enhancedLegalDataService } = await import("./services/enhancedLegalDataService.js");
+      await enhancedLegalDataService.generateComprehensiveLegalDatabase();
+      
+      const finalLegalCount = await storage.getAllLegalCases();
+      
+      res.json({
+        success: true,
+        message: "Enhanced Legal Cases database created successfully",
+        data: {
+          legalCases: finalLegalCount.length,
+          enhanced: true,
+          features: ["Detailed Sources", "Judge Names", "Citations", "Related Cases", "Compliance Topics"],
+          timestamp: new Date().toISOString()
+        }
+      });
+      
+    } catch (error) {
+      console.error("❌ ENHANCED LEGAL SYNC ERROR:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Enhanced Legal Cases sync failed",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // FALLBACK: Basic Legal Cases Sync (Legacy)
+  app.post('/api/admin/force-legal-sync-basic', async (req, res) => {
+    try {
+      console.log("🚨 BASIC LEGAL SYNC: Force generating Legal Cases for Live Deployment...");
       
       // Force generate 2100 legal cases immediately
       const jurisdictions = ["US", "EU", "DE", "UK", "CH", "FR"];
