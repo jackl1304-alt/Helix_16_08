@@ -652,7 +652,7 @@ export default function LegalCases() {
                                 <div className="flex items-center gap-2 mb-2">
                                   <Gavel className="h-5 w-5 text-blue-600" />
                                   <h3 className="font-semibold text-lg text-blue-600 hover:text-blue-800">
-                                    {legalCase.documentTitle || legalCase.title || 'Unbekannter Fall'}
+                                    {legalCase.title || 'Unbekannter Fall'}
                                   </h3>
                                   <Eye className="h-4 w-4 text-blue-600" />
                                 </div>
@@ -661,38 +661,31 @@ export default function LegalCases() {
                                 </p>
                                 <div className="flex flex-wrap gap-2 text-xs text-gray-500">
                                   <span><strong>Gericht:</strong> {legalCase.court || 'Nicht spezifiziert'}</span>
-                                  <span><strong>Fall-Nr:</strong> {legalCase.caseNumber || legalCase.documentId}</span>
+                                  <span><strong>Fall-Nr:</strong> {legalCase.caseNumber}</span>
                                   <span><strong>Quelle:</strong> {Array.isArray(legalSources) ? legalSources.find(s => s.id === selectedSource)?.name || selectedSource : selectedSource}</span>
                                 </div>
                               </div>
                               <div className="space-y-3">
                                 <div className="flex items-center gap-2">
                                   <Calendar className="h-4 w-4 text-gray-400" />
-                                  <span className="text-sm">{new Date(legalCase.originalDate).toLocaleDateString('de-DE')}</span>
+                                  <span className="text-sm">{new Date(legalCase.dateDecided).toLocaleDateString('de-DE')}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <Globe className="h-4 w-4 text-gray-400" />
-                                  <span className="text-sm">{legalCase.region}</span>
+                                  <span className="text-sm">{legalCase.jurisdiction}</span>
                                 </div>
                                 <div className="flex flex-wrap gap-1">
-                                  <Badge className={getCaseTypeColor(legalCase.category)}>
-                                    {legalCase.category}
+                                  <Badge className={getCaseTypeColor('Legal Case')}>
+                                    Legal Case
                                   </Badge>
-                                  <Badge className={getStatusColor(legalCase.status)}>
-                                    {legalCase.status}
+                                  <Badge className={getStatusColor(legalCase.outcome)}>
+                                    {legalCase.outcome}
                                   </Badge>
                                 </div>
                                 <div className="flex flex-wrap gap-1">
-                                  {legalCase.deviceClasses?.slice(0, 3).map((cls: string, index: number) => (
-                                    <Badge key={`device-${legalCase.id}-${index}-${cls}`} variant="outline" className="text-xs">
-                                      {cls}
-                                    </Badge>
-                                  ))}
-                                  {legalCase.deviceClasses && legalCase.deviceClasses.length > 3 && (
-                                    <Badge variant="outline" className="text-xs">
-                                      +{legalCase.deviceClasses.length - 3} mehr
-                                    </Badge>
-                                  )}
+                                  <Badge variant="outline" className="text-xs">
+                                    {legalCase.deviceType}
+                                  </Badge>
                                 </div>
                                 <div className="flex gap-2 pt-2">
                                   <Dialog>
@@ -776,7 +769,7 @@ export default function LegalCases() {
                                                 <h6 className="font-semibold text-base mb-3 text-blue-700">Auswirkungen und Handlungsempfehlungen</h6>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                   <div className="bg-yellow-50 p-4 rounded-lg">
-                                                    <h7 className="font-medium mb-2 block">Sofortige Maßnahmen:</h7>
+                                                    <h6 className="font-medium mb-2 block">Sofortige Maßnahmen:</h6>
                                                     <ul className="text-sm space-y-1">
                                                       <li>• QMS-Dokumentation überprüfen</li>
                                                       <li>• Compliance-Verfahren anpassen</li>
@@ -785,7 +778,7 @@ export default function LegalCases() {
                                                     </ul>
                                                   </div>
                                                   <div className="bg-blue-50 p-4 rounded-lg">
-                                                    <h7 className="font-medium mb-2 block">Langfristige Anpassungen:</h7>
+                                                    <h6 className="font-medium mb-2 block">Langfristige Anpassungen:</h6>
                                                     <ul className="text-sm space-y-1">
                                                       <li>• Prozesse standardisieren</li>
                                                       <li>• Monitoring-Systeme erweitern</li>
