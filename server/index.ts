@@ -235,6 +235,13 @@ app.use((req, res, next) => {
     }
   }
   
+  // FORCE JSON RESPONSE for all API routes BEFORE registering routes
+  app.use('/api/*', (req, res, next) => {
+    res.setHeader('Content-Type', 'application/json');
+    next();
+  });
+
+  // CRITICAL FIX: Register API routes AFTER setting JSON headers
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

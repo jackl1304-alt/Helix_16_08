@@ -41,6 +41,7 @@ Preferred communication style: German language - Simple, everyday language.
 - ✅ **UI-STABILITÄT BEHOBEN**: Loading-Overlay verhindert weiße Seite während Synchronisation
 - ✅ **SYNC-API ROUTING REPARIERT**: Frontend nutzt korrekten Endpunkt /api/admin/sync-legal-cases
 - ✅ **PERFORMANCE OPTIMIERT**: API-Limits hinzugefügt (Regulatory Updates: 100, Legal Cases: 50)
+- ✅ **HTML→JSON KONVERTIERUNG**: Explizite JSON-Header für alle API-Endpunkte implementiert
 - ✅ **PRODUCTION-READY**: System bereit für Live-Deployment ohne veraltete Dependencies
 
 ## Key Components
