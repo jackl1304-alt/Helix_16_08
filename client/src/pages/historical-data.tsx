@@ -12,10 +12,28 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ChangeComparison } from "@/components/change-comparison";
 import { DocumentViewer, DocumentLink } from "@/components/document-viewer";
-import { HistoricalDataRecord, ChangeDetection, HistoricalReport } from "@shared/schema";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+// Types defined locally to avoid import issues
+interface HistoricalDataRecord {
+  id: string;
+  source_id: string;
+  title: string;
+  description?: string;
+  document_url?: string;
+  published_at: string;
+  archived_at?: string;
+  change_type?: string;
+  version?: string;
+}
 
-// Types are now imported from shared schema
+interface ChangeDetection {
+  id: string;
+  document_id: string;
+  change_type: string;
+  description: string;
+  detected_at: string;
+}
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 export default function HistoricalData() {
   const [selectedSource, setSelectedSource] = useState<string>("fda_guidance");
@@ -99,13 +117,13 @@ export default function HistoricalData() {
       try {
         const response = await fetch(`/api/historical/report/${selectedSource}`);
         if (!response.ok) {
-          return fallbackReport;
+          return null;
         }
         const data = await response.json();
-        return data || fallbackReport;
+        return data || null;
       } catch (error) {
         console.error("Report data error:", error);
-        return fallbackReport;
+        return null;
       }
     },
     enabled: !!selectedSource
