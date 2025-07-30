@@ -33,6 +33,7 @@ interface LegalCase {
 export default function LegalCasesFinal() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedJurisdiction, setSelectedJurisdiction] = useState("all");
+  const [isSyncing, setIsSyncing] = useState(false);
 
   // Lade Legal Cases direkt von API
   const { data: legalCases = [], isLoading, error, refetch } = useQuery({
@@ -91,13 +92,35 @@ export default function LegalCasesFinal() {
 
   // Enhanced Sync Button - Behält Synchronisation bei
   const handleSync = async () => {
+    console.log("🔄 Starting Enhanced Sync...");
+    setIsSyncing(true);
     try {
-      const response = await fetch('/api/admin/force-legal-sync', { method: 'POST' });
+      // Erste versuche die Admin API
+      let response = await fetch('/api/admin/force-legal-sync', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (!response.ok) {
+        console.log("🔄 Admin API failed, trying legacy sync...");
+        // Fallback zur normalen Sync API
+        response = await fetch('/api/sync/legal-cases', { 
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+      
       if (response.ok) {
+        const result = await response.json();
+        console.log("✅ Sync successful:", result);
         await refetch(); // Lade Daten neu
+      } else {
+        console.error("❌ Sync failed:", response.status);
       }
     } catch (error) {
-      console.error('Sync error:', error);
+      console.error('❌ Sync error:', error);
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -140,9 +163,13 @@ export default function LegalCasesFinal() {
             {legalCases.length} juristische Entscheidungen mit detaillierten Quellenangaben
           </p>
         </div>
-        <Button onClick={handleSync} className="bg-blue-600 hover:bg-blue-700">
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Enhanced Sync
+        <Button 
+          onClick={handleSync} 
+          disabled={isSyncing}
+          className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+        >
+          <RefreshCw className={`h-4 w-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+          {isSyncing ? 'Synchronisiert...' : 'Enhanced Sync'}
         </Button>
       </div>
 
