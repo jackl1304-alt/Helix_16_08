@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage-morning";
+import { storage } from "./storage";
 import { aiApprovalService } from "./services/ai-approval-service";
 import { 
   insertUserSchema, 

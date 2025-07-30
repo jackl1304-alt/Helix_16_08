@@ -101,32 +101,25 @@ export const regulatoryUpdates = pgTable("regulatory_updates", {
   index("idx_regulatory_updates_priority").on(table.priority),
 ]);
 
-// Legal cases table
+// Legal cases table - FIXED: Match actual database structure
 export const legalCases = pgTable("legal_cases", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  caseNumber: varchar("case_number"),
+  id: text("id").primaryKey(),
+  caseNumber: text("case_number"),
   title: text("title").notNull(),
-  court: varchar("court").notNull(),
-  jurisdiction: varchar("jurisdiction").notNull(),
-  caseType: varchar("case_type"),
+  court: text("court").notNull(),
+  jurisdiction: text("jurisdiction").notNull(),
+  decisionDate: timestamp("decision_date", { mode: "date" }),
   summary: text("summary"),
-  fullText: text("full_text"),
-  outcome: varchar("outcome"),
-  significance: varchar("significance"),
-  deviceType: varchar("device_type"),
-  legalIssues: text("legal_issues").array(),
-  dateDecided: timestamp("date_decided"),
-  documentUrl: varchar("document_url"),
-  citations: text("citations").array(),
-  tags: text("tags").array(),
-  language: varchar("language").default("en"),
-  metadata: jsonb("metadata"),
+  content: text("content"),
+  documentUrl: text("document_url"),
+  impactLevel: text("impact_level"),
+  keywords: text("keywords").array(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
   index("idx_legal_cases_jurisdiction").on(table.jurisdiction),
   index("idx_legal_cases_court").on(table.court),
-  index("idx_legal_cases_decided").on(table.dateDecided),
+  index("idx_legal_cases_decision").on(table.decisionDate),
 ]);
 
 // Knowledge base articles
