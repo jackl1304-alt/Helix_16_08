@@ -333,26 +333,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Legal cases routes
   app.get("/api/legal-cases", async (req, res) => {
     try {
+      console.log("[API] Legal cases endpoint called");
       let cases = await storage.getAllLegalCases();
-      console.log(`Fetched ${cases.length} legal cases from database`);
+      console.log(`[API] Fetched ${cases.length} legal cases from database`);
       
       // AUTO-INITIALIZATION: If 0 legal cases, initialize automatically
       if (cases.length === 0) {
-        console.log("Auto-initializing legal cases database...");
+        console.log("[API] Auto-initializing legal cases database...");
         
-        const { productionService } = await import("./services/ProductionService.js");
-        const result = await productionService.initializeProductionData();
-        
-        if (result.success) {
-          cases = await storage.getAllLegalCases();
-          console.log(`Initialized ${cases.length} legal cases`);
+        try {
+          const { productionService } = await import("./services/ProductionService.js");
+          const result = await productionService.initializeProductionData();
+          
+          if (result.success) {
+            cases = await storage.getAllLegalCases();
+            console.log(`[API] After initialization: ${cases.length} legal cases available`);
+          } else {
+            console.log("[API] Initialization failed, returning empty array");
+          }
+        } catch (initError) {
+          console.error("[API] Initialization error:", String(initError));
+          // Continue with empty array instead of failing
         }
       }
       
+      console.log(`[API] Returning ${cases.length} legal cases`);
       res.json(cases);
     } catch (error) {
-      console.error("Error fetching legal cases:", error);
-      res.status(500).json({ message: "Failed to fetch legal cases" });
+      console.error("[API] Error in legal-cases endpoint:", error);
+      res.status(500).json({ message: "Failed to fetch legal cases", error: error.message });
     }
   });
 
