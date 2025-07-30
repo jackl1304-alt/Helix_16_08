@@ -80,9 +80,12 @@ export default function LegalCases() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Enhanced Legal Database Sync
+  // Enhanced Legal Database Sync with stable UI
+  const [isSyncing, setIsSyncing] = useState(false);
+  
   const syncMutation = useMutation({
     mutationFn: async () => {
+      setIsSyncing(true);
       console.log("🔄 ENHANCED LEGAL SYNC: Triggering comprehensive legal database generation...");
       const response = await fetch('/api/admin/force-legal-sync', {
         method: 'POST',
@@ -107,6 +110,7 @@ export default function LegalCases() {
       queryClient.invalidateQueries({ queryKey: ['/api/legal/data'] });
       queryClient.invalidateQueries({ queryKey: ['/api/legal-cases'] });
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+      setIsSyncing(false);
     },
     onError: (error) => {
       console.error("❌ ENHANCED SYNC ERROR:", error);
@@ -115,6 +119,7 @@ export default function LegalCases() {
         description: error instanceof Error ? error.message : "Unbekannter Fehler",
         variant: "destructive",
       });
+      setIsSyncing(false);
     }
   });
 
@@ -268,27 +273,7 @@ export default function LegalCases() {
     }
   };
 
-  // Show loading overlay during sync
-  if (syncMutation.isPending) {
-    return (
-      <div className={cn(
-        "space-y-6",
-        device.isMobile ? "p-4" : device.isTablet ? "p-6" : "p-8"
-      )}>
-        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
-          <div className="text-center">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-              Legal Cases werden synchronisiert...
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
-              Bitte warten Sie, während die Datenbank aktualisiert wird.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div className={cn(
@@ -306,10 +291,10 @@ export default function LegalCases() {
         </div>
         <Button 
           onClick={() => syncMutation.mutate()}
-          disabled={syncMutation.isPending}
+          disabled={isSyncing || syncMutation.isPending}
           className="min-w-[180px]"
         >
-          {syncMutation.isPending ? (
+          {(isSyncing || syncMutation.isPending) ? (
             <>
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
               Synchronisiere...
@@ -567,29 +552,48 @@ export default function LegalCases() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {isLoadingData ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                  <span className="ml-2">Lade Rechtsfälle...</span>
-                </div>
-              ) : filteredData.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">Keine Rechtsfälle gefunden.</p>
-                  <Button 
-                    onClick={() => syncMutation.mutate()}
-                    disabled={syncMutation.isPending}
-                    className="mt-4"
-                  >
-                    {syncMutation.isPending ? "Synchronisiere..." : "Rechtsfälle laden"}
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {filteredData.map((legalCase) => (
-                    <EnhancedLegalCard key={legalCase.id} case={legalCase} />
-                  ))}
-                </div>
-              )}
+              {/* Stable UI - no conditional returns that remove content */}
+              <div className="space-y-4">
+                {isSyncing && (
+                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"></div>
+                      <div>
+                        <p className="font-medium text-blue-900 dark:text-blue-100">
+                          Legal Cases werden synchronisiert...
+                        </p>
+                        <p className="text-sm text-blue-700 dark:text-blue-300">
+                          Die Datenbank wird aktualisiert. Dieser Vorgang kann einige Minuten dauern.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {isLoadingData ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    <span className="ml-2">Lade Rechtsfälle...</span>
+                  </div>
+                ) : filteredData.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">Keine Rechtsfälle gefunden.</p>
+                    <Button 
+                      onClick={() => syncMutation.mutate()}
+                      disabled={isSyncing || syncMutation.isPending}
+                      className="mt-4"
+                    >
+                      {(isSyncing || syncMutation.isPending) ? "Synchronisiere..." : "Rechtsfälle laden"}
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    {filteredData.map((legalCase) => (
+                      <EnhancedLegalCard key={legalCase.id} case={legalCase} />
+                    ))}
+                  </>
+                )}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -616,9 +620,9 @@ export default function LegalCases() {
                     <Button 
                       variant="outline" 
                       onClick={() => syncMutation.mutate()}
-                      disabled={syncMutation.isPending}
+                      disabled={isSyncing || syncMutation.isPending}
                     >
-                      {syncMutation.isPending ? 'Synchronisiere...' : 'Erneut synchronisieren'}
+                      {(isSyncing || syncMutation.isPending) ? 'Synchronisiere...' : 'Erneut synchronisieren'}
                     </Button>
                     <Button 
                       variant="ghost" 
