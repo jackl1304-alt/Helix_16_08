@@ -340,8 +340,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (cases.length === 0) {
         console.log("🚨 ZERO LEGAL CASES: Triggering emergency fix...");
         
-        const { emergencyLiveFix } = await import("./emergency-live-fix.js");
-        const wasFixed = await emergencyLiveFix();
+        // Clean emergency fix without legacy imports
+        const { productionService } = await import("./services/ProductionService.js");
+        const result = await productionService.initializeProductionData();
+        const wasFixed = result.success;
         
         if (wasFixed) {
           // Re-fetch after fix
@@ -1016,149 +1018,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // LIVE PRODUCTION DATABASE FIX - specifically for helixV1-delta.replit.app
-  app.post('/api/admin/live-production-fix', async (req, res) => {
+  // PRODUCTION INITIALIZATION - Clean service for legal cases
+  app.post('/api/admin/initialize-production', async (req, res) => {
     try {
-      console.log("🚨 LIVE PRODUCTION FIX: Starting direct repair for helixV1-delta.replit.app...");
+      console.log("Initializing production legal cases database...");
       
-      const { fixLiveProductionDatabase } = await import("./live-production-fix");
-      const count = await fixLiveProductionDatabase();
-      
-      res.json({
-        success: true,
-        message: "Live production database fix completed successfully",
-        data: {
-          legalCases: count,
-          timestamp: new Date().toISOString(),
-          fixType: "live_production_repair",
-          domain: "helixV1-delta.replit.app"
-        }
-      });
-      
-    } catch (error) {
-      console.error("❌ Live production fix error:", error);
-      res.status(500).json({
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-        message: "Live production fix failed"
-      });
-    }
-  });
-
-  // PROFESSIONAL DATABASE MIGRATION SERVICE
-  app.post('/api/admin/professional-migration', async (req, res) => {
-    try {
-      console.log("🚀 PROFESSIONAL MIGRATION: Starting database migration service...");
-      
-      const { migrationService } = await import("./production-solutions/DatabaseMigrationService.js");
-      const result = await migrationService.migrateLegalCasesToProduction();
-      
-      const report = await migrationService.generateMigrationReport(result);
-      console.log("📊 Migration Report:\n", report);
+      const { productionService } = await import("./services/ProductionService.js");
+      const result = await productionService.initializeProductionData();
       
       res.json({
         success: result.success,
-        message: result.success ? 
-          `Professional migration completed - ${result.migratedCount} legal cases migrated` :
-          `Professional migration failed`,
+        message: result.message,
         data: {
-          migratedCount: result.migratedCount,
-          duration: result.duration,
-          errors: result.errors,
-          timestamp: result.timestamp,
-          report: report
+          legalCases: result.count,
+          timestamp: new Date().toISOString()
         }
       });
       
     } catch (error) {
-      console.error("❌ Professional migration error:", error);
+      console.error("Production initialization error:", error);
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
-        message: "Professional migration service failed"
+        message: "Production initialization failed"
       });
     }
   });
 
-  // ENVIRONMENT SYNCHRONIZATION SERVICE
-  app.post('/api/admin/environment-sync', async (req, res) => {
+  // PRODUCTION HEALTH CHECK - Clean health monitoring
+  app.get('/api/admin/health', async (req, res) => {
     try {
-      console.log("🔄 ENVIRONMENT SYNC: Starting synchronization service...");
+      console.log("Checking production health status...");
       
-      const { syncService } = await import("./production-solutions/EnvironmentSyncService.js");
-      const { mode = 'incremental' } = req.body;
-      
-      // Configure sync mode
-      syncService['config'].syncMode = mode;
-      
-      const result = await syncService.synchronizeEnvironments();
-      
-      res.json({
-        success: result.success,
-        message: result.success ? 
-          `Environment synchronization completed - ${result.synchronized} cases synchronized` :
-          `Environment synchronization failed`,
-        data: {
-          synchronized: result.synchronized,
-          skipped: result.skipped,
-          duration: result.duration,
-          errors: result.errors,
-          lastSyncTimestamp: result.lastSyncTimestamp,
-          mode: mode
-        }
-      });
-      
-    } catch (error) {
-      console.error("❌ Environment sync error:", error);
-      res.status(500).json({
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-        message: "Environment synchronization service failed"
-      });
-    }
-  });
-
-  // PRODUCTION HEALTH CHECK
-  app.get('/api/admin/production-health', async (req, res) => {
-    try {
-      console.log("🏥 PRODUCTION HEALTH: Checking system status...");
-      
-      const { neon } = await import('@neondatabase/serverless');
-      const sql = neon(process.env.DATABASE_URL!);
-      
-      const [legalCasesResult, regulatoryUpdatesResult, dataSourcesResult] = await Promise.all([
-        sql`SELECT COUNT(*) as count FROM legal_cases`,
-        sql`SELECT COUNT(*) as count FROM regulatory_updates`,
-        sql`SELECT COUNT(*) as count FROM data_sources WHERE is_active = true`
-      ]);
-      
-      const health = {
-        legalCases: parseInt(legalCasesResult[0]?.count || '0'),
-        regulatoryUpdates: parseInt(regulatoryUpdatesResult[0]?.count || '0'),
-        activeDataSources: parseInt(dataSourcesResult[0]?.count || '0'),
-        status: 'healthy',
-        timestamp: new Date().toISOString()
-      };
-      
-      // Determine overall health status
-      if (health.legalCases === 0) {
-        health.status = 'degraded';
-      } else if (health.legalCases >= 2000 && health.regulatoryUpdates >= 5000) {
-        health.status = 'optimal';
-      }
+      const { productionService } = await import("./services/ProductionService.js");
+      const health = await productionService.getHealthStatus();
       
       res.json({
         success: true,
-        message: `Production health check completed - Status: ${health.status}`,
+        message: `System status: ${health.status}`,
         data: health
       });
       
     } catch (error) {
-      console.error("❌ Production health check error:", error);
+      console.error("Health check error:", error);
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
-        message: "Production health check failed"
+        message: "Health check failed"
       });
     }
   });
@@ -1191,94 +1097,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ENHANCED: Emergency Legal Cases Sync with Direct Database Access
-  app.post('/api/admin/force-legal-sync', async (req, res) => {
+  // LEGAL CASES SYNC - Uses clean production service
+  app.post('/api/admin/sync-legal-cases', async (req, res) => {
     try {
-      console.log("🚨 ENHANCED LEGAL SYNC: Starting direct database legal cases generation...");
+      console.log("Starting legal cases synchronization...");
       
-      // Use direct database connection like dashboard stats
-      const { neon } = await import('@neondatabase/serverless');
-      const sql = neon(process.env.DATABASE_URL!);
+      const { productionService } = await import("./services/ProductionService.js");
+      const result = await productionService.initializeProductionData();
       
-      // Check current count first
-      const beforeResult = await sql`SELECT COUNT(*) as count FROM legal_cases`;
-      const beforeCount = parseInt(beforeResult[0]?.count || '0');
-      console.log(`Before sync: ${beforeCount} legal cases`);
-      
-      if (beforeCount === 0) {
-        console.log("🚨 GENERATING 2025 LEGAL CASES DIRECTLY INTO PRODUCTION DB...");
-        
-        // Generate cases directly into the same database the dashboard reads from
-        const jurisdictions = ['US', 'EU', 'DE', 'UK', 'CH', 'FR'];
-        let generated = 0;
-        
-        for (let i = 0; i < 2025; i++) {
-          const jurisdiction = jurisdictions[i % jurisdictions.length];
-          const caseId = `live_sync_${jurisdiction.toLowerCase()}_${Date.now()}_${i}`;
-          
-          await sql`
-            INSERT INTO legal_cases (
-              id, case_number, title, court, jurisdiction, decision_date, 
-              summary, content, document_url, impact_level, created_at
-            ) VALUES (
-              ${caseId},
-              ${jurisdiction + '-2025-' + String(i + 1).padStart(4, '0')},
-              ${`${jurisdiction} Medical Device Case ${i + 1}`},
-              ${jurisdiction === 'US' ? 'U.S. District Court' : 
-                jurisdiction === 'EU' ? 'European Court of Justice' :
-                jurisdiction === 'DE' ? 'Bundesgerichtshof' : 'High Court'},
-              ${jurisdiction},
-              ${new Date(2020 + Math.floor(i / 405), (i % 12), ((i % 28) + 1)).toISOString()},
-              ${`Medical device regulatory case involving ${jurisdiction} jurisdiction - Case ${i + 1}`},
-              ${`This landmark ${jurisdiction} case addresses medical device regulation and compliance requirements. The court examined regulatory authority and implementation of new classification criteria for medical devices. Case ${i + 1} establishes important precedent for manufacturers.`},
-              ${`https://legal-docs.example.com/${jurisdiction.toLowerCase()}/case_${i}`},
-              ${'medium'},
-              ${new Date().toISOString()}
-            )
-          `;
-          generated++;
-          
-          if (generated % 200 === 0) {
-            console.log(`Generated ${generated}/2025 legal cases...`);
-          }
+      res.json({
+        success: result.success,
+        message: result.message,
+        data: {
+          legalCases: result.count,
+          timestamp: new Date().toISOString()
         }
-        
-        const afterResult = await sql`SELECT COUNT(*) as count FROM legal_cases`;
-        const afterCount = parseInt(afterResult[0]?.count || '0');
-        
-        console.log(`✅ SYNC COMPLETE: ${beforeCount} → ${afterCount} legal cases`);
-        
-        res.json({
-          success: true,
-          message: "Enhanced Legal Cases database created successfully",
-          data: {
-            legalCases: afterCount,
-            generated: generated,
-            enhanced: true,
-            features: ["Direct Database Access", "Production Sync", "2025 Legal Cases"],
-            timestamp: new Date().toISOString()
-          }
-        });
-      } else {
-        console.log(`Database already contains ${beforeCount} legal cases - no sync needed`);
-        res.json({
-          success: true,
-          message: "Legal cases already available",
-          data: {
-            legalCases: beforeCount,
-            generated: 0,
-            enhanced: false,
-            timestamp: new Date().toISOString()
-          }
-        });
-      }
+      });
       
     } catch (error) {
-      console.error("❌ ENHANCED LEGAL SYNC ERROR:", error);
-      res.status(500).json({ 
-        success: false, 
-        message: "Enhanced Legal Cases sync failed",
-        error: error instanceof Error ? error.message : "Unknown error"
+      console.error("Legal cases sync error:", error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+        message: "Legal cases synchronization failed"
       });
     }
   });
@@ -1352,8 +1193,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log("🔧 PRODUCTION DATABASE DIRECT REPAIR: Starting guaranteed fix...");
       
-      const { repairProductionDatabase } = await import("./production-database-repair.js");
-      const result = await repairProductionDatabase();
+      // Clean production repair without legacy imports
+      const { productionService } = await import("./services/ProductionService.js");
+      const result = await productionService.initializeProductionData();
       
       res.json({
         success: result.success,
