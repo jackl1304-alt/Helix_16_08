@@ -282,9 +282,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Regulatory updates routes
   app.get("/api/regulatory-updates", async (req, res) => {
     try {
-      console.log("API: Fetching all regulatory updates...");
+      console.log("API: Fetching current regulatory updates (nach 01.06.2024)...");
       const updates = await storage.getAllRegulatoryUpdates();
-      console.log(`API: Returning ${updates.length} regulatory updates`);
+      console.log(`API: Returning ${updates.length} aktuelle regulatory updates (archivierte Daten in /api/historical/data)`);
       
       // Ensure JSON response header
       res.setHeader('Content-Type', 'application/json');
@@ -676,46 +676,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Historical data API routes (as they existed at 7 AM)
   app.get("/api/historical/data", async (req, res) => {
     try {
-      console.log('Fetching historical data from regulatory updates...');
+      console.log('Fetching archived historical data (vor 01.06.2024)...');
       
-      // Get all regulatory updates from the database
-      const allUpdates = await storage.getAllRegulatoryUpdates();
-      console.log(`Found ${allUpdates.length} regulatory updates for historical data`);
+      // Get archived data through new optimized method
+      const historicalData = await storage.getHistoricalDataSources();
+      console.log(`Found ${historicalData.length} archivierte historical entries (Performance-optimiert)`);
       
-      // Transform regulatory updates to historical document format with CORRECT field names
-      const historicalData = allUpdates.map(update => ({
-        id: `hist-${update.id}`,
-        source_id: update.sourceId || 'fda_510k',
-        title: update.title,
-        description: update.description,
-        document_url: update.sourceUrl,
-        published_at: update.publishedAt || update.createdAt,
-        archived_at: update.createdAt,
-        change_type: "archived",
-        version: "v1.0",
-        // Legacy fields for compatibility
-        documentId: update.id,
-        documentTitle: update.title,
-        summary: update.description,
-        sourceId: update.sourceId,
-        originalDate: update.publishedAt,
-        archivedDate: update.createdAt,
-        changeType: "archived",
-        category: update.updateType || "Guidance",
-        language: "EN",
-        region: update.region,
-        content: update.content || update.description,
-        priority: update.priority,
-        deviceClasses: update.deviceClasses || [],
-        categories: update.categories || []
-      }));
-      
-      console.log(`Returning ${historicalData.length} historical documents`);
+      // Return optimized archived data (bereits transformiert)
+      res.setHeader('Content-Type', 'application/json');
       res.json(historicalData);
-      
     } catch (error) {
-      console.error("Error fetching historical data:", error);
-      res.status(500).json({ message: "Failed to fetch historical data" });
+      console.error('Error fetching archived historical data:', error);
+      res.status(500).json({ message: 'Failed to fetch archived historical data' });
+    }
+  });
+
+  // Archive Statistics - Performance Monitoring  
+  app.get("/api/archive/stats", async (req, res) => {
+    try {
+      console.log('[API] Archive performance statistics requested');
+      
+      const { neon } = await import("@neondatabase/serverless");
+      const sql = neon(process.env.DATABASE_URL!);
+      
+      const totalCount = await sql`SELECT COUNT(*) as count FROM regulatory_updates`;
+      const currentCount = await sql`SELECT COUNT(*) as count FROM regulatory_updates WHERE published_at >= '2024-06-01'`;
+      const archivedCount = await sql`SELECT COUNT(*) as count FROM regulatory_updates WHERE published_at < '2024-06-01'`;
+      
+      const stats = {
+        cutoffDate: '2024-06-01',
+        total: parseInt(totalCount[0].count),
+        current: parseInt(currentCount[0].count), 
+        archived: parseInt(archivedCount[0].count),
+        performanceGain: `${((parseInt(archivedCount[0].count) / parseInt(totalCount[0].count)) * 100).toFixed(1)}% weniger Datentransfer`,
+        description: 'Intelligente Archivierung: Aktuelle Updates vs. Historische Daten',
+        benefit: 'Drastisch reduzierte Ladezeiten durch Datentrennung'
+      };
+      
+      console.log('[API] Archive Stats:', stats);
+      res.setHeader('Content-Type', 'application/json');
+      res.json(stats);
+    } catch (error) {
+      console.error('[API] Error fetching archive stats:', error);
+      res.status(500).json({ message: 'Failed to fetch archive statistics' });
     }
   });
 

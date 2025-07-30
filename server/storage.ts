@@ -285,19 +285,73 @@ class MorningStorage implements IStorage {
 
   async getHistoricalDataSources() {
     try {
-      console.log('[DB] getHistoricalDataSources called');
-      const result = await sql`SELECT * FROM data_sources ORDER BY created_at DESC`;
-      console.log(`[DB] Found ${result.length} historical data sources`);
+      console.log('[DB] getHistoricalDataSources called - ARCHIVIERTE DATEN (vor 01.06.2024)');
       
-      // Transform to consistent format
-      const transformedResult = result.map(source => ({
-        ...source,
-        isActive: source.is_active,
-        lastSync: source.last_sync_at,
-        url: source.url || source.endpoint
-      }));
+      // Kombiniere archivierte Regulatory Updates mit Historical Data
+      const cutoffDate = '2024-06-01';
       
-      return transformedResult;
+      // Hole archivierte Regulatory Updates (vor 01.06.2024)
+      const archivedUpdates = await sql`
+        SELECT 
+          id,
+          title,
+          description,
+          source_id,
+          source_url as document_url,
+          published_at,
+          region,
+          update_type as category,
+          priority,
+          device_classes,
+          created_at as archived_at,
+          'regulatory_update' as source_type
+        FROM regulatory_updates 
+        WHERE published_at < ${cutoffDate}
+        ORDER BY published_at DESC
+      `;
+      
+      // Hole Data Sources für Metadaten
+      const dataSources = await sql`SELECT * FROM data_sources ORDER BY created_at DESC`;
+      
+      console.log(`[DB] Archivierte Updates (vor ${cutoffDate}): ${archivedUpdates.length} Einträge`);
+      console.log(`[DB] Data Sources: ${dataSources.length} Quellen`);
+      
+      // Kombiniere und transformiere zu einheitlichem Format
+      const historicalData = [
+        ...archivedUpdates.map(update => ({
+          id: update.id,
+          source_id: update.source_id,
+          title: update.title,
+          description: update.description,
+          document_url: update.document_url,
+          published_at: update.published_at,
+          archived_at: update.archived_at,
+          region: update.region,
+          category: update.category,
+          priority: update.priority,
+          deviceClasses: Array.isArray(update.device_classes) ? update.device_classes : [],
+          source_type: 'archived_regulatory'
+        })),
+        ...dataSources.map(source => ({
+          id: source.id,
+          source_id: source.id,
+          title: source.name,
+          description: `Datenquelle: ${source.name} (${source.country})`,
+          document_url: source.endpoint,
+          published_at: source.created_at,
+          archived_at: source.last_sync_at,
+          region: source.country,
+          category: source.type,
+          priority: 'low',
+          deviceClasses: [],
+          source_type: 'data_source',
+          isActive: source.is_active,
+          lastSync: source.last_sync_at,
+          url: source.url || source.endpoint
+        }))
+      ];
+      
+      return historicalData;
     } catch (error) {
       console.error("Historical data sources error:", error);
       return [];
@@ -306,13 +360,16 @@ class MorningStorage implements IStorage {
 
   async getAllRegulatoryUpdates() {
     try {
-      console.log('[DB] getAllRegulatoryUpdates called (ALL DATA - NO LIMITS)');
-      // REMOVED LIMITS: Get complete dataset for full data viewing
+      console.log('[DB] getAllRegulatoryUpdates called - ONLY RECENT DATA (nach 01.06.2024)');
+      // PERFORMANCE OPTIMIZATION: Nur aktuelle Updates nach 01.06.2024
+      // Ältere Daten sind in historischen Daten archiviert
+      const cutoffDate = '2024-06-01';
       const result = await sql`
         SELECT * FROM regulatory_updates 
+        WHERE published_at >= ${cutoffDate}
         ORDER BY published_at DESC
       `;
-      console.log(`[DB] getAllRegulatoryUpdates result count: ${result.length} (ALL DATA)`);
+      console.log(`[DB] Recent regulatory updates (nach ${cutoffDate}): ${result.length} Einträge`);
       return result;
     } catch (error) {
       console.error("All regulatory updates error:", error);
