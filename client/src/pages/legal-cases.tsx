@@ -854,7 +854,7 @@ export default function LegalCases() {
                           <DialogHeader>
                             <DialogTitle className="flex items-center gap-2">
                               <Gavel className="h-5 w-5" />
-                              {legalCase.documentTitle || legalCase.title}
+                              {legalCase.title}
                             </DialogTitle>
                           </DialogHeader>
                           <div className="flex-1 overflow-auto space-y-6">
@@ -869,9 +869,9 @@ export default function LegalCases() {
                               </p>
                               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                                 <div><strong>Gericht:</strong> {legalCase.court || 'Nicht spezifiziert'}</div>
-                                <div><strong>Datum:</strong> {new Date(legalCase.originalDate).toLocaleDateString('de-DE')}</div>
-                                <div><strong>Jurisdiktion:</strong> {legalCase.region}</div>
-                                <div><strong>Status:</strong> {legalCase.status}</div>
+                                <div><strong>Datum:</strong> {new Date(legalCase.dateDecided).toLocaleDateString('de-DE')}</div>
+                                <div><strong>Jurisdiktion:</strong> {legalCase.jurisdiction}</div>
+                                <div><strong>Status:</strong> {legalCase.outcome}</div>
                               </div>
                             </div>
 
@@ -883,14 +883,14 @@ export default function LegalCases() {
                               </h4>
                               <div className="prose max-w-none text-sm">
                                 <div className="bg-gray-50 p-4 rounded border-l-4 border-blue-400 mb-4">
-                                  <h5 className="font-medium mb-2">Fall-Nummer: {legalCase.caseNumber || legalCase.documentId}</h5>
+                                  <h5 className="font-medium mb-2">Fall-Nummer: {legalCase.caseNumber}</h5>
                                   <p><strong>Rechtsquelle:</strong> {Array.isArray(legalSources) ? legalSources.find(s => s.id === selectedSource)?.name || selectedSource : selectedSource}</p>
-                                  <p><strong>Kategorie:</strong> {legalCase.category}</p>
-                                  <p><strong>Geräteklassen:</strong> {legalCase.deviceClasses?.join(', ') || 'Alle Klassen'}</p>
+                                  <p><strong>Kategorie:</strong> Legal Case</p>
+                                  <p><strong>Geräteklassen:</strong> {legalCase.deviceType}</p>
                                 </div>
                                 
                                 <div className="whitespace-pre-wrap">
-                                  {legalCase.content || `
+                                  {legalCase.fullText || `
 Zusammenfassung der Entscheidung:
 ${legalCase.summary || 'Detaillierte Informationen zur Gerichtsentscheidung sind verfügbar.'}
 
@@ -904,9 +904,9 @@ Diese Entscheidung basiert auf den aktuellen Regulierungen für Medizinprodukte 
 Auswirkungen:
 Die Entscheidung präzisiert bestehende rechtliche Anforderungen und kann als Präzedenzfall für ähnliche Verfahren dienen.
 
-Relevante Dokumentenklassen: ${legalCase.deviceClasses?.join(', ') || 'Alle Medizinproduktklassen'}
+Relevante Dokumentenklassen: ${legalCase.deviceType}
 Sprache: ${legalCase.language || 'Deutsch'}
-Quelle: ${legalCase.sourceId}
+Quelle: Legal Database
                                   `}
                                 </div>
                               </div>
@@ -954,12 +954,12 @@ Quelle: ${legalCase.sourceId}
                               <Button 
                                 onClick={() => {
                                   try {
-                                    const content = legalCase.content || `${legalCase.documentTitle}\n\n${legalCase.summary || 'Vollständiger Inhalt nicht verfügbar'}`;
+                                    const content = legalCase.fullText || `${legalCase.title}\n\n${legalCase.summary || 'Vollständiger Inhalt nicht verfügbar'}`;
                                     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
                                     const url = URL.createObjectURL(blob);
                                     const a = document.createElement('a');
                                     a.href = url;
-                                    a.download = `Gerichtsentscheidung_${legalCase.documentTitle.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_')}.txt`;
+                                    a.download = `Gerichtsentscheidung_${legalCase.title.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_')}.txt`;
                                     document.body.appendChild(a);
                                     a.click();
                                     document.body.removeChild(a);
