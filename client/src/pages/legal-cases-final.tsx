@@ -12,8 +12,8 @@ import {
   MapPin, 
   ExternalLink, 
   Search,
-  Download,
-  AlertTriangle
+  AlertTriangle,
+  RefreshCw
 } from "lucide-react";
 
 interface LegalCase {
@@ -30,81 +30,74 @@ interface LegalCase {
   keywords: string[];
 }
 
-export default function LegalCasesNew() {
+export default function LegalCasesFinal() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedJurisdiction, setSelectedJurisdiction] = useState("all");
-  const [selectedImpact, setSelectedImpact] = useState("all");
 
   // Lade Legal Cases direkt von API
-  const { data: legalCases = [], isLoading, error } = useQuery({
+  const { data: legalCases = [], isLoading, error, refetch } = useQuery({
     queryKey: ['/api/legal-cases'],
     queryFn: async () => {
-      console.log("🔄 Fetching legal cases from API...");
       const response = await fetch('/api/legal-cases');
       if (!response.ok) {
         throw new Error('Failed to fetch legal cases');
       }
       const data = await response.json();
-      console.log("✅ Legal cases loaded:", data.length);
-      console.log("📊 First legal case:", data[0]);
       return data as LegalCase[];
     }
   });
 
-  // Filtere die Daten - DEBUG VERSION
-  const filteredCases = legalCases.filter((legalCase) => {
-    const matchesSearch = searchTerm === "" || 
-      legalCase.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      legalCase.summary?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      legalCase.court?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      legalCase.caseNumber?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesJurisdiction = selectedJurisdiction === "all" || 
-      legalCase.jurisdiction?.toLowerCase().includes(selectedJurisdiction.toLowerCase()) ||
-      legalCase.jurisdiction === selectedJurisdiction;
-
-    const matchesImpact = selectedImpact === "all" || 
-      legalCase.impactLevel?.toLowerCase() === selectedImpact.toLowerCase();
-
-    // Debug logging für erste 3 Items
-    if (legalCases.indexOf(legalCase) < 3) {
-      console.log("🔍 Filter Debug:", {
-        id: legalCase.id,
-        jurisdiction: legalCase.jurisdiction,
-        impactLevel: legalCase.impactLevel,
-        selectedJurisdiction,
-        selectedImpact,
-        matchesJurisdiction,
-        matchesImpact,
-        matchesSearch
-      });
+  // Sehr einfache Filterung ohne komplexe Logik
+  const filteredCases = legalCases.filter((item) => {
+    // Suche
+    if (searchTerm && searchTerm.length > 0) {
+      const searchLower = searchTerm.toLowerCase();
+      const matches = 
+        (item.title && item.title.toLowerCase().includes(searchLower)) ||
+        (item.summary && item.summary.toLowerCase().includes(searchLower)) ||
+        (item.court && item.court.toLowerCase().includes(searchLower)) ||
+        (item.caseNumber && item.caseNumber.toLowerCase().includes(searchLower));
+      if (!matches) return false;
     }
-
-    return matchesSearch && matchesJurisdiction && matchesImpact;
+    
+    // Jurisdiktion
+    if (selectedJurisdiction !== "all") {
+      if (!item.jurisdiction || !item.jurisdiction.toLowerCase().includes(selectedJurisdiction.toLowerCase())) {
+        return false;
+      }
+    }
+    
+    return true;
   });
 
-  // Debug filtered cases
-  console.log("🔄 Filtered cases count:", filteredCases.length);
-  console.log("📝 Total legal cases:", legalCases.length);
-
   const formatDate = (dateString: string) => {
+    if (!dateString) return "Kein Datum";
     try {
-      return new Date(dateString).toLocaleDateString('de-DE', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
+      return new Date(dateString).toLocaleDateString('de-DE');
     } catch {
       return dateString;
     }
   };
 
   const getImpactColor = (impact: string) => {
-    switch (impact?.toLowerCase()) {
-      case 'high': return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low': return 'bg-green-100 text-green-800 border-green-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    if (!impact) return 'bg-gray-100 text-gray-800';
+    switch (impact.toLowerCase()) {
+      case 'high': return 'bg-red-100 text-red-800';
+      case 'medium': return 'bg-yellow-100 text-yellow-800';
+      case 'low': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  // Enhanced Sync Button - Behält Synchronisation bei
+  const handleSync = async () => {
+    try {
+      const response = await fetch('/api/admin/force-legal-sync', { method: 'POST' });
+      if (response.ok) {
+        await refetch(); // Lade Daten neu
+      }
+    } catch (error) {
+      console.error('Sync error:', error);
     }
   };
 
@@ -125,8 +118,11 @@ export default function LegalCasesNew() {
         <div className="text-center py-12">
           <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">Fehler beim Laden</h3>
-          <p className="text-gray-600">Die Legal Cases konnten nicht geladen werden.</p>
-          <p className="text-sm text-red-600 mt-2">{error.message}</p>
+          <p className="text-gray-600 mb-4">Die Legal Cases konnten nicht geladen werden.</p>
+          <Button onClick={() => refetch()} variant="outline">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Erneut versuchen
+          </Button>
         </div>
       </div>
     );
@@ -134,7 +130,7 @@ export default function LegalCasesNew() {
 
   return (
     <div className="space-y-6 p-6">
-      {/* Header */}
+      {/* Header mit Sync Button */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
@@ -144,6 +140,10 @@ export default function LegalCasesNew() {
             {legalCases.length} juristische Entscheidungen mit detaillierten Quellenangaben
           </p>
         </div>
+        <Button onClick={handleSync} className="bg-blue-600 hover:bg-blue-700">
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Enhanced Sync
+        </Button>
       </div>
 
       {/* Statistiken */}
@@ -153,8 +153,8 @@ export default function LegalCasesNew() {
             <div className="flex items-center">
               <Scale className="h-8 w-8 text-blue-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Gesamte Fälle</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{legalCases.length}</p>
+                <p className="text-sm font-medium text-gray-600">Gesamte Fälle</p>
+                <p className="text-2xl font-bold text-gray-900">{legalCases.length}</p>
               </div>
             </div>
           </CardContent>
@@ -165,8 +165,8 @@ export default function LegalCasesNew() {
             <div className="flex items-center">
               <AlertTriangle className="h-8 w-8 text-red-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">High-Impact</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-sm font-medium text-gray-600">High-Impact</p>
+                <p className="text-2xl font-bold text-gray-900">
                   {legalCases.filter(c => c.impactLevel === 'high').length}
                 </p>
               </div>
@@ -179,8 +179,8 @@ export default function LegalCasesNew() {
             <div className="flex items-center">
               <MapPin className="h-8 w-8 text-green-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Jurisdiktionen</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-sm font-medium text-gray-600">Jurisdiktionen</p>
+                <p className="text-2xl font-bold text-gray-900">
                   {new Set(legalCases.map(c => c.jurisdiction)).size}
                 </p>
               </div>
@@ -193,21 +193,21 @@ export default function LegalCasesNew() {
             <div className="flex items-center">
               <Calendar className="h-8 w-8 text-purple-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Gefilterte Fälle</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{filteredCases.length}</p>
+                <p className="text-sm font-medium text-gray-600">Gefilterte Fälle</p>
+                <p className="text-2xl font-bold text-gray-900">{filteredCases.length}</p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filter Controls */}
+      {/* Einfache Filter */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Filteroptionen</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium">Jurisdiktion</label>
               <Select value={selectedJurisdiction} onValueChange={setSelectedJurisdiction}>
@@ -216,33 +216,16 @@ export default function LegalCasesNew() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Alle Jurisdiktionen</SelectItem>
-                  <SelectItem value="US Federal">US Federal</SelectItem>
-                  <SelectItem value="US Supreme">US Supreme</SelectItem>
-                  <SelectItem value="FDA Enforcement">FDA Enforcement</SelectItem>
-                  <SelectItem value="EU Court">EU Court</SelectItem>
-                  <SelectItem value="German Federal">German Federal</SelectItem>
-                  <SelectItem value="UK High">UK High</SelectItem>
-                  <SelectItem value="Swiss Federal">Swiss Federal</SelectItem>
+                  <SelectItem value="US">USA (alle)</SelectItem>
+                  <SelectItem value="EU">Europa</SelectItem>
+                  <SelectItem value="German">Deutschland</SelectItem>
+                  <SelectItem value="UK">Vereinigtes Königreich</SelectItem>
+                  <SelectItem value="Swiss">Schweiz</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             
             <div>
-              <label className="text-sm font-medium">Impact Level</label>
-              <Select value={selectedImpact} onValueChange={setSelectedImpact}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Impact wählen" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle Impact Levels</SelectItem>
-                  <SelectItem value="high">High Impact</SelectItem>
-                  <SelectItem value="medium">Medium Impact</SelectItem>
-                  <SelectItem value="low">Low Impact</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="sm:col-span-2">
               <label className="text-sm font-medium">Suche</label>
               <div className="relative">
                 <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
@@ -258,31 +241,28 @@ export default function LegalCasesNew() {
         </CardContent>
       </Card>
 
-      {/* Debug Info */}
-      <div className="bg-blue-50 p-4 rounded-lg text-sm">
-        <p><strong>Debug Info:</strong></p>
-        <p>Total Cases: {legalCases.length}</p>
-        <p>Filtered Cases: {filteredCases.length}</p>
-        <p>Search Term: "{searchTerm}"</p>
-        <p>Selected Jurisdiction: {selectedJurisdiction}</p>
-        <p>Selected Impact: {selectedImpact}</p>
-      </div>
-
-      {/* Legal Cases Liste */}
+      {/* Legal Cases Liste - IMMER anzeigen wenn Daten da sind */}
       <div className="space-y-4">
-        {filteredCases.length === 0 ? (
+        {legalCases.length === 0 ? (
           <Card>
             <CardContent className="p-8 text-center">
               <Scale className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Keine Rechtsfälle gefunden</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Keine Daten geladen</h3>
+              <p className="text-gray-600">Verwenden Sie Enhanced Sync um Legal Cases zu laden.</p>
+            </CardContent>
+          </Card>
+        ) : filteredCases.length === 0 ? (
+          <Card>
+            <CardContent className="p-8 text-center">
+              <Scale className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Keine Treffer</h3>
               <p className="text-gray-600">
-                Passen Sie Ihre Filterkriterien an oder versuchen Sie eine andere Suche.
+                Keine Rechtsfälle entsprechen Ihren Filterkriterien. ({legalCases.length} insgesamt verfügbar)
               </p>
               <Button 
                 onClick={() => {
                   setSearchTerm("");
                   setSelectedJurisdiction("all");
-                  setSelectedImpact("all");
                 }}
                 variant="outline"
                 className="mt-4"
@@ -292,17 +272,18 @@ export default function LegalCasesNew() {
             </CardContent>
           </Card>
         ) : (
-          filteredCases.map((legalCase) => (
+          // Zeige gefilterte Cases
+          filteredCases.slice(0, 50).map((legalCase) => (
             <Card key={legalCase.id} className="hover:shadow-md transition-shadow">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <CardTitle className="text-lg mb-2">{legalCase.title}</CardTitle>
+                    <CardTitle className="text-lg mb-2">{legalCase.title || "Kein Titel"}</CardTitle>
                     <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
-                      <Badge variant="outline">{legalCase.caseNumber}</Badge>
+                      {legalCase.caseNumber && <Badge variant="outline">{legalCase.caseNumber}</Badge>}
                       <span className="flex items-center gap-1">
                         <MapPin className="h-4 w-4" />
-                        {legalCase.court}
+                        {legalCase.court || "Kein Gericht"}
                       </span>
                       <span className="flex items-center gap-1">
                         <Calendar className="h-4 w-4" />
@@ -311,16 +292,20 @@ export default function LegalCasesNew() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge className={getImpactColor(legalCase.impactLevel)}>
-                      {legalCase.impactLevel}
-                    </Badge>
-                    <Badge variant="secondary">{legalCase.jurisdiction}</Badge>
+                    {legalCase.impactLevel && (
+                      <Badge className={getImpactColor(legalCase.impactLevel)}>
+                        {legalCase.impactLevel}
+                      </Badge>
+                    )}
+                    {legalCase.jurisdiction && (
+                      <Badge variant="secondary">{legalCase.jurisdiction}</Badge>
+                    )}
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-700 dark:text-gray-300 mb-4 line-clamp-3">
-                  {legalCase.summary}
+                <p className="text-gray-700 mb-4 line-clamp-3">
+                  {legalCase.summary || "Keine Zusammenfassung verfügbar"}
                 </p>
                 
                 {/* Keywords */}
@@ -349,15 +334,15 @@ export default function LegalCasesNew() {
                         <div className="grid grid-cols-2 gap-4 text-sm">
                           <div>
                             <span className="font-medium">Aktenzeichen:</span>
-                            <p>{legalCase.caseNumber}</p>
+                            <p>{legalCase.caseNumber || "Nicht verfügbar"}</p>
                           </div>
                           <div>
                             <span className="font-medium">Gericht:</span>
-                            <p>{legalCase.court}</p>
+                            <p>{legalCase.court || "Nicht verfügbar"}</p>
                           </div>
                           <div>
                             <span className="font-medium">Jurisdiktion:</span>
-                            <p>{legalCase.jurisdiction}</p>
+                            <p>{legalCase.jurisdiction || "Nicht verfügbar"}</p>
                           </div>
                           <div>
                             <span className="font-medium">Entscheidungsdatum:</span>
@@ -367,13 +352,13 @@ export default function LegalCasesNew() {
                         
                         <div>
                           <span className="font-medium">Zusammenfassung:</span>
-                          <p className="mt-1 text-gray-700 dark:text-gray-300">{legalCase.summary}</p>
+                          <p className="mt-1 text-gray-700">{legalCase.summary || "Nicht verfügbar"}</p>
                         </div>
                         
                         <div>
                           <span className="font-medium">Volltext der Entscheidung:</span>
-                          <div className="mt-1 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-sm">
-                            {legalCase.content}
+                          <div className="mt-1 p-4 bg-gray-50 rounded-lg text-sm max-h-96 overflow-y-auto">
+                            {legalCase.content || "Volltext nicht verfügbar"}
                           </div>
                         </div>
                       </div>
