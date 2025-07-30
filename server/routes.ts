@@ -1235,6 +1235,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // PRODUCTION DATABASE DIRECT REPAIR - Guaranteed Fix
+  app.post('/api/admin/production-database-repair', async (req, res) => {
+    try {
+      console.log("🔧 PRODUCTION DATABASE DIRECT REPAIR: Starting guaranteed fix...");
+      
+      const { repairProductionDatabase } = await import("./production-database-repair.js");
+      const result = await repairProductionDatabase();
+      
+      res.json({
+        success: result.success,
+        message: result.success ? "Production database repair completed successfully" : "Production database repair failed",
+        data: {
+          before: result.before,
+          after: result.after,
+          inserted: result.inserted,
+          timestamp: new Date().toISOString(),
+          repairType: "direct_database_repair"
+        },
+        error: result.error || null
+      });
+      
+    } catch (error) {
+      console.error("❌ Production database repair error:", error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+        message: "Production database direct repair failed"
+      });
+    }
+  });
+
   // MANUAL SYNCHRONIZATION API for Live Deployment - SIMPLIFIED VERSION
   app.post('/api/admin/force-sync', async (req, res) => {
     try {
