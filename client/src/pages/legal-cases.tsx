@@ -268,13 +268,33 @@ export default function LegalCases() {
     }
   };
 
+  // Show loading overlay during sync
+  if (syncMutation.isPending) {
+    return (
+      <div className={cn(
+        "space-y-6",
+        device.isMobile ? "p-4" : device.isTablet ? "p-6" : "p-8"
+      )}>
+        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+              Legal Cases werden synchronisiert...
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              Bitte warten Sie, während die Datenbank aktualisiert wird.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={cn(
       "space-y-6",
       device.isMobile ? "p-4" : device.isTablet ? "p-6" : "p-8"
     )}>
-
-
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
@@ -287,13 +307,19 @@ export default function LegalCases() {
         <Button 
           onClick={() => syncMutation.mutate()}
           disabled={syncMutation.isPending}
+          className="min-w-[180px]"
         >
           {syncMutation.isPending ? (
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              Synchronisiere...
+            </>
           ) : (
-            <Download className="h-4 w-4 mr-2" />
+            <>
+              <Download className="h-4 w-4 mr-2" />
+              Daten synchronisieren
+            </>
           )}
-          Daten synchronisieren
         </Button>
       </div>
 
