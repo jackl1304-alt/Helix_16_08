@@ -125,9 +125,23 @@ export function EnhancedLegalCard({ case: legalCase }: EnhancedLegalCardProps) {
             <strong className="text-gray-700 dark:text-gray-300">Gericht:</strong>
             <p className="text-gray-600 dark:text-gray-400">{legalCase.court}</p>
           </div>
-          <div>
+          <div className="col-span-2">
             <strong className="text-gray-700 dark:text-gray-300">Ergebnis:</strong>
             <p className="text-gray-600 dark:text-gray-400">{legalCase.outcome}</p>
+            
+            {legalCase.verdict && (
+              <div className="mt-2 bg-red-50 dark:bg-red-900/20 p-2 rounded border-l-4 border-red-500">
+                <strong className="text-red-700 dark:text-red-300 text-xs">Urteilsspruch:</strong>
+                <p className="text-red-600 dark:text-red-400 text-xs mt-1 font-medium">{legalCase.verdict}</p>
+              </div>
+            )}
+            
+            {legalCase.damages && (
+              <div className="mt-2 bg-green-50 dark:bg-green-900/20 p-2 rounded border-l-4 border-green-500">
+                <strong className="text-green-700 dark:text-green-300 text-xs">Schadensersatz:</strong>
+                <p className="text-green-600 dark:text-green-400 text-xs mt-1 font-medium">{legalCase.damages}</p>
+              </div>
+            )}
           </div>
           <div>
             <strong className="text-gray-700 dark:text-gray-300">Gerätetype:</strong>
