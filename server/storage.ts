@@ -286,7 +286,7 @@ class MorningStorage implements IStorage {
   async getHistoricalDataSources() {
     try {
       console.log('[DB] getHistoricalDataSources called');
-      const result = await sql`SELECT * FROM data_sources ORDER BY created_at DESC LIMIT 100`;
+      const result = await sql`SELECT * FROM data_sources ORDER BY created_at DESC`;
       console.log(`[DB] Found ${result.length} historical data sources`);
       
       // Transform to consistent format
@@ -306,14 +306,13 @@ class MorningStorage implements IStorage {
 
   async getAllRegulatoryUpdates() {
     try {
-      console.log('[DB] getAllRegulatoryUpdates called (optimized with limit)');
-      // PERFORMANCE OPTIMIZATION: Limit to 100 most recent for faster loading
+      console.log('[DB] getAllRegulatoryUpdates called (ALL DATA - NO LIMITS)');
+      // REMOVED LIMITS: Get complete dataset for full data viewing
       const result = await sql`
         SELECT * FROM regulatory_updates 
-        ORDER BY published_at DESC 
-        LIMIT 100
+        ORDER BY published_at DESC
       `;
-      console.log(`[DB] getAllRegulatoryUpdates result count: ${result.length} (limited for performance)`);
+      console.log(`[DB] getAllRegulatoryUpdates result count: ${result.length} (ALL DATA)`);
       return result;
     } catch (error) {
       console.error("All regulatory updates error:", error);
@@ -416,14 +415,13 @@ class MorningStorage implements IStorage {
 
   async getAllLegalCases() {
     try {
-      console.log('[DB] getAllLegalCases called (optimized with limit)');
-      // PERFORMANCE OPTIMIZATION: Limit to 50 most recent for faster loading
+      console.log('[DB] getAllLegalCases called (ALL DATA - NO LIMITS)');
+      // REMOVED LIMITS: Get all legal cases for complete dataset viewing
       const result = await sql`
         SELECT * FROM legal_cases 
-        ORDER BY decision_date DESC 
-        LIMIT 50
+        ORDER BY decision_date DESC
       `;
-      console.log(`Fetched ${result.length} legal cases from database (limited for performance)`);
+      console.log(`Fetched ${result.length} legal cases from database (ALL DATA)`);
       return result.map(row => ({
         id: row.id,
         caseNumber: row.case_number,
