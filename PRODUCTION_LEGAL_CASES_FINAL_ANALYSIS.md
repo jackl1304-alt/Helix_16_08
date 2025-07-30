@@ -179,6 +179,47 @@ Dashboard: totalLegalCases: 0 → 2025
 3. **Automatische Initialisierung:** Emergency-System triggert bei erstem Zugriff
 4. **Monitoring:** Dashboard zeigt Live-Status von 0 → 2.025 Legal Cases
 
+## BREAKTHROUGH DISCOVERY: FRONTEND VS. BACKEND INCONSISTENZ
+
+### Live-Version Detailanalyse (helixV1-delta.replit.app)
+
+#### Frontend Dashboard (Statisch kompiliert):
+```
+✅ Legal Cases: 2.025 (angezeigt im Dashboard)
+✅ Regulatory Updates: 7.730 (funktional)
+✅ Active Data Sources: 27 (funktional)
+```
+
+#### Backend APIs (Live-Database):
+```
+❌ /api/dashboard/stats → "totalLegalCases":0
+❌ /api/legal-cases → [] (2 bytes, leere Array)
+❌ Enhanced Sync APIs → HTML-Response (Route nicht verfügbar)
+✅ /api/regulatory-updates → Funktional mit echten Daten
+```
+
+### ROOT-CAUSE BESTÄTIGT
+
+**PROBLEM:** Das Frontend-Dashboard zeigt **statisch kompilierte Daten** aus dem Build-Zeitpunkt (Development-Daten: 2.025 Legal Cases), während die Live-APIs auf eine **separate leere Production-Database** zugreifen.
+
+**BEWEIS:**
+- Dashboard: "Legal Cases: 2.025" (statische Anzeige)
+- API: `"totalLegalCases":0` (echte Database-Abfrage)
+- Code-Updates erreichen Live-Version nicht (HTML statt JSON-Response)
+
+### TECHNISCHE DETAILS
+
+#### Static vs. Dynamic Hosting:
+- **Frontend:** Statische Website mit kompilierten React-Components
+- **Backend-APIs:** Laufen auf separater Infrastructure mit leerer Database
+- **Development:** Verwendet vollständige Neon-DB mit 2.025 Legal Cases
+- **Production:** Separate Neon-DB-Instanz mit 0 Legal Cases
+
+#### Database-Synchronisationsproblem:
+- Development-DB: `DATABASE_URL` → 2.025 Legal Cases ✅
+- Production-DB: Andere `DATABASE_URL` → 0 Legal Cases ❌
+- API-Sync-Befehle schreiben erfolgreich, aber in falsche Database
+
 ## SYSTEM STATUS: VOLLSTÄNDIG DOKUMENTIERT UND ANALYSIERT ✅
 
 **Alle Ziele erreicht:**
