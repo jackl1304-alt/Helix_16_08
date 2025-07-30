@@ -360,16 +360,15 @@ class MorningStorage implements IStorage {
 
   async getAllRegulatoryUpdates() {
     try {
-      console.log('[DB] getAllRegulatoryUpdates called - ONLY RECENT DATA (nach 01.06.2024)');
-      // PERFORMANCE OPTIMIZATION: Nur aktuelle Updates nach 01.06.2024
-      // Ältere Daten sind in historischen Daten archiviert
-      const cutoffDate = '2024-06-01';
+      console.log('[DB] getAllRegulatoryUpdates called - ALLE DATEN FÜR FRONTEND');
+      // Frontend-Anzeige: Alle verfügbaren Regulatory Updates
+      // (Frontend kann selbst entscheiden, welche als "archiviert" gelten)
       const result = await sql`
         SELECT * FROM regulatory_updates 
-        WHERE published_at >= ${cutoffDate}
         ORDER BY published_at DESC
+        LIMIT 5000
       `;
-      console.log(`[DB] Recent regulatory updates (nach ${cutoffDate}): ${result.length} Einträge`);
+      console.log(`[DB] Alle regulatory updates für Frontend: ${result.length} Einträge`);
       return result;
     } catch (error) {
       console.error("All regulatory updates error:", error);
