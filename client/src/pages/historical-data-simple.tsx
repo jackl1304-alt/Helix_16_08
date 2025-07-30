@@ -7,14 +7,23 @@ import { Calendar, FileText, Database, TrendingUp } from "lucide-react";
 
 interface HistoricalDataRecord {
   id: string;
-  source_id: string;
-  title: string;
+  source_id?: string;
+  sourceId?: string;
+  title?: string;
+  documentTitle?: string;
   description?: string;
+  summary?: string;
   document_url?: string;
-  published_at: string;
+  published_at?: string;
+  originalDate?: string;
   archived_at?: string;
   change_type?: string;
   version?: string;
+  region?: string;
+  category?: string;
+  language?: string;
+  priority?: string;
+  deviceClasses?: string[];
 }
 
 export default function HistoricalData() {
@@ -136,11 +145,26 @@ export default function HistoricalData() {
               <Card key={item.id}>
                 <CardHeader>
                   <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">{item.title}</CardTitle>
-                      <CardDescription>{item.description}</CardDescription>
+                    <div className="flex-1 mr-4">
+                      <CardTitle className="text-lg">{item.title || item.documentTitle}</CardTitle>
+                      <CardDescription className="mt-1">
+                        {item.description || item.summary || 'Keine Beschreibung verfügbar'}
+                      </CardDescription>
+                      {item.region && (
+                        <Badge variant="secondary" className="mt-2 mr-2">{item.region}</Badge>
+                      )}
+                      {item.category && (
+                        <Badge variant="outline" className="mt-2">{item.category}</Badge>
+                      )}
                     </div>
-                    <Badge variant="outline">{item.source_id}</Badge>
+                    <div className="flex flex-col gap-2">
+                      <Badge variant="outline">{item.source_id || item.sourceId}</Badge>
+                      {item.priority && (
+                        <Badge variant={item.priority === 'high' ? 'destructive' : item.priority === 'medium' ? 'default' : 'secondary'}>
+                          {item.priority}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -148,13 +172,35 @@ export default function HistoricalData() {
                     <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-300">
                       <span className="flex items-center">
                         <Calendar className="h-4 w-4 mr-1" />
-                        {new Date(item.published_at).toLocaleDateString('de-DE')}
+                        {(() => {
+                          try {
+                            const date = new Date(item.published_at || item.originalDate);
+                            return isNaN(date.getTime()) 
+                              ? (item.published_at || item.originalDate || 'Unbekannt').split('T')[0] 
+                              : date.toLocaleDateString('de-DE', {
+                                  year: 'numeric',
+                                  month: '2-digit', 
+                                  day: '2-digit'
+                                });
+                          } catch {
+                            return 'Unbekannt';
+                          }
+                        })()}
                       </span>
                       {item.change_type && (
                         <Badge variant="secondary">{item.change_type}</Badge>
                       )}
                       {item.version && (
-                        <Badge variant="outline">{item.version}</Badge>
+                        <Badge variant="outline">v{item.version}</Badge>
+                      )}
+                      {item.language && (
+                        <Badge variant="outline">{item.language}</Badge>
+                      )}
+                      {item.deviceClasses && item.deviceClasses.length > 0 && (
+                        <span className="text-xs text-gray-500">
+                          Geräte: {item.deviceClasses.slice(0, 2).join(', ')}
+                          {item.deviceClasses.length > 2 && ` +${item.deviceClasses.length - 2} weitere`}
+                        </span>
                       )}
                     </div>
                     {item.document_url && (
