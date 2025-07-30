@@ -38,6 +38,8 @@ interface LegalDataRecord {
   summary: string;
   fullText?: string;
   outcome: string;
+  verdict?: string;
+  damages?: string;
   significance: string;
   deviceType: string;
   legalIssues: string[];

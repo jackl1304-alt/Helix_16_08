@@ -328,7 +328,7 @@ Für Rückfragen wenden Sie sich an die entsprechende Regulierungsbehörde.
     }
 
     this.changeHistory = changes;
-    return changes.slice(0, 100);
+    return changes; // Entferne Limit - zeige alle Änderungen
   }
 
   private async performDetailedComparison(oldDoc: HistoricalDataRecord, newDoc: HistoricalDataRecord): Promise<DetailedComparison> {
@@ -441,14 +441,14 @@ Für Rückfragen wenden Sie sich an die entsprechende Regulierungsbehörde.
     const oldLines = new Set(oldContent.split('\n').filter(line => line.trim()));
     const newLines = newContent.split('\n').filter(line => line.trim());
     
-    return newLines.filter(line => !oldLines.has(line)).slice(0, 10);
+    return newLines.filter(line => !oldLines.has(line)); // Zeige alle neuen Zeilen
   }
 
   private findRemovedContent(oldContent: string, newContent: string): string[] {
     const newLines = new Set(newContent.split('\n').filter(line => line.trim()));
     const oldLines = oldContent.split('\n').filter(line => line.trim());
     
-    return oldLines.filter(line => !newLines.has(line)).slice(0, 10);
+    return oldLines.filter(line => !newLines.has(line)); // Zeige alle entfernten Zeilen
   }
 
   private findModifiedSections(oldContent: string, newContent: string): string[] {
@@ -617,7 +617,7 @@ Für Rückfragen wenden Sie sich an die entsprechende Regulierungsbehörde.
       highImpactChanges: sourceChanges.filter(c => c.impactAssessment === 'high').length,
       categorization,
       languageDistribution,
-      recentActivity: sourceChanges.slice(0, 10)
+      recentActivity: sourceChanges // Zeige alle Aktivitäten
     };
   }
 

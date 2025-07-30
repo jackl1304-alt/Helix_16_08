@@ -424,7 +424,7 @@ The case highlights the ongoing evolution of medical device law and the need for
     const changes: ChangeDetection[] = [];
     const changeTypes = ['appeal_filed', 'decision_reversed', 'settlement_reached', 'precedent_overruled'];
     
-    for (let i = 0; i < (limit || 10); i++) {
+    for (let i = 0; i < (limit || 10000); i++) { // Entferne Limit für vollständige Anzeige
       const sourceIds = Object.keys(legalDataSources);
       const sourceId = this.getRandomElement(sourceIds);
       const sourceData = this.legalData.get(sourceId) || [];
