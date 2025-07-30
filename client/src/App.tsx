@@ -5,21 +5,21 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
-import DashboardFixed from "@/pages/dashboard-fixed";
+import Dashboard from "@/pages/dashboard";
 import DataCollection from "@/pages/data-collection";
 import GlobalSources from "@/pages/global-sources";
 import Analytics from "@/pages/analytics";
-import RegulatoryUpdates from "@/pages/regulatory-updates-fixed";
+import RegulatoryUpdates from "@/pages/regulatory-updates";
 import NewsletterManager from "@/pages/newsletter-manager";
-import ApprovalWorkflowFixed from "@/pages/approval-workflow-fixed";
+import ApprovalWorkflow from "@/pages/approval-workflow";
 import UserManagement from "@/pages/user-management";
 import SystemSettings from "@/pages/system-settings";
 import AuditLogs from "@/pages/audit-logs";
 import AIInsights from "@/pages/ai-insights";
 import KnowledgeBase from "@/pages/knowledge-base";
 import AIApprovalDemo from "@/pages/ai-approval-demo";
-import HistoricalData from "@/pages/historical-data-7am";
-import LegalCases from "@/pages/legal-cases-direct";
+import HistoricalData from "@/pages/historical-data";
+import LegalCases from "@/pages/legal-cases";
 import IntelligentSearch from "@/pages/intelligent-search";
 import DocumentViewer from "@/pages/document-viewer";
 import SyncManager from "@/pages/sync-manager";
@@ -29,14 +29,14 @@ function Router() {
   return (
     <Switch>
       {/* Pages with Sidebar */}
-      <Route path="/" component={DashboardFixed} />
+      <Route path="/" component={Dashboard} />
       <Route path="/data-collection" component={DataCollection} />
       <Route path="/global-sources" component={GlobalSources} />
       <Route path="/analytics" component={Analytics} />
       <Route path="/regulatory-updates" component={RegulatoryUpdates} />
       <Route path="/sync-manager" component={SyncManager} />
       <Route path="/newsletter-manager" component={NewsletterManager} />
-      <Route path="/approval-workflow" component={ApprovalWorkflowFixed} />
+      <Route path="/approval-workflow" component={ApprovalWorkflow} />
       <Route path="/user-management" component={UserManagement} />
       <Route path="/system-settings" component={SystemSettings} />
       <Route path="/audit-logs" component={AuditLogs} />
