@@ -93,6 +93,10 @@ Der Antrag auf gerichtliche Überprüfung wird abgewiesen. Die FDA-Entscheidung 
   
   const randomDecision = decisions[Math.floor(Math.random() * decisions.length)];
   
+  if (!randomDecision) {
+    return `${court.toUpperCase()}\n${caseNumber}\n${title}\n\nEntscheidung vom ${decisionDate}\n\nKeine Entscheidungsdetails verfügbar.`;
+  }
+  
   return `
 ${court.toUpperCase()}
 ${caseNumber}

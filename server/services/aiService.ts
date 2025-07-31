@@ -36,7 +36,7 @@ export class AIService {
 
       return optimization;
     } catch (error) {
-      console.error("Error optimizing product:", error);
+      // console.error("Error optimizing product:", error);
       throw error;
     }
   }
@@ -88,7 +88,7 @@ export class AIService {
         autoProcessed: fraudScore < 0.3 && inventoryCheck.allAvailable,
       };
     } catch (error) {
-      console.error("Error processing order:", error);
+      // console.error("Error processing order:", error);
       throw error;
     }
   }
@@ -155,7 +155,7 @@ export class AIService {
         escalated: shouldEscalate,
       };
     } catch (error) {
-      console.error("Error handling customer service:", error);
+      // console.error("Error handling customer service:", error);
       throw error;
     }
   }
@@ -189,7 +189,7 @@ export class AIService {
         aiRecommendations: campaign,
       };
     } catch (error) {
-      console.error("Error generating marketing campaign:", error);
+      // console.error("Error generating marketing campaign:", error);
       throw error;
     }
   }
@@ -233,7 +233,7 @@ export class AIService {
         recommendations: this.generateSegmentRecommendations(segments),
       };
     } catch (error) {
-      console.error("Error analyzing customer segmentation:", error);
+      // console.error("Error analyzing customer segmentation:", error);
       throw error;
     }
   }
@@ -279,7 +279,7 @@ export class AIService {
         autoUpdated: optimizations.filter(o => Math.abs((o.suggestedPrice - o.currentPrice) / o.currentPrice) < 0.1).length,
       };
     } catch (error) {
-      console.error("Error optimizing product pricing:", error);
+      // console.error("Error optimizing product pricing:", error);
       throw error;
     }
   }
@@ -315,7 +315,7 @@ export class AIService {
         totalRecommendedOrders: recommendations.reduce((sum, r) => sum + r.suggestedOrder, 0),
       };
     } catch (error) {
-      console.error("Error optimizing inventory:", error);
+      // console.error("Error optimizing inventory:", error);
       throw error;
     }
   }

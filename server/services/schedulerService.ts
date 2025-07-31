@@ -8,18 +8,18 @@ class SchedulerService {
 
   start(): void {
     if (this.isRunning) {
-      console.log("Scheduler already running");
+      // console.log("Scheduler already running");
       return;
     }
 
-    console.log("Starting scheduler service...");
+    // console.log("Starting scheduler service...");
     this.isRunning = true;
 
     // Daily data collection at 6 AM UTC
     this.scheduleDaily(() => {
-      console.log("Running daily data collection...");
+      // console.log("Running daily data collection...");
       dataCollectionService.syncAllSources().catch(error => {
-        console.error("Daily data collection failed:", error);
+        // console.error("Daily data collection failed:", error);
         this.notifyAdminsOfError("Daily Data Collection Failed", error.message);
       });
     }, { hour: 6, minute: 0 });
@@ -27,26 +27,26 @@ class SchedulerService {
     // Hourly check for urgent approvals
     this.scheduleHourly(() => {
       this.checkUrgentApprovals().catch(error => {
-        console.error("Urgent approvals check failed:", error);
+        // console.error("Urgent approvals check failed:", error);
       });
     });
 
     // Weekly newsletter generation (Mondays at 9 AM UTC)
     this.scheduleWeekly(() => {
       this.generateWeeklyNewsletter().catch(error => {
-        console.error("Weekly newsletter generation failed:", error);
+        // console.error("Weekly newsletter generation failed:", error);
       });
     }, { day: 1, hour: 9, minute: 0 }); // Monday = 1
 
-    console.log("Scheduler service started successfully");
+    // console.log("Scheduler service started successfully");
   }
 
   stop(): void {
-    console.log("Stopping scheduler service...");
+    // console.log("Stopping scheduler service...");
     this.intervals.forEach(interval => clearInterval(interval));
     this.intervals = [];
     this.isRunning = false;
-    console.log("Scheduler service stopped");
+    // console.log("Scheduler service stopped");
   }
 
   private scheduleDaily(callback: () => void, time: { hour: number; minute: number }): void {
@@ -127,13 +127,13 @@ class SchedulerService {
         await this.notifyAdminsOfUrgentApprovals(overdueApprovals);
       }
     } catch (error) {
-      console.error("Error checking urgent approvals:", error);
+      // console.error("Error checking urgent approvals:", error);
     }
   }
 
   private async generateWeeklyNewsletter(): Promise<void> {
     try {
-      console.log("Generating weekly newsletter...");
+      // console.log("Generating weekly newsletter...");
       
       // Get updates from the past week
       const lastWeek = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -148,7 +148,7 @@ class SchedulerService {
       );
 
       if (weeklyUpdates.length === 0) {
-        console.log("No updates this week, skipping newsletter generation");
+        // console.log("No updates this week, skipping newsletter generation");
         return;
       }
 
@@ -164,13 +164,13 @@ class SchedulerService {
         scheduledFor: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours from now
       });
 
-      console.log(`Weekly newsletter generated: ${newsletter.id}`);
+      // console.log(`Weekly newsletter generated: ${newsletter.id}`);
       
       // Notify admins that newsletter is ready for review
       await this.notifyAdminsOfNewsletter(newsletter);
       
     } catch (error) {
-      console.error("Error generating weekly newsletter:", error);
+      // console.error("Error generating weekly newsletter:", error);
     }
   }
 
@@ -285,7 +285,7 @@ For detailed information and analysis, visit your Helix dashboard.
         'urgent'
       );
     } catch (error) {
-      console.error("Failed to notify admins of error:", error);
+      // console.error("Failed to notify admins of error:", error);
     }
   }
 
@@ -303,7 +303,7 @@ For detailed information and analysis, visit your Helix dashboard.
         'urgent'
       );
     } catch (error) {
-      console.error("Failed to notify admins of urgent approvals:", error);
+      // console.error("Failed to notify admins of urgent approvals:", error);
     }
   }
 
@@ -321,7 +321,7 @@ For detailed information and analysis, visit your Helix dashboard.
         'medium'
       );
     } catch (error) {
-      console.error("Failed to notify admins of newsletter:", error);
+      // console.error("Failed to notify admins of newsletter:", error);
     }
   }
 }
