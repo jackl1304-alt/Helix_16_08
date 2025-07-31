@@ -24,6 +24,7 @@ const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
   { name: "Data Collection", href: "/data-collection", icon: Database },
   { name: "Sync Manager", href: "/sync-manager", icon: RefreshCw },
+  { name: "Phase 1 Integration", href: "/phase1-integration", icon: Shield },
   { name: "Global Sources", href: "/global-sources", icon: Globe },
   { name: "Regulatory Updates", href: "/regulatory-updates", icon: FileText },
   { name: "Newsletter Manager", href: "/newsletter-manager", icon: Newspaper },

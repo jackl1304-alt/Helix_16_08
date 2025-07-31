@@ -14,6 +14,14 @@ import {
 } from "../shared/schema";
 
 import { PDFService } from "./services/pdfService";
+import { FDAOpenAPIService } from "./services/fdaOpenApiService";
+import { RSSMonitoringService } from "./services/rssMonitoringService";
+import { DataQualityService } from "./services/dataQualityService";
+
+// Initialize new Phase 1 services
+const fdaApiService = new FDAOpenAPIService();
+const rssService = new RSSMonitoringService();
+const qualityService = new DataQualityService();
 
 // Generate full legal decision content for realistic court cases
 function generateFullLegalDecision(legalCase: any): string {
@@ -1525,6 +1533,155 @@ Status: Archiviertes historisches Dokument
     } catch (error) {
       console.error("Error fetching all data:", error);
       res.status(500).json({ error: "Failed to fetch complete data" });
+    }
+  });
+
+  // ========== PHASE 1 NEW API ENDPOINTS ==========
+  
+  // FDA OpenAPI Integration
+  app.post("/api/fda/sync-510k", async (req, res) => {
+    try {
+      console.log('[API] Starting FDA 510(k) sync...');
+      await fdaApiService.collect510kDevices(50);
+      res.json({ success: true, message: 'FDA 510(k) sync completed' });
+    } catch (error: any) {
+      console.error('[API] FDA 510(k) sync failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/fda/sync-recalls", async (req, res) => {
+    try {
+      console.log('[API] Starting FDA recalls sync...');
+      await fdaApiService.collectRecalls(25);
+      res.json({ success: true, message: 'FDA recalls sync completed' });
+    } catch (error: any) {
+      console.error('[API] FDA recalls sync failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/fda/sync-all", async (req, res) => {
+    try {
+      console.log('[API] Starting complete FDA sync...');
+      await fdaApiService.syncFDAData();
+      res.json({ success: true, message: 'Complete FDA sync finished' });
+    } catch (error: any) {
+      console.error('[API] Complete FDA sync failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // RSS Monitoring Service
+  app.post("/api/rss/monitor-feeds", async (req, res) => {
+    try {
+      console.log('[API] Starting RSS monitoring cycle...');
+      await rssService.monitorAllFeeds();
+      res.json({ success: true, message: 'RSS monitoring completed' });
+    } catch (error: any) {
+      console.error('[API] RSS monitoring failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/rss/feeds-status", async (req, res) => {
+    try {
+      const status = rssService.getFeedStatus();
+      res.json(status);
+    } catch (error: any) {
+      console.error('[API] RSS feeds status failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/rss/start-monitoring", async (req, res) => {
+    try {
+      console.log('[API] Starting continuous RSS monitoring...');
+      rssService.startContinuousMonitoring();
+      res.json({ success: true, message: 'Continuous RSS monitoring started' });
+    } catch (error: any) {
+      console.error('[API] Start RSS monitoring failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Data Quality Service
+  app.post("/api/quality/analyze", async (req, res) => {
+    try {
+      console.log('[API] Starting data quality analysis...');
+      const updates = await storage.getAllRegulatoryUpdates();
+      const report = await qualityService.generateQualityReport(updates);
+      res.json(report);
+    } catch (error: any) {
+      console.error('[API] Data quality analysis failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/quality/find-duplicates", async (req, res) => {
+    try {
+      const { threshold = 0.85 } = req.body;
+      console.log(`[API] Finding duplicates with threshold ${threshold}...`);
+      
+      const updates = await storage.getAllRegulatoryUpdates();
+      const duplicates = await qualityService.findDuplicates(updates, threshold);
+      
+      res.json({ 
+        duplicates, 
+        total: duplicates.length,
+        threshold,
+        analyzed: updates.length 
+      });
+    } catch (error: any) {
+      console.error('[API] Find duplicates failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/quality/clean-batch", async (req, res) => {
+    try {
+      console.log('[API] Starting batch data cleaning...');
+      const updates = await storage.getAllRegulatoryUpdates();
+      const cleanedData = await qualityService.cleanBatchData(updates.slice(0, 100));
+      
+      res.json({ 
+        success: true, 
+        cleaned: cleanedData.length,
+        message: 'Batch data cleaning completed' 
+      });
+    } catch (error: any) {
+      console.error('[API] Batch cleaning failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Combined Phase 1 Sync Endpoint
+  app.post("/api/phase1/sync-all", async (req, res) => {
+    try {
+      console.log('[API] Starting Phase 1 comprehensive sync...');
+      
+      // Run all Phase 1 services
+      await Promise.all([
+        fdaApiService.syncFDAData(),
+        rssService.monitorAllFeeds()
+      ]);
+      
+      // Generate quality report
+      const updates = await storage.getAllRegulatoryUpdates();
+      const qualityReport = await qualityService.generateQualityReport(updates);
+      
+      res.json({ 
+        success: true, 
+        message: 'Phase 1 comprehensive sync completed',
+        qualityReport: {
+          totalUpdates: qualityReport.metrics.totalUpdates,
+          averageScore: qualityReport.metrics.averageQualityScore,
+          duplicates: qualityReport.metrics.duplicateCount
+        }
+      });
+    } catch (error: any) {
+      console.error('[API] Phase 1 sync failed:', error);
+      res.status(500).json({ message: error.message });
     }
   });
 
