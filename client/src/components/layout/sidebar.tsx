@@ -48,6 +48,7 @@ const knowledgeBase = [
 
 const administration = [
   { name: "User Management", href: "/user-management", icon: Users },
+  { name: "Data Sources Admin", href: "/administration/data-sources", icon: Database },
   { name: "System Settings", href: "/system-settings", icon: Settings },
   { name: "Audit Logs", href: "/audit-logs", icon: FileText },
 ];
