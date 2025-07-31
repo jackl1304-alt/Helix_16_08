@@ -392,7 +392,7 @@ export default function KnowledgeBasePage() {
         description: message,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/knowledge/sources-status'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/knowledge/combined-articles'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/knowledge/articles'] });
       queryClient.invalidateQueries({ queryKey: ['/api/regulatory-updates'] });
     },
     onError: (error: any) => {
