@@ -27,6 +27,7 @@ export default function EnhancedLegalCases() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJurisdiction, setSelectedJurisdiction] = useState('all');
   const [selectedImpactLevel, setSelectedImpactLevel] = useState('all');
+  const [selectedDocument, setSelectedDocument] = useState<ComprehensiveLegalCase | null>(null);
   const queryClient = useQueryClient();
 
   // Fetch comprehensive legal cases from Enhanced API
@@ -400,11 +401,12 @@ export default function EnhancedLegalCases() {
                         
                         {legalCase.documentUrl && (
                           <div className="flex justify-end">
-                            <Button variant="outline" asChild>
-                              <a href={legalCase.documentUrl} target="_blank" rel="noopener noreferrer">
-                                <FileText className="w-4 h-4 mr-2" />
-                                View Court Documents
-                              </a>
+                            <Button 
+                              variant="outline" 
+                              onClick={() => setSelectedDocument(legalCase)}
+                            >
+                              <FileText className="w-4 h-4 mr-2" />
+                              Dokument anzeigen
                             </Button>
                           </div>
                         )}
@@ -428,6 +430,76 @@ export default function EnhancedLegalCases() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Document Viewer Modal */}
+      {selectedDocument && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-4xl max-h-[90vh] w-full overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h2 className="text-xl font-semibold">Gerichtsdokument</h2>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setSelectedDocument(null)}
+              >
+                ✕
+              </Button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              <div className="space-y-4">
+                <div className="border-b pb-4">
+                  <h3 className="text-lg font-semibold mb-2">{selectedDocument.title}</h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                    <div><strong>Fall-Nr:</strong> {selectedDocument.caseNumber}</div>
+                    <div><strong>Gericht:</strong> {selectedDocument.court}</div>
+                    <div><strong>Jurisdiktion:</strong> {selectedDocument.jurisdiction}</div>
+                    <div><strong>Datum:</strong> {new Date(selectedDocument.decisionDate).toLocaleDateString('de-DE')}</div>
+                  </div>
+                </div>
+                
+                <div className="prose max-w-none">
+                  <h4 className="text-lg font-semibold mb-3">Vollständiges Gerichtsdokument</h4>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed">
+                      {selectedDocument.content}
+                    </pre>
+                  </div>
+                </div>
+                
+                <div className="flex justify-between items-center pt-4 border-t">
+                  <div className="text-sm text-gray-500">
+                    Quelle: {selectedDocument.documentUrl}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline"
+                      onClick={() => {
+                        const content = `${selectedDocument.title}\n\n${selectedDocument.content}`;
+                        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${selectedDocument.caseNumber.replace(/[^a-z0-9]/gi, '_')}_Gerichtsdokument.txt`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                      }}
+                    >
+                      <FileText className="w-4 h-4 mr-2" />
+                      Herunterladen
+                    </Button>
+                    <Button onClick={() => setSelectedDocument(null)}>
+                      Schließen
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
