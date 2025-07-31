@@ -48,10 +48,22 @@ export default function RegulatoryUpdates() {
   const [selectedType, setSelectedType] = useState<string>("all");
 
   const { data: updates, isLoading, error: updatesError } = useQuery<RegulatoryUpdate[]>({
-    queryKey: ["/api/regulatory-updates"],
+    queryKey: ["/api/regulatory-updates/recent"],
     staleTime: 30000,
     gcTime: 60000,
     refetchOnMount: true,
+  });
+
+  // DEBUG: Log der ersten paar Updates
+  console.log("REGULATORY UPDATES DEBUG:", {
+    totalUpdates: updates?.length,
+    firstUpdate: updates?.[0] ? {
+      title: updates[0].title,
+      description: updates[0].description,
+      source_id: updates[0].source_id,
+      hasDescription: !!updates[0].description,
+      hasSourceId: !!updates[0].source_id
+    } : null
   });
 
   const filteredUpdates = (updates || []).filter(update => {
@@ -308,22 +320,39 @@ Helix Regulatory Intelligence Platform
                   
                   <div>
                     <label className="text-sm font-medium text-gray-500">Beschreibung</label>
-                    <p className="mt-1 text-sm">{update.description}</p>
+                    <div className="mt-1 text-sm bg-blue-50 p-3 rounded border">
+                      {update.description || 'Keine Beschreibung verfügbar'}
+                    </div>
                   </div>
                   
                   <div>
                     <label className="text-sm font-medium text-gray-500">Vollständiger Inhalt</label>
-                    <div className="mt-1 text-sm bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
-                      <p><strong>Titel:</strong> {update.title}</p>
-                      <p><strong>Beschreibung:</strong> {update.description}</p>
-                      <p><strong>Quelle ID:</strong> {update.source_id}</p>
-                      <p><strong>Region:</strong> {update.region}</p>
-                      <p><strong>Priorität:</strong> {priorityLabels[update.priority]}</p>
-                      <p><strong>Typ:</strong> {update.update_type}</p>
-                      <p><strong>Veröffentlicht am:</strong> {new Date(update.published_at).toLocaleDateString('de-DE')}</p>
+                    <div className="mt-1 text-sm bg-gray-50 dark:bg-gray-900 p-4 rounded-lg space-y-2">
+                      <div><strong>Titel:</strong> <span className="text-blue-600">{update.title || 'Nicht verfügbar'}</span></div>
+                      <div><strong>Beschreibung:</strong> <span className="text-green-600">{update.description || 'Keine Beschreibung vorhanden'}</span></div>
+                      <div><strong>Quelle ID:</strong> <span className="text-purple-600">{update.source_id || 'Keine Quelle-ID'}</span></div>
+                      <div><strong>Region:</strong> <span className="text-orange-600">{update.region || 'Unbekannt'}</span></div>
+                      <div><strong>Priorität:</strong> <span className="text-red-600">{priorityLabels[update.priority] || update.priority || 'Nicht gesetzt'}</span></div>
+                      <div><strong>Typ:</strong> <span className="text-indigo-600">{update.update_type || 'Nicht klassifiziert'}</span></div>
+                      <div><strong>Veröffentlicht am:</strong> <span className="text-gray-600">{update.published_at ? new Date(update.published_at).toLocaleDateString('de-DE') : 'Kein Datum'}</span></div>
                       {update.source_url && (
-                        <p><strong>Quelle-URL:</strong> {update.source_url}</p>
+                        <div><strong>Quelle-URL:</strong> <span className="text-blue-500 break-all">{update.source_url}</span></div>
                       )}
+                      {!update.source_url && (
+                        <div><strong>Quelle-URL:</strong> <span className="text-gray-400">Nicht verfügbar</span></div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* DEBUG INFO für Benutzer */}
+                  <div>
+                    <label className="text-sm font-medium text-red-500">DEBUG - Rohdaten-Check</label>
+                    <div className="mt-1 text-xs bg-red-50 p-3 rounded border border-red-200">
+                      <div>update.description: "{update.description}"</div>
+                      <div>update.source_id: "{update.source_id}"</div>
+                      <div>Datentyp description: {typeof update.description}</div>
+                      <div>Datentyp source_id: {typeof update.source_id}</div>
+                      <div>Daten verfügbar: {update.description ? '✅' : '❌'} / {update.source_id ? '✅' : '❌'}</div>
                     </div>
                   </div>
                   
