@@ -17,11 +17,17 @@ import { PDFService } from "./services/pdfService";
 import { FDAOpenAPIService } from "./services/fdaOpenApiService";
 import { RSSMonitoringService } from "./services/rssMonitoringService";
 import { DataQualityService } from "./services/dataQualityService";
+import { EUDAMEDService } from "./services/eudamedService";
+import { CrossReferenceService } from "./services/crossReferenceService";
+import { RegionalExpansionService } from "./services/regionalExpansionService";
 
-// Initialize new Phase 1 services
+// Initialize Phase 1 & 2 services
 const fdaApiService = new FDAOpenAPIService();
 const rssService = new RSSMonitoringService();
 const qualityService = new DataQualityService();
+const eudamedService = new EUDAMEDService();
+const crossRefService = new CrossReferenceService();
+const regionalService = new RegionalExpansionService();
 
 // Generate full legal decision content for realistic court cases
 function generateFullLegalDecision(legalCase: any): string {
@@ -1681,6 +1687,181 @@ Status: Archiviertes historisches Dokument
       });
     } catch (error: any) {
       console.error('[API] Phase 1 sync failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ========== PHASE 2 NEW API ENDPOINTS ==========
+  
+  // EUDAMED Integration
+  app.post("/api/eudamed/sync-devices", async (req, res) => {
+    try {
+      console.log('[API] Starting EUDAMED device sync...');
+      await eudamedService.collectDeviceRegistrations(30);
+      res.json({ success: true, message: 'EUDAMED device sync completed' });
+    } catch (error: any) {
+      console.error('[API] EUDAMED device sync failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/eudamed/sync-incidents", async (req, res) => {
+    try {
+      console.log('[API] Starting EUDAMED incident sync...');
+      await eudamedService.collectIncidentReports(15);
+      res.json({ success: true, message: 'EUDAMED incident sync completed' });
+    } catch (error: any) {
+      console.error('[API] EUDAMED incident sync failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/eudamed/sync-all", async (req, res) => {
+    try {
+      console.log('[API] Starting complete EUDAMED sync...');
+      await eudamedService.syncEUDAMEDData();
+      res.json({ success: true, message: 'Complete EUDAMED sync finished' });
+    } catch (error: any) {
+      console.error('[API] Complete EUDAMED sync failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Cross-Reference Engine
+  app.post("/api/crossref/map-devices", async (req, res) => {
+    try {
+      console.log('[API] Starting device mapping...');
+      const mappings = await crossRefService.mapDevicesBetweenJurisdictions();
+      res.json({ 
+        success: true, 
+        mappings, 
+        count: mappings.length,
+        message: 'Device mapping completed' 
+      });
+    } catch (error: any) {
+      console.error('[API] Device mapping failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/crossref/map-standards", async (req, res) => {
+    try {
+      console.log('[API] Starting standards mapping...');
+      const mappings = await crossRefService.mapStandardsToRegulations();
+      res.json({ 
+        success: true, 
+        mappings, 
+        count: mappings.length,
+        message: 'Standards mapping completed' 
+      });
+    } catch (error: any) {
+      console.error('[API] Standards mapping failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/crossref/timeline/:deviceId", async (req, res) => {
+    try {
+      const { deviceId } = req.params;
+      console.log(`[API] Generating timeline for device: ${deviceId}`);
+      const timeline = await crossRefService.generateRegulatoryTimeline(deviceId);
+      
+      if (timeline) {
+        res.json(timeline);
+      } else {
+        res.status(404).json({ message: 'Device timeline not found' });
+      }
+    } catch (error: any) {
+      console.error('[API] Timeline generation failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/crossref/comprehensive", async (req, res) => {
+    try {
+      console.log('[API] Starting comprehensive cross-reference...');
+      const result = await crossRefService.generateComprehensiveCrossReference();
+      res.json({ 
+        success: true, 
+        ...result,
+        message: 'Comprehensive cross-reference completed' 
+      });
+    } catch (error: any) {
+      console.error('[API] Comprehensive cross-reference failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Regional Expansion Service
+  app.post("/api/regional/sync/:authorityId", async (req, res) => {
+    try {
+      const { authorityId } = req.params;
+      console.log(`[API] Starting regional sync for: ${authorityId}`);
+      await regionalService.collectRegionalUpdates(authorityId);
+      res.json({ success: true, message: `Regional sync completed for ${authorityId}` });
+    } catch (error: any) {
+      console.error(`[API] Regional sync failed for ${req.params.authorityId}:`, error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/regional/sync-all", async (req, res) => {
+    try {
+      console.log('[API] Starting all regional authorities sync...');
+      await regionalService.syncAllRegionalAuthorities();
+      res.json({ success: true, message: 'All regional authorities sync completed' });
+    } catch (error: any) {
+      console.error('[API] All regional sync failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/regional/authorities-status", async (req, res) => {
+    try {
+      const status = regionalService.getAuthorityStatus();
+      res.json(status);
+    } catch (error: any) {
+      console.error('[API] Regional authorities status failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/regional/authorities", async (req, res) => {
+    try {
+      const authorities = regionalService.getRegionalAuthorities();
+      res.json(authorities);
+    } catch (error: any) {
+      console.error('[API] Get regional authorities failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Combined Phase 2 Sync Endpoint
+  app.post("/api/phase2/sync-all", async (req, res) => {
+    try {
+      console.log('[API] Starting Phase 2 comprehensive sync...');
+      
+      // Run all Phase 2 services
+      const results = await Promise.allSettled([
+        eudamedService.syncEUDAMEDData(),
+        regionalService.syncAllRegionalAuthorities(),
+        crossRefService.generateComprehensiveCrossReference()
+      ]);
+      
+      const successCount = results.filter(r => r.status === 'fulfilled').length;
+      const totalCount = results.length;
+      
+      res.json({ 
+        success: successCount === totalCount, 
+        message: `Phase 2 sync completed: ${successCount}/${totalCount} services successful`,
+        results: results.map((r, i) => ({
+          service: ['EUDAMED', 'Regional', 'CrossRef'][i],
+          status: r.status,
+          ...(r.status === 'rejected' && { error: r.reason?.message })
+        }))
+      });
+    } catch (error: any) {
+      console.error('[API] Phase 2 sync failed:', error);
       res.status(500).json({ message: error.message });
     }
   });

@@ -15,7 +15,8 @@ import {
   Shield,
   Search,
   RefreshCw,
-  Bot
+  Bot,
+  Network
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoPath from "@assets/ICON Helix_1753735921077.jpg";
@@ -25,6 +26,7 @@ const navigation = [
   { name: "Data Collection", href: "/data-collection", icon: Database },
   { name: "Sync Manager", href: "/sync-manager", icon: RefreshCw },
   { name: "Phase 1 Integration", href: "/phase1-integration", icon: Shield },
+  { name: "Phase 2 Extensions", href: "/phase2-integration", icon: Network },
   { name: "Global Sources", href: "/global-sources", icon: Globe },
   { name: "Regulatory Updates", href: "/regulatory-updates", icon: FileText },
   { name: "Newsletter Manager", href: "/newsletter-manager", icon: Newspaper },
