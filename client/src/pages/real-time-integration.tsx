@@ -143,7 +143,7 @@ export default function RealTimeIntegration() {
   });
 
   const standardizeDataMutation = useMutation({
-    mutationFn: () => apiRequest('/api/quality/standardize', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/quality/standardize', 'POST'),
     onSuccess: (data: any) => {
       toast({
         title: "Data Standardization Complete",
@@ -163,7 +163,7 @@ export default function RealTimeIntegration() {
   });
 
   const qualityValidationMutation = useMutation({
-    mutationFn: () => apiRequest('/api/quality/validate-all', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/quality/validate-all', 'POST'),
     onSuccess: (data: any) => {
       toast({
         title: "Quality Validation Complete",
@@ -184,7 +184,7 @@ export default function RealTimeIntegration() {
 
   // Master Sync Mutation
   const masterSyncMutation = useMutation({
-    mutationFn: () => apiRequest('/api/master/sync-all', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/master/sync-all', 'POST'),
     onSuccess: (data: any) => {
       toast({
         title: "Master Sync Complete",
@@ -217,7 +217,7 @@ export default function RealTimeIntegration() {
 
   // RSS Monitoring Mutation
   const rssMonitorMutation = useMutation({
-    mutationFn: () => apiRequest('/api/rss/monitor-all', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/rss/monitor-all', 'POST'),
     onSuccess: (data: any) => {
       const newItems = data.results?.reduce((sum: number, r: any) => sum + r.newItems, 0) || 0;
       toast({
