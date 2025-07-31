@@ -60,19 +60,31 @@ export default function AnalyticsPage() {
     queryKey: ['/api/dashboard/stats'],
   });
 
+  // Type the dashboard stats data properly
+  interface DashboardStats {
+    totalUpdates: number;
+    totalLegalCases: number;
+    pendingApprovals: number;
+    totalArticles: number;
+    recentUpdates: number;
+    activeDataSources: number;
+  }
+
+  const stats = statsData as DashboardStats || {};
+
   // Convert dashboard stats to analytics format
   const analyticsData: AnalyticsData = statsData ? {
     regionDistribution: [
-      { region: "Europa", count: Math.floor(statsData.totalUpdates * 0.35), percentage: 35 },
-      { region: "Nordamerika", count: Math.floor(statsData.totalUpdates * 0.28), percentage: 28 },
-      { region: "Asien-Pazifik", count: Math.floor(statsData.totalUpdates * 0.22), percentage: 22 },
-      { region: "Deutschland", count: Math.floor(statsData.totalUpdates * 0.15), percentage: 15 }
+      { region: "Europa", count: Math.floor((stats.totalUpdates || 0) * 0.35), percentage: 35 },
+      { region: "Nordamerika", count: Math.floor((stats.totalUpdates || 0) * 0.28), percentage: 28 },
+      { region: "Asien-Pazifik", count: Math.floor((stats.totalUpdates || 0) * 0.22), percentage: 22 },
+      { region: "Deutschland", count: Math.floor((stats.totalUpdates || 0) * 0.15), percentage: 15 }
     ],
     categoryBreakdown: [
-      { category: "Regulatorische Updates", count: statsData.totalUpdates || 0, color: COLORS.primary },
-      { category: "Rechtsfälle", count: statsData.totalLegalCases || 0, color: COLORS.secondary },
-      { category: "Wartende Genehmigungen", count: statsData.pendingApprovals || 0, color: COLORS.info },
-      { category: "Knowledge Articles", count: statsData.totalArticles || 0, color: COLORS.warning }
+      { category: "Regulatorische Updates", count: stats.totalUpdates || 0, color: COLORS.primary },
+      { category: "Rechtsfälle", count: stats.totalLegalCases || 0, color: COLORS.secondary },
+      { category: "Wartende Genehmigungen", count: stats.pendingApprovals || 0, color: COLORS.info },
+      { category: "Knowledge Articles", count: stats.totalArticles || 0, color: COLORS.warning }
     ],
     timelineData: Array.from({ length: 30 }, (_, i) => ({
       date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -80,20 +92,20 @@ export default function AnalyticsPage() {
       approvals: Math.floor(Math.random() * 15) + 2
     })),
     priorityStats: [
-      { priority: "Hoch", count: Math.floor((statsData.totalUpdates || 0) * 0.15), color: COLORS.danger },
-      { priority: "Mittel", count: Math.floor((statsData.totalUpdates || 0) * 0.65), color: COLORS.warning },
-      { priority: "Niedrig", count: Math.floor((statsData.totalUpdates || 0) * 0.20), color: COLORS.success }
+      { priority: "Hoch", count: Math.floor((stats.totalUpdates || 0) * 0.15), color: COLORS.danger },
+      { priority: "Mittel", count: Math.floor((stats.totalUpdates || 0) * 0.65), color: COLORS.warning },
+      { priority: "Niedrig", count: Math.floor((stats.totalUpdates || 0) * 0.20), color: COLORS.success }
     ],
     sourcePerformance: [
-      { source: "FDA", updates: Math.floor((statsData.totalUpdates || 0) * 0.3), lastSync: "2025-07-31T10:00:00Z", status: "active" },
-      { source: "EMA", updates: Math.floor((statsData.totalUpdates || 0) * 0.25), lastSync: "2025-07-31T09:30:00Z", status: "active" },
-      { source: "BfArM", updates: Math.floor((statsData.totalUpdates || 0) * 0.2), lastSync: "2025-07-31T09:00:00Z", status: "active" },
-      { source: "MHRA", updates: Math.floor((statsData.totalUpdates || 0) * 0.15), lastSync: "2025-07-31T08:30:00Z", status: "active" },
-      { source: "Swissmedic", updates: Math.floor((statsData.totalUpdates || 0) * 0.1), lastSync: "2025-07-31T08:00:00Z", status: "active" }
+      { source: "FDA", updates: Math.floor((stats.totalUpdates || 0) * 0.3), lastSync: "2025-07-31T10:00:00Z", status: "active" },
+      { source: "EMA", updates: Math.floor((stats.totalUpdates || 0) * 0.25), lastSync: "2025-07-31T09:30:00Z", status: "active" },
+      { source: "BfArM", updates: Math.floor((stats.totalUpdates || 0) * 0.2), lastSync: "2025-07-31T09:00:00Z", status: "active" },
+      { source: "MHRA", updates: Math.floor((stats.totalUpdates || 0) * 0.15), lastSync: "2025-07-31T08:30:00Z", status: "active" },
+      { source: "Swissmedic", updates: Math.floor((stats.totalUpdates || 0) * 0.1), lastSync: "2025-07-31T08:00:00Z", status: "active" }
     ],
     languageDistribution: [
-      { language: "Deutsch", count: Math.floor((statsData.totalUpdates || 0) * 0.4) },
-      { language: "English", count: Math.floor((statsData.totalUpdates || 0) * 0.6) }
+      { language: "Deutsch", count: Math.floor((stats.totalUpdates || 0) * 0.4) },
+      { language: "English", count: Math.floor((stats.totalUpdates || 0) * 0.6) }
     ],
     monthlyTrends: Array.from({ length: 12 }, (_, i) => ({
       month: new Date(2025, i, 1).toLocaleDateString('de-DE', { month: 'short' }),
@@ -173,7 +185,7 @@ export default function AnalyticsPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{statsData?.totalUpdates || 0}</div>
+            <div className="text-2xl font-bold">{(stats.totalUpdates || 0).toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
               +12.5% gegenüber letztem Monat
             </p>
@@ -186,7 +198,7 @@ export default function AnalyticsPage() {
             <Globe className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{statsData?.totalLegalCases || 0}</div>
+            <div className="text-2xl font-bold">{(stats.totalLegalCases || 0).toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
               +8.3% gegenüber letztem Monat
             </p>
@@ -199,7 +211,7 @@ export default function AnalyticsPage() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{statsData?.pendingApprovals || 0}</div>
+            <div className="text-2xl font-bold">{(stats.pendingApprovals || 0).toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
               -2.1% gegenüber letztem Monat
             </p>
@@ -212,7 +224,7 @@ export default function AnalyticsPage() {
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{statsData?.activeDataSources || 0}</div>
+            <div className="text-2xl font-bold">{(stats.activeDataSources || 0).toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
               Alle Quellen aktiv
             </p>
