@@ -2325,27 +2325,28 @@ Status: Archiviertes historisches Dokument
   // Get real knowledge articles from database
   app.get('/api/knowledge/articles', async (req, res) => {
     try {
-      const knowledgeArticles = await db.select({
-        id: regulatoryUpdates.id,
-        title: regulatoryUpdates.title,
-        content: regulatoryUpdates.description,
-        authority: regulatoryUpdates.source_id,
-        region: regulatoryUpdates.region,
-        category: regulatoryUpdates.update_type,
-        published_at: regulatoryUpdates.published_at,
-        priority: regulatoryUpdates.priority,
-        tags: regulatoryUpdates.device_classes,
-        url: regulatoryUpdates.source_url,
-        summary: regulatoryUpdates.description,
-        language: sql.raw(`'en'`),
-        source: sql.raw(`CONCAT('Knowledge: ', ${regulatoryUpdates.source_id})`)
-      })
-      .from(regulatoryUpdates)
-      .where(eq(regulatoryUpdates.update_type, 'guidance'))
-      .orderBy(desc(regulatoryUpdates.created_at));
+      // Simple query for knowledge articles
+      const knowledgeArticles = await storage.getAllRegulatoryUpdates();
+      const guidanceArticles = knowledgeArticles
+        .filter(update => update.update_type === 'guidance')
+        .map(update => ({
+          id: update.id,
+          title: update.title,
+          content: update.description || 'Content available from source',
+          authority: update.source_id || 'Unknown Authority',
+          region: update.region || 'Global',
+          category: 'medtech_knowledge',
+          published_at: update.published_at || new Date().toISOString(),
+          priority: update.priority || 'medium',
+          tags: Array.isArray(update.device_classes) ? update.device_classes : ['medical-devices'],
+          url: update.source_url || '',
+          summary: update.description?.slice(0, 200) || 'Summary available from source',
+          language: 'en',
+          source: `Knowledge: ${update.source_id || 'Database'}`
+        }));
 
-      console.log(`[API] Retrieved ${knowledgeArticles.length} knowledge articles from database`);
-      res.json(knowledgeArticles);
+      console.log(`[API] Retrieved ${guidanceArticles.length} knowledge articles from database`);
+      res.json(guidanceArticles);
     } catch (error) {
       console.error('[API] Error fetching knowledge articles:', error);
       res.status(500).json({ error: 'Failed to fetch knowledge articles' });
