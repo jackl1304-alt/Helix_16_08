@@ -1,714 +1,495 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
-  Book, 
+  BookOpen, 
+  RefreshCw, 
   Search, 
-  Plus,
-  Edit3,
-  Trash2,
-  FileText,
-  Tag,
+  Filter, 
+  Globe, 
   Calendar,
-  Eye,
-  Download,
-  Upload,
-  Filter,
-  Archive,
-  Star,
-  ExternalLink,
-  Bookmark,
-  FolderOpen,
-  Users,
-  Clock
+  FileText,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  TrendingUp,
+  Database,
+  Zap
 } from "lucide-react";
-import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+
+interface KnowledgeSource {
+  id: string;
+  name: string;
+  url: string;
+  category: 'medtech_knowledge' | 'regulatory_updates' | 'legal_cases';
+  authority: string;
+  region: string;
+  language: string;
+  priority: 'high' | 'medium' | 'low';
+  updateFrequency: number;
+  lastChecked: string;
+  status: 'active' | 'pending' | 'error';
+}
 
 interface KnowledgeArticle {
   id: string;
   title: string;
   content: string;
-  excerpt: string;
+  authority: string;
+  region: string;
   category: string;
+  published_at: string;
+  priority: string;
   tags: string[];
-  author: string;
-  createdAt: string;
-  updatedAt: string;
-  status: 'draft' | 'published' | 'archived';
-  views: number;
-  rating: number;
-  isFavorite: boolean;
-  attachments: Attachment[];
-  relatedRegulations: string[];
-  applicableRegions: string[];
-  deviceClasses: string[];
-}
-
-interface Attachment {
-  id: string;
-  name: string;
-  type: string;
-  size: number;
   url: string;
+  summary?: string;
+  language: string;
+  source: string;
 }
 
-interface Category {
-  id: string;
-  name: string;
-  description: string;
-  articleCount: number;
-  color: string;
+interface CollectionResult {
+  success: boolean;
+  summary: {
+    totalSources: number;
+    successfulSources: number;
+    totalArticles: number;
+    categoryBreakdown: Record<string, number>;
+    processedAt: string;
+  };
 }
 
-const mockCategories: Category[] = [
-  {
-    id: "regulatory_guidance",
-    name: "Regulatorische Leitfäden",
-    description: "Umfassende Anleitungen zu regulatorischen Anforderungen",
-    articleCount: 24,
-    color: "bg-blue-100 text-blue-800"
-  },
-  {
-    id: "compliance_procedures",
-    name: "Compliance-Verfahren",
-    description: "Schritt-für-Schritt Anleitungen für Compliance-Prozesse",
-    articleCount: 18,
-    color: "bg-green-100 text-green-800"
-  },
-  {
-    id: "best_practices",
-    name: "Best Practices",
-    description: "Bewährte Verfahren und Empfehlungen",
-    articleCount: 31,
-    color: "bg-purple-100 text-purple-800"
-  },
-  {
-    id: "case_studies",
-    name: "Fallstudien",
-    description: "Reale Beispiele und Lösungsansätze",
-    articleCount: 15,
-    color: "bg-orange-100 text-orange-800"
-  },
-  {
-    id: "regulatory_updates",
-    name: "Regulatorische Updates",
-    description: "Aktuelle Änderungen und neue Anforderungen",
-    articleCount: 42,
-    color: "bg-red-100 text-red-800"
-  },
-  {
-    id: "templates_checklists",
-    name: "Vorlagen & Checklisten",
-    description: "Praktische Hilfsmittel für den täglichen Gebrauch",
-    articleCount: 27,
-    color: "bg-yellow-100 text-yellow-800"
-  }
-];
-
-const mockArticles: KnowledgeArticle[] = [
-  {
-    id: "1",
-    title: "MDR Implementierung: Vollständiger Leitfaden für Klasse III Geräte",
-    content: "Detaillierte Anleitung zur vollständigen Implementierung der EU MDR für Medizinprodukte der Klasse III...",
-    excerpt: "Umfassender Leitfaden zur MDR-Implementierung mit praktischen Checklisten und Zeitplänen für Klasse III Medizinprodukte.",
-    category: "regulatory_guidance",
-    tags: ["MDR", "Klasse III", "EU", "Implementierung", "Compliance"],
-    author: "Dr. Maria Schmidt",
-    createdAt: "2025-01-20T10:00:00Z",
-    updatedAt: "2025-01-25T14:30:00Z",
-    status: "published",
-    views: 342,
-    rating: 4.8,
-    isFavorite: true,
-    attachments: [
-      { id: "1", name: "MDR_Checklist_Class_III.pdf", type: "pdf", size: 2456789, url: "/attachments/mdr_checklist.pdf" },
-      { id: "2", name: "Timeline_Template.xlsx", type: "excel", size: 987654, url: "/attachments/timeline.xlsx" }
-    ],
-    relatedRegulations: ["EU MDR 2017/745", "ISO 13485", "ISO 14971"],
-    applicableRegions: ["EU", "Deutschland"],
-    deviceClasses: ["Klasse III"]
-  },
-  {
-    id: "2", 
-    title: "FDA 510(k) Einreichung: Schritt-für-Schritt Anleitung",
-    content: "Komplette Anleitung für erfolgreiche FDA 510(k) Einreichungen mit häufigen Fehlern und deren Vermeidung...",
-    excerpt: "Praktischer Leitfaden für FDA 510(k) Einreichungen mit Beispielen, Checklisten und typischen Stolpersteinen.",
-    category: "compliance_procedures",
-    tags: ["FDA", "510(k)", "USA", "Einreichung", "Predicate Device"],
-    author: "James Wilson",
-    createdAt: "2025-01-18T08:15:00Z",
-    updatedAt: "2025-01-22T16:45:00Z",
-    status: "published",
-    views: 287,
-    rating: 4.6,
-    isFavorite: false,
-    attachments: [
-      { id: "3", name: "510k_Submission_Template.docx", type: "word", size: 1234567, url: "/attachments/510k_template.docx" }
-    ],
-    relatedRegulations: ["21 CFR 807", "21 CFR 820"],
-    applicableRegions: ["USA"],
-    deviceClasses: ["Klasse II"]
-  },
-  {
-    id: "3",
-    title: "Cybersecurity für Medizinprodukte: Best Practices 2025",
-    content: "Aktuelle Best Practices für Cybersecurity in Medizinprodukten basierend auf FDA und EU Anforderungen...",
-    excerpt: "Umfassende Cybersecurity-Leitlinien für Medizinprodukte mit praktischen Implementierungsstrategien.",
-    category: "best_practices",
-    tags: ["Cybersecurity", "FDA", "EU", "Vernetzte Geräte", "Risikomanagement"],
-    author: "Dr. Lisa Chen",
-    createdAt: "2025-01-15T12:30:00Z", 
-    updatedAt: "2025-01-26T09:20:00Z",
-    status: "published",
-    views: 456,
-    rating: 4.9,
-    isFavorite: true,
-    attachments: [
-      { id: "4", name: "Cybersecurity_Framework.pdf", type: "pdf", size: 3456789, url: "/attachments/cybersecurity.pdf" },
-      { id: "5", name: "Vulnerability_Assessment_Template.xlsx", type: "excel", size: 678901, url: "/attachments/vulnerability.xlsx" }
-    ],
-    relatedRegulations: ["FDA Cybersecurity Guidance", "EU MDR", "IEC 62304", "ISO 27001"],
-    applicableRegions: ["USA", "EU", "Global"],
-    deviceClasses: ["Klasse II", "Klasse III"]
-  }
-];
-
-export default function KnowledgeBase() {
+export default function KnowledgeBasePage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedRegion, setSelectedRegion] = useState<string>("all");
+  const [selectedSource, setSelectedSource] = useState<string>("all");
   const { toast } = useToast();
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedArticle, setSelectedArticle] = useState<KnowledgeArticle | null>(null);
-  const [newArticleDialog, setNewArticleDialog] = useState(false);
-  const [newArticle, setNewArticle] = useState({
-    title: "",
-    content: "",
-    category: "",
-    tags: "",
-    relatedRegulations: ""
+  const queryClient = useQueryClient();
+
+  // Fetch knowledge sources status
+  const { data: sourcesData, isLoading: sourcesLoading } = useQuery({
+    queryKey: ['/api/knowledge/sources-status'],
+    refetchInterval: 30000
   });
 
-  const { data: articles = mockArticles, isLoading: articlesLoading } = useQuery<KnowledgeArticle[]>({
-    queryKey: ["/api/knowledge-base/articles"],
-    enabled: false // Use mock data
+  // Fetch knowledge articles (from regulatory updates that are knowledge articles)
+  const { data: articlesData, isLoading: articlesLoading } = useQuery({
+    queryKey: ['/api/regulatory-updates'],
+    select: (data: any) => data?.updates?.filter((update: any) => 
+      update.category === 'medtech_knowledge' || 
+      update.category === 'regulatory_updates' || 
+      update.category === 'legal_cases' ||
+      update.source?.includes('Knowledge:')
+    ) || []
   });
 
-  const { data: categories = mockCategories } = useQuery<Category[]>({
-    queryKey: ["/api/knowledge-base/categories"],
-    enabled: false // Use mock data  
-  });
-
-  const createArticleMutation = useMutation({
-    mutationFn: async (article: any) => {
-      return await apiRequest("/api/knowledge-base/articles", "POST", article);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/knowledge-base/articles"] });
-      setNewArticleDialog(false);
-      setNewArticle({ title: "", content: "", category: "", tags: "", relatedRegulations: "" });
-      toast({
-        title: "Artikel erstellt",
-        description: "Der Knowledge Base Artikel wurde erfolgreich erstellt."
-      });
+  // Collection mutation
+  const collectMutation = useMutation({
+    mutationFn: () => fetch('/api/knowledge/collect-articles', { method: 'POST' }).then(res => res.json()),
+    onSuccess: (data: CollectionResult) => {
+      if (data.success) {
+        toast({
+          title: "Knowledge Collection Erfolgreich",
+          description: `${data.summary.totalArticles} Artikel von ${data.summary.successfulSources} Quellen gesammelt`,
+        });
+        queryClient.invalidateQueries({ queryKey: ['/api/regulatory-updates'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/knowledge/sources-status'] });
+      } else {
+        toast({
+          title: "Collection Fehler",
+          description: "Fehler beim Sammeln der Knowledge Articles",
+          variant: "destructive"
+        });
+      }
     }
   });
 
-  const toggleFavoriteMutation = useMutation({
-    mutationFn: async ({ articleId, isFavorite }: { articleId: string; isFavorite: boolean }) => {
-      return await apiRequest(`/api/knowledge-base/articles/${articleId}/favorite`, "PATCH", { isFavorite });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/knowledge-base/articles"] });
+  // Sync specific source mutation
+  const syncSourceMutation = useMutation({
+    mutationFn: (sourceId: string) => 
+      fetch(`/api/knowledge/sync-source/${sourceId}`, { method: 'POST' }).then(res => res.json()),
+    onSuccess: (data, sourceId) => {
+      if (data.success) {
+        toast({
+          title: "Quelle Synchronisiert",
+          description: `${data.result.articlesCreated} neue Artikel von ${sourceId} hinzugefügt`,
+        });
+        queryClient.invalidateQueries({ queryKey: ['/api/regulatory-updates'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/knowledge/sources-status'] });
+      }
     }
   });
 
+  const sources: KnowledgeSource[] = (sourcesData as any)?.sources || [];
+  const articles: KnowledgeArticle[] = articlesData || [];
+
+  // Filter articles
   const filteredArticles = articles.filter(article => {
-    const matchesSearch = searchQuery === "" ||
-      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-
+    const matchesSearch = !searchTerm || 
+      article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      article.authority.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      article.content?.toLowerCase().includes(searchTerm.toLowerCase());
+    
     const matchesCategory = selectedCategory === "all" || article.category === selectedCategory;
-
-    return matchesSearch && matchesCategory;
+    const matchesRegion = selectedRegion === "all" || article.region === selectedRegion;
+    const matchesSource = selectedSource === "all" || article.authority === selectedSource;
+    
+    return matchesSearch && matchesCategory && matchesRegion && matchesSource;
   });
+
+  // Statistics
+  const stats = {
+    totalSources: sources.length,
+    activeSources: sources.filter(s => s.status === 'active').length,
+    totalArticles: articles.length,
+    categories: {
+      medtech_knowledge: articles.filter(a => a.category === 'medtech_knowledge').length,
+      regulatory_updates: articles.filter(a => a.category === 'regulatory_updates').length,
+      legal_cases: articles.filter(a => a.category === 'legal_cases').length
+    },
+    regions: Array.from(new Set(articles.map(a => a.region))).length,
+    languages: Array.from(new Set(articles.map(a => a.language))).length
+  };
+
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'medtech_knowledge': return <BookOpen className="h-4 w-4" />;
+      case 'regulatory_updates': return <FileText className="h-4 w-4" />;
+      case 'legal_cases': return <AlertCircle className="h-4 w-4" />;
+      default: return <Database className="h-4 w-4" />;
+    }
+  };
+
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'medtech_knowledge': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      case 'regulatory_updates': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'legal_cases': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'active': return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'pending': return <Clock className="h-4 w-4 text-yellow-500" />;
+      case 'error': return <AlertCircle className="h-4 w-4 text-red-500" />;
+      default: return <Database className="h-4 w-4 text-gray-500" />;
+    }
+  };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('de-DE', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
-
-  const formatFileSize = (bytes: number) => {
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    if (bytes === 0) return '0 Bytes';
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
-  };
-
-  const handleCreateArticle = () => {
-    if (newArticle.title && newArticle.content && newArticle.category) {
-      createArticleMutation.mutate({
-        ...newArticle,
-        tags: newArticle.tags.split(',').map(tag => tag.trim()),
-        relatedRegulations: newArticle.relatedRegulations.split(',').map(reg => reg.trim())
-      });
-    }
-  };
-
-  const toggleFavorite = (articleId: string, currentFavorite: boolean) => {
-    toggleFavoriteMutation.mutate({ articleId, isFavorite: !currentFavorite });
+    if (!dateString || dateString === 'Never') return 'Nie';
+    return new Date(dateString).toLocaleString('de-DE');
   };
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="flex justify-between items-center mb-8">
+    <div className="container mx-auto p-6 space-y-8">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center">
-            <Book className="mr-3 h-8 w-8 text-primary" />
-            Knowledge Base
-          </h1>
-          <p className="text-muted-foreground">
-            Zentrale Wissensdatenbank für regulatorische Compliance und Best Practices
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Knowledge Base</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Medizintechnik Wissensartikel, Regulatorische Updates und Rechtsfälle
           </p>
         </div>
-        
-        <div className="flex space-x-2">
-          <Dialog open={newArticleDialog} onOpenChange={setNewArticleDialog}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Artikel erstellen
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Neuen Artikel erstellen</DialogTitle>
-                <DialogDescription>
-                  Erstellen Sie einen neuen Knowledge Base Artikel
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Titel</label>
-                  <Input
-                    value={newArticle.title}
-                    onChange={(e) => setNewArticle({...newArticle, title: e.target.value})}
-                    placeholder="Artikel-Titel eingeben..."
-                  />
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Kategorie</label>
-                  <Select value={newArticle.category} onValueChange={(value) => setNewArticle({...newArticle, category: value})}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Kategorie auswählen" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Inhalt</label>
-                  <Textarea
-                    value={newArticle.content}
-                    onChange={(e) => setNewArticle({...newArticle, content: e.target.value})}
-                    placeholder="Artikel-Inhalt..."
-                    rows={6}
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Tags (kommagetrennt)</label>
-                  <Input
-                    value={newArticle.tags}
-                    onChange={(e) => setNewArticle({...newArticle, tags: e.target.value})}
-                    placeholder="Tag1, Tag2, Tag3..."
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Zugehörige Vorschriften (kommagetrennt)</label>
-                  <Input
-                    value={newArticle.relatedRegulations}
-                    onChange={(e) => setNewArticle({...newArticle, relatedRegulations: e.target.value})}
-                    placeholder="MDR 2017/745, ISO 13485..."
-                  />
-                </div>
-
-                <div className="flex justify-end space-x-2">
-                  <Button variant="outline" onClick={() => setNewArticleDialog(false)}>
-                    Abbrechen
-                  </Button>
-                  <Button onClick={handleCreateArticle} disabled={createArticleMutation.isPending}>
-                    {createArticleMutation.isPending ? "Erstelle..." : "Artikel erstellen"}
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-
-          <Button variant="outline">
-            <Upload className="mr-2 h-4 w-4" />
-            Import
-          </Button>
-          <Button variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-        </div>
+        <Button
+          onClick={() => collectMutation.mutate()}
+          disabled={collectMutation.isPending}
+          className="bg-blue-600 hover:bg-blue-700"
+        >
+          {collectMutation.isPending ? (
+            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <Zap className="h-4 w-4 mr-2" />
+          )}
+          Alle Quellen Synchronisieren
+        </Button>
       </div>
 
-      <Tabs defaultValue="articles" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="articles">Artikel</TabsTrigger>
-          <TabsTrigger value="categories">Kategorien</TabsTrigger>
-          <TabsTrigger value="favorites">Favoriten</TabsTrigger>
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Quellen</CardTitle>
+            <Database className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.activeSources}/{stats.totalSources}</div>
+            <p className="text-xs text-muted-foreground">Aktive Datenquellen</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Knowledge Articles</CardTitle>
+            <BookOpen className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalArticles}</div>
+            <p className="text-xs text-muted-foreground">Gesamt Artikel</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Regionen</CardTitle>
+            <Globe className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.regions}</div>
+            <p className="text-xs text-muted-foreground">Abgedeckte Regionen</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Sprachen</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.languages}</div>
+            <p className="text-xs text-muted-foreground">Unterstützte Sprachen</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Tabs defaultValue="articles" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="articles">Knowledge Articles</TabsTrigger>
+          <TabsTrigger value="sources">Datenquellen</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="articles">
-          {/* Search and Filter */}
-          <Card className="mb-6">
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="md:col-span-2">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Knowledge Base durchsuchen..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
+        <TabsContent value="articles" className="space-y-6">
+          {/* Search and Filters */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Search className="h-5 w-5" />
+                Suche und Filter
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Input
+                  placeholder="Suche nach Titel, Inhalt oder Behörde..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full"
+                />
+                
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Kategorie" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle Kategorien</SelectItem>
+                    <SelectItem value="medtech_knowledge">Medizintechnik Wissen</SelectItem>
+                    <SelectItem value="regulatory_updates">Regulatorische Updates</SelectItem>
+                    <SelectItem value="legal_cases">Rechtsfälle</SelectItem>
+                  </SelectContent>
+                </Select>
 
-                <div>
-                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Alle Kategorien</SelectItem>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Region" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle Regionen</SelectItem>
+                    {Array.from(new Set(articles.map(a => a.region))).map(region => (
+                      <SelectItem key={region} value={region}>{region}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={selectedSource} onValueChange={setSelectedSource}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Quelle" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle Quellen</SelectItem>
+                    {Array.from(new Set(articles.map(a => a.authority))).map(authority => (
+                      <SelectItem key={authority} value={authority}>{authority}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Filter className="h-4 w-4" />
+                {filteredArticles.length} von {articles.length} Artikeln angezeigt
               </div>
             </CardContent>
           </Card>
 
-          {/* Articles Grid */}
-          <div className="grid gap-6">
-            {filteredArticles.map((article) => (
-              <Card key={article.id} className="hover:shadow-lg transition-all duration-200">
-                <CardHeader>
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center space-x-3">
-                      <Badge className={categories.find(c => c.id === article.category)?.color || "bg-gray-100 text-gray-800"}>
-                        {categories.find(c => c.id === article.category)?.name || article.category}
-                      </Badge>
-                      {article.status === 'draft' && (
-                        <Badge variant="outline">Entwurf</Badge>
-                      )}
-                      {article.isFavorite && (
-                        <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                      )}
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleFavorite(article.id, article.isFavorite)}
-                      >
-                        <Star className={`h-4 w-4 ${article.isFavorite ? 'text-yellow-500 fill-current' : 'text-gray-400'}`} />
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <Edit3 className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedArticle(article)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <CardTitle className="text-xl mb-2">{article.title}</CardTitle>
-                  
-                  <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                    <div className="flex items-center space-x-1">
-                      <Users className="h-4 w-4" />
-                      <span>{article.author}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Calendar className="h-4 w-4" />
-                      <span>{formatDate(article.createdAt)}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Eye className="h-4 w-4" />
-                      <span>{article.views} Aufrufe</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Star className="h-4 w-4" />
-                      <span>{article.rating}</span>
-                    </div>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="space-y-4">
-                  <p className="text-muted-foreground">{article.excerpt}</p>
-
-                  {article.tags.length > 0 && (
-                    <div>
-                      <div className="flex flex-wrap gap-2">
-                        {article.tags.map((tag) => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
-                            <Tag className="h-3 w-3 mr-1" />
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {article.relatedRegulations.length > 0 && (
-                    <div>
-                      <p className="text-sm font-medium mb-2">Zugehörige Vorschriften:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {article.relatedRegulations.map((regulation) => (
-                          <Badge key={regulation} variant="outline">
-                            <FileText className="h-3 w-3 mr-1" />
-                            {regulation}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {article.attachments.length > 0 && (
-                    <div>
-                      <p className="text-sm font-medium mb-2">Anhänge:</p>
-                      <div className="space-y-1">
-                        {article.attachments.map((attachment) => (
-                          <div key={attachment.id} className="flex items-center space-x-2 text-sm">
-                            <FileText className="h-4 w-4 text-muted-foreground" />
-                            <span>{attachment.name}</span>
-                            <span className="text-muted-foreground">({formatFileSize(attachment.size)})</span>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => {
-                                const downloadUrl = `/api/knowledge-base/attachments/${attachment.name}`;
-                                const link = document.createElement('a');
-                                link.href = downloadUrl;
-                                link.download = attachment.name;
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
-                                toast({
-                                  title: "Download gestartet",
-                                  description: `${attachment.name} wird heruntergeladen...`
-                                });
-                              }}
-                            >
-                              <Download className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex justify-between items-center pt-4 border-t">
-                    <div className="flex space-x-2">
-                      {article.applicableRegions.map((region) => (
-                        <Badge key={region} variant="outline" className="text-xs">
-                          {region}
-                        </Badge>
-                      ))}
-                    </div>
-                    <Button variant="outline" size="sm">
-                      Vollständig lesen
-                      <ExternalLink className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {filteredArticles.length === 0 && (
-            <div className="text-center py-12">
-              <Book className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Keine Artikel gefunden</h3>
-              <p className="text-muted-foreground">
-                Passen Sie Ihre Suchkriterien an oder erstellen Sie einen neuen Artikel.
-              </p>
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="categories">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map((category) => (
-              <Card key={category.id} className="hover:shadow-lg transition-all duration-200">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <Badge className={category.color} variant="secondary">
-                      {category.articleCount} Artikel
-                    </Badge>
-                    <FolderOpen className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <CardTitle className="text-lg">{category.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground mb-4">{category.description}</p>
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => setSelectedCategory(category.id)}
-                  >
-                    Artikel anzeigen
+          {/* Articles List */}
+          <div className="space-y-4">
+            {articlesLoading ? (
+              <div className="text-center py-8">
+                <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4" />
+                <p>Lade Knowledge Articles...</p>
+              </div>
+            ) : filteredArticles.length === 0 ? (
+              <Card>
+                <CardContent className="text-center py-8">
+                  <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold mb-2">Keine Artikel gefunden</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Versuchen Sie andere Suchbegriffe oder synchronisieren Sie neue Artikel.
+                  </p>
+                  <Button onClick={() => collectMutation.mutate()}>
+                    Quellen Synchronisieren
                   </Button>
                 </CardContent>
               </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="favorites">
-          <div className="grid gap-6">
-            {articles.filter(article => article.isFavorite).map((article) => (
-              <Card key={article.id} className="hover:shadow-lg transition-all duration-200">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg flex items-center">
-                        <Star className="h-5 w-5 text-yellow-500 fill-current mr-2" />
-                        {article.title}
-                      </CardTitle>
-                      <p className="text-muted-foreground mt-2">{article.excerpt}</p>
-                    </div>
-                    <Badge className={categories.find(c => c.id === article.category)?.color || "bg-gray-100 text-gray-800"}>
-                      {categories.find(c => c.id === article.category)?.name || article.category}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                      <span>{article.author}</span>
-                      <span>{formatDate(article.updatedAt)}</span>
-                      <span>{article.views} Aufrufe</span>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      Öffnen
-                      <ExternalLink className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {articles.filter(article => article.isFavorite).length === 0 && (
-            <div className="text-center py-12">
-              <Bookmark className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Keine Favoriten gespeichert</h3>
-              <p className="text-muted-foreground">
-                Markieren Sie Artikel mit einem Stern, um sie hier zu sammeln.
-              </p>
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
-
-      {/* Article Detail Modal */}
-      {selectedArticle && (
-        <Dialog open={!!selectedArticle} onOpenChange={() => setSelectedArticle(null)}>
-          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-2xl">{selectedArticle.title}</DialogTitle>
-              <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                <span>{selectedArticle.author}</span>
-                <span>{formatDate(selectedArticle.createdAt)}</span>
-                <span>{selectedArticle.views} Aufrufe</span>
-                <div className="flex items-center space-x-1">
-                  <Star className="h-4 w-4" />
-                  <span>{selectedArticle.rating}</span>
-                </div>
-              </div>
-            </DialogHeader>
-            <div className="space-y-6">
-              <div className="prose max-w-none">
-                <p>{selectedArticle.content}</p>
-              </div>
-
-              {selectedArticle.attachments.length > 0 && (
-                <div>
-                  <h4 className="font-medium mb-3">Anhänge</h4>
-                  <div className="space-y-2">
-                    {selectedArticle.attachments.map((attachment) => (
-                      <div key={attachment.id} className="flex items-center justify-between p-3 border rounded">
-                        <div className="flex items-center space-x-3">
-                          <FileText className="h-5 w-5 text-muted-foreground" />
-                          <div>
-                            <p className="font-medium">{attachment.name}</p>
-                            <p className="text-sm text-muted-foreground">{formatFileSize(attachment.size)}</p>
+            ) : (
+              <ScrollArea className="h-[600px] pr-4">
+                <div className="space-y-4">
+                  {filteredArticles.map((article) => (
+                    <Card key={article.id} className="hover:shadow-md transition-shadow">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <CardTitle className="text-lg mb-2">{article.title}</CardTitle>
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge className={getCategoryColor(article.category)}>
+                                {getCategoryIcon(article.category)}
+                                <span className="ml-1">
+                                  {article.category === 'medtech_knowledge' && 'Medizintechnik'}
+                                  {article.category === 'regulatory_updates' && 'Regulatorisch'}
+                                  {article.category === 'legal_cases' && 'Rechtsfälle'}
+                                </span>
+                              </Badge>
+                              <Badge variant="outline">
+                                <Globe className="h-3 w-3 mr-1" />
+                                {article.region}
+                              </Badge>
+                              <Badge variant="outline">{article.language}</Badge>
+                            </div>
+                            <CardDescription className="text-sm">
+                              {article.authority} • {formatDate(article.published_at)}
+                            </CardDescription>
                           </div>
                         </div>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => {
-                            const downloadUrl = `/api/knowledge-base/attachments/${attachment.name}`;
-                            const link = document.createElement('a');
-                            link.href = downloadUrl;
-                            link.download = attachment.name;
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                            toast({
-                              title: "Download gestartet",
-                              description: `${attachment.name} wird heruntergeladen...`
-                            });
-                          }}
-                        >
-                          <Download className="h-4 w-4 mr-2" />
-                          Download
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          {article.summary || article.content?.slice(0, 200) + '...'}
+                        </p>
+                        
+                        {article.tags && article.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-4">
+                            {article.tags.slice(0, 5).map((tag, index) => (
+                              <Badge key={index} variant="secondary" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <Calendar className="h-3 w-3" />
+                            {formatDate(article.published_at)}
+                          </div>
+                          {article.url && (
+                            <Button variant="outline" size="sm" asChild>
+                              <a href={article.url} target="_blank" rel="noopener noreferrer">
+                                Quelle öffnen
+                              </a>
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+              </ScrollArea>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="sources" className="space-y-6">
+          <div className="grid gap-4">
+            {sourcesLoading ? (
+              <div className="text-center py-8">
+                <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4" />
+                <p>Lade Datenquellen...</p>
+              </div>
+            ) : (
+              sources.map((source) => (
+                <Card key={source.id}>
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="flex items-center gap-2 text-lg">
+                          {getStatusIcon(source.status)}
+                          {source.name}
+                        </CardTitle>
+                        <CardDescription className="mt-2">
+                          {source.authority} • {source.region} • {source.language}
+                        </CardDescription>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => syncSourceMutation.mutate(source.id)}
+                        disabled={syncSourceMutation.isPending}
+                      >
+                        {syncSourceMutation.isPending ? (
+                          <RefreshCw className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <RefreshCw className="h-4 w-4" />
+                        )}
+                        Sync
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                      <div>
+                        <Badge className={getCategoryColor(source.category)}>
+                          {getCategoryIcon(source.category)}
+                          <span className="ml-1">
+                            {source.category === 'medtech_knowledge' && 'Medizintechnik'}
+                            {source.category === 'regulatory_updates' && 'Regulatorisch'}
+                            {source.category === 'legal_cases' && 'Rechtsfälle'}
+                          </span>
+                        </Badge>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Update: alle {source.updateFrequency}h
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Priorität: {source.priority}
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>Letzte Prüfung: {formatDate(source.lastChecked)}</span>
+                      <a 
+                        href={source.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        Quelle besuchen
+                      </a>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
