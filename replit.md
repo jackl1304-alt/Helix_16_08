@@ -32,6 +32,14 @@ Preferred communication style: German language - Simple, everyday language.
 
 ### Recent Changes
 
+#### July 31, 2025 - DATENKLARSTELLUNG UND ENHANCED LEGAL CASES
+- ✅ **DATENKLARSTELLUNG**: Enhanced Legal Cases verwenden simulierte Demo-Daten, nicht echte Gerichtsfälle
+- ✅ **REALISTISCHE CASE-GENERIERUNG**: Real Case Data Generator erstellt authentisch wirkende Falldetails
+- ✅ **DOKUMENTENANSICHT REPARIERT**: Modal-Ansicht im gleichen Fenster statt externe Links
+- ✅ **DEUTSCHE MEDIZINPRODUKTE**: CardioSecure Stent, NeuroLink Stimulator, FlexiJoint Hip Implant
+- ✅ **TRANSPARENZ**: Klare Kennzeichnung als "Simulierte Daten für Demonstrationszwecke"
+- ✅ **VOLLSTÄNDIGE FALLREKONSTRUKTIONEN**: Medizinprodukt-Details, Schadensersatz, Verfahrensverläufe
+
 #### July 31, 2025 - FINALE JAVASCRIPT-FEHLER ELIMINATION KOMPLETT
 - ✅ **ALLE JAVASCRIPT FEHLER BEHOBEN**: Systematische Reparatur aller "Window.fetch: Invalid request method [object Object]" Fehler
 - ✅ **API-PARAMETER STRUCTURE FIX**: Alle { method: 'POST' } durch 'POST' ersetzt in Phase 1, 2, 3 und Real-Time Integration  
