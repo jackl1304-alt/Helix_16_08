@@ -325,7 +325,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/regulatory-updates/recent", async (req, res) => {
     try {
-      console.log("[API] Generating fresh regulatory updates with valid dates");
+      const { logger } = await import('./services/logger.service');
+      logger.info("API: Generating fresh regulatory updates with valid dates");
+      
       res.setHeader('Content-Type', 'application/json');
       res.setHeader('Cache-Control', 'no-cache');
       
@@ -357,11 +359,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
       });
       
-      console.log("[API] Returning fresh updates with valid dates:", freshUpdates.length);
-      res.json(freshUpdates);
+      logger.info("API: Returning fresh updates with valid dates", { count: freshUpdates.length });
+      
+      res.json({
+        success: true,
+        data: freshUpdates,
+        timestamp: new Date().toISOString()
+      });
     } catch (error) {
-      console.error("Error generating fresh updates:", error);
-      res.status(500).json({ message: "Failed to generate fresh updates" });
+      const { logger } = await import('./services/logger.service');
+      logger.error("Error generating fresh updates:", error);
+      res.status(500).json({ 
+        success: false,
+        error: "Failed to generate fresh updates",
+        timestamp: new Date().toISOString()
+      });
     }
   });
 
