@@ -2329,8 +2329,15 @@ Status: Archiviertes historisches Dokument
       const allUpdates = await storage.getAllRegulatoryUpdates();
       
       // Filter for knowledge articles - include all guidance type updates
+      console.log(`Filtering ${allUpdates.length} updates for guidance type...`);
       const knowledgeArticles = allUpdates
-        .filter(update => update.update_type === 'guidance')
+        .filter(update => {
+          const isGuidance = update.update_type === 'guidance';
+          if (isGuidance) {
+            console.log(`Found guidance article: ${update.title} (${update.source_id})`);
+          }
+          return isGuidance;
+        })
         .map(update => ({
           id: update.id,
           title: update.title || 'Knowledge Article',
