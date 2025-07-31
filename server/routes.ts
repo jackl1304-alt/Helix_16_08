@@ -2480,7 +2480,50 @@ Status: Archiviertes historisches Dokument
   // Get real knowledge articles from database
   app.get('/api/knowledge/articles', async (req, res) => {
     try {
-      // Get ALL regulatory updates and find knowledge-related content
+      console.log('[API] Loading real knowledge articles from knowledge_base table...');
+      
+      // Load real articles from knowledge_base table
+      const realArticles = await storage.getAllKnowledgeArticles();
+      console.log(`[API] Found ${realArticles.length} real knowledge articles in database`);
+      
+      if (realArticles.length > 0) {
+        // Transform database articles to API format
+        const knowledgeArticles = realArticles.map(article => ({
+          id: article.id,
+          title: article.title,
+          content: article.content,
+          category: article.category,
+          tags: Array.isArray(article.tags) ? article.tags : (article.tags ? JSON.parse(article.tags) : []),
+          published_at: article.created_at,
+          status: article.is_published ? 'published' : 'draft',
+          created_at: article.created_at,
+          updated_at: article.updated_at || article.created_at,
+          // Extract authority from tags
+          authority: Array.isArray(article.tags) 
+            ? article.tags.find(tag => ['FDA', 'EMA', 'BfArM', 'MHRA', 'Swissmedic', 'ISO', 'IEC', 'Johner', 'MTD', 'PubMed', 'JAMA'].includes(tag))
+            : 'Knowledge Base',
+          region: 'Global',
+          priority: 'high',
+          language: article.content?.includes('DiGA') || article.content?.includes('Deutschland') ? 'de' : 'en',
+          source: `Knowledge Base: ${article.category}`,
+          summary: article.content?.substring(0, 150) + '...'
+        }));
+
+        res.json({
+          success: true,
+          data: knowledgeArticles,
+          meta: {
+            totalArticles: knowledgeArticles.length,
+            totalUpdates: 0,
+            timestamp: new Date().toISOString(),
+            message: `${knowledgeArticles.length} real knowledge articles loaded from database`,
+            dataSource: 'knowledge_base'
+          }
+        });
+        return;
+      }
+      
+      // Fallback: Get ALL regulatory updates and find knowledge-related content
       const allUpdates = await storage.getAllRegulatoryUpdates();
       
       // Filter for knowledge articles - include all guidance type updates
