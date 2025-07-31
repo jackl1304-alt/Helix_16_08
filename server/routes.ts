@@ -1528,7 +1528,34 @@ Status: Archiviertes historisches Dokument
     return damages[Math.floor(Math.random() * damages.length)];
   }
 
-  // Enhanced Legal Cases API with court decisions and damages
+  // Enhanced Legal Cases API (without sourceId parameter)
+  app.get("/api/legal-cases/enhanced", async (req, res) => {
+    try {
+      console.log("[API] Enhanced Legal Cases endpoint called");
+      
+      // FORCE JSON headers explicitly
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Cache-Control', 'no-cache');
+      
+      const allCases = await storage.getAllLegalCases(); // OHNE LIMIT - alle Daten
+      console.log(`[API] Enhanced Legal Cases: Fetched ${allCases.length} cases from database`);
+      
+      const enhancedCases = allCases.map((legalCase: any) => ({
+        ...legalCase,
+        verdict: generateVerdict(legalCase),
+        damages: generateDamages(legalCase),
+        fullDecisionText: generateFullLegalDecision(legalCase)
+      }));
+      
+      console.log(`[API] Enhanced Legal Cases: Returning ${enhancedCases.length} enhanced cases`);
+      res.json(enhancedCases);
+    } catch (error: any) {
+      console.error("[API] Enhanced Legal Cases failed:", error);
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Enhanced Legal Cases API with court decisions and damages (with sourceId)
   app.get("/api/legal-cases/enhanced/:sourceId", async (req, res) => {
     try {
       const { sourceId } = req.params;
