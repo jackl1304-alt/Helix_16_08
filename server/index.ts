@@ -245,6 +245,9 @@ app.use((req, res, next) => {
   });
 
   // REGISTER API ROUTES FIRST - HIGHEST PRIORITY
+  const { default: knowledgeExtractionRoutes } = await import("./routes/knowledge-extraction.routes");
+  app.use("/api/knowledge-extraction", knowledgeExtractionRoutes);
+  
   registerRoutes(app);
   
   const server = createServer(app);

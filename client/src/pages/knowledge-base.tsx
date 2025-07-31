@@ -22,9 +22,11 @@ import {
   Clock,
   TrendingUp,
   Database,
-  Zap
+  Zap,
+  Download
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { KnowledgeExtractionPanel } from "@/components/knowledge/KnowledgeExtractionPanel";
 
 interface KnowledgeSource {
   id: string;
@@ -590,8 +592,12 @@ export default function KnowledgeBasePage() {
       </div>
 
       <Tabs defaultValue="articles" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="articles">Knowledge Articles</TabsTrigger>
+          <TabsTrigger value="extraction">
+            <Download className="h-4 w-4 mr-2" />
+            Extraktion
+          </TabsTrigger>
           <TabsTrigger value="sources">Datenquellen</TabsTrigger>
         </TabsList>
 
@@ -742,6 +748,10 @@ export default function KnowledgeBasePage() {
               </ScrollArea>
             )}
           </div>
+        </TabsContent>
+
+        <TabsContent value="extraction" className="space-y-6">
+          <KnowledgeExtractionPanel />
         </TabsContent>
 
         <TabsContent value="sources" className="space-y-6">
