@@ -54,17 +54,7 @@ export default function RegulatoryUpdates() {
     refetchOnMount: true,
   });
 
-  // DEBUG: Log der ersten paar Updates
-  console.log("REGULATORY UPDATES DEBUG:", {
-    totalUpdates: updates?.length,
-    firstUpdate: updates?.[0] ? {
-      title: updates[0].title,
-      description: updates[0].description,
-      source_id: updates[0].source_id,
-      hasDescription: !!updates[0].description,
-      hasSourceId: !!updates[0].source_id
-    } : null
-  });
+  // Echte Regulatory Updates mit authentischen Inhalten werden geladen
 
   const filteredUpdates = (updates || []).filter(update => {
     const matchesSearch = !searchTerm || 
@@ -344,17 +334,7 @@ Helix Regulatory Intelligence Platform
                     </div>
                   </div>
                   
-                  {/* DEBUG INFO für Benutzer */}
-                  <div>
-                    <label className="text-sm font-medium text-red-500">DEBUG - Rohdaten-Check</label>
-                    <div className="mt-1 text-xs bg-red-50 p-3 rounded border border-red-200">
-                      <div>update.description: "{update.description}"</div>
-                      <div>update.source_id: "{update.source_id}"</div>
-                      <div>Datentyp description: {typeof update.description}</div>
-                      <div>Datentyp source_id: {typeof update.source_id}</div>
-                      <div>Daten verfügbar: {update.description ? '✅' : '❌'} / {update.source_id ? '✅' : '❌'}</div>
-                    </div>
-                  </div>
+                  {/* Entfernt: DEBUG-Sektion für finales System */}
                   
                   {(update.device_classes?.length > 0) && (
                     <div>
