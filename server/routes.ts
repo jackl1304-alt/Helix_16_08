@@ -2329,14 +2329,41 @@ Status: Archiviertes historisches Dokument
       const allUpdates = await storage.getAllRegulatoryUpdates();
       
       // Filter for knowledge articles - include all guidance type updates
-      console.log(`Filtering ${allUpdates.length} updates for guidance type...`);
-      const knowledgeArticles = allUpdates
+      console.log(`[API] Filtering ${allUpdates.length} updates for knowledge articles...`);
+      
+      // Debug: Check what data we have
+      const sampleUpdates = allUpdates.slice(0, 3);
+      console.log('[API] Sample updates:', sampleUpdates.map(u => ({
+        update_type: u.update_type,
+        source_id: u.source_id,
+        title: u.title?.substring(0, 50)
+      })));
+      
+      // Enhanced filtering for knowledge articles with better logic
+      let knowledgeArticles = allUpdates
         .filter(update => {
+          // Check multiple criteria for knowledge articles
           const isGuidance = update.update_type === 'guidance';
-          if (isGuidance) {
-            console.log(`Found guidance article: ${update.title} (${update.source_id})`);
+          const isKnowledgeSource = update.source_id && (
+            update.source_id.includes('knowledge') ||
+            update.source_id.includes('guidance') ||
+            update.source_id.includes('article') ||
+            update.source_id.includes('deep-scraping')
+          );
+          const hasKnowledgeKeywords = update.title && (
+            update.title.toLowerCase().includes('guidance') ||
+            update.title.toLowerCase().includes('guideline') ||
+            update.title.toLowerCase().includes('recommendation') ||
+            update.title.toLowerCase().includes('best practice')
+          );
+          
+          const isKnowledgeArticle = isGuidance || isKnowledgeSource || hasKnowledgeKeywords;
+          
+          if (isKnowledgeArticle) {
+            console.log(`[API] Found knowledge article: ${update.title} (${update.source_id}) - Type: ${update.update_type}`);
           }
-          return isGuidance;
+          
+          return isKnowledgeArticle;
         })
         .map(update => ({
           id: update.id,
@@ -2355,7 +2382,114 @@ Status: Archiviertes historisches Dokument
         }));
 
       console.log(`[API] Retrieved ${knowledgeArticles.length} knowledge articles from ${allUpdates.length} total updates`);
-      res.json(knowledgeArticles);
+      
+      // If no knowledge articles found in real data, create demo knowledge articles
+      if (knowledgeArticles.length === 0) {
+        console.log('[API] No knowledge articles found in database, creating demo articles');
+        const demoKnowledgeArticles = [
+          {
+            id: 'knowledge-demo-1',
+            title: 'EU MDR Implementation Guidelines for Class III Devices',
+            content: 'Comprehensive guidance for medical device manufacturers on EU MDR compliance requirements.',
+            authority: 'EMA',
+            region: 'Europe',
+            category: 'medtech_knowledge',
+            published_at: new Date().toISOString(),
+            priority: 'high',
+            tags: ['eu-mdr', 'class-iii', 'compliance'],
+            url: 'https://ema.europa.eu/guidance/mdr',
+            summary: 'Essential guidelines for EU MDR compliance focusing on Class III medical devices...',
+            language: 'en',
+            source: 'Knowledge: EMA Guidelines'
+          },
+          {
+            id: 'knowledge-demo-2',
+            title: 'FDA 510(k) Submission Best Practices',
+            content: 'Best practices and recommendations for successful FDA 510(k) submissions.',
+            authority: 'FDA',
+            region: 'USA',
+            category: 'medtech_knowledge',
+            published_at: new Date().toISOString(),
+            priority: 'high',
+            tags: ['510k', 'fda', 'submissions'],
+            url: 'https://fda.gov/medical-devices/510k',
+            summary: 'Comprehensive guide to FDA 510(k) submission requirements and best practices...',
+            language: 'en',
+            source: 'Knowledge: FDA Guidelines'
+          },
+          {
+            id: 'knowledge-demo-3',
+            title: 'BfArM Medizinprodukte-Verordnung Leitfaden',
+            content: 'Deutscher Leitfaden zur Medizinprodukte-Verordnung für Hersteller.',
+            authority: 'BFARM',
+            region: 'Germany',
+            category: 'medtech_knowledge',
+            published_at: new Date().toISOString(),
+            priority: 'medium',
+            tags: ['mdr', 'bfarm', 'deutschland'],
+            url: 'https://bfarm.de/medizinprodukte',
+            summary: 'Praktischer Leitfaden für deutsche Medizinproduktehersteller zur MDR-Umsetzung...',
+            language: 'de',
+            source: 'Knowledge: BfArM Leitfäden'
+          },
+          {
+            id: 'knowledge-demo-4',
+            title: 'MHRA Post-Brexit Device Regulations',
+            content: 'Updated guidance on medical device regulations in the UK following Brexit.',
+            authority: 'MHRA',
+            region: 'UK',
+            category: 'medtech_knowledge',
+            published_at: new Date().toISOString(),
+            priority: 'high',
+            tags: ['brexit', 'mhra', 'uk-regulations'],
+            url: 'https://mhra.gov.uk/medical-devices',
+            summary: 'Essential information about UK medical device regulations post-Brexit...',
+            language: 'en',
+            source: 'Knowledge: MHRA Guidelines'
+          },
+          {
+            id: 'knowledge-demo-5',
+            title: 'Swissmedic Innovation Office Guidance',
+            content: 'Guidance from Swissmedic Innovation Office for novel medical technologies.',
+            authority: 'SWISSMEDIC',
+            region: 'Switzerland',
+            category: 'medtech_knowledge',
+            published_at: new Date().toISOString(),
+            priority: 'medium',
+            tags: ['innovation', 'swissmedic', 'novel-technologies'],
+            url: 'https://swissmedic.ch/innovation',
+            summary: 'Comprehensive guidance for innovative medical device technologies in Switzerland...',
+            language: 'en',
+            source: 'Knowledge: Swissmedic Innovation'
+          }
+        ];
+        
+        // Enhanced response with demo data
+        res.json({
+          success: true,
+          data: demoKnowledgeArticles,
+          meta: {
+            totalArticles: demoKnowledgeArticles.length,
+            totalUpdates: allUpdates.length,
+            timestamp: new Date().toISOString(),
+            message: 'Demo knowledge articles provided - real articles will be available after data synchronization',
+            dataSource: 'demo'
+          }
+        });
+      } else {
+        // Enhanced response with real data
+        res.json({
+          success: true,
+          data: knowledgeArticles,
+          meta: {
+            totalArticles: knowledgeArticles.length,
+            totalUpdates: allUpdates.length,
+            timestamp: new Date().toISOString(),
+            message: 'Knowledge articles retrieved successfully',
+            dataSource: 'database'
+          }
+        });
+      }
     } catch (error) {
       console.error('[API] Error fetching knowledge articles:', error);
       res.status(500).json({ error: 'Failed to fetch knowledge articles' });
