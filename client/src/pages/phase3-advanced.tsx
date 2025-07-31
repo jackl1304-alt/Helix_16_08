@@ -61,6 +61,12 @@ export default function Phase3Advanced() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeOperation, setActiveOperation] = useState<string | null>(null);
+
+  // Phase 3 Status Query
+  const { data: phase3Status, isLoading: statusLoading } = useQuery({
+    queryKey: ['/api/phase3/status'],
+    refetchInterval: 60000 // Refresh every minute
+  });
   const [predictionParams, setPredictionParams] = useState({
     deviceCategory: '',
     manufacturer: '',
@@ -71,10 +77,7 @@ export default function Phase3Advanced() {
 
   // AI Summarization Mutations
   const batchSummarizeMutation = useMutation({
-    mutationFn: (hours: number) => apiRequest('/api/ai/batch-summarize', { 
-      method: 'POST',
-      body: JSON.stringify({ hours })
-    }),
+    mutationFn: (hours: number) => apiRequest('/api/ai/batch-summarize', 'POST', { hours }),
     onSuccess: (data: any) => {
       toast({
         title: "AI Batch Summarization",
@@ -93,10 +96,7 @@ export default function Phase3Advanced() {
   });
 
   const trendAnalysisMutation = useMutation({
-    mutationFn: (timeframe: string) => apiRequest('/api/ai/analyze-trends', { 
-      method: 'POST',
-      body: JSON.stringify({ timeframe })
-    }),
+    mutationFn: (timeframe: string) => apiRequest('/api/ai/analyze-trends', 'POST', { timeframe }),
     onSuccess: (data: TrendAnalysis) => {
       toast({
         title: "Trend Analysis Complete",
