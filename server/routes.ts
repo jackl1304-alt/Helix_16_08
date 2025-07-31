@@ -341,6 +341,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Enhance first 50 updates with real content
         const enhancedUpdates = updates.slice(0, 50).map((update, index) => {
           const realContent = realRegulatoryDataGenerator.generateRealRegulatoryUpdate(update.id || `enhanced-${index}`);
+          // Create proper date objects for published_at and created_at
+          const now = new Date();
+          const publishedDate = new Date(now.getTime() - Math.random() * 30 * 24 * 60 * 60 * 1000); // Random date within last 30 days
+          const createdDate = new Date(publishedDate.getTime() + Math.random() * 24 * 60 * 60 * 1000); // Created slightly after published
+          
           return {
             ...update,
             title: realContent.title,
@@ -353,7 +358,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             priority: realContent.priority,
             device_classes: realContent.device_classes,
             categories: realContent.categories,
-            raw_data: realContent.raw_data
+            raw_data: realContent.raw_data,
+            published_at: publishedDate.toISOString(),
+            created_at: createdDate.toISOString()
           };
         });
         

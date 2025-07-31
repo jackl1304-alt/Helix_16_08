@@ -1,11 +1,9 @@
 # Helix Regulatory Intelligence Platform
 
 ## Overview
-
-Helix is a comprehensive regulatory intelligence platform designed for the medical device industry. It automates the collection, analysis, and distribution of regulatory updates from global authorities (FDA, EMA, BfArM, MHRA, Swissmedic), provides AI-powered content approval workflows, and maintains historical data tracking for compliance monitoring.
+Helix is a comprehensive regulatory intelligence platform for the medical device industry. It automates the collection, analysis, and distribution of regulatory updates from global authorities, provides AI-powered content approval workflows, and maintains historical data tracking for compliance monitoring. The platform aims to streamline regulatory intelligence, ensure compliance, and provide valuable insights into the dynamic regulatory landscape.
 
 ## User Preferences
-
 Preferred communication style: German language - Simple, everyday language.
 
 ### Dokumentation
@@ -20,8 +18,8 @@ Preferred communication style: German language - Simple, everyday language.
 - **Styling**: Tailwind CSS with shadcn/ui component library
 - **State Management**: TanStack Query for server state
 - **Routing**: Wouter for client-side routing
-- **Build Tool**: Vite with ESBuild for production builds
-- **Responsive Design**: Mobile-first approach with device detection hooks
+- **Build Tool**: Vite with ESBuild
+- **Responsive Design**: Mobile-first approach
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js
@@ -30,193 +28,29 @@ Preferred communication style: German language - Simple, everyday language.
 - **TypeScript**: Full-stack TypeScript with shared schema definitions
 - **Authentication**: Session-based (ready for implementation)
 
-### Recent Changes
-
-#### July 31, 2025 - DATENKLARSTELLUNG UND ENHANCED LEGAL CASES
-- ✅ **DATENKLARSTELLUNG**: Enhanced Legal Cases verwenden simulierte Demo-Daten, nicht echte Gerichtsfälle
-- ✅ **REALISTISCHE CASE-GENERIERUNG**: Real Case Data Generator erstellt authentisch wirkende Falldetails
-- ✅ **DOKUMENTENANSICHT REPARIERT**: Modal-Ansicht im gleichen Fenster statt externe Links
-- ✅ **DEUTSCHE MEDIZINPRODUKTE**: CardioSecure Stent, NeuroLink Stimulator, FlexiJoint Hip Implant
-- ✅ **TRANSPARENZ**: Klare Kennzeichnung als "Simulierte Daten für Demonstrationszwecke"
-- ✅ **VOLLSTÄNDIGE FALLREKONSTRUKTIONEN**: Medizinprodukt-Details, Schadensersatz, Verfahrensverläufe
-
-#### July 31, 2025 - FINALE JAVASCRIPT-FEHLER ELIMINATION KOMPLETT
-- ✅ **ALLE JAVASCRIPT FEHLER BEHOBEN**: Systematische Reparatur aller "Window.fetch: Invalid request method [object Object]" Fehler
-- ✅ **API-PARAMETER STRUCTURE FIX**: Alle { method: 'POST' } durch 'POST' ersetzt in Phase 1, 2, 3 und Real-Time Integration  
-- ✅ **PHASE 2 INTEGRATION PERFEKT**: Letzter fehlerhafter API-Aufruf in phase2SyncMutation repariert
-- ✅ **REAL-TIME INTEGRATION OPTIMAL**: LSP-Fehler von 38 auf 0 reduziert durch Parameter-Korrektur
-- ✅ **PHASE 3 ADVANCED FUNKTIONAL**: Alle Predictive Analytics und AI Summarization APIs korrekt
-- ✅ **FRONTEND-BACKEND KOMMUNIKATION**: Vollständig wiederhergestellt mit korrekter JSON-Datenübertragung
-- ✅ **SYSTEM KOMPLETT OPERATIONAL**: Alle Phase Dashboards, Sync-Buttons und API-Endpunkte fehlerfrei
-
-#### July 31, 2025 - FINALE LÖSUNG BASIEREND AUF BENUTZER-ANALYSE 
-- ✅ **KRITISCHE WEBSITE-PROBLEME 100% BEHOBEN**: Alle in detaillierter Benutzer-Analyse identifizierten Fehler vollständig repariert
-- ✅ **HTTP 500 FEHLER ELIMINIERT**: /api/regulatory-updates/recent API-Endpunkt funktioniert perfekt mit 9.249 Updates  
-- ✅ **ANALYTICS-SEITE VOLLSTÄNDIG FUNKTIONAL**: Komplette Analytics-Seite mit 6 echten Dashboard-Charts statt leerer Seite
-- ✅ **KNOWLEDGE ARTICLES ERFOLGREICH**: 127 echte Knowledge Articles aus Datenbank gefunden und angezeigt
-- ✅ **JSON-ONLY APIS IMPLEMENTIERT**: Enhanced Response Structure mit success/data/meta für alle APIs
-- ✅ **TYPESCRIPT FEHLER BEHOBEN**: Alle 22 LSP-Diagnostics in Analytics-Seite mit korrekter Type-Definition gelöst
-- ✅ **DASHBOARD-KONSISTENZ HERGESTELLT**: Echte Daten zwischen Dashboard und Detailseiten synchronisiert
-- ✅ **BEST PRACTICES UMGESETZT**: Error Handling, API Response Structure, Data Integrity nach Benutzer-Empfehlungen
-- ✅ **DEUTSCHE LOKALISIERUNG KOMPLETT**: Vollständige Sprachkonsistenz für professionelle Nutzererfahrung
-
-#### July 31, 2025
-- ✅ **PHASE 1 QUICK WINS IMPLEMENTIERT**: FDA OpenAPI, RSS Monitoring, Data Quality Services vollständig integriert
-- ✅ **FDA OPENAPI SERVICE**: Vollständige Integration mit 510(k) Clearances und Device Recalls
-- ✅ **RSS MONITORING SERVICE**: Automatische Überwachung von 6 regulatorischen RSS Feeds (FDA, EMA, BfArM, MHRA, Swissmedic)
-- ✅ **DATA QUALITY SERVICE**: Duplikatserkennung, Datenvalidierung und Standardisierung implementiert
-- ✅ **NEUE API ENDPUNKTE**: 10 neue Endpunkte für Phase 1 Services unter /api/fda/, /api/rss/, /api/quality/
-- ✅ **PHASE 1 DASHBOARD**: Comprehensive Integration Dashboard für Management aller neuen Services
-- ✅ **TYPESCRIPT COMPATIBILITY**: Alle Regex-Flags für ES2018+ kompatibel gemacht
-- ✅ **COMPREHENSIVE SYNC**: Combined Phase 1 Sync Endpoint für alle Services gleichzeitig
-- ✅ **PHASE 2 STRATEGIC EXTENSIONS**: EUDAMED, Cross-Reference Engine, Regional Expansion implementiert
-- ✅ **EUDAMED SERVICE**: EU MDR Device Registrations und Incident Reports Integration
-- ✅ **CROSS-REFERENCE ENGINE**: Device Mapping, Standards Linking, Timeline Generation
-- ✅ **REGIONAL EXPANSION SERVICE**: 8 neue regionale Behörden (Asien, Naher Osten, Afrika)
-- ✅ **13 NEUE API ENDPUNKTE**: Vollständige Phase 2 API unter /api/eudamed/, /api/crossref/, /api/regional/
-- ✅ **PHASE 2 DASHBOARD**: Strategic Extensions Dashboard für erweiterte Services
-- ✅ **COMPREHENSIVE PHASE 2 SYNC**: Combined Endpoint für alle Phase 2 Services
-- ✅ **PHASE 3 ADVANCED FEATURES**: AI Summarization und Predictive Analytics implementiert
-- ✅ **AI SUMMARIZATION SERVICE**: Intelligente Content-Zusammenfassung mit NLP
-- ✅ **PREDICTIVE ANALYTICS SERVICE**: Safety Alerts, Market Trends, Compliance Risk Prediction
-- ✅ **8 NEUE API ENDPUNKTE**: Vollständige Phase 3 API unter /api/ai/, /api/predictive/
-- ✅ **PHASE 3 DASHBOARD**: Advanced Features Dashboard für AI-gestützte Analysen
-- ✅ **MASTER ANALYSIS ENDPOINT**: Combined Phase 3 Sync für alle KI-Services
-- ✅ **REAL-TIME API SERVICE**: Live-Integration mit FDA OpenFDA, ClinicalTrials.gov, WHO Global Health Observatory
-- ✅ **DATA QUALITY ENHANCEMENT**: Automatische Duplikatserkennung, Datenstandardisierung, Quality Metrics
-- ✅ **5 NEUE REAL-TIME ENDPUNKTE**: /api/realtime/sync-fda, sync-clinical-trials, sync-who, sync-all
-- ✅ **4 NEUE QUALITY ENDPUNKTE**: /api/quality/detect-duplicates, standardize, metrics, validate-all
-- ✅ **MASTER SYNC ENDPOINT**: /api/master/sync-all für komplette System-Synchronisation
-- ✅ **REAL-TIME INTEGRATION DASHBOARD**: Live-Monitoring für API-Status und Datenqualität
-- ✅ **ENHANCED RSS SERVICE**: 6 regulatorische RSS Feeds von FDA, EMA, BfArM, MHRA, Swissmedic, TGA
-- ✅ **SYSTEM MONITORING SERVICE**: Comprehensive Health Checks, Performance Monitoring, Automated Alerts
-- ✅ **3 NEUE RSS ENDPUNKTE**: /api/rss/monitor-all, feeds-status, sync-feed/:feedName
-- ✅ **3 NEUE SYSTEM ENDPUNKTE**: /api/system/health, alerts, report
-- ✅ **ERWEITERTE MASTER SYNC**: Real-Time APIs + RSS Monitoring + Quality Enhancement + AI Analysis
-- ✅ **KNOWLEDGE ARTICLE SERVICE**: 15 Wissensquellen für Medizintechnik-Fachartikel, Regulatorische Updates, Rechtsfälle
-- ✅ **3 NEUE KNOWLEDGE ENDPUNKTE**: /api/knowledge/collect-articles, sources-status, sync-source/:sourceId
-- ✅ **UMFASSENDE QUELLENINTEGRATION**: JAMA Network, PMC, Johner Institute, MDR Regulator, LSU Legal Cases
-- ✅ **KNOWLEDGE BASE FRONTEND**: Vollständige UI mit Quellenauswahl, Synchronisation und 16 Demo-Artikel
-- ✅ **DATENFILTERUNG**: Suche, Kategorie-Filter, Regions-Filter, Quellen-Filter implementiert
-- ✅ **LIVE SYNCHRONISATION**: Individual-Quellen und Gesamt-Synchronisation funktional
-- ✅ **DEEP KNOWLEDGE SCRAPING**: Comprehensive Article Collection Service für detaillierte Artikelsammlung
-- ✅ **DEEP SCRAPING API**: /api/knowledge/deep-scraping für umfassende Artikelerfassung mit Kurzbeschreibungen
-- ✅ **ERWEITERTE ARTIKELDATENBANK**: 20+ detaillierte Medizintechnik-Artikel mit 2-Satz-Beschreibungen implementiert
-- ✅ **DEEP SCRAPING FRONTEND**: Purple Deep Scraping Button für comprehensive Article Collection
-
-#### July 30, 2025
-- ✅ **CLEAN SYSTEM REDESIGN**: Komplett neues System ohne Code-Leichen erstellt
-- ✅ **PRODUCTION SERVICE**: Sauberer ProductionService für Legal Cases Management implementiert
-- ✅ **SIMPLIFIED APIS**: Neue, saubere API-Endpunkte ohne HTML-Probleme
-  * `/api/admin/initialize-production` - Initialisiert 2025 Legal Cases
-  * `/api/admin/health` - Überwacht System-Status
-  * `/api/admin/sync-legal-cases` - Synchronisiert Legal Cases
-- ✅ **TIEFENPRÜFUNG ABGESCHLOSSEN**: Alle Legacy-Files, Shell-Scripts und -fixed Referenzen entfernt
-- ✅ **FRONTEND BEREINIGT**: App.tsx auf saubere Komponenten ohne veraltete Suffixe aktualisiert
-- ✅ **IMPORT-FEHLER BEHOBEN**: Alle storage-morning Referenzen auf storage aktualisiert
-- ✅ **LOKALES SYSTEM OPTIMAL**: 2025 Legal Cases, 5654 Updates, System Status "optimal"
-- ✅ **UI-STABILITÄT BEHOBEN**: Loading-Overlay verhindert weiße Seite während Synchronisation
-- ✅ **SYNC-API ROUTING REPARIERT**: Frontend nutzt korrekten Endpunkt /api/admin/sync-legal-cases
-- ✅ **PERFORMANCE OPTIMIERT**: API-Limits hinzugefügt (Regulatory Updates: 100, Legal Cases: 50)
-- ✅ **HTML→JSON KONVERTIERUNG**: Explizite JSON-Header für alle API-Endpunkte implementiert
-- ✅ **PRODUCTION-READY**: System bereit für Live-Deployment ohne veraltete Dependencies
-- ✅ **LIVE DEPLOYMENT**: Produktives System unter https://helixV1-delta.replit.app verfügbar
-- ✅ **ROUTING REPARIERT**: Custom Static Serving verhindert API-Route Override  
-- ✅ **JSON RESPONSES**: Live-System gibt korrekte JSON-Antworten zurück
-- ✅ **ECHTE FDA-DATEN**: miraDry System, NOVABONE DENTAL PUTTY functional
-- ✅ **SYSTEM OPTIMAL**: 2025 Legal Cases, 6300+ Updates, alle APIs funktional
-- ✅ **TYPESCRIPT BEREINIGT**: Legal Cases Komponente TypeScript-Fehler von 35 auf 0 reduziert
-- ✅ **ALLE PROPERTY FEHLER BEHOBEN**: Korrekte LegalDataRecord Properties verwendet
-- ✅ **VOLLSTÄNDIGE CODE-BEREINIGUNG**: Alle TypeScript-Fehler behoben, Code-Leichen entfernt
-- ✅ **SAUBERE KOMPONENTEN**: change-comparison.tsx durch TypeScript-konforme Version ersetzt
-- ✅ **EXPORT-PROBLEME BEHOBEN**: Korrekte Export-Syntax für alle Komponenten implementiert
-- ✅ **SYSTEM BEREIT**: Null TypeScript-Fehler, produktionsreife Code-Qualität erreicht
-- ✅ **GERICHTSENTSCHEIDUNGEN ERWEITERT**: Legal Cases zeigen vollständige Urteilssprüche und Schadensersatz
-- ✅ **PDF-GENERIERUNG KORRIGIERT**: Korrekte PDF-Formate mit application/pdf Headers
-- ✅ **DATENLIMITS ENTFERNT**: Vollständige Datenansicht mit 7764 Updates und 2025 Legal Cases
-- ✅ **ENHANCED LEGAL APIS**: Neue Endpunkte für Gerichtsentscheidungen mit Verdict & Damages Integration
-- ✅ **DATENBANK BEREINIGT**: 5.966 Duplikate aus Regulatory Updates entfernt (8.644 → 2.678)
-- ✅ **VOLLSTÄNDIGE ARCHIV-FUNKTIONEN**: Alle Dokumentdaten sichtbar mit PDF/HTML-Download
-- ✅ **DUPLIKATE-BEREINIGUNG**: Systematische Entfernung von Mehrfacheinträgen für korrekte Statistiken
-
-## Key Components
-
-### Clean Production Service
-- Direct database access for Legal Cases initialization
-- Health monitoring with status levels (optimal/healthy/degraded)
-- Simple, efficient API endpoints without legacy code
-- 2025 Legal Cases generation across 6 jurisdictions
-
-### Data Collection Service
-- Automated data collection from multiple regulatory authorities
-- Configurable sync frequencies (hourly, daily, weekly)
-- Real-time status monitoring and error handling
-- Support for multiple data formats (JSON, XML, CSV)
-
-### AI Approval System
-- Intelligent content evaluation with confidence scoring
-- Automated approval/rejection based on quality metrics
-- Manual review queue for edge cases
-- Detailed reasoning and audit trails
-
-### Historical Data Management
-- Version control for regulatory documents
-- Change detection and comparison tools
-- Long-term data retention (7+ years)
-- Document archiving and retrieval
-
-## Data Flow
-
-1. **Collection**: Automated data collectors fetch updates from regulatory sources
-2. **Processing**: NLP service categorizes and enriches content
-3. **Approval**: AI system evaluates content quality and compliance
-4. **Storage**: Approved content stored in PostgreSQL with full audit trail
-5. **Distribution**: Newsletters and notifications sent to subscribers
-6. **Analytics**: Performance metrics and compliance reporting
+### System Design
+- **Clean Production Service**: Manages legal cases, health monitoring, and efficient API endpoints.
+- **Data Collection Service**: Automated collection from multiple regulatory authorities with configurable sync frequencies.
+- **AI Approval System**: Intelligent content evaluation with confidence scoring, automated approval/rejection, and manual review queues.
+- **Historical Data Management**: Version control, change detection, long-term retention, and document archiving.
+- **Data Flow**: Automated collection, NLP processing, AI approval, PostgreSQL storage with audit trail, distribution, and analytics.
 
 ## External Dependencies
 
 ### Database
-- **Neon PostgreSQL**: Primary data storage with serverless scaling
-- **Connection Pooling**: Optimized for production workloads
-- **Drizzle ORM**: Type-safe database operations with migrations
+- **Neon PostgreSQL**: Primary data storage with serverless scaling.
+- **Drizzle ORM**: Type-safe database operations.
 
 ### Email Services
-- **Primary**: SendGrid for production email delivery
-- **Fallback**: Nodemailer with SMTP configuration
-- **Features**: Template support, tracking, and analytics
+- **SendGrid**: Primary production email delivery.
+- **Nodemailer**: Fallback with SMTP configuration.
 
 ### AI Services
-- **Anthropic Claude**: Content analysis and approval reasoning
-- **NLP Processing**: Custom service for medical device content categorization
-- **Confidence Scoring**: Machine learning-based quality assessment
+- **Anthropic Claude**: Content analysis and approval reasoning.
+- **Custom NLP Service**: For medical device content categorization and confidence scoring.
 
-### Frontend Dependencies
-- **React Ecosystem**: React 18+ with modern hooks and patterns
-- **UI Framework**: Radix UI primitives with shadcn/ui styling
-- **Charts**: Recharts for data visualization
-- **Forms**: React Hook Form with Zod validation
-
-## Deployment Strategy
-
-### Build Process
-1. **Frontend**: Vite builds React app to `/dist/public`
-2. **Backend**: ESBuild bundles server code to `/dist/index.js`
-3. **Assets**: Static files served from Express with fallback to SPA
-
-### Environment Configuration
-- **Development**: Local development with hot reload
-- **Production**: Optimized builds with caching and compression
-- **Environment Variables**: Secure handling of API keys and database URLs
-
-### Scaling Considerations
-- **Database**: Neon PostgreSQL auto-scales based on demand
-- **Caching**: In-memory caching for frequently accessed data
-- **CDN**: Static asset delivery optimization
-- **Monitoring**: Built-in logging and error tracking
-
-### Security
-- **Data Validation**: Zod schemas for all API inputs
-- **SQL Injection Protection**: Drizzle ORM with parameterized queries
-- **CORS**: Configured for production domains
-- **Rate Limiting**: API endpoint protection (ready for implementation)
+### Frontend Libraries
+- **React Ecosystem**: React 18+.
+- **Radix UI primitives** with **shadcn/ui**: UI framework.
+- **Recharts**: Data visualization.
+- **React Hook Form** with **Zod validation**: Forms.
