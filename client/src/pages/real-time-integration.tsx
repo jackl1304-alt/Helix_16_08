@@ -212,6 +212,35 @@ export default function RealTimeIntegration() {
     refetchInterval: 300000 // Refresh every 5 minutes
   });
 
+  // RSS Feed Status Query
+  const { data: rssStatus } = useQuery({
+    queryKey: ['/api/rss/feeds-status'],
+    refetchInterval: 60000 // Refresh every minute
+  });
+
+  // RSS Monitoring Mutation
+  const rssMonitorMutation = useMutation({
+    mutationFn: () => apiRequest('/api/rss/monitor-all', { method: 'POST' }),
+    onSuccess: (data: any) => {
+      const newItems = data.results?.reduce((sum: number, r: any) => sum + r.newItems, 0) || 0;
+      toast({
+        title: "RSS Monitoring Complete",
+        description: `Found ${newItems} new items from ${data.results?.filter((r: any) => r.success).length || 0} feeds`,
+      });
+      setActiveOperation(null);
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/rss/feeds-status'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "RSS Monitoring Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+      setActiveOperation(null);
+    }
+  });
+
   const handleOperation = (operationType: string, mutation: any) => {
     setActiveOperation(operationType);
     mutation.mutate();
@@ -297,7 +326,7 @@ export default function RealTimeIntegration() {
 
         {/* Real-Time APIs Tab */}
         <TabsContent value="real-time-apis" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -410,6 +439,42 @@ export default function RealTimeIntegration() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Activity className="h-5 w-5" />
+                  RSS Monitoring
+                </CardTitle>
+                <CardDescription>
+                  Enhanced RSS Feed Monitoring
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  onClick={() => handleOperation('rss-monitoring', rssMonitorMutation)}
+                  disabled={!!activeOperation}
+                  className="w-full"
+                >
+                  {activeOperation === 'rss-monitoring' ? (
+                    <>
+                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                      Monitoring...
+                    </>
+                  ) : (
+                    <>
+                      <Activity className="mr-2 h-4 w-4" />
+                      Monitor RSS Feeds
+                    </>
+                  )}
+                </Button>
+                {rssMonitorMutation.data && (
+                  <div className="mt-2 text-sm text-muted-foreground">
+                    Feeds: {rssMonitorMutation.data.results?.filter((r: any) => r.success).length || 0}/{rssMonitorMutation.data.results?.length || 0}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
                   Comprehensive Sync
                 </CardTitle>
                 <CardDescription>
@@ -443,14 +508,39 @@ export default function RealTimeIntegration() {
             </Card>
           </div>
 
+          {/* RSS Feed Status Display */}
+          {rssStatus?.feeds && (
+            <Card>
+              <CardHeader>
+                <CardTitle>RSS Feed Status</CardTitle>
+                <CardDescription>Real-time monitoring of regulatory RSS feeds</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {rssStatus.feeds.map((feed: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <div className="font-medium text-sm">{feed.name}</div>
+                        <div className="text-xs text-muted-foreground">{feed.authority} - {feed.region}</div>
+                      </div>
+                      <Badge variant={feed.status === 'active' ? 'default' : 'destructive'}>
+                        {feed.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Sync Results Display */}
-          {(fdaSyncMutation.data || clinicalTrialsSyncMutation.data || whoSyncMutation.data || comprehensiveSyncMutation.data) && (
+          {(fdaSyncMutation.data || clinicalTrialsSyncMutation.data || whoSyncMutation.data || rssMonitorMutation.data || comprehensiveSyncMutation.data) && (
             <Card>
               <CardHeader>
                 <CardTitle>Latest Sync Results</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                   {fdaSyncMutation.data && (
                     <div className="text-center">
                       <div className="text-2xl font-bold text-blue-600">
@@ -475,12 +565,20 @@ export default function RealTimeIntegration() {
                       <div className="text-sm text-muted-foreground">WHO Indicators</div>
                     </div>
                   )}
-                  {comprehensiveSyncMutation.data && (
+                  {rssMonitorMutation.data && (
                     <div className="text-center">
                       <div className="text-2xl font-bold text-orange-600">
+                        {rssMonitorMutation.data.results?.reduce((sum: number, r: any) => sum + r.newItems, 0) || 0}
+                      </div>
+                      <div className="text-sm text-muted-foreground">RSS New Items</div>
+                    </div>
+                  )}
+                  {comprehensiveSyncMutation.data && (
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-indigo-600">
                         {comprehensiveSyncMutation.data.summary?.successfulSources || 0}
                       </div>
-                      <div className="text-sm text-muted-foreground">Successful Sources</div>
+                      <div className="text-sm text-muted-foreground">Total Sources</div>
                     </div>
                   )}
                 </div>
@@ -781,6 +879,13 @@ export default function RealTimeIntegration() {
                     </div>
                     <Badge variant="outline">Connected</Badge>
                   </div>
+                  <div className="flex items-center justify-between p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Activity className="h-4 w-4 text-orange-600" />
+                      <span className="font-medium">Enhanced RSS Monitoring</span>
+                    </div>
+                    <Badge variant="outline">6 Feeds Active</Badge>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -830,6 +935,7 @@ export default function RealTimeIntegration() {
                     <li>✅ FDA OpenFDA Device APIs (510k, PMA, Recalls)</li>
                     <li>✅ ClinicalTrials.gov Medical Device Studies</li>
                     <li>✅ WHO Global Health Observatory Indicators</li>
+                    <li>✅ Enhanced RSS Feed Monitoring (6 Feeds)</li>
                     <li>✅ Real-time Data Synchronization</li>
                     <li>✅ Comprehensive Quality Enhancement</li>
                   </ul>
