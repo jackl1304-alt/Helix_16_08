@@ -30,20 +30,20 @@ export default function EnhancedLegalCases() {
   const queryClient = useQueryClient();
 
   // Fetch comprehensive legal cases
-  const { data: legalCases = [], isLoading: isLoadingCases } = useQuery({
+  const { data: legalCases = [], isLoading: isLoadingCases } = useQuery<ComprehensiveLegalCase[]>({
     queryKey: ['/api/legal/cases'],
   });
 
   // Enhanced legal cases generation mutation
   const generateEnhancedCasesMutation = useMutation({
-    mutationFn: () => apiRequest('/api/legal/comprehensive-cases', { method: 'POST' }),
+    mutationFn: () => fetch('/api/legal/comprehensive-cases', { method: 'POST' }).then(res => res.json()),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/legal/cases'] });
     },
   });
 
   // Filter cases based on search and filters
-  const filteredCases = legalCases.filter((legalCase: ComprehensiveLegalCase) => {
+  const filteredCases = (legalCases as ComprehensiveLegalCase[]).filter((legalCase: ComprehensiveLegalCase) => {
     const matchesSearch = !searchTerm || 
       legalCase.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       legalCase.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||

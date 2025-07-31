@@ -383,28 +383,20 @@ export class DeepKnowledgeScrapingService {
       let articlesStored = 0;
       
       for (const article of articles) {
-        // Convert to regulatory update format for database storage
+        // Convert to regulatory update format matching schema
         const regulatoryUpdate = {
           id: article.id,
           title: article.title,
           description: article.description,
-          content: this.formatArticleContent(article),
-          source_id: article.sourceId,
-          document_url: article.url,
-          published_at: article.publishedAt,
+          sourceId: article.sourceId,
+          documentUrl: article.url,
+          publishedDate: article.publishedAt,
           jurisdiction: article.jurisdiction,
           language: article.language,
-          priority: this.calculatePriority(article.relevanceScore),
-          categories: [article.category],
+          priority: this.calculatePriorityAsNumber(article.relevanceScore),
+          category: article.category,
           tags: article.tags,
-          ai_summary: article.description,
-          impact_score: article.relevanceScore,
-          change_type: 'knowledge_article',
-          affected_products: ['medical devices'],
-          regulatory_body: this.determineRegulatoryBody(article.sourceId),
-          compliance_deadline: null,
-          status: 'active'
-        };
+          content: this.formatArticleContent(article)
         
         // Check if article already exists
         const existingArticle = await db
@@ -516,6 +508,16 @@ For deeper understanding, consider exploring:
     if (relevanceScore >= 7) return 'high';
     if (relevanceScore >= 5) return 'medium';
     return 'low';
+  }
+
+  /**
+   * Calculate priority as number for database storage
+   */
+  private calculatePriorityAsNumber(score: number): number {
+    if (score >= 9) return 4; // critical
+    if (score >= 7) return 3; // high
+    if (score >= 5) return 2; // medium
+    return 1; // low
   }
 
   /**
