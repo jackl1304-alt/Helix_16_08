@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ConfigurationError } from '../../shared/types/errors';
+import { ConfigurationError } from '@shared/types/errors';
 import { Logger } from '../services/logger.service';
 
 const logger = new Logger('Environment');

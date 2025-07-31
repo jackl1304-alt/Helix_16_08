@@ -8,7 +8,7 @@ import {
   formatErrorResponse,
   ValidationError,
   DatabaseError
-} from '../../shared/types/errors';
+} from '@shared/types/errors';
 
 const logger = new Logger('ErrorMiddleware');
 

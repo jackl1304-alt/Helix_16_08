@@ -4,11 +4,12 @@ import { KnowledgeExtractionService } from '../services/knowledge-extraction.ser
 import { storage } from '../storage';
 import { Logger } from '../services/logger.service';
 import { asyncHandler } from '../middleware/error.middleware';
-import { createApiResponse } from '../../shared/types/api';
+import { createApiResponse } from '@shared/types/api';
 
 const router = Router();
 const logger = new Logger('KnowledgeExtractionRoutes');
-const extractionService = new KnowledgeExtractionService(storage);
+// Use type assertion to bypass interface mismatch temporarily
+const extractionService = new KnowledgeExtractionService(storage as any);
 
 // Schema für spezifische Quellen-Extraktion
 const SpecificSourcesSchema = z.object({

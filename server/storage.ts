@@ -37,6 +37,7 @@ export interface IStorage {
   getDataSourceById(id: string): Promise<any>;
   getDataSources(): Promise<any[]>;
   getDataSourceByType(type: string): Promise<any>;
+  deleteKnowledgeArticle(id: string): Promise<boolean>;
 }
 
 // Direct SQL Storage Implementation for 7AM Morning State
@@ -574,13 +575,19 @@ class MorningStorage implements IStorage {
         return null;
       }
       
+      const record = result[0];
+      if (!record) {
+        console.warn(`[DB] Invalid record for data source id: ${id}`);
+        return null;
+      }
+      
       return {
-        id: result[0].id,
-        name: result[0].name,
-        type: result[0].type,
-        endpoint: result[0].endpoint,
-        isActive: result[0].is_active,
-        lastSync: result[0].last_sync_at
+        id: record.id,
+        name: record.name,
+        type: record.type,
+        endpoint: record.endpoint,
+        isActive: record.is_active,
+        lastSync: record.last_sync_at
       };
     } catch (error: any) {
       console.error(`[DB] Error getting data source by id ${id}:`, error);
@@ -602,13 +609,19 @@ class MorningStorage implements IStorage {
         return null;
       }
       
+      const record = result[0];
+      if (!record) {
+        console.warn(`[DB] Invalid record for data source type: ${type}`);
+        return null;
+      }
+      
       return {
-        id: result[0].id,
-        name: result[0].name,
-        type: result[0].type,
-        endpoint: result[0].endpoint,
-        isActive: result[0].is_active,
-        lastSync: result[0].last_sync_at
+        id: record.id,
+        name: record.name,
+        type: record.type,
+        endpoint: record.endpoint,
+        isActive: record.is_active,
+        lastSync: record.last_sync_at
       };
     } catch (error: any) {
       console.error(`[DB] Error getting data source by type ${type}:`, error);
