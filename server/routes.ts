@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import adminRoutes from "./routes/admin.routes";
 import { aiApprovalService } from "./services/ai-approval-service";
 import { 
   insertUserSchema, 
@@ -135,6 +136,9 @@ Status: Rechtskräftig
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  
+  // Admin routes
+  app.use('/api/admin', adminRoutes);
   
   // Dashboard API routes
   app.get("/api/dashboard/stats", async (req, res) => {
