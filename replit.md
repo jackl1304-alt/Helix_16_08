@@ -11,26 +11,44 @@ Preferred communication style: German language - Simple, everyday language.
 - Klare Priorisierung nach Implementierungsstand
 - Technische Schulden transparent dokumentieren
 
+### Code Quality Standards (Updated 2025-07-31)
+- **Production-Ready**: Complete removal of all demo data and mock content
+- **Type Safety**: No 'any' types, comprehensive TypeScript interfaces
+- **Modern Practices**: ESLint, Prettier, structured logging with Winston
+- **Security**: Input validation, rate limiting, sanitization
+- **Performance**: Optimized queries, caching, error handling
+
 ## System Architecture
 
 ### Frontend Architecture
-- **Framework**: React with TypeScript
+- **Framework**: React with TypeScript (Strict Mode)
 - **Styling**: Tailwind CSS with shadcn/ui component library
 - **State Management**: TanStack Query for server state
 - **Routing**: Wouter for client-side routing
 - **Build Tool**: Vite with ESBuild
 - **Responsive Design**: Mobile-first approach
+- **Code Quality**: ESLint with TypeScript rules, Prettier formatting
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js
 - **Database**: PostgreSQL with Drizzle ORM
 - **Database Provider**: Neon (serverless PostgreSQL)
-- **TypeScript**: Full-stack TypeScript with shared schema definitions
+- **TypeScript**: Full-stack TypeScript with shared schema definitions (Strict Mode)
 - **Authentication**: Session-based (ready for implementation)
 - **Logging**: Winston logger service with structured logging
 - **Error Handling**: Centralized error middleware with proper error types
-- **Validation**: Zod schemas for input validation
+- **Validation**: Zod schemas for input validation and runtime type safety
 - **Environment**: Validated environment configuration with type safety
+- **Security**: Rate limiting, input sanitization, security headers
+- **API Design**: RESTful APIs with consistent JSON responses and error handling
+
+### Code Quality Standards
+- **Type Safety**: Eliminated all 'any' types, implemented proper TypeScript interfaces
+- **Error Handling**: Structured error classes with status codes and operational flags
+- **Logging**: Replaced 200+ console.log statements with structured Winston logging
+- **Validation**: Comprehensive Zod schemas for all API endpoints
+- **Security**: Rate limiting (100 req/15min), input sanitization, XSS protection
+- **Performance**: Optimized database queries, caching strategies, lazy loading
 
 ### System Design
 - **Clean Production Service**: Manages legal cases, health monitoring, and efficient API endpoints.

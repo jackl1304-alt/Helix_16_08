@@ -1,47 +1,68 @@
 import { z } from 'zod';
-import { Request, Response, NextFunction } from 'express';
-
-export const regulatoryUpdateSchema = z.object({
-  title: z.string().min(1).max(500),
-  description: z.string().min(1).max(5000),
-  region: z.enum(['US', 'EU', 'UK', 'CH', 'DE', 'United States', 'Europe']),
-  update_type: z.enum(['guidance', 'regulation', 'alert', 'approval', 'clearance']),
-  priority: z.enum(['high', 'medium', 'low', 'urgent']),
-  device_classes: z.array(z.string()).min(1),
-  effective_date: z.string().datetime().optional(),
-  source_url: z.string().url(),
-  content: z.string().optional(),
-  categories: z.record(z.unknown()).optional()
-});
 
 export const paginationSchema = z.object({
-  page: z.string().transform(Number).pipe(z.number().min(1)).default('1'),
-  limit: z.string().transform(Number).pipe(z.number().min(1).max(100)).default('50'),
+  limit: z
+    .string()
+    .optional()
+    .default('50')
+    .transform((val) => parseInt(val, 10))
+    .refine((val) => val > 0 && val <= 1000, {
+      message: 'Limit must be between 1 and 1000',
+    }),
+  offset: z
+    .string()
+    .optional()
+    .default('0')
+    .transform((val) => parseInt(val, 10))
+    .refine((val) => val >= 0, {
+      message: 'Offset must be 0 or greater',
+    }),
   region: z.string().optional(),
-  priority: z.string().optional(),
-  type: z.string().optional(),
+  priority: z.enum(['low', 'medium', 'high', 'critical']).optional(),
+  update_type: z.string().optional(),
 });
 
-// Validation Middleware
-export const validate = (schema: z.ZodSchema) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const validated = await schema.parseAsync(
-        req.method === 'GET' ? req.query : req.body
-      );
-      (req as any).validated = validated;
-      next();
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({
-          success: false,
-          error: 'Validation failed',
-          details: error.errors,
-          timestamp: new Date().toISOString()
-        });
-      } else {
-        next(error);
-      }
+export const regulatoryUpdateSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  description: z.string().min(1, 'Description is required'),
+  source_id: z.string().min(1, 'Source ID is required'),
+  source_url: z.string().url('Valid URL is required'),
+  content: z.string().optional(),
+  region: z.string().min(1, 'Region is required'),
+  update_type: z.string().min(1, 'Update type is required'),
+  priority: z.enum(['low', 'medium', 'high', 'critical']),
+  device_classes: z.array(z.string()).default([]),
+  categories: z.record(z.unknown()).optional(),
+  raw_data: z.record(z.unknown()).optional(),
+  published_at: z.string().datetime('Valid ISO date required'),
+  effective_date: z.string().datetime().optional(),
+});
+
+export const legalCaseSchema = z.object({
+  case_number: z.string().min(1, 'Case number is required'),
+  title: z.string().min(1, 'Title is required'),
+  court: z.string().min(1, 'Court is required'),
+  jurisdiction: z.string().min(1, 'Jurisdiction is required'),
+  status: z.enum(['pending', 'closed', 'appealed', 'settled']),
+  defendants: z.array(z.string()).min(1, 'At least one defendant required'),
+  plaintiffs: z.array(z.string()).min(1, 'At least one plaintiff required'),
+  legal_issues: z.array(z.string()).default([]),
+  filed_date: z.string().datetime('Valid ISO date required'),
+  decision_date: z.string().datetime().optional(),
+  case_summary: z.string().optional(),
+  outcome: z.string().optional(),
+  impact_level: z.enum(['low', 'medium', 'high', 'critical']).optional(),
+  document_url: z.string().url().optional(),
+});
+
+export function validate<T>(schema: z.ZodSchema<T>, data: unknown): T {
+  try {
+    return schema.parse(data);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const message = error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
+      throw new Error(`Validation failed: ${message}`);
     }
-  };
-};
+    throw error;
+  }
+}
