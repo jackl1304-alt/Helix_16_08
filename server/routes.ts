@@ -24,6 +24,8 @@ import { AISummarizationService } from "./services/aiSummarizationService";
 import { PredictiveAnalyticsService } from "./services/predictiveAnalyticsService";
 import { RealTimeAPIService } from "./services/realTimeAPIService";
 import { DataQualityEnhancementService } from "./services/dataQualityEnhancementService";
+import { EnhancedRSSService } from "./services/enhancedRSSService";
+import { SystemMonitoringService } from "./services/systemMonitoringService";
 
 // Initialize Phase 1 & 2 services
 const fdaApiService = new FDAOpenAPIService();
@@ -36,6 +38,8 @@ const aiSummaryService = new AISummarizationService();
 const predictiveService = new PredictiveAnalyticsService();
 const realTimeAPIService = new RealTimeAPIService();
 const dataQualityService = new DataQualityEnhancementService();
+const enhancedRSSService = new EnhancedRSSService();
+const systemMonitoringService = new SystemMonitoringService();
 
 // Generate full legal decision content for realistic court cases
 function generateFullLegalDecision(legalCase: any): string {
@@ -2155,15 +2159,56 @@ Status: Archiviertes historisches Dokument
     }
   });
 
+  // ========== ENHANCED RSS MONITORING ENDPOINTS ==========
+  
+  // Monitor All RSS Feeds
+  app.post("/api/rss/monitor-all", async (req, res) => {
+    try {
+      console.log('[API] Starting enhanced RSS monitoring...');
+      
+      const result = await enhancedRSSService.monitorAllFeeds();
+      res.json(result);
+    } catch (error: any) {
+      console.error('[API] RSS monitoring failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Get RSS Feed Status
+  app.get("/api/rss/feeds-status", async (req, res) => {
+    try {
+      const feedStatus = await enhancedRSSService.getFeedStatus();
+      res.json({ success: true, feeds: feedStatus });
+    } catch (error: any) {
+      console.error('[API] Failed to get RSS feed status:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Sync Specific RSS Feed
+  app.post("/api/rss/sync-feed/:feedName", async (req, res) => {
+    try {
+      const { feedName } = req.params;
+      console.log(`[API] Syncing specific RSS feed: ${feedName}`);
+      
+      const result = await enhancedRSSService.syncSpecificFeed(decodeURIComponent(feedName));
+      res.json({ success: result.success, result });
+    } catch (error: any) {
+      console.error('[API] RSS feed sync failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // ========== MASTER INTEGRATION ENDPOINT ==========
   
-  // Ultimate Sync: Real-Time APIs + Quality Enhancement + AI Analysis
+  // Ultimate Sync: Real-Time APIs + RSS + Quality Enhancement + AI Analysis
   app.post("/api/master/sync-all", async (req, res) => {
     try {
-      console.log('[API] Starting master synchronization: Real-Time APIs + Quality + AI...');
+      console.log('[API] Starting master synchronization: Real-Time APIs + RSS + Quality + AI...');
       
       const results = await Promise.allSettled([
         realTimeAPIService.performComprehensiveSync(),
+        enhancedRSSService.monitorAllFeeds(),
         dataQualityService.validateAndCleanData(),
         aiSummaryService.batchSummarizeRecent(24),
         predictiveService.generateComplianceRiskAssessment()
@@ -2171,9 +2216,10 @@ Status: Archiviertes historisches Dokument
       
       const masterReport = {
         realTimeSync: results[0].status === 'fulfilled' ? results[0].value : { success: false, error: 'Failed' },
-        dataQuality: results[1].status === 'fulfilled' ? results[1].value : { success: false, error: 'Failed' },
-        aiSummarization: results[2].status === 'fulfilled' ? results[2].value : { success: false, error: 'Failed' },
-        predictiveAnalytics: results[3].status === 'fulfilled' ? results[3].value : { success: false, error: 'Failed' }
+        rssMonitoring: results[1].status === 'fulfilled' ? results[1].value : { success: false, error: 'Failed' },
+        dataQuality: results[2].status === 'fulfilled' ? results[2].value : { success: false, error: 'Failed' },
+        aiSummarization: results[3].status === 'fulfilled' ? results[3].value : { success: false, error: 'Failed' },
+        predictiveAnalytics: results[4].status === 'fulfilled' ? results[4].value : { success: false, error: 'Failed' }
       };
       
       const successCount = Object.values(masterReport).filter(r => r.success).length;
@@ -2187,6 +2233,43 @@ Status: Archiviertes historisches Dokument
       });
     } catch (error: any) {
       console.error('[API] Master sync failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ========== SYSTEM MONITORING ENDPOINTS ==========
+  
+  // Get System Health
+  app.get("/api/system/health", async (req, res) => {
+    try {
+      const health = await systemMonitoringService.getSystemHealth();
+      res.json({ success: true, health });
+    } catch (error: any) {
+      console.error('[API] System health check failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Get System Alerts
+  app.get("/api/system/alerts", async (req, res) => {
+    try {
+      const alerts = await systemMonitoringService.getSystemAlerts();
+      res.json({ success: true, alerts });
+    } catch (error: any) {
+      console.error('[API] Failed to get system alerts:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Generate System Report
+  app.get("/api/system/report", async (req, res) => {
+    try {
+      console.log('[API] Generating comprehensive system report...');
+      
+      const report = await systemMonitoringService.generateSystemReport();
+      res.json({ success: true, report });
+    } catch (error: any) {
+      console.error('[API] System report generation failed:', error);
       res.status(500).json({ message: error.message });
     }
   });
