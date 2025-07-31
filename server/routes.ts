@@ -2494,28 +2494,48 @@ Status: Archiviertes historisches Dokument
         title: u.title?.substring(0, 50)
       })));
       
-      // Enhanced filtering for knowledge articles with better logic
+      // Enhanced filtering for extracted knowledge articles
       let knowledgeArticles = allUpdates
         .filter(update => {
-          // Check multiple criteria for knowledge articles
-          const isGuidance = update.update_type === 'guidance';
-          const isKnowledgeSource = update.source_id && (
-            update.source_id.includes('knowledge') ||
-            update.source_id.includes('guidance') ||
-            update.source_id.includes('article') ||
-            update.source_id.includes('deep-scraping')
-          );
-          const hasKnowledgeKeywords = update.title && (
-            update.title.toLowerCase().includes('guidance') ||
-            update.title.toLowerCase().includes('guideline') ||
-            update.title.toLowerCase().includes('recommendation') ||
-            update.title.toLowerCase().includes('best practice')
+          // Check for extracted knowledge sources from our Universal Extractor
+          const isExtractedSource = update.source_id && (
+            update.source_id.includes('jama_') ||
+            update.source_id.includes('nejm_') ||
+            update.source_id.includes('lancet_') ||
+            update.source_id.includes('fda_guidance_') ||
+            update.source_id.includes('ema_guidelines') ||
+            update.source_id.includes('bfarm_') ||
+            update.source_id.includes('swissmedic_') ||
+            update.source_id.includes('mhra_') ||
+            update.source_id.includes('iso_') ||
+            update.source_id.includes('iec_') ||
+            update.source_id.includes('pubmed_') ||
+            update.source_id.includes('johner_') ||
+            update.source_id.includes('mtd_') ||
+            update.source_id.includes('network_medical_devices')
           );
           
-          const isKnowledgeArticle = isGuidance || isKnowledgeSource || hasKnowledgeKeywords;
+          const isResearchCategory = update.category && (
+            update.category.includes('medtech_research') ||
+            update.category.includes('regulatory_guidance') ||
+            update.category.includes('technical_standards') ||
+            update.category.includes('legal_research')
+          );
+          
+          const hasKnowledgeTags = update.tags && Array.isArray(update.tags) && 
+            update.tags.some(tag => 
+              tag.includes('medical-devices') ||
+              tag.includes('research') ||
+              tag.includes('jama') ||
+              tag.includes('regulatory') ||
+              tag.includes('standards') ||
+              tag.includes('legal')
+            );
+          
+          const isKnowledgeArticle = isExtractedSource || isResearchCategory || hasKnowledgeTags;
           
           if (isKnowledgeArticle) {
-            console.log(`[API] Found knowledge article: ${update.title} (${update.source_id}) - Type: ${update.update_type}`);
+            console.log(`[API] Found knowledge article: ${update.title} (${update.source_id}) - Category: ${update.category}`);
           }
           
           return isKnowledgeArticle;
@@ -2523,17 +2543,22 @@ Status: Archiviertes historisches Dokument
         .map(update => ({
           id: update.id,
           title: update.title || 'Knowledge Article',
-          content: update.description || 'Medical technology knowledge content from regulatory source',
-          authority: (update.source_id || 'Knowledge').toUpperCase().split('_')[0],
+          content: update.content || update.summary || 'Medical technology knowledge content from extracted source',
+          authority: update.authority || 'Unknown Authority',
           region: update.region || 'Global',
-          category: 'medtech_knowledge',
-          published_at: update.published_at || new Date().toISOString(),
+          category: update.category || 'medtech_knowledge',
+          published_at: update.published_at || update.created_at || new Date().toISOString(),
           priority: update.priority || 'medium',
-          tags: Array.isArray(update.device_classes) ? update.device_classes : ['medical-devices', 'knowledge'],
-          url: update.source_url || '',
-          summary: (update.description || 'Knowledge article summary').slice(0, 200) + '...',
+          tags: Array.isArray(update.tags) ? update.tags : ['medical-devices', 'knowledge'],
+          url: update.url || '#',
+          summary: update.summary || (update.content ? update.content.slice(0, 200) + '...' : 'Knowledge article from extracted source'),
           language: 'en',
-          source: `Knowledge: ${update.source_id || 'Database'}`
+          source: `${update.authority || 'Knowledge'}: ${update.source_id || 'Database'}`,
+          source_id: update.source_id || 'unknown',
+          device_classes: Array.isArray(update.device_classes) ? update.device_classes : [],
+          status: 'published',
+          created_at: update.created_at || new Date().toISOString(),
+          updated_at: update.updated_at || new Date().toISOString()
         }));
 
       console.log(`[API] Retrieved ${knowledgeArticles.length} knowledge articles from ${allUpdates.length} total updates`);
