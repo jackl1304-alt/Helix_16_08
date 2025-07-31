@@ -45,6 +45,12 @@ export default function Phase2Integration() {
   const queryClient = useQueryClient();
   const [activeSync, setActiveSync] = useState<string | null>(null);
 
+  // Phase 2 Status Query
+  const { data: phase2Status, isLoading: statusLoading } = useQuery({
+    queryKey: ['/api/phase2/status'],
+    refetchInterval: 60000 // Refresh every minute
+  });
+
   // Regional Authorities Status Query
   const { data: regionalStatus, isLoading: regionalLoading } = useQuery({
     queryKey: ['/api/regional/authorities-status'],
@@ -53,7 +59,7 @@ export default function Phase2Integration() {
 
   // EUDAMED Sync Mutations
   const eudamedDevicesMutation = useMutation({
-    mutationFn: () => apiRequest('/api/eudamed/sync-devices', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/eudamed/sync-devices', 'POST'),
     onSuccess: () => {
       toast({
         title: "EUDAMED Device Sync",
@@ -73,7 +79,7 @@ export default function Phase2Integration() {
   });
 
   const eudamedIncidentsMutation = useMutation({
-    mutationFn: () => apiRequest('/api/eudamed/sync-incidents', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/eudamed/sync-incidents', 'POST'),
     onSuccess: () => {
       toast({
         title: "EUDAMED Incident Sync",
@@ -93,7 +99,7 @@ export default function Phase2Integration() {
   });
 
   const eudamedCompleteMutation = useMutation({
-    mutationFn: () => apiRequest('/api/eudamed/sync-all', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/eudamed/sync-all', 'POST'),
     onSuccess: () => {
       toast({
         title: "Complete EUDAMED Sync",

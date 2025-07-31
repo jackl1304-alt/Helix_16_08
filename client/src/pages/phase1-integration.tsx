@@ -48,6 +48,12 @@ export default function Phase1Integration() {
   const queryClient = useQueryClient();
   const [activeSync, setActiveSync] = useState<string | null>(null);
 
+  // Phase 1 Status Query
+  const { data: phase1Status, isLoading: statusLoading } = useQuery({
+    queryKey: ['/api/phase1/status'],
+    refetchInterval: 30000 // Refresh every 30 seconds
+  });
+
   // RSS Feeds Status Query
   const { data: rssStatus, isLoading: rssLoading } = useQuery({
     queryKey: ['/api/rss/feeds-status'],
@@ -56,7 +62,7 @@ export default function Phase1Integration() {
 
   // FDA Sync Mutations
   const fda510kMutation = useMutation({
-    mutationFn: () => apiRequest('/api/fda/sync-510k', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/fda/sync-510k', 'POST'),
     onSuccess: () => {
       toast({
         title: "FDA 510(k) Sync",
@@ -76,7 +82,7 @@ export default function Phase1Integration() {
   });
 
   const fdaRecallsMutation = useMutation({
-    mutationFn: () => apiRequest('/api/fda/sync-recalls', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/fda/sync-recalls', 'POST'),
     onSuccess: () => {
       toast({
         title: "FDA Recalls Sync",
@@ -96,7 +102,7 @@ export default function Phase1Integration() {
   });
 
   const fdaCompleteMutation = useMutation({
-    mutationFn: () => apiRequest('/api/fda/sync-all', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/fda/sync-all', 'POST'),
     onSuccess: () => {
       toast({
         title: "Complete FDA Sync",
@@ -117,7 +123,7 @@ export default function Phase1Integration() {
 
   // RSS Monitoring Mutations
   const rssMonitorMutation = useMutation({
-    mutationFn: () => apiRequest('/api/rss/monitor-feeds', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/rss/monitor-feeds', 'POST'),
     onSuccess: () => {
       toast({
         title: "RSS Monitoring",
@@ -137,7 +143,7 @@ export default function Phase1Integration() {
   });
 
   const rssStartMutation = useMutation({
-    mutationFn: () => apiRequest('/api/rss/start-monitoring', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/rss/start-monitoring', 'POST'),
     onSuccess: () => {
       toast({
         title: "Continuous RSS Monitoring",
@@ -156,7 +162,7 @@ export default function Phase1Integration() {
 
   // Data Quality Mutations
   const qualityAnalysisMutation = useMutation({
-    mutationFn: () => apiRequest('/api/quality/analyze', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/quality/analyze', 'POST'),
     onSuccess: (data: QualityReport) => {
       toast({
         title: "Data Quality Analysis",
@@ -175,10 +181,7 @@ export default function Phase1Integration() {
   });
 
   const duplicatesMutation = useMutation({
-    mutationFn: (threshold: number) => apiRequest('/api/quality/find-duplicates', { 
-      method: 'POST',
-      body: JSON.stringify({ threshold })
-    }),
+    mutationFn: (threshold: number) => apiRequest('/api/quality/find-duplicates', 'POST', { threshold }),
     onSuccess: (data: any) => {
       toast({
         title: "Duplicate Detection",
@@ -198,7 +201,7 @@ export default function Phase1Integration() {
 
   // Combined Phase 1 Sync
   const phase1SyncMutation = useMutation({
-    mutationFn: () => apiRequest('/api/phase1/sync-all', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/phase1/sync-all', 'POST'),
     onSuccess: (data: any) => {
       toast({
         title: "Phase 1 Complete Sync",
