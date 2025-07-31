@@ -22,6 +22,8 @@ import { CrossReferenceService } from "./services/crossReferenceService";
 import { RegionalExpansionService } from "./services/regionalExpansionService";
 import { AISummarizationService } from "./services/aiSummarizationService";
 import { PredictiveAnalyticsService } from "./services/predictiveAnalyticsService";
+import { RealTimeAPIService } from "./services/realTimeAPIService";
+import { DataQualityEnhancementService } from "./services/dataQualityEnhancementService";
 
 // Initialize Phase 1 & 2 services
 const fdaApiService = new FDAOpenAPIService();
@@ -32,6 +34,8 @@ const crossRefService = new CrossReferenceService();
 const regionalService = new RegionalExpansionService();
 const aiSummaryService = new AISummarizationService();
 const predictiveService = new PredictiveAnalyticsService();
+const realTimeAPIService = new RealTimeAPIService();
+const dataQualityService = new DataQualityEnhancementService();
 
 // Generate full legal decision content for realistic court cases
 function generateFullLegalDecision(legalCase: any): string {
@@ -2038,6 +2042,151 @@ Status: Archiviertes historisches Dokument
       });
     } catch (error: any) {
       console.error('[API] Phase 3 analysis failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ========== REAL-TIME API INTEGRATION ENDPOINTS ==========
+  
+  // FDA Real-Time Data Sync
+  app.post("/api/realtime/sync-fda", async (req, res) => {
+    try {
+      console.log('[API] Starting FDA real-time data synchronization...');
+      
+      const result = await realTimeAPIService.syncFDAData();
+      res.json(result);
+    } catch (error: any) {
+      console.error('[API] FDA sync failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Clinical Trials Real-Time Data Sync
+  app.post("/api/realtime/sync-clinical-trials", async (req, res) => {
+    try {
+      console.log('[API] Starting Clinical Trials real-time synchronization...');
+      
+      const result = await realTimeAPIService.syncClinicalTrialsData();
+      res.json(result);
+    } catch (error: any) {
+      console.error('[API] Clinical Trials sync failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // WHO Global Health Observatory Sync
+  app.post("/api/realtime/sync-who", async (req, res) => {
+    try {
+      console.log('[API] Starting WHO Global Health Observatory synchronization...');
+      
+      const result = await realTimeAPIService.syncWHOData();
+      res.json(result);
+    } catch (error: any) {
+      console.error('[API] WHO sync failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Comprehensive Real-Time Sync
+  app.post("/api/realtime/sync-all", async (req, res) => {
+    try {
+      console.log('[API] Starting comprehensive real-time data synchronization...');
+      
+      const result = await realTimeAPIService.performComprehensiveSync();
+      res.json(result);
+    } catch (error: any) {
+      console.error('[API] Comprehensive real-time sync failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ========== DATA QUALITY ENHANCEMENT ENDPOINTS ==========
+  
+  // Detect Duplicates
+  app.post("/api/quality/detect-duplicates", async (req, res) => {
+    try {
+      const { keyFields = ['title', 'authority'] } = req.body;
+      console.log('[API] Starting duplicate detection...');
+      
+      const report = await dataQualityService.detectDuplicates(keyFields);
+      res.json({ success: true, report });
+    } catch (error: any) {
+      console.error('[API] Duplicate detection failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Standardize Data
+  app.post("/api/quality/standardize", async (req, res) => {
+    try {
+      console.log('[API] Starting data standardization...');
+      
+      const report = await dataQualityService.standardizeData();
+      res.json({ success: true, report });
+    } catch (error: any) {
+      console.error('[API] Data standardization failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Calculate Quality Metrics
+  app.get("/api/quality/metrics", async (req, res) => {
+    try {
+      console.log('[API] Calculating data quality metrics...');
+      
+      const metrics = await dataQualityService.calculateQualityMetrics();
+      res.json({ success: true, metrics });
+    } catch (error: any) {
+      console.error('[API] Quality metrics calculation failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Comprehensive Data Quality Check
+  app.post("/api/quality/validate-all", async (req, res) => {
+    try {
+      console.log('[API] Starting comprehensive data quality validation...');
+      
+      const result = await dataQualityService.validateAndCleanData();
+      res.json(result);
+    } catch (error: any) {
+      console.error('[API] Data quality validation failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ========== MASTER INTEGRATION ENDPOINT ==========
+  
+  // Ultimate Sync: Real-Time APIs + Quality Enhancement + AI Analysis
+  app.post("/api/master/sync-all", async (req, res) => {
+    try {
+      console.log('[API] Starting master synchronization: Real-Time APIs + Quality + AI...');
+      
+      const results = await Promise.allSettled([
+        realTimeAPIService.performComprehensiveSync(),
+        dataQualityService.validateAndCleanData(),
+        aiSummaryService.batchSummarizeRecent(24),
+        predictiveService.generateComplianceRiskAssessment()
+      ]);
+      
+      const masterReport = {
+        realTimeSync: results[0].status === 'fulfilled' ? results[0].value : { success: false, error: 'Failed' },
+        dataQuality: results[1].status === 'fulfilled' ? results[1].value : { success: false, error: 'Failed' },
+        aiSummarization: results[2].status === 'fulfilled' ? results[2].value : { success: false, error: 'Failed' },
+        predictiveAnalytics: results[3].status === 'fulfilled' ? results[3].value : { success: false, error: 'Failed' }
+      };
+      
+      const successCount = Object.values(masterReport).filter(r => r.success).length;
+      const totalServices = Object.keys(masterReport).length;
+      
+      res.json({ 
+        success: successCount > 0, 
+        message: `Master sync completed: ${successCount}/${totalServices} services successful`,
+        masterReport,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error('[API] Master sync failed:', error);
       res.status(500).json({ message: error.message });
     }
   });
