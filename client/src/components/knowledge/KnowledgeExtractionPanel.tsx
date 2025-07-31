@@ -20,11 +20,11 @@ interface ExtractionStats {
 
 interface ExtractionStatus {
   totalArticles: number;
-  autoExtractedArticles: number;
-  needsReviewArticles: number;
-  publishedArticles: number;
-  draftArticles: number;
-  availableSourceData: {
+  autoExtractedArticles?: number;
+  needsReviewArticles?: number;
+  publishedArticles?: number;
+  draftArticles?: number;
+  availableSourceData?: {
     regulatoryUpdates: number;
     legalCases: number;
     totalSources: number;
@@ -180,7 +180,7 @@ export function KnowledgeExtractionPanel() {
             <CardContent>
               <div className="text-2xl font-bold">{status.totalArticles}</div>
               <p className="text-xs text-muted-foreground">
-                {status.publishedArticles} veröffentlicht
+                {status.publishedArticles || 0} veröffentlicht
               </p>
             </CardContent>
           </Card>
@@ -191,7 +191,7 @@ export function KnowledgeExtractionPanel() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-blue-600">
-                {status.autoExtractedArticles}
+                {status.autoExtractedArticles || 0}
               </div>
               <p className="text-xs text-muted-foreground">
                 Automatisch erstellt
@@ -205,7 +205,7 @@ export function KnowledgeExtractionPanel() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-orange-600">
-                {status.needsReviewArticles}
+                {status.needsReviewArticles || 0}
               </div>
               <p className="text-xs text-muted-foreground">
                 Manuelle Überprüfung
@@ -219,7 +219,7 @@ export function KnowledgeExtractionPanel() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
-                {status.availableSourceData.totalSources}
+                {status.availableSourceData?.totalSources || 0}
               </div>
               <p className="text-xs text-muted-foreground">
                 Datenquellen verfügbar
