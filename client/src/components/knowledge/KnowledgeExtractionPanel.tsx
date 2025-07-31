@@ -235,8 +235,8 @@ export function KnowledgeExtractionPanel() {
           <Download className="h-4 w-4" />
           <AlertDescription>
             <strong>Extraktions-Potenzial:</strong> {' '}
-            {status.extractionPotential.unprocessedRegulatory} regulatorische Updates und{' '}
-            {status.extractionPotential.unprocessedLegal} Rechtsfälle können noch extrahiert werden.
+            {status?.extractionPotential?.unprocessedRegulatory || 0} regulatorische Updates und{' '}
+            {status?.extractionPotential?.unprocessedLegal || 0} Rechtsfälle können noch extrahiert werden.
           </AlertDescription>
         </Alert>
       )}
