@@ -65,6 +65,9 @@ Preferred communication style: German language - Simple, everyday language.
 - ✅ **3 NEUE RSS ENDPUNKTE**: /api/rss/monitor-all, feeds-status, sync-feed/:feedName
 - ✅ **3 NEUE SYSTEM ENDPUNKTE**: /api/system/health, alerts, report
 - ✅ **ERWEITERTE MASTER SYNC**: Real-Time APIs + RSS Monitoring + Quality Enhancement + AI Analysis
+- ✅ **KNOWLEDGE ARTICLE SERVICE**: 15 Wissensquellen für Medizintechnik-Fachartikel, Regulatorische Updates, Rechtsfälle
+- ✅ **3 NEUE KNOWLEDGE ENDPUNKTE**: /api/knowledge/collect-articles, sources-status, sync-source/:sourceId
+- ✅ **UMFASSENDE QUELLENINTEGRATION**: JAMA Network, PMC, Johner Institute, MDR Regulator, LSU Legal Cases
 
 #### July 30, 2025
 - ✅ **CLEAN SYSTEM REDESIGN**: Komplett neues System ohne Code-Leichen erstellt

@@ -26,6 +26,7 @@ import { RealTimeAPIService } from "./services/realTimeAPIService";
 import { DataQualityEnhancementService } from "./services/dataQualityEnhancementService";
 import { EnhancedRSSService } from "./services/enhancedRSSService";
 import { SystemMonitoringService } from "./services/systemMonitoringService";
+import { KnowledgeArticleService } from "./services/knowledgeArticleService";
 
 // Initialize Phase 1 & 2 services
 const fdaApiService = new FDAOpenAPIService();
@@ -40,6 +41,7 @@ const realTimeAPIService = new RealTimeAPIService();
 const dataQualityService = new DataQualityEnhancementService();
 const enhancedRSSService = new EnhancedRSSService();
 const systemMonitoringService = new SystemMonitoringService();
+const knowledgeArticleService = new KnowledgeArticleService();
 
 // Generate full legal decision content for realistic court cases
 function generateFullLegalDecision(legalCase: any): string {
@@ -2209,6 +2211,7 @@ Status: Archiviertes historisches Dokument
       const results = await Promise.allSettled([
         realTimeAPIService.performComprehensiveSync(),
         enhancedRSSService.monitorAllFeeds(),
+        knowledgeArticleService.collectKnowledgeArticles(),
         dataQualityService.validateAndCleanData(),
         aiSummaryService.batchSummarizeRecent(24),
         predictiveService.generateComplianceRiskAssessment()
@@ -2217,12 +2220,13 @@ Status: Archiviertes historisches Dokument
       const masterReport = {
         realTimeSync: results[0].status === 'fulfilled' ? results[0].value : { success: false, error: 'Failed' },
         rssMonitoring: results[1].status === 'fulfilled' ? results[1].value : { success: false, error: 'Failed' },
-        dataQuality: results[2].status === 'fulfilled' ? results[2].value : { success: false, error: 'Failed' },
-        aiSummarization: results[3].status === 'fulfilled' ? results[3].value : { success: false, error: 'Failed' },
-        predictiveAnalytics: results[4].status === 'fulfilled' ? results[4].value : { success: false, error: 'Failed' }
+        knowledgeCollection: results[2].status === 'fulfilled' ? results[2].value : { success: false, error: 'Failed' },
+        dataQuality: results[3].status === 'fulfilled' ? results[3].value : { success: false, error: 'Failed' },
+        aiSummarization: results[4].status === 'fulfilled' ? results[4].value : { success: false, error: 'Failed' },
+        predictiveAnalytics: results[5].status === 'fulfilled' ? results[5].value : { success: false, error: 'Failed' }
       };
       
-      const successCount = Object.values(masterReport).filter(r => r.success).length;
+      const successCount = Object.values(masterReport).filter(r => r && typeof r === 'object' && 'success' in r && r.success).length;
       const totalServices = Object.keys(masterReport).length;
       
       res.json({ 
@@ -2270,6 +2274,46 @@ Status: Archiviertes historisches Dokument
       res.json({ success: true, report });
     } catch (error: any) {
       console.error('[API] System report generation failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ========== KNOWLEDGE ARTICLE ENDPOINTS ==========
+  
+  // Collect Knowledge Articles
+  app.post("/api/knowledge/collect-articles", async (req, res) => {
+    try {
+      console.log('[API] Starting knowledge article collection...');
+      
+      const result = await knowledgeArticleService.collectKnowledgeArticles();
+      res.json(result);
+    } catch (error: any) {
+      console.error('[API] Knowledge article collection failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Get Knowledge Sources Status
+  app.get("/api/knowledge/sources-status", async (req, res) => {
+    try {
+      const sourcesStatus = await knowledgeArticleService.getSourcesStatus();
+      res.json({ success: true, sources: sourcesStatus });
+    } catch (error: any) {
+      console.error('[API] Failed to get knowledge sources status:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Sync Specific Knowledge Source
+  app.post("/api/knowledge/sync-source/:sourceId", async (req, res) => {
+    try {
+      const { sourceId } = req.params;
+      console.log(`[API] Syncing specific knowledge source: ${sourceId}`);
+      
+      const result = await knowledgeArticleService.syncSpecificSource(sourceId);
+      res.json({ success: result.success, result });
+    } catch (error: any) {
+      console.error('[API] Knowledge source sync failed:', error);
       res.status(500).json({ message: error.message });
     }
   });
