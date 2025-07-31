@@ -1717,6 +1717,29 @@ Status: Archiviertes historisches Dokument
     }
   });
 
+  // ========== PHASE 1 API ENDPOINTS ==========
+  
+  // Phase 1 Status
+  app.get("/api/phase1/status", async (req, res) => {
+    try {
+      const fdaStatus = await fdaApiService.getServiceStatus();
+      const rssStatus = await rssService.getMonitoringStatus();
+      const qualityMetrics = await qualityService.getMetrics();
+      
+      res.json({
+        success: true,
+        services: {
+          fda: fdaStatus,
+          rss: rssStatus,
+          quality: qualityMetrics
+        },
+        overall_status: "operational"
+      });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
   // Combined Phase 1 Sync Endpoint
   app.post("/api/phase1/sync-all", async (req, res) => {
     try {
@@ -1743,7 +1766,7 @@ Status: Archiviertes historisches Dokument
       });
     } catch (error: any) {
       console.error('[API] Phase 1 sync failed:', error);
-      res.status(500).json({ message: error.message });
+      res.status(500).json({ success: false, message: error.message });
     }
   });
 
@@ -1892,6 +1915,29 @@ Status: Archiviertes historisches Dokument
     }
   });
 
+  // ========== PHASE 2 API ENDPOINTS ==========
+  
+  // Phase 2 Status
+  app.get("/api/phase2/status", async (req, res) => {
+    try {
+      const eudamedStatus = await eudamedService.getServiceStatus();
+      const regionalStatus = await regionalService.getRegionalStatus();
+      const crossRefStatus = await crossRefService.getStatus();
+      
+      res.json({
+        success: true,
+        services: {
+          eudamed: eudamedStatus,
+          regional: regionalStatus,
+          crossref: crossRefStatus
+        },
+        overall_status: "operational"
+      });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
   // Combined Phase 2 Sync Endpoint
   app.post("/api/phase2/sync-all", async (req, res) => {
     try {
@@ -1918,7 +1964,7 @@ Status: Archiviertes historisches Dokument
       });
     } catch (error: any) {
       console.error('[API] Phase 2 sync failed:', error);
-      res.status(500).json({ message: error.message });
+      res.status(500).json({ success: false, message: error.message });
     }
   });
 
