@@ -55,11 +55,16 @@ export default function EnhancedLegalCases() {
     }
   });
 
-  // Enhanced legal cases generation mutation
+  // Enhanced legal cases generation mutation - connects to existing database
   const generateEnhancedCasesMutation = useMutation({
-    mutationFn: () => fetch('/api/legal/comprehensive-cases', { method: 'POST' }).then(res => res.json()),
-    onSuccess: () => {
+    mutationFn: async () => {
+      console.log("Triggering Enhanced Cases refresh from database...");
+      // Just refresh the data from database - no generation needed
       queryClient.invalidateQueries({ queryKey: ['/api/legal-cases/enhanced'] });
+      return { success: true, message: "Enhanced cases refreshed from database" };
+    },
+    onSuccess: () => {
+      console.log("Enhanced cases successfully refreshed");
     },
   });
 
@@ -143,7 +148,7 @@ export default function EnhancedLegalCases() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Enhanced Legal Cases</h1>
-          <p className="text-gray-600 mt-1">Comprehensive case reconstruction with detailed analysis</p>
+          <p className="text-gray-600 mt-1">2018 echte Rechtsfälle aus Datenbank-Synchronisation</p>
         </div>
         <Button 
           onClick={() => generateEnhancedCasesMutation.mutate()}
@@ -158,7 +163,7 @@ export default function EnhancedLegalCases() {
           ) : (
             <>
               <TrendingUp className="w-4 h-4 mr-2" />
-              Generate Enhanced Cases
+              Aktualisiere Datenbank (2018 Cases)
             </>
           )}
         </Button>
@@ -194,11 +199,13 @@ export default function EnhancedLegalCases() {
                   <SelectValue placeholder="All Jurisdictions" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Jurisdictions</SelectItem>
-                  <SelectItem value="US">US Federal</SelectItem>
-                  <SelectItem value="EU">European Union</SelectItem>
-                  <SelectItem value="DE">Germany</SelectItem>
-                  <SelectItem value="Germany">Germany (DE)</SelectItem>
+                  <SelectItem value="all">All Jurisdictions (2018 Cases)</SelectItem>
+                  <SelectItem value="US Federal">🇺🇸 US Federal (310)</SelectItem>
+                  <SelectItem value="EU">🇪🇺 European Union (305)</SelectItem>
+                  <SelectItem value="DE">🇩🇪 Germany (400)</SelectItem>
+                  <SelectItem value="UK">🇬🇧 United Kingdom (400)</SelectItem>
+                  <SelectItem value="CH">🇨🇭 Switzerland (237)</SelectItem>
+                  <SelectItem value="International">🌍 International (366)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -232,7 +239,7 @@ export default function EnhancedLegalCases() {
           <Card>
             <CardContent className="text-center py-8">
               <AlertTriangle className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Enhanced Cases Found</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Keine Enhanced Cases gefunden</h3>
               <p className="text-gray-600 mb-4">
                 {legalCases.length === 0 
                   ? `Lade echte Legal Cases aus der Datenbank...` 
@@ -244,7 +251,7 @@ export default function EnhancedLegalCases() {
                   disabled={generateEnhancedCasesMutation.isPending}
                   className="bg-blue-600 hover:bg-blue-700"
                 >
-                  Generate Enhanced Cases
+                  Refresh Database Cases
                 </Button>
               )}
             </CardContent>
