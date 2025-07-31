@@ -397,6 +397,7 @@ export class DeepKnowledgeScrapingService {
           category: article.category,
           tags: article.tags,
           content: this.formatArticleContent(article)
+        };
         
         // Check if article already exists
         const existingArticle = await db
