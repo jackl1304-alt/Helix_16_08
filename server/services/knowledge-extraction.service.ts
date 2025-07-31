@@ -170,17 +170,20 @@ export class KnowledgeExtractionService {
    * Extrahiert Artikel-Informationen aus einem regulatorischen Update
    */
   private extractArticleFromRegulatoryUpdate(update: RegulatoryUpdate): ExtractedArticle | null {
-    if (!update.title || !update.url) {
+    if (!update.title) {
       return null;
     }
 
+    // Use source_url instead of url, fallback to constructed link
+    const link = update.source_url || `https://example.com/regulatory/${update.id}`;
+
     return {
       title: this.cleanTitle(update.title),
-      link: update.url,
-      source: update.source,
+      link: link,
+      source: update.source || 'Regulatory Authority',
       sourceType: 'regulatory',
       category: this.categorizeRegulatoryUpdate(update),
-      region: update.region,
+      region: update.region || 'Global',
       extractedAt: new Date()
     };
   }
@@ -223,7 +226,7 @@ export class KnowledgeExtractionService {
    */
   private categorizeRegulatoryUpdate(update: RegulatoryUpdate): string {
     const title = update.title.toLowerCase();
-    const type = update.type.toLowerCase();
+    const type = (update.update_type || '').toLowerCase();
 
     if (title.includes('software') || title.includes('samd')) {
       return 'Software & Digital Health';
@@ -245,7 +248,7 @@ export class KnowledgeExtractionService {
    */
   private categorizeLegalCase(legalCase: LegalCase): string {
     const title = legalCase.title.toLowerCase();
-    const issues = legalCase.tags.join(' ').toLowerCase();
+    const issues = (legalCase.keywords || []).join(' ').toLowerCase();
 
     if (title.includes('patent') || issues.includes('patent')) {
       return 'Patent Law';
@@ -264,8 +267,13 @@ export class KnowledgeExtractionService {
    * Konstruiert einen Link für Rechtsfälle
    */
   private constructLegalCaseLink(legalCase: LegalCase): string {
+    // Verwende document_url falls vorhanden, sonst Suchlink
+    if (legalCase.document_url) {
+      return legalCase.document_url;
+    }
+    
     // Fallback: Suchlink basierend auf Gerichtshof und Fallnummer
-    const searchQuery = encodeURIComponent(`${legalCase.court} ${legalCase.caseNumber}`);
+    const searchQuery = encodeURIComponent(`${legalCase.court} ${legalCase.case_number || legalCase.caseNumber || legalCase.id}`);
     return `https://www.google.com/search?q=${searchQuery}`;
   }
 

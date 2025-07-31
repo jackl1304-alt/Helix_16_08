@@ -33,6 +33,8 @@ export interface IStorage {
   getLegalCasesByJurisdiction(jurisdiction: string): Promise<any[]>;
   createLegalCase(data: any): Promise<any>;
   getAllKnowledgeArticles(): Promise<any[]>;
+  addKnowledgeArticle(data: any): Promise<any>;
+  createKnowledgeArticle(data: any): Promise<any>;
   updateDataSourceLastSync(id: string, lastSync: Date): Promise<any>;
   getDataSourceById(id: string): Promise<any>;
   getDataSources(): Promise<any[]>;
@@ -540,6 +542,26 @@ class MorningStorage implements IStorage {
       console.error("All knowledge articles error:", error);
       return [];
     }
+  }
+
+  async addKnowledgeArticle(data: any) {
+    try {
+      console.log('[DB] Adding knowledge article:', data.title);
+      const result = await sql`
+        INSERT INTO knowledge_base (title, content, category, tags, is_published, created_at)
+        VALUES (${data.title}, ${data.content}, ${data.category}, ${JSON.stringify(data.tags || [])}, ${data.isPublished || false}, NOW())
+        RETURNING *
+      `;
+      console.log('[DB] Knowledge article added successfully');
+      return result[0];
+    } catch (error) {
+      console.error('[DB] Error adding knowledge article:', error);
+      throw error;
+    }
+  }
+
+  async createKnowledgeArticle(data: any) {
+    return this.addKnowledgeArticle(data);
   }
 
   async updateDataSourceLastSync(id: string, lastSync: Date) {

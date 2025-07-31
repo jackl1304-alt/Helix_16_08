@@ -63,16 +63,22 @@ export function KnowledgeExtractionPanel() {
   const { toast } = useToast();
 
   // Hole aktuellen Status
-  const { data: status, isLoading: statusLoading } = useQuery<ExtractionStatus>({
+  const { data: statusResponse, isLoading: statusLoading } = useQuery({
     queryKey: ['/api/knowledge-extraction/status'],
     refetchInterval: 30000, // Aktualisiere alle 30 Sekunden
   });
 
+  // Extract data from API response wrapper
+  const status = statusResponse?.data || statusResponse;
+
   // Hole Vorschau der extrahierbaren Artikel
-  const { data: preview, isLoading: previewLoading } = useQuery<ExtractionPreview>({
+  const { data: previewResponse, isLoading: previewLoading } = useQuery({
     queryKey: ['/api/knowledge-extraction/preview'],
     enabled: !!status,
   });
+
+  // Extract data from API response wrapper
+  const preview = previewResponse?.data || previewResponse;
 
   // Vollständige Extraktion
   const extractAllMutation = useMutation({
