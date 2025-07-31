@@ -29,6 +29,7 @@ import { EnhancedRSSService } from "./services/enhancedRSSService";
 import { SystemMonitoringService } from "./services/systemMonitoringService";
 import { KnowledgeArticleService } from "./services/knowledgeArticleService";
 import { JAMANetworkScrapingService } from "./services/jamaNetworkScrapingService";
+import { UniversalKnowledgeExtractor } from "./services/universalKnowledgeExtractor";
 
 // Initialize Phase 1 & 2 services
 const fdaApiService = new FDAOpenAPIService();
@@ -45,6 +46,7 @@ const enhancedRSSService = new EnhancedRSSService();
 const systemMonitoringService = new SystemMonitoringService();
 const knowledgeArticleService = new KnowledgeArticleService();
 const jamaScrapingService = new JAMANetworkScrapingService();
+const universalExtractor = new UniversalKnowledgeExtractor();
 
 // Generate full legal decision content for realistic court cases
 function generateFullLegalDecision(legalCase: any): string {
@@ -2435,6 +2437,42 @@ Status: Archiviertes historisches Dokument
       res.status(500).json({ 
         success: false, 
         message: error.message || 'Failed to extract JAMA Network articles'
+      });
+    }
+  });
+
+  // Universal Knowledge Extraction - All Sources
+  app.post('/api/knowledge/extract-all-sources', async (req, res) => {
+    try {
+      logger.info('API: Starting universal knowledge extraction from all sources');
+      
+      const stats = await universalExtractor.extractFromAllSources();
+      
+      res.json({ 
+        success: true, 
+        message: `Successfully extracted articles from ${stats.processedSources}/${stats.totalSources} sources`,
+        stats,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      logger.error('API: Universal knowledge extraction failed', error);
+      res.status(500).json({ 
+        success: false, 
+        message: error.message || 'Failed to extract from all sources'
+      });
+    }
+  });
+
+  // Get Knowledge Sources Status
+  app.get('/api/knowledge/sources-status', async (req, res) => {
+    try {
+      const status = await universalExtractor.getSourcesStatus();
+      res.json(status);
+    } catch (error: any) {
+      logger.error('API: Failed to get sources status', error);
+      res.status(500).json({ 
+        success: false, 
+        message: error.message || 'Failed to get sources status'
       });
     }
   });
