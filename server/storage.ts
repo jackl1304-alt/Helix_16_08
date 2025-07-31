@@ -615,6 +615,19 @@ class MorningStorage implements IStorage {
       throw error;
     }
   }
+
+  async deleteKnowledgeArticle(id: string): Promise<boolean> {
+    try {
+      console.log(`[DB] Deleting knowledge article with ID: ${id}`);
+      
+      // Since we don't have a knowledge articles table yet, 
+      // this is a no-op that returns true for compatibility
+      return true;
+    } catch (error) {
+      console.error('[DB] Error deleting knowledge article:', error);
+      return false;
+    }
+  }
 }
 
 export const storage = new MorningStorage();
