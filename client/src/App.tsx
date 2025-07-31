@@ -23,6 +23,7 @@ import LegalCases from "@/pages/legal-cases";
 import IntelligentSearch from "@/pages/intelligent-search";
 import DocumentViewer from "@/pages/document-viewer";
 import SyncManager from "@/pages/sync-manager";
+import Phase1Integration from "@/pages/phase1-integration";
 import { ResponsiveLayout } from "@/components/responsive-layout";
 
 function Router() {
@@ -46,6 +47,7 @@ function Router() {
       <Route path="/legal-cases" component={LegalCases} />
       <Route path="/intelligent-search" component={IntelligentSearch} />
       <Route path="/ai-approval-demo" component={AIApprovalDemo} />
+      <Route path="/phase1-integration" component={Phase1Integration} />
       <Route path="/documents/:sourceType/:documentId" component={DocumentViewer} />
       
       {/* Fallback to 404 */}
