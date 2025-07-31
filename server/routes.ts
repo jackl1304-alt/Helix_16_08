@@ -946,6 +946,27 @@ Status: Archiviertes historisches Dokument
     }
   });
 
+  // Deep Knowledge Article Scraping - Comprehensive Medical Device Articles
+  app.post('/api/knowledge/deep-scraping', async (req, res) => {
+    try {
+      const { deepKnowledgeScrapingService } = await import('./services/deepKnowledgeScrapingService');
+      const result = await deepKnowledgeScrapingService.storeComprehensiveMedTechArticles();
+      
+      res.json({
+        success: true,
+        message: `Deep knowledge scraping completed successfully`,
+        articlesStored: result.articlesStored,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error('Error in deep knowledge scraping:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+  });
+
   // Enhanced Legal Cases with comprehensive reconstruction
   app.post('/api/legal/comprehensive-cases', async (req, res) => {
     try {

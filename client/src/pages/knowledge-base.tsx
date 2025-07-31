@@ -367,6 +367,27 @@ export default function KnowledgeBasePage() {
     }
   });
 
+  // Deep scraping mutation for comprehensive articles
+  const deepScrapingMutation = useMutation({
+    mutationFn: () => apiRequest('/api/knowledge/deep-scraping', { method: 'POST' }),
+    onSuccess: (data: any) => {
+      toast({
+        title: "Deep Scraping erfolgreich",
+        description: `${data.articlesStored || 'Mehrere'} umfassende Medizintechnik-Artikel mit Detailbeschreibungen hinzugefügt.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/knowledge/sources-status'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/knowledge/combined-articles'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/regulatory-updates'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Deep Scraping Fehler",
+        description: error.message || "Fehler beim Deep Scraping der Artikel",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Collection mutation
   const collectMutation = useMutation({
     mutationFn: () => fetch('/api/knowledge/collect-articles', { method: 'POST' }).then(res => res.json()),
@@ -476,18 +497,33 @@ export default function KnowledgeBasePage() {
             Medizintechnik Wissensartikel, Regulatorische Updates und Rechtsfälle
           </p>
         </div>
-        <Button
-          onClick={() => collectMutation.mutate()}
-          disabled={collectMutation.isPending}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          {collectMutation.isPending ? (
-            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-          ) : (
-            <Zap className="h-4 w-4 mr-2" />
-          )}
-          Alle Quellen Synchronisieren
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            onClick={() => deepScrapingMutation.mutate()}
+            disabled={deepScrapingMutation.isPending}
+            className="bg-purple-600 hover:bg-purple-700"
+          >
+            {deepScrapingMutation.isPending ? (
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Search className="h-4 w-4 mr-2" />
+            )}
+            Deep Scraping
+          </Button>
+          
+          <Button
+            onClick={() => collectMutation.mutate()}
+            disabled={collectMutation.isPending}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            {collectMutation.isPending ? (
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Zap className="h-4 w-4 mr-2" />
+            )}
+            Alle Quellen Synchronisieren
+          </Button>
+        </div>
       </div>
 
       {/* Statistics Cards */}
