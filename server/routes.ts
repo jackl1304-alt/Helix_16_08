@@ -326,52 +326,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/regulatory-updates/recent", async (req, res) => {
     try {
       const { logger } = await import('./services/logger.service');
-      logger.info("API: Generating fresh regulatory updates with valid dates");
+      const { validate, paginationSchema } = await import('./validators/regulatory.validator');
+      
+      // Validate query parameters
+      const validatedQuery = paginationSchema.parse(req.query);
+      
+      logger.info("API: Fetching recent regulatory updates from database", { 
+        limit: validatedQuery.limit,
+        region: validatedQuery.region 
+      });
       
       res.setHeader('Content-Type', 'application/json');
       res.setHeader('Cache-Control', 'no-cache');
       
-      // Import the real data generator
-      const { realRegulatoryDataGenerator } = await import('./services/realRegulatoryDataGenerator');
+      const updates = await storage.getRecentRegulatoryUpdates(validatedQuery.limit);
       
-      // Generate fresh updates with valid dates
-      const now = new Date();
-      const freshUpdates = Array.from({ length: 10 }, (_, index) => {
-        const realContent = realRegulatoryDataGenerator.generateRealRegulatoryUpdate(`fresh-${index}`);
-        const publishedDate = new Date(now.getTime() - Math.random() * 30 * 24 * 60 * 60 * 1000);
-        const createdDate = new Date(publishedDate.getTime() + Math.random() * 2 * 60 * 60 * 1000);
-        
-        return {
-          id: `fresh-update-${index}`,
-          title: realContent.title,
-          description: realContent.description,
-          source_id: realContent.source_id,
-          source_url: realContent.source_url,
-          content: realContent.content,
-          region: realContent.region,
-          update_type: realContent.update_type,
-          priority: realContent.priority,
-          device_classes: realContent.device_classes,
-          categories: realContent.categories,
-          raw_data: realContent.raw_data,
-          published_at: publishedDate.toISOString(),
-          created_at: createdDate.toISOString()
-        };
+      // Filter by region if specified
+      const filteredUpdates = validatedQuery.region 
+        ? updates.filter(update => update.region?.toLowerCase().includes(validatedQuery.region!.toLowerCase()))
+        : updates;
+      
+      logger.info("API: Retrieved regulatory updates", { 
+        total: updates.length,
+        filtered: filteredUpdates.length,
+        region: validatedQuery.region || 'all'
       });
-      
-      logger.info("API: Returning fresh updates with valid dates", { count: freshUpdates.length });
       
       res.json({
         success: true,
-        data: freshUpdates,
+        data: filteredUpdates,
         timestamp: new Date().toISOString()
       });
     } catch (error) {
       const { logger } = await import('./services/logger.service');
-      logger.error("Error generating fresh updates:", error);
+      logger.error("Error fetching regulatory updates:", error);
       res.status(500).json({ 
         success: false,
-        error: "Failed to generate fresh updates",
+        error: "Failed to fetch regulatory updates",
         timestamp: new Date().toISOString()
       });
     }

@@ -2,44 +2,45 @@ import { Request, Response, NextFunction } from 'express';
 import { logger } from '../services/logger.service';
 import { ApiResponse, RegulatoryUpdate } from '@shared/types/api';
 import { AppError, asyncHandler } from '../middleware/error.middleware';
+import { storage } from '../storage';
 
 export class RegulatoryController {
   getRecent = asyncHandler(async (req: Request, res: Response<ApiResponse<RegulatoryUpdate[]>>, next: NextFunction) => {
-    logger.info("API: Generating fresh regulatory updates with valid dates");
+    logger.info("API: Fetching recent regulatory updates from database");
     
-    // Import the real data generator
-    const { realRegulatoryDataGenerator } = await import('../services/realRegulatoryDataGenerator');
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+    const region = req.query.region as string;
     
-    // Generate fresh updates with valid dates
-    const now = new Date();
-    const freshUpdates: RegulatoryUpdate[] = Array.from({ length: 10 }, (_, index) => {
-      const realContent = realRegulatoryDataGenerator.generateRealRegulatoryUpdate(`fresh-${index}`);
-      const publishedDate = new Date(now.getTime() - Math.random() * 30 * 24 * 60 * 60 * 1000);
-      const createdDate = new Date(publishedDate.getTime() + Math.random() * 2 * 60 * 60 * 1000);
-      
-      return {
-        id: `fresh-update-${index}`,
-        title: realContent.title,
-        description: realContent.description,
-        source_id: realContent.source_id,
-        source_url: realContent.source_url,
-        content: realContent.content,
-        region: realContent.region,
-        update_type: realContent.update_type as any,
-        priority: realContent.priority as any,
-        device_classes: realContent.device_classes,
-        categories: realContent.categories,
-        raw_data: realContent.raw_data,
-        published_at: publishedDate.toISOString(),
-        created_at: createdDate.toISOString()
-      };
+    const updates = await storage.getRecentRegulatoryUpdates(limit);
+    
+    // Filter by region if specified
+    const filteredUpdates = region && region !== 'all'
+      ? updates.filter(update => update.region?.toLowerCase().includes(region.toLowerCase()))
+      : updates;
+    
+    logger.info("API: Retrieved regulatory updates from database", { 
+      total: updates.length,
+      filtered: filteredUpdates.length,
+      region: region || 'all'
     });
-    
-    logger.info("API: Returning fresh updates with valid dates", { count: freshUpdates.length });
     
     res.json({
       success: true,
-      data: freshUpdates,
+      data: filteredUpdates,
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  getAll = asyncHandler(async (req: Request, res: Response<ApiResponse<RegulatoryUpdate[]>>, next: NextFunction) => {
+    logger.info("API: Fetching all regulatory updates");
+    
+    const updates = await storage.getAllRegulatoryUpdates();
+    
+    logger.info("API: Retrieved all regulatory updates", { count: updates.length });
+    
+    res.json({
+      success: true,
+      data: updates,
       timestamp: new Date().toISOString()
     });
   });

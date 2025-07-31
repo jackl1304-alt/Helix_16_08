@@ -367,7 +367,7 @@ export default function LegalRelationshipViewer({
                         
                         <div className="mt-3 pt-3 border-t">
                           <p className="text-sm text-red-600 font-medium">
-                            ⚠️ Unterschiedliche Rechtslage - Vorsicht bei Rechtsberatung erforderlich
+                            Unterschiedliche Rechtslage - Vorsicht bei Rechtsberatung erforderlich
                           </p>
                         </div>
                       </CardContent>

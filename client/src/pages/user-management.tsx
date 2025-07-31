@@ -64,7 +64,7 @@ const userFormSchema = z.object({
 
 type UserFormData = z.infer<typeof userFormSchema>;
 
-const mockUsers: User[] = [
+const initialUsers: User[] = [
   {
     id: "1",
     email: "admin@helix.com",
@@ -113,7 +113,7 @@ const mockUsers: User[] = [
   }
 ];
 
-const mockActivity: UserActivity[] = [
+const recentActivity: UserActivity[] = [
   {
     id: "1",
     userId: "1",
@@ -181,12 +181,12 @@ export default function UserManagement() {
     }
   });
 
-  const { data: users = mockUsers, isLoading: usersLoading } = useQuery<User[]>({
+  const { data: users = initialUsers, isLoading: usersLoading } = useQuery<User[]>({
     queryKey: ["/api/users"],
     enabled: false // Use mock data
   });
 
-  const { data: userActivity = mockActivity, isLoading: activityLoading } = useQuery<UserActivity[]>({
+  const { data: userActivity = recentActivity, isLoading: activityLoading } = useQuery<UserActivity[]>({
     queryKey: ["/api/users/activity"],
     enabled: false // Use mock data
   });

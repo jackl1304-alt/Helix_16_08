@@ -255,18 +255,7 @@ Helix Regulatory Intelligence Platform
         { label: "Heute", value: todayCount }
       ]}
     >
-      <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-        <div className="flex items-start gap-3">
-          <div className="text-amber-600 text-lg">⚠️</div>
-          <div>
-            <h3 className="font-semibold text-amber-800">Echte Regulatory Updates - Demo Content</h3>
-            <p className="text-sm text-amber-700 mt-1">
-              Diese Updates verwenden authentische regulatorische Inhalte von FDA PMA/510(k), EMA CHMP und BfArM Leitlinien zu Demonstrationszwecken. 
-              Echte behördliche Daten für realistische Darstellung der Helix Regulatory Intelligence Platform.
-            </p>
-          </div>
-        </div>
-      </div>
+
       <FilterBar
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
