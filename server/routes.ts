@@ -2322,6 +2322,36 @@ Status: Archiviertes historisches Dokument
 
   // ========== KNOWLEDGE ARTICLE ENDPOINTS ==========
   
+  // Get real knowledge articles from database
+  app.get('/api/knowledge/articles', async (req, res) => {
+    try {
+      const knowledgeArticles = await db.select({
+        id: regulatoryUpdates.id,
+        title: regulatoryUpdates.title,
+        content: regulatoryUpdates.description,
+        authority: regulatoryUpdates.source_id,
+        region: regulatoryUpdates.region,
+        category: regulatoryUpdates.update_type,
+        published_at: regulatoryUpdates.published_at,
+        priority: regulatoryUpdates.priority,
+        tags: regulatoryUpdates.device_classes,
+        url: regulatoryUpdates.source_url,
+        summary: regulatoryUpdates.description,
+        language: sql.raw(`'en'`),
+        source: sql.raw(`CONCAT('Knowledge: ', ${regulatoryUpdates.source_id})`)
+      })
+      .from(regulatoryUpdates)
+      .where(eq(regulatoryUpdates.update_type, 'guidance'))
+      .orderBy(desc(regulatoryUpdates.created_at));
+
+      console.log(`[API] Retrieved ${knowledgeArticles.length} knowledge articles from database`);
+      res.json(knowledgeArticles);
+    } catch (error) {
+      console.error('[API] Error fetching knowledge articles:', error);
+      res.status(500).json({ error: 'Failed to fetch knowledge articles' });
+    }
+  });
+  
   // Collect Knowledge Articles
   app.post("/api/knowledge/collect-articles", async (req, res) => {
     try {
