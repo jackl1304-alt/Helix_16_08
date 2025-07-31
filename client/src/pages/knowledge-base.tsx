@@ -370,7 +370,7 @@ export default function KnowledgeBasePage() {
 
   // Deep scraping mutation for comprehensive articles
   const deepScrapingMutation = useMutation({
-    mutationFn: () => apiRequest('/api/knowledge/deep-scraping', { method: 'POST' }),
+    mutationFn: () => fetch('/api/knowledge/deep-scraping', { method: 'POST' }).then(res => res.json()),
     onSuccess: (data: any) => {
       const articlesCount = data?.articlesStored || 0;
       const message = articlesCount > 0 
