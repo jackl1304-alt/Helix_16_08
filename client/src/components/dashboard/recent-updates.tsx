@@ -12,11 +12,12 @@ interface RegulatoryUpdate {
   description: string;
   region: string;
   priority: 'low' | 'medium' | 'high' | 'urgent';
-  updateType: string;
-  sourceId: string;
-  sourceUrl?: string;
-  publishedAt: string;
-  createdAt: string;
+  update_type: string;
+  source_id: string;
+  source_url?: string;
+  published_at: string;
+  created_at: string;
+  device_classes?: string[];
 }
 
 const priorityColors = {
@@ -37,8 +38,8 @@ export function RecentUpdates() {
   const [selectedRegion, setSelectedRegion] = useState<string>('all');
   
   const { data: updates, isLoading } = useQuery<RegulatoryUpdate[]>({
-    queryKey: ["/api/regulatory-updates", { region: selectedRegion === 'all' ? undefined : selectedRegion, limit: 10 }],
-    select: (data) => Array.isArray(data) ? data : [],
+    queryKey: ["/api/regulatory-updates/recent", { region: selectedRegion === 'all' ? undefined : selectedRegion, limit: 10 }],
+    select: (data) => Array.isArray(data) ? data.slice(0, 10) : [],
   });
 
   if (isLoading) {
@@ -146,7 +147,7 @@ export function RecentUpdates() {
       <CardContent>
         <div className="space-y-4">
           {(updates || []).map((update) => {
-            const timeAgo = new Date(update.createdAt).toLocaleString();
+            const timeAgo = new Date(update.created_at).toLocaleString();
             
             return (
               <div
@@ -179,7 +180,7 @@ export function RecentUpdates() {
                           className="text-xs text-primary hover:text-primary/80 p-0 h-auto"
                           onClick={() => {
                             // Navigate to internal document viewer
-                            const sourceId = update.sourceId || update.region.toLowerCase();
+                            const sourceId = update.source_id || update.region.toLowerCase();
                             window.location.href = `/documents/${sourceId}/${update.id}`;
                           }}
                         >
@@ -195,7 +196,7 @@ export function RecentUpdates() {
                               // Fetch full content and download
                               const response = await fetch(`/api/regulatory-updates/${update.id}`);
                               const fullUpdate = await response.json();
-                              const content = fullUpdate.content || `Titel: ${update.title}\n\nBeschreibung: ${update.description}\n\nQuelle: ${update.region}\nPriorität: ${update.priority}\nTyp: ${update.updateType}`;
+                              const content = fullUpdate.content || `Titel: ${update.title}\n\nBeschreibung: ${update.description}\n\nQuelle: ${update.region}\nPriorität: ${update.priority}\nTyp: ${update.update_type}`;
                               const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
                               const url = URL.createObjectURL(blob);
                               const a = document.createElement('a');
