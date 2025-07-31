@@ -28,6 +28,7 @@ import { DataQualityEnhancementService } from "./services/dataQualityEnhancement
 import { EnhancedRSSService } from "./services/enhancedRSSService";
 import { SystemMonitoringService } from "./services/systemMonitoringService";
 import { KnowledgeArticleService } from "./services/knowledgeArticleService";
+import { JAMANetworkScrapingService } from "./services/jamaNetworkScrapingService";
 
 // Initialize Phase 1 & 2 services
 const fdaApiService = new FDAOpenAPIService();
@@ -43,6 +44,7 @@ const dataQualityService = new DataQualityEnhancementService();
 const enhancedRSSService = new EnhancedRSSService();
 const systemMonitoringService = new SystemMonitoringService();
 const knowledgeArticleService = new KnowledgeArticleService();
+const jamaScrapingService = new JAMANetworkScrapingService();
 
 // Generate full legal decision content for realistic court cases
 function generateFullLegalDecision(legalCase: any): string {
@@ -2415,6 +2417,27 @@ Status: Archiviertes historisches Dokument
   });
 
   // ========== KNOWLEDGE ARTICLE ENDPOINTS ==========
+  
+  // JAMA Network Article Extraction
+  app.post('/api/knowledge/extract-jama', async (req, res) => {
+    try {
+      logger.info('API: Starting JAMA Network article extraction');
+      
+      await jamaScrapingService.saveArticlesToKnowledgeBase();
+      
+      res.json({ 
+        success: true, 
+        message: 'JAMA Network articles successfully extracted and saved to knowledge base',
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      logger.error('API: JAMA Network extraction failed', error);
+      res.status(500).json({ 
+        success: false, 
+        message: error.message || 'Failed to extract JAMA Network articles'
+      });
+    }
+  });
   
   // Get real knowledge articles from database
   app.get('/api/knowledge/articles', async (req, res) => {
