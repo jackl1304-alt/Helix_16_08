@@ -149,7 +149,10 @@ export default function EnhancedLegalCases() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Enhanced Legal Cases</h1>
-          <p className="text-gray-600 mt-1">2018 echte Rechtsfälle aus Datenbank-Synchronisation</p>
+          <p className="text-gray-600 mt-1">
+            2018 simulierte Rechtsfälle für Demonstrationszwecke 
+            <span className="text-orange-600 font-medium ml-1">(Demo-Daten)</span>
+          </p>
         </div>
         <Button 
           onClick={() => generateEnhancedCasesMutation.mutate()}

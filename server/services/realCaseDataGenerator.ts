@@ -1,9 +1,11 @@
 /**
- * Real Case Data Generator - Authentic Legal Case Enhancement
+ * Realistic Case Data Generator - Demo Legal Case Enhancement
  * 
- * Generates realistic, detailed case information for legal cases
- * with authentic medical device details, real settlement amounts,
- * and comprehensive litigation timelines.
+ * WICHTIGER HINWEIS: Diese Daten sind SIMULIERT und für Demonstrationszwecke.
+ * Nicht für rechtliche Beratung oder echte Gerichtsfälle verwenden.
+ * 
+ * Generiert realistische, detaillierte Fallinformationen für Legal Cases
+ * mit authentisch wirkenden Medizinprodukt-Details und Verfahrensverläufen.
  */
 
 export class RealCaseDataGenerator {
@@ -70,6 +72,7 @@ export class RealCaseDataGenerator {
     
     return `
 ## VOLLSTÄNDIGE FALLREKONSTRUKTION - DEUTSCHE GERICHTSBARKEIT
+### ⚠️ HINWEIS: SIMULIERTE DATEN FÜR DEMONSTRATIONSZWECKE ⚠️
 
 ### FALLÜBERSICHT
 **Aktenzeichen:** ${caseNumber}
@@ -143,6 +146,7 @@ Das Gericht erkannte auf Zahlung von **${settlementAmount.toLocaleString('de-DE'
     
     return `
 ## COMPREHENSIVE CASE RECONSTRUCTION - US FEDERAL JURISDICTION
+### ⚠️ NOTE: SIMULATED DATA FOR DEMONSTRATION PURPOSES ⚠️
 
 ### CASE OVERVIEW
 **Case Number:** ${caseNumber}
