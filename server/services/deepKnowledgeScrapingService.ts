@@ -383,20 +383,25 @@ export class DeepKnowledgeScrapingService {
       let articlesStored = 0;
       
       for (const article of articles) {
-        // Convert to regulatory update format matching schema
+        // Convert to regulatory update format matching actual database columns
         const regulatoryUpdate = {
           id: article.id,
           title: article.title,
-          description: article.description,
-          sourceId: article.sourceId,
-          documentUrl: article.url,
-          publishedDate: article.publishedAt,
-          jurisdiction: article.jurisdiction,
-          language: article.language,
+          description: `${article.description}\n\n${this.formatArticleContent(article)}`,
+          source_id: article.sourceId,
+          source_url: article.url,
+          published_at: article.publishedAt,
+          region: article.jurisdiction,
           priority: this.calculatePriorityAsNumber(article.relevanceScore),
-          category: article.category,
-          tags: article.tags,
-          content: this.formatArticleContent(article)
+          categories: [article.category],
+          device_classes: article.tags,
+          update_type: 'knowledge_article',
+          raw_data: { 
+            author: article.author,
+            wordCount: article.wordCount,
+            relevanceScore: article.relevanceScore,
+            difficulty: article.difficulty
+          }
         };
         
         // Check if article already exists
