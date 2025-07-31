@@ -218,7 +218,7 @@ export default function Phase2Integration() {
 
   // Combined Phase 2 Sync
   const phase2SyncMutation = useMutation({
-    mutationFn: () => apiRequest('/api/phase2/sync-all', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/phase2/sync-all', 'POST'),
     onSuccess: (data: any) => {
       toast({
         title: "Phase 2 Complete Sync",
