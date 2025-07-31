@@ -84,12 +84,17 @@ export default function KnowledgeBasePage() {
   // Load real knowledge articles from database
   const { data: realArticlesData = [], isLoading: realArticlesLoading } = useQuery({
     queryKey: ['/api/knowledge/articles'],
+    refetchInterval: 30000 // Refresh every 30 seconds to show new collected articles
   });
 
   // Fetch knowledge articles - combine real and demo data  
   const { data: articlesData, isLoading: articlesLoading } = useQuery({
     queryKey: ['/api/knowledge/combined-articles'],
     queryFn: async () => {
+      // Load real knowledge articles from the new API
+      const realArticlesData = realArticlesData || [];
+      console.log(`Loading combined articles: ${realArticlesData.length} real articles`);
+      
       // Create demo knowledge articles based on the 16 sources for immediate display
       const demoArticles = [
         {

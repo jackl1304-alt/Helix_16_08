@@ -235,9 +235,10 @@ app.use((req, res, next) => {
     }
   }
   
-  // FORCE JSON RESPONSE for all API routes BEFORE registering routes
+  // FORCE JSON RESPONSE for all API routes BEFORE registering routes  
   app.use('/api/*', (req, res, next) => {
     res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Cache-Control', 'no-cache');
     next();
   });
 
@@ -279,7 +280,8 @@ app.use((req, res, next) => {
       // ONLY fallback to index.html for NON-API routes
       app.use((req, res, next) => {
         if (req.path.startsWith('/api/')) {
-          return next(); // Let API routes handle themselves
+          console.log(`API ROUTE BLOCKED from HTML fallback: ${req.path}`);
+          return res.status(404).json({ error: `API route not found: ${req.path}` });
         }
         // Fallback to SPA for all non-API routes
         res.sendFile(path.resolve(distPath, "index.html"));
