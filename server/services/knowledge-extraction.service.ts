@@ -1,7 +1,7 @@
 import { Logger } from './logger.service';
-import { IStorage } from '../../shared/types/storage';
-import { RegulatoryUpdate, LegalCase } from '../../shared/types/api';
-import { AppError, DatabaseError } from '../../shared/types/errors';
+import { IStorage } from '@shared/types/storage';
+import { RegulatoryUpdate, LegalCase } from '@shared/types/api';
+import { AppError, DatabaseError } from '@shared/types/errors';
 
 const logger = new Logger('KnowledgeExtraction');
 
