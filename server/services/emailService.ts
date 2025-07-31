@@ -55,10 +55,10 @@ class EmailService {
       };
 
       const info = await this.transporter.sendMail(mailOptions);
-      console.log('Email sent successfully:', info.messageId);
+      // console.log('Email sent successfully:', info.messageId);
       return true;
     } catch (error) {
-      console.error('Error sending email:', error);
+      // console.error('Error sending email:', error);
       return false;
     }
   }
@@ -87,7 +87,7 @@ class EmailService {
           });
           sentCount++;
         } catch (error) {
-          console.error(`Failed to send email to ${email}:`, error);
+          // console.error(`Failed to send email to ${email}:`, error);
           failedCount++;
         }
       });
@@ -240,10 +240,10 @@ Diese Nachricht wurde automatisch von Helix generiert.
   async verifyConnection(): Promise<boolean> {
     try {
       await this.transporter.verify();
-      console.log('Email service connection verified successfully');
+      // console.log('Email service connection verified successfully');
       return true;
     } catch (error) {
-      console.error('Email service connection failed:', error);
+      // console.error('Email service connection failed:', error);
       return false;
     }
   }
