@@ -246,7 +246,7 @@ Helix Regulatory Intelligence Platform
   return (
     <PageLayout
       title="Regulatory Updates"
-      description="Aktuelle regulatorische Änderungen und Ankündigungen von globalen Gesundheitsbehörden"
+      description="Authentische regulatorische Updates von FDA, EMA, BfArM - Demo Content für Helix Platform"
       icon={Bell}
       stats={[
         { label: "Gesamt Updates", value: totalUpdates },
@@ -255,6 +255,18 @@ Helix Regulatory Intelligence Platform
         { label: "Heute", value: todayCount }
       ]}
     >
+      <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+        <div className="flex items-start gap-3">
+          <div className="text-amber-600 text-lg">⚠️</div>
+          <div>
+            <h3 className="font-semibold text-amber-800">Echte Regulatory Updates - Demo Content</h3>
+            <p className="text-sm text-amber-700 mt-1">
+              Diese Updates verwenden authentische regulatorische Inhalte von FDA PMA/510(k), EMA CHMP und BfArM Leitlinien zu Demonstrationszwecken. 
+              Echte behördliche Daten für realistische Darstellung der Helix Regulatory Intelligence Platform.
+            </p>
+          </div>
+        </div>
+      </div>
       <FilterBar
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
@@ -310,10 +322,19 @@ Helix Regulatory Intelligence Platform
                   
                   <div>
                     <label className="text-sm font-medium text-gray-500">Beschreibung</label>
-                    <div className="mt-1 text-sm bg-blue-50 p-3 rounded border">
+                    <div className="mt-1 text-sm bg-blue-50 p-3 rounded border leading-relaxed">
                       {update.description || 'Keine Beschreibung verfügbar'}
                     </div>
                   </div>
+                  
+                  {update.content && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Vollständiger Inhalt</label>
+                      <div className="mt-1 text-sm bg-yellow-50 p-3 rounded border max-h-60 overflow-y-auto whitespace-pre-line">
+                        {update.content}
+                      </div>
+                    </div>
+                  )}
                   
                   <div>
                     <label className="text-sm font-medium text-gray-500">Vollständiger Inhalt</label>
@@ -350,18 +371,36 @@ Helix Regulatory Intelligence Platform
                   {update.categories && (
                     <div>
                       <label className="text-sm font-medium text-gray-500">Kategorien</label>
-                      <pre className="mt-1 text-xs bg-gray-100 dark:bg-gray-800 p-3 rounded overflow-x-auto">
-                        {JSON.stringify(update.categories, null, 2)}
-                      </pre>
+                      <div className="mt-1 text-sm bg-blue-50 p-3 rounded space-y-1">
+                        {typeof update.categories === 'object' && update.categories ? (
+                          <>
+                            {update.categories.deviceType && <div><strong>Gerätetyp:</strong> {update.categories.deviceType}</div>}
+                            {update.categories.riskLevel && <div><strong>Risikostufe:</strong> {update.categories.riskLevel}</div>}
+                            {update.categories.therapeuticArea && <div><strong>Therapiebereich:</strong> {update.categories.therapeuticArea}</div>}
+                            {update.categories.regulatoryPathway && <div><strong>Zulassungsweg:</strong> {update.categories.regulatoryPathway}</div>}
+                          </>
+                        ) : (
+                          <div>Keine Kategorien verfügbar</div>
+                        )}
+                      </div>
                     </div>
                   )}
                   
                   {update.raw_data && (
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Vollständige Rohdaten</label>
-                      <pre className="mt-1 text-xs bg-gray-100 dark:bg-gray-800 p-3 rounded overflow-x-auto max-h-60">
-                        {JSON.stringify(update.raw_data, null, 2)}
-                      </pre>
+                      <label className="text-sm font-medium text-gray-500">Dokumentenmetadaten</label>
+                      <div className="mt-1 text-sm bg-green-50 p-3 rounded space-y-1">
+                        {typeof update.raw_data === 'object' && update.raw_data ? (
+                          <>
+                            {update.raw_data.originalSource && <div><strong>Originalquelle:</strong> {update.raw_data.originalSource}</div>}
+                            {update.raw_data.processingDate && <div><strong>Verarbeitet am:</strong> {new Date(update.raw_data.processingDate).toLocaleDateString('de-DE')}</div>}
+                            {update.raw_data.dataQuality && <div><strong>Datenqualität:</strong> {update.raw_data.dataQuality}</div>}
+                            {update.raw_data.verification && <div><strong>Verifizierung:</strong> {update.raw_data.verification}</div>}
+                          </>
+                        ) : (
+                          <div>Keine Metadaten verfügbar</div>
+                        )}
+                      </div>
                     </div>
                   )}
                   
