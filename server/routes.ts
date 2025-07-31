@@ -813,12 +813,7 @@ Veröffentlicht: ${document.published_at ? new Date(document.published_at).toLoc
 Archiviert: ${document.archived_at ? new Date(document.archived_at).toLocaleDateString('de-DE') : 'Unbekannt'}
 
 INHALT:
-${document.description || document.summary || 'Keine Beschreibung verfügbar'}
-
-${document.content ? `
-VOLLSTÄNDIGER INHALT:
-${document.content}
-` : ''}
+${document.description || 'Keine Beschreibung verfügbar'}
 
 TECHNISCHE DETAILS:
 ${document.deviceClasses && document.deviceClasses.length > 0 ? `Geräteklassen: ${document.deviceClasses.join(', ')}` : ''}
@@ -827,7 +822,7 @@ ${document.region ? `Region: ${document.region}` : ''}
 ${document.category ? `Kategorie: ${document.category}` : ''}
 
 METADATEN:
-${document.categories ? `Kategorien: ${JSON.stringify(document.categories, null, 2)}` : ''}
+${document.category ? `Kategorie: ${JSON.stringify(document.category, null, 2)}` : ''}
 
 QUELLE & VERLINKUNG:
 ${document.document_url ? `Original-URL: ${document.document_url}` : ''}
@@ -1479,7 +1474,7 @@ Status: Archiviertes historisches Dokument
   });
 
   // Helper functions for Legal Cases enhancement
-  function generateVerdict(legalCase: any): string {
+  function generateVerdict(legalCase: { [key: string]: any }): string {
     const verdicts = [
       "Klage wird stattgegeben. Beklagte wird zur Zahlung von Schadensersatz verurteilt.",
       "Klage wird abgewiesen. Keine Produkthaftung nachweisbar.",
@@ -1490,7 +1485,7 @@ Status: Archiviertes historisches Dokument
     return verdicts[Math.floor(Math.random() * verdicts.length)];
   }
 
-  function generateDamages(legalCase: any): string {
+  function generateDamages(legalCase: { [key: string]: any }): string {
     const damages = [
       "€2.300.000 Schadensersatz plus Zinsen und Anwaltskosten",
       "€850.000 Schmerzensgeld und Behandlungskosten", 
@@ -1513,7 +1508,7 @@ Status: Archiviertes historisches Dokument
       const allCases = await storage.getAllLegalCases(); // OHNE LIMIT - alle Daten
       console.log(`[API] Enhanced Legal Cases: Fetched ${allCases.length} cases from database`);
       
-      const enhancedCases = allCases.map((legalCase: any) => ({
+      const enhancedCases = allCases.map((legalCase: { [key: string]: any }) => ({
         ...legalCase,
         verdict: generateVerdict(legalCase),
         damages: generateDamages(legalCase),
@@ -1535,7 +1530,7 @@ Status: Archiviertes historisches Dokument
       const { sourceId } = req.params;
       const allCases = await storage.getAllLegalCases(); // OHNE LIMIT - alle Daten
       
-      const enhancedCases = allCases.map((legalCase: any) => ({
+      const enhancedCases = allCases.map((legalCase: { [key: string]: any }) => ({
         ...legalCase,
         verdict: generateVerdict(legalCase),
         damages: generateDamages(legalCase),

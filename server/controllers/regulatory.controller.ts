@@ -2,21 +2,48 @@ import { Request, Response, NextFunction } from 'express';
 import { logger } from '../services/logger.service';
 import { ApiResponse, RegulatoryUpdate } from '@shared/types/api';
 import { AppError, asyncHandler } from '../middleware/error.middleware';
+import { ValidationError, NotFoundError } from '@shared/types/errors';
+import { StorageRegulatoryUpdate } from '@shared/types/storage';
 import { storage } from '../storage';
 
 export class RegulatoryController {
   getRecent = asyncHandler(async (req: Request, res: Response<ApiResponse<RegulatoryUpdate[]>>, next: NextFunction) => {
     logger.info("API: Fetching recent regulatory updates from database");
     
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+    const limitParam = req.query.limit as string;
+    const limit = limitParam ? parseInt(limitParam, 10) : 50;
+    
+    if (isNaN(limit) || limit < 1 || limit > 1000) {
+      throw new ValidationError('Limit must be a number between 1 and 1000');
+    }
+    
     const region = req.query.region as string;
     
-    const updates = await storage.getRecentRegulatoryUpdates(limit);
+    const updates: StorageRegulatoryUpdate[] = await storage.getRecentRegulatoryUpdates(limit);
     
     // Filter by region if specified
     const filteredUpdates = region && region !== 'all'
       ? updates.filter(update => update.region?.toLowerCase().includes(region.toLowerCase()))
       : updates;
+    
+    // Transform to API format
+    const transformedUpdates: RegulatoryUpdate[] = filteredUpdates.map(update => ({
+      id: update.id,
+      title: update.title,
+      description: update.description,
+      region: update.region,
+      update_type: update.update_type as any,
+      priority: update.priority as any,
+      device_classes: update.device_classes,
+      published_at: update.published_at,
+      created_at: update.created_at,
+      effective_date: update.effective_date,
+      source_id: update.source_id,
+      source_url: update.source_url,
+      content: update.content,
+      categories: update.categories,
+      raw_data: update.raw_data
+    }));
     
     logger.info("API: Retrieved regulatory updates from database", { 
       total: updates.length,
@@ -26,7 +53,7 @@ export class RegulatoryController {
     
     res.json({
       success: true,
-      data: filteredUpdates,
+      data: transformedUpdates,
       timestamp: new Date().toISOString()
     });
   });
@@ -34,13 +61,32 @@ export class RegulatoryController {
   getAll = asyncHandler(async (req: Request, res: Response<ApiResponse<RegulatoryUpdate[]>>, next: NextFunction) => {
     logger.info("API: Fetching all regulatory updates");
     
-    const updates = await storage.getAllRegulatoryUpdates();
+    const updates: StorageRegulatoryUpdate[] = await storage.getAllRegulatoryUpdates();
     
-    logger.info("API: Retrieved all regulatory updates", { count: updates.length });
+    // Transform to API format
+    const transformedUpdates: RegulatoryUpdate[] = updates.map(update => ({
+      id: update.id,
+      title: update.title,
+      description: update.description,
+      region: update.region,
+      update_type: update.update_type as any,
+      priority: update.priority as any,
+      device_classes: update.device_classes,
+      published_at: update.published_at,
+      created_at: update.created_at,
+      effective_date: update.effective_date,
+      source_id: update.source_id,
+      source_url: update.source_url,
+      content: update.content,
+      categories: update.categories,
+      raw_data: update.raw_data
+    }));
+    
+    logger.info("API: Retrieved all regulatory updates", { count: transformedUpdates.length });
     
     res.json({
       success: true,
-      data: updates,
+      data: transformedUpdates,
       timestamp: new Date().toISOString()
     });
   });
