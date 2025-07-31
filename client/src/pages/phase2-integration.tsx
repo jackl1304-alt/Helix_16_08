@@ -120,7 +120,7 @@ export default function Phase2Integration() {
 
   // Cross-Reference Mutations
   const deviceMappingMutation = useMutation({
-    mutationFn: () => apiRequest('/api/crossref/map-devices', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/crossref/map-devices', 'POST'),
     onSuccess: (data: any) => {
       toast({
         title: "Device Mapping",
@@ -139,7 +139,7 @@ export default function Phase2Integration() {
   });
 
   const standardsMappingMutation = useMutation({
-    mutationFn: () => apiRequest('/api/crossref/map-standards', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/crossref/map-standards', 'POST'),
     onSuccess: (data: any) => {
       toast({
         title: "Standards Mapping",
@@ -158,7 +158,7 @@ export default function Phase2Integration() {
   });
 
   const comprehensiveCrossRefMutation = useMutation({
-    mutationFn: () => apiRequest('/api/crossref/comprehensive', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/crossref/comprehensive', 'POST'),
     onSuccess: (data: CrossRefResult) => {
       toast({
         title: "Comprehensive Cross-Reference",
@@ -178,7 +178,7 @@ export default function Phase2Integration() {
 
   // Regional Sync Mutations
   const regionalSyncAllMutation = useMutation({
-    mutationFn: () => apiRequest('/api/regional/sync-all', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/regional/sync-all', 'POST'),
     onSuccess: () => {
       toast({
         title: "Regional Sync",
@@ -199,7 +199,7 @@ export default function Phase2Integration() {
 
   const regionalSyncSingleMutation = useMutation({
     mutationFn: (authorityId: string) => 
-      apiRequest(`/api/regional/sync/${authorityId}`, { method: 'POST' }),
+      apiRequest(`/api/regional/sync/${authorityId}`, 'POST'),
     onSuccess: (data: any, authorityId: string) => {
       toast({
         title: "Regional Authority Sync",

@@ -43,7 +43,7 @@ export default function RealTimeIntegration() {
 
   // Real-Time API Sync Mutations
   const fdaSyncMutation = useMutation({
-    mutationFn: () => apiRequest('/api/realtime/sync-fda', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/realtime/sync-fda', 'POST'),
     onSuccess: (data: SyncResult) => {
       toast({
         title: "FDA Sync Complete",
@@ -63,7 +63,7 @@ export default function RealTimeIntegration() {
   });
 
   const clinicalTrialsSyncMutation = useMutation({
-    mutationFn: () => apiRequest('/api/realtime/sync-clinical-trials', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/realtime/sync-clinical-trials', 'POST'),
     onSuccess: (data: SyncResult) => {
       toast({
         title: "Clinical Trials Sync Complete",
@@ -83,7 +83,7 @@ export default function RealTimeIntegration() {
   });
 
   const whoSyncMutation = useMutation({
-    mutationFn: () => apiRequest('/api/realtime/sync-who', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/realtime/sync-who', 'POST'),
     onSuccess: (data: SyncResult) => {
       toast({
         title: "WHO Sync Complete",
@@ -103,7 +103,7 @@ export default function RealTimeIntegration() {
   });
 
   const comprehensiveSyncMutation = useMutation({
-    mutationFn: () => apiRequest('/api/realtime/sync-all', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/realtime/sync-all', 'POST'),
     onSuccess: (data: SyncResult) => {
       toast({
         title: "Comprehensive Sync Complete",
@@ -124,10 +124,7 @@ export default function RealTimeIntegration() {
 
   // Data Quality Mutations
   const detectDuplicatesMutation = useMutation({
-    mutationFn: () => apiRequest('/api/quality/detect-duplicates', { 
-      method: 'POST',
-      body: JSON.stringify({ keyFields: ['title', 'authority'] })
-    }),
+    mutationFn: () => apiRequest('/api/quality/detect-duplicates', 'POST', { keyFields: ['title', 'authority'] }),
     onSuccess: (data: any) => {
       toast({
         title: "Duplicate Detection Complete",

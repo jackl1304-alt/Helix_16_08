@@ -116,10 +116,7 @@ export default function Phase3Advanced() {
 
   // Predictive Analytics Mutations
   const generatePredictionsMutation = useMutation({
-    mutationFn: (params: any) => apiRequest('/api/predictive/generate', { 
-      method: 'POST',
-      body: JSON.stringify(params)
-    }),
+    mutationFn: (params: any) => apiRequest('/api/predictive/generate', 'POST', params),
     onSuccess: (data: PredictionResult) => {
       toast({
         title: "Predictive Analysis Complete",
@@ -157,10 +154,7 @@ export default function Phase3Advanced() {
   });
 
   const safetyAlertPredictionMutation = useMutation({
-    mutationFn: (params: any) => apiRequest('/api/predictive/safety-alerts', { 
-      method: 'POST',
-      body: JSON.stringify(params)
-    }),
+    mutationFn: (params: any) => apiRequest('/api/predictive/safety-alerts', 'POST', params),
     onSuccess: (data: PredictionResult) => {
       toast({
         title: "Safety Alert Predictions",
@@ -179,10 +173,7 @@ export default function Phase3Advanced() {
   });
 
   const marketTrendMutation = useMutation({
-    mutationFn: (params: any) => apiRequest('/api/predictive/market-trends', { 
-      method: 'POST',
-      body: JSON.stringify(params)
-    }),
+    mutationFn: (params: any) => apiRequest('/api/predictive/market-trends', 'POST', params),
     onSuccess: (data: PredictionResult) => {
       toast({
         title: "Market Trend Predictions",
@@ -202,7 +193,7 @@ export default function Phase3Advanced() {
 
   // Phase 3 Master Analysis
   const phase3AnalysisMutation = useMutation({
-    mutationFn: () => apiRequest('/api/phase3/analyze-all', { method: 'POST' }),
+    mutationFn: () => apiRequest('/api/phase3/analyze-all', 'POST'),
     onSuccess: (data: any) => {
       toast({
         title: "Phase 3 Master Analysis",
