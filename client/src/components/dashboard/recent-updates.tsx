@@ -37,10 +37,12 @@ const priorityLabels = {
 export function RecentUpdates() {
   const [selectedRegion, setSelectedRegion] = useState<string>('all');
   
-  const { data: updates, isLoading } = useQuery<RegulatoryUpdate[]>({
+  const { data: response, isLoading } = useQuery<{success: boolean, data: RegulatoryUpdate[], timestamp: string}>({
     queryKey: ["/api/regulatory-updates/recent", { region: selectedRegion === 'all' ? undefined : selectedRegion, limit: 10 }],
-    select: (data) => Array.isArray(data) ? data.slice(0, 10) : [],
+    select: (data) => data,
   });
+
+  const updates = response?.data || [];
 
   if (isLoading) {
     return (

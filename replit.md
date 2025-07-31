@@ -27,6 +27,10 @@ Preferred communication style: German language - Simple, everyday language.
 - **Database Provider**: Neon (serverless PostgreSQL)
 - **TypeScript**: Full-stack TypeScript with shared schema definitions
 - **Authentication**: Session-based (ready for implementation)
+- **Logging**: Winston logger service with structured logging
+- **Error Handling**: Centralized error middleware with proper error types
+- **Validation**: Zod schemas for input validation
+- **Environment**: Validated environment configuration with type safety
 
 ### System Design
 - **Clean Production Service**: Manages legal cases, health monitoring, and efficient API endpoints.
