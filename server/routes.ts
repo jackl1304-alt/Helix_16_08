@@ -20,6 +20,8 @@ import { DataQualityService } from "./services/dataQualityService";
 import { EUDAMEDService } from "./services/eudamedService";
 import { CrossReferenceService } from "./services/crossReferenceService";
 import { RegionalExpansionService } from "./services/regionalExpansionService";
+import { AISummarizationService } from "./services/aiSummarizationService";
+import { PredictiveAnalyticsService } from "./services/predictiveAnalyticsService";
 
 // Initialize Phase 1 & 2 services
 const fdaApiService = new FDAOpenAPIService();
@@ -28,6 +30,8 @@ const qualityService = new DataQualityService();
 const eudamedService = new EUDAMEDService();
 const crossRefService = new CrossReferenceService();
 const regionalService = new RegionalExpansionService();
+const aiSummaryService = new AISummarizationService();
+const predictiveService = new PredictiveAnalyticsService();
 
 // Generate full legal decision content for realistic court cases
 function generateFullLegalDecision(legalCase: any): string {
@@ -1862,6 +1866,178 @@ Status: Archiviertes historisches Dokument
       });
     } catch (error: any) {
       console.error('[API] Phase 2 sync failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ========== PHASE 3 NEW API ENDPOINTS ==========
+  
+  // AI Summarization Service
+  app.post("/api/ai/summarize/:contentId", async (req, res) => {
+    try {
+      const { contentId } = req.params;
+      const { contentType = 'regulatory_update', priority = 'standard', targetAudience = 'regulatory' } = req.body;
+      
+      console.log(`[API] Starting AI summarization for: ${contentId}`);
+      
+      const summary = await aiSummaryService.generateSummary({
+        contentId,
+        contentType,
+        priority,
+        targetAudience
+      });
+      
+      res.json(summary);
+    } catch (error: any) {
+      console.error('[API] AI summarization failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/ai/batch-summarize", async (req, res) => {
+    try {
+      const { hours = 24 } = req.body;
+      console.log(`[API] Starting batch summarization for last ${hours} hours`);
+      
+      const summaries = await aiSummaryService.batchSummarizeRecent(hours);
+      res.json({ 
+        success: true, 
+        summaries, 
+        count: summaries.length,
+        message: `Generated ${summaries.length} summaries` 
+      });
+    } catch (error: any) {
+      console.error('[API] Batch summarization failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/ai/analyze-trends", async (req, res) => {
+    try {
+      const { timeframe = '30d' } = req.body;
+      console.log(`[API] Starting trend analysis for timeframe: ${timeframe}`);
+      
+      const analysis = await aiSummaryService.analyzeTrends(timeframe);
+      res.json(analysis);
+    } catch (error: any) {
+      console.error('[API] Trend analysis failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Predictive Analytics Service
+  app.post("/api/predictive/generate", async (req, res) => {
+    try {
+      const { 
+        deviceCategory, 
+        manufacturer, 
+        jurisdiction, 
+        timeHorizon = '90d', 
+        predictionType = 'safety_alerts' 
+      } = req.body;
+      
+      console.log(`[API] Generating ${predictionType} predictions for ${timeHorizon}`);
+      
+      const predictions = await predictiveService.generatePredictions({
+        deviceCategory,
+        manufacturer,
+        jurisdiction,
+        timeHorizon,
+        predictionType
+      });
+      
+      res.json(predictions);
+    } catch (error: any) {
+      console.error('[API] Predictive analytics failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/predictive/compliance-risk", async (req, res) => {
+    try {
+      const { jurisdiction } = req.query;
+      console.log(`[API] Generating compliance risk assessment for: ${jurisdiction || 'all jurisdictions'}`);
+      
+      const risks = await predictiveService.generateComplianceRiskAssessment(jurisdiction as string);
+      res.json({ 
+        success: true, 
+        risks, 
+        count: risks.length,
+        message: 'Compliance risk assessment completed' 
+      });
+    } catch (error: any) {
+      console.error('[API] Compliance risk assessment failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/predictive/safety-alerts", async (req, res) => {
+    try {
+      const { deviceCategory, timeHorizon = '90d' } = req.body;
+      console.log(`[API] Predicting safety alerts for: ${deviceCategory || 'all devices'}`);
+      
+      const predictions = await predictiveService.generatePredictions({
+        deviceCategory,
+        timeHorizon,
+        predictionType: 'safety_alerts'
+      });
+      
+      res.json(predictions);
+    } catch (error: any) {
+      console.error('[API] Safety alert prediction failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/predictive/market-trends", async (req, res) => {
+    try {
+      const { jurisdiction, timeHorizon = '180d' } = req.body;
+      console.log(`[API] Predicting market trends for: ${jurisdiction || 'global markets'}`);
+      
+      const predictions = await predictiveService.generatePredictions({
+        jurisdiction,
+        timeHorizon,
+        predictionType: 'market_trends'
+      });
+      
+      res.json(predictions);
+    } catch (error: any) {
+      console.error('[API] Market trend prediction failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Combined Phase 3 Sync Endpoint
+  app.post("/api/phase3/analyze-all", async (req, res) => {
+    try {
+      console.log('[API] Starting Phase 3 comprehensive analysis...');
+      
+      // Run all Phase 3 services
+      const results = await Promise.allSettled([
+        aiSummaryService.batchSummarizeRecent(24),
+        aiSummaryService.analyzeTrends('30d'),
+        predictiveService.generatePredictions({
+          timeHorizon: '90d',
+          predictionType: 'safety_alerts'
+        }),
+        predictiveService.generateComplianceRiskAssessment()
+      ]);
+      
+      const successCount = results.filter(r => r.status === 'fulfilled').length;
+      const totalCount = results.length;
+      
+      res.json({ 
+        success: successCount === totalCount, 
+        message: `Phase 3 analysis completed: ${successCount}/${totalCount} services successful`,
+        results: results.map((r, i) => ({
+          service: ['AI Summarization', 'Trend Analysis', 'Safety Predictions', 'Compliance Risk'][i],
+          status: r.status,
+          ...(r.status === 'fulfilled' && { data: r.value }),
+          ...(r.status === 'rejected' && { error: r.reason?.message })
+        }))
+      });
+    } catch (error: any) {
+      console.error('[API] Phase 3 analysis failed:', error);
       res.status(500).json({ message: error.message });
     }
   });

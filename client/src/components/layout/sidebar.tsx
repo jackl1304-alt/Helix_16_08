@@ -27,6 +27,7 @@ const navigation = [
   { name: "Sync Manager", href: "/sync-manager", icon: RefreshCw },
   { name: "Phase 1 Integration", href: "/phase1-integration", icon: Shield },
   { name: "Phase 2 Extensions", href: "/phase2-integration", icon: Network },
+  { name: "Phase 3 Advanced", href: "/phase3-advanced", icon: Brain },
   { name: "Global Sources", href: "/global-sources", icon: Globe },
   { name: "Regulatory Updates", href: "/regulatory-updates", icon: FileText },
   { name: "Newsletter Manager", href: "/newsletter-manager", icon: Newspaper },
