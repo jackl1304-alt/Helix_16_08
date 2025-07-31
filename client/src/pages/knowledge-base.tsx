@@ -82,7 +82,7 @@ export default function KnowledgeBasePage() {
   });
 
   // Load real knowledge articles from database
-  const { data: realArticlesData, isLoading: realArticlesLoading } = useQuery({
+  const { data: realArticlesData = [], isLoading: realArticlesLoading } = useQuery({
     queryKey: ['/api/knowledge/articles'],
   });
 
