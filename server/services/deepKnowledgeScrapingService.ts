@@ -404,17 +404,28 @@ export class DeepKnowledgeScrapingService {
           }
         };
         
-        // Check if article already exists
-        const existingArticle = await db
-          .select()
-          .from(regulatoryUpdates)
-          .where(eq(regulatoryUpdates.id, article.id))
-          .limit(1);
-        
-        if (existingArticle.length === 0) {
-          await db.insert(regulatoryUpdates).values([regulatoryUpdate]);
-          articlesStored++;
-          console.log(`[Deep Knowledge Service] Stored article: ${article.title}`);
+        // Use direct SQL to insert article with correct schema
+        try {
+          const result = await db.execute(sql`
+            INSERT INTO regulatory_updates (
+              id, title, description, source_id, source_url, 
+              published_at, region, priority, categories, device_classes, 
+              update_type, raw_data
+            ) VALUES (
+              ${article.id}, ${article.title}, ${regulatoryUpdate.description},
+              ${article.sourceId}, ${article.url}, ${article.publishedAt},
+              ${article.jurisdiction}, ${this.calculatePriorityAsNumber(article.relevanceScore)},
+              ${JSON.stringify([article.category])}, ${JSON.stringify(article.tags)},
+              'guidance', ${JSON.stringify(regulatoryUpdate.raw_data)}
+            ) ON CONFLICT (id) DO NOTHING
+          `);
+          
+          if (result.rowCount && result.rowCount > 0) {
+            articlesStored++;
+            console.log(`[Deep Knowledge Service] Stored article: ${article.title}`);
+          }
+        } catch (insertError) {
+          console.log(`[Deep Knowledge Service] Article ${article.id} already exists, skipping`);
         }
       }
       

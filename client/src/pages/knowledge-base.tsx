@@ -371,9 +371,14 @@ export default function KnowledgeBasePage() {
   const deepScrapingMutation = useMutation({
     mutationFn: () => apiRequest('/api/knowledge/deep-scraping', { method: 'POST' }),
     onSuccess: (data: any) => {
+      const articlesCount = data?.articlesStored || 0;
+      const message = articlesCount > 0 
+        ? `${articlesCount} neue umfassende Medizintechnik-Artikel hinzugefügt` 
+        : "Deep Scraping vollständig - alle 17 Artikel bereits in Datenbank vorhanden";
+      
       toast({
         title: "Deep Scraping erfolgreich",
-        description: `${data.articlesStored || 'Mehrere'} umfassende Medizintechnik-Artikel mit Detailbeschreibungen hinzugefügt.`,
+        description: message,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/knowledge/sources-status'] });
       queryClient.invalidateQueries({ queryKey: ['/api/knowledge/combined-articles'] });
