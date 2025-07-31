@@ -38,17 +38,18 @@ export default function EnhancedLegalCases() {
       const data = await response.json();
       
       // Transform data to match ComprehensiveLegalCase interface
+      console.log("Enhanced Legal Cases - Raw data sample:", data.slice(0, 2));
       return data.map((item: any): ComprehensiveLegalCase => ({
         id: item.id,
-        caseNumber: item.caseNumber,
+        caseNumber: item.caseNumber || item.case_number,
         title: item.title,
         court: item.court,
         jurisdiction: item.jurisdiction,
-        decisionDate: item.decisionDate,
+        decisionDate: item.decisionDate || item.decision_date,
         summary: item.summary,
-        content: item.content || item.fullDecisionText,
-        documentUrl: item.documentUrl,
-        impactLevel: item.impactLevel || 'medium',
+        content: item.content || item.fullDecisionText || item.verdict || 'Comprehensive legal case details',
+        documentUrl: item.documentUrl || item.document_url,
+        impactLevel: (item.impactLevel || item.impact_level || 'medium') as 'high' | 'medium' | 'low',
         keywords: item.keywords || []
       }));
     }
@@ -65,14 +66,23 @@ export default function EnhancedLegalCases() {
   // Filter cases based on search and filters
   const filteredCases = (legalCases as ComprehensiveLegalCase[]).filter((legalCase: ComprehensiveLegalCase) => {
     const matchesSearch = !searchTerm || 
-      legalCase.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      legalCase.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      legalCase.keywords.some(keyword => keyword.toLowerCase().includes(searchTerm.toLowerCase()));
+      legalCase.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      legalCase.summary?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      legalCase.keywords?.some(keyword => keyword.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    const matchesJurisdiction = selectedJurisdiction === 'all' || legalCase.jurisdiction === selectedJurisdiction;
+    const matchesJurisdiction = selectedJurisdiction === 'all' || legalCase.jurisdiction?.includes(selectedJurisdiction);
     const matchesImpactLevel = selectedImpactLevel === 'all' || legalCase.impactLevel === selectedImpactLevel;
     
     return matchesSearch && matchesJurisdiction && matchesImpactLevel;
+  });
+
+  console.log("Enhanced Legal Cases DEBUG:", {
+    totalCases: legalCases.length,
+    filteredCases: filteredCases.length,
+    searchTerm,
+    selectedJurisdiction,
+    selectedImpactLevel,
+    sampleCase: legalCases[0]
   });
 
   // Extract case details from content for display
@@ -185,9 +195,10 @@ export default function EnhancedLegalCases() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Jurisdictions</SelectItem>
-                  <SelectItem value="US Federal">US Federal</SelectItem>
+                  <SelectItem value="US">US Federal</SelectItem>
                   <SelectItem value="EU">European Union</SelectItem>
                   <SelectItem value="DE">Germany</SelectItem>
+                  <SelectItem value="Germany">Germany (DE)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -224,8 +235,8 @@ export default function EnhancedLegalCases() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No Enhanced Cases Found</h3>
               <p className="text-gray-600 mb-4">
                 {legalCases.length === 0 
-                  ? 'No comprehensive legal cases available. Generate enhanced cases to see detailed reconstructions.'
-                  : 'No cases match your current search criteria.'}
+                  ? `Lade echte Legal Cases aus der Datenbank...` 
+                  : `${legalCases.length} Cases verfügbar, aber Filter ergeben 0 Treffer. Prüfe Suchkriterien.`}
               </p>
               {legalCases.length === 0 && (
                 <Button 
