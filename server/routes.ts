@@ -946,6 +946,27 @@ Status: Archiviertes historisches Dokument
     }
   });
 
+  // Enhanced Legal Cases with comprehensive reconstruction
+  app.post('/api/legal/comprehensive-cases', async (req, res) => {
+    try {
+      const { enhancedLegalCaseService } = await import('./services/enhancedLegalCaseService');
+      const result = await enhancedLegalCaseService.storeComprehensiveCases();
+      
+      res.json({
+        success: true,
+        message: `Enhanced legal cases stored successfully`,
+        casesStored: result.casesStored,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error('Error storing comprehensive legal cases:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+  });
+
   // Legal sync endpoint
   app.post("/api/legal/sync", async (req, res) => {
     try {

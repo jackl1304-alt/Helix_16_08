@@ -43,6 +43,7 @@ const knowledgeBase = [
   { name: "Custom Knowledge", href: "/knowledge-base", icon: Book },
   { name: "Historische Daten", href: "/historical-data", icon: Archive },
   { name: "Rechtsfälle", href: "/legal-cases", icon: FileText },
+  { name: "Enhanced Legal Cases", href: "/enhanced-legal-cases", icon: Shield },
 ];
 
 const administration = [
