@@ -29,16 +29,36 @@ export default function EnhancedLegalCases() {
   const [selectedImpactLevel, setSelectedImpactLevel] = useState('all');
   const queryClient = useQueryClient();
 
-  // Fetch comprehensive legal cases
+  // Fetch comprehensive legal cases from Enhanced API
   const { data: legalCases = [], isLoading: isLoadingCases } = useQuery<ComprehensiveLegalCase[]>({
-    queryKey: ['/api/legal/cases'],
+    queryKey: ['/api/legal-cases/enhanced'],
+    queryFn: async (): Promise<ComprehensiveLegalCase[]> => {
+      const response = await fetch('/api/legal-cases/enhanced');
+      if (!response.ok) throw new Error('Failed to fetch enhanced legal cases');
+      const data = await response.json();
+      
+      // Transform data to match ComprehensiveLegalCase interface
+      return data.map((item: any): ComprehensiveLegalCase => ({
+        id: item.id,
+        caseNumber: item.caseNumber,
+        title: item.title,
+        court: item.court,
+        jurisdiction: item.jurisdiction,
+        decisionDate: item.decisionDate,
+        summary: item.summary,
+        content: item.content || item.fullDecisionText,
+        documentUrl: item.documentUrl,
+        impactLevel: item.impactLevel || 'medium',
+        keywords: item.keywords || []
+      }));
+    }
   });
 
   // Enhanced legal cases generation mutation
   const generateEnhancedCasesMutation = useMutation({
     mutationFn: () => fetch('/api/legal/comprehensive-cases', { method: 'POST' }).then(res => res.json()),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/legal/cases'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/legal-cases/enhanced'] });
     },
   });
 
