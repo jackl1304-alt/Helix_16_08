@@ -1,51 +1,168 @@
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../services/logger.service';
+import { ZodError } from 'zod';
+import { Logger } from '../services/logger.service';
+import { 
+  AppError, 
+  isAppError, 
+  isOperationalError, 
+  formatErrorResponse,
+  ValidationError,
+  DatabaseError
+} from '../../shared/types/errors';
 
-export class AppError extends Error {
-  constructor(
-    public statusCode: number,
-    public message: string,
-    public isOperational = true
-  ) {
-    super(message);
-    Object.setPrototypeOf(this, AppError.prototype);
-  }
-}
+const logger = new Logger('ErrorMiddleware');
 
-export const errorHandler = (
-  error: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  if (error instanceof AppError) {
-    logger.error(`AppError: ${error.message}`, { 
-      statusCode: error.statusCode,
-      path: req.path,
-      method: req.method
-    });
-    
-    return res.status(error.statusCode).json({
-      success: false,
-      error: error.message,
-      timestamp: new Date().toISOString()
-    });
-  }
-  
-  // Unerwartete Fehler
-  logger.error('Unexpected error:', error);
-  
-  res.status(500).json({
-    success: false,
-    error: process.env.NODE_ENV === 'production' 
-      ? 'Internal server error' 
-      : error.message,
-    timestamp: new Date().toISOString()
-  });
-};
-
+// Async handler wrapper to catch async errors
 export const asyncHandler = (fn: Function) => {
   return (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
 };
+
+// Global error handler middleware
+export const errorHandler = (
+  error: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  let processedError: AppError;
+
+  // Handle Zod validation errors
+  if (error instanceof ZodError) {
+    const validationErrors = error.errors.map(err => ({
+      field: err.path.join('.'),
+      message: err.message,
+      code: err.code
+    }));
+    
+    processedError = new ValidationError(
+      'Request validation failed',
+      validationErrors[0]?.field || 'unknown',
+      'invalid',
+      'valid input'
+    );
+  }
+  // Handle known application errors
+  else if (isAppError(error)) {
+    processedError = error;
+  }
+  // Handle unknown errors
+  else {
+    processedError = new AppError(
+      process.env.NODE_ENV === 'production' 
+        ? 'Internal server error'
+        : error.message || 'Unknown error occurred',
+      500,
+      false
+    );
+  }
+
+  // Log the error
+  if (isOperationalError(processedError)) {
+    logger.warn('Operational error occurred', {
+      error: processedError.message,
+      statusCode: processedError.statusCode,
+      url: req.originalUrl,
+      method: req.method,
+      userAgent: req.get('User-Agent'),
+      ip: req.ip
+    });
+  } else {
+    logger.error('Non-operational error occurred', {
+      error: processedError.message,
+      stack: processedError.stack,
+      statusCode: processedError.statusCode,
+      url: req.originalUrl,
+      method: req.method,
+      userAgent: req.get('User-Agent'),
+      ip: req.ip
+    });
+  }
+
+  // Send error response
+  const errorResponse = formatErrorResponse(processedError);
+  res.status(processedError.statusCode).json(errorResponse);
+};
+
+// 404 Not Found handler
+export const notFoundHandler = (req: Request, res: Response, next: NextFunction): void => {
+  const error = new AppError(`Route ${req.originalUrl} not found`, 404);
+  next(error);
+};
+
+// Database error handler
+export const handleDatabaseError = (error: unknown, operation: string, table?: string): never => {
+  logger.error('Database error occurred', {
+    operation,
+    table,
+    error: error instanceof Error ? error.message : String(error)
+  });
+
+  if (error instanceof Error) {
+    throw new DatabaseError(error.message, operation, table, error);
+  }
+  
+  throw new DatabaseError('Unknown database error', operation, table);
+};
+
+// Validation error handler
+export const handleValidationError = (
+  field: string,
+  value: unknown,
+  expectedType: string,
+  customMessage?: string
+): never => {
+  const message = customMessage || `Invalid value for ${field}`;
+  throw new ValidationError(message, field, value, expectedType);
+};
+
+// External service error handler
+export const handleExternalServiceError = (
+  serviceName: string,
+  error: unknown,
+  context?: Record<string, unknown>
+): never => {
+  logger.error('External service error', {
+    serviceName,
+    error: error instanceof Error ? error.message : String(error),
+    ...context
+  });
+
+  const message = error instanceof Error ? error.message : 'External service unavailable';
+  throw new AppError(`${serviceName} service error: ${message}`, 502);
+};
+
+// Process unhandled promise rejections
+process.on('unhandledRejection', (reason: unknown, promise: Promise<any>) => {
+  logger.error('Unhandled Promise Rejection', {
+    reason: reason instanceof Error ? reason.message : String(reason),
+    stack: reason instanceof Error ? reason.stack : undefined
+  });
+  
+  // In production, gracefully shutdown
+  if (process.env.NODE_ENV === 'production') {
+    process.exit(1);
+  }
+});
+
+// Process uncaught exceptions
+process.on('uncaughtException', (error: Error) => {
+  logger.error('Uncaught Exception', {
+    error: error.message,
+    stack: error.stack
+  });
+  
+  // Always exit on uncaught exception
+  process.exit(1);
+});
+
+// Graceful shutdown handlers
+const gracefulShutdown = (signal: string) => {
+  logger.info(`Received ${signal}, shutting down gracefully`);
+  
+  process.exit(0);
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
