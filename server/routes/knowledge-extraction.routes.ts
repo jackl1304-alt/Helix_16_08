@@ -64,10 +64,26 @@ router.get('/status', asyncHandler(async (req: Request, res: Response) => {
       extractionPotential: status.extractionPotential
     });
 
-    res.json(createApiResponse(true, status));
+    res.json(status);
   } catch (error) {
     logger.error('Failed to fetch knowledge extraction status', { error });
-    res.status(500).json(createApiResponse(false, undefined, 'Failed to fetch status'));
+    res.status(500).json({ 
+      error: 'Failed to fetch status',
+      totalArticles: 0,
+      autoExtractedArticles: 0,
+      needsReviewArticles: 0,
+      publishedArticles: 0,
+      draftArticles: 0,
+      availableSourceData: {
+        regulatoryUpdates: 0,
+        legalCases: 0,
+        totalSources: 0
+      },
+      extractionPotential: {
+        unprocessedRegulatory: 0,
+        unprocessedLegal: 0
+      }
+    });
   }
 }));
 
