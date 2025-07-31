@@ -5,6 +5,7 @@ console.log(`[ENV DEBUG] DATABASE_URL first 30 chars: ${process.env.DATABASE_URL
 console.log(`[ENV DEBUG] REPLIT_DEPLOYMENT: ${process.env.REPLIT_DEPLOYMENT}`);
 
 import express, { type Request, Response, NextFunction } from "express";
+import { createServer } from "http";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { emailService } from "./services/emailService";
@@ -235,15 +236,18 @@ app.use((req, res, next) => {
     }
   }
   
-  // FORCE JSON RESPONSE for all API routes BEFORE registering routes  
+  // CRITICAL: Block HTML fallback for ALL API routes - FORCE JSON ONLY
   app.use('/api/*', (req, res, next) => {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Cache-Control', 'no-cache');
+    console.log(`[CRITICAL] API ROUTE DETECTED: ${req.path} - FORCING JSON ONLY`);
     next();
   });
 
-  // CRITICAL FIX: Register API routes AFTER setting JSON headers
-  const server = await registerRoutes(app);
+  // REGISTER API ROUTES FIRST - HIGHEST PRIORITY
+  registerRoutes(app);
+  
+  const server = createServer(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
