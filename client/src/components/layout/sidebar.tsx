@@ -26,10 +26,6 @@ const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
   { name: "Data Collection", href: "/data-collection", icon: Database },
   { name: "Sync Manager", href: "/sync-manager", icon: RefreshCw },
-  { name: "Phase 1 Integration", href: "/phase1-integration", icon: Shield },
-  { name: "Phase 2 Extensions", href: "/phase2-integration", icon: Network },
-  { name: "Phase 3 Advanced", href: "/phase3-advanced", icon: Brain },
-  { name: "Real-Time APIs", href: "/real-time-integration", icon: Zap },
   { name: "Global Sources", href: "/global-sources", icon: Globe },
   { name: "Regulatory Updates", href: "/regulatory-updates", icon: FileText },
   { name: "Newsletter Manager", href: "/newsletter-manager", icon: Newspaper },
@@ -48,6 +44,10 @@ const knowledgeBase = [
 
 const administration = [
   { name: "Administration", href: "/administration", icon: Shield },
+  { name: "Phase 1 Integration", href: "/phase1-integration", icon: Settings },
+  { name: "Phase 2 Extensions", href: "/phase2-integration", icon: Network },
+  { name: "Phase 3 Advanced", href: "/phase3-advanced", icon: Brain },
+  { name: "Real-Time APIs", href: "/real-time-integration", icon: Zap },
   { name: "User Management", href: "/user-management", icon: Users },
   { name: "Data Sources Admin", href: "/administration/data-sources", icon: Database },
   { name: "System Settings", href: "/system-settings", icon: Settings },
@@ -129,7 +129,7 @@ export function Sidebar() {
 
         <div className="mt-8 px-4">
           <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-            Administration
+            Administration & Entwicklung
           </h3>
           <div className="mt-4 space-y-2">
             {administration.map((item) => {
