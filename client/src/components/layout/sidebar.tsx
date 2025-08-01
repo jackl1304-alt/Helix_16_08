@@ -29,6 +29,7 @@ const navigation = [
   { name: "Global Sources", href: "/global-sources", icon: Globe },
   { name: "Regulatory Updates", href: "/regulatory-updates", icon: FileText },
   { name: "Newsletter Manager", href: "/newsletter-manager", icon: Newspaper },
+  { name: "GRIP Datenquelle", href: "/grip-data", icon: Shield },
   { name: "Approval Workflow", href: "/approval-workflow", icon: CheckCircle },
   { name: "Analytics", href: "/analytics", icon: TrendingUp },
 ];

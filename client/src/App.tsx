@@ -43,6 +43,7 @@ const Phase3Advanced = lazy(() => import("@/pages/phase3-advanced"));
 const RealTimeIntegration = lazy(() => import("@/pages/real-time-integration"));
 const DataSourcesAdmin = lazy(() => import("@/pages/admin/data-sources"));
 const Administration = lazy(() => import("@/pages/administration"));
+const GripData = lazy(() => import("@/pages/grip-data"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -82,6 +83,7 @@ function Router() {
         <Route path="/real-time-integration" component={RealTimeIntegration} />
         <Route path="/administration/data-sources" component={DataSourcesAdmin} />
         <Route path="/administration" component={Administration} />
+        <Route path="/grip-data" component={GripData} />
         <Route path="/documents/:sourceType/:documentId" component={DocumentViewer} />
         
         {/* Fallback to 404 */}

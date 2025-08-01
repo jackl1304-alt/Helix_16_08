@@ -1,6 +1,7 @@
 import { storage } from "../storage";
 import { fdaOpenApiService } from "./fdaOpenApiService";
 import { aiService } from "./aiService";
+import { gripService } from "./gripService";
 import type { InsertRegulatoryUpdate } from "@shared/schema";
 
 // Dynamic import to avoid module resolution issues during compilation
@@ -288,6 +289,36 @@ export class DataCollectionService {
     }
   }
 
+  async collectGripData(): Promise<void> {
+    console.log("🔗 Starting GRIP platform data collection...");
+    
+    try {
+      // Test connection first
+      const isConnected = await gripService.testConnection();
+      if (!isConnected) {
+        throw new Error("Failed to establish connection to GRIP platform");
+      }
+
+      // Extract regulatory data from GRIP
+      const gripUpdates = await gripService.extractRegulatoryData();
+      
+      if (gripUpdates.length === 0) {
+        console.log("ℹ️ No new data available from GRIP platform");
+        return;
+      }
+
+      // Process and store GRIP data
+      for (const update of gripUpdates) {
+        await storage.createRegulatoryUpdate(update);
+      }
+
+      console.log(`🎯 GRIP data collection completed - ${gripUpdates.length} updates processed`);
+    } catch (error) {
+      console.error("❌ Error collecting GRIP data:", error);
+      throw error;
+    }
+  }
+
   async collectAllGlobalData(): Promise<void> {
     console.log("🌐 Starting comprehensive global regulatory data collection...");
     
@@ -298,6 +329,7 @@ export class DataCollectionService {
       this.collectBfARMData().catch(e => ({ source: 'BfArM', error: e })),
       this.collectSwissmedicData().catch(e => ({ source: 'Swissmedic', error: e })),
       this.collectMHRAData().catch(e => ({ source: 'MHRA', error: e })),
+      this.collectGripData().catch(e => ({ source: 'GRIP', error: e })),
     ];
 
     const results = await Promise.allSettled(collectionPromises);
@@ -307,7 +339,7 @@ export class DataCollectionService {
     const failedSources: string[] = [];
 
     results.forEach((result, index) => {
-      const sources = ['FDA', 'EMA', 'BfArM', 'Swissmedic', 'MHRA'];
+      const sources = ['FDA', 'EMA', 'BfArM', 'Swissmedic', 'MHRA', 'GRIP'];
       
       if (result.status === 'fulfilled' && !result.value?.error) {
         console.log(`✅ ${sources[index]} data collection successful`);

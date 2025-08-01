@@ -68,8 +68,10 @@ app.use((req, res, next) => {
     const existingSources = await storage.getAllDataSources();
     console.log(`Found ${existingSources.length} existing data sources`);
     
-    // ALWAYS ensure minimum 21+ data sources exist for production
+    // ALWAYS ensure minimum 21+ data sources exist for production including GRIP
     const requiredSources = [
+      // GRIP Platform - Global Intelligence
+      { id: 'grip_platform', name: 'GRIP Regulatory Intelligence', endpoint: 'https://grip-app.pureglobal.com', country: 'GLOBAL', region: 'Global', type: 'intelligence', category: 'regulatory', isActive: true },
       // North America - FDA & Health Canada
       { id: 'fda_510k', name: 'FDA 510(k) Database', endpoint: 'https://api.fda.gov/device/510k.json', country: 'US', region: 'North America', type: 'regulatory', category: 'approvals', isActive: true },
       { id: 'fda_pma', name: 'FDA PMA Database', endpoint: 'https://api.fda.gov/device/pma.json', country: 'US', region: 'North America', type: 'regulatory', category: 'approvals', isActive: true },
