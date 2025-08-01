@@ -87,7 +87,7 @@ export class FDAOpenAPIService {
     }
   }
 
-  async collect510kDevices(limit: number = 100): Promise<void> {
+  async collect510kDevices(limit: number = 100): Promise<FDADevice[]> {
     try {
       console.log(`[FDA API] Collecting 510(k) devices (limit: ${limit})`);
       
@@ -105,6 +105,7 @@ export class FDAOpenAPIService {
       }
       
       console.log(`[FDA API] 510(k) collection completed`);
+      return data.results as FDADevice[];
     } catch (error) {
       console.error('[FDA API] Error collecting 510k devices:', error);
       throw error;
@@ -114,30 +115,17 @@ export class FDAOpenAPIService {
   private async process510kDevice(device: FDADevice): Promise<void> {
     try {
       const regulatoryUpdate = {
-        id: `fda-510k-${device.k_number || Math.random().toString(36).substr(2, 9)}`,
         title: `FDA 510(k): ${device.device_name || 'Unknown Device'}${device.k_number ? ` (${device.k_number})` : ''}`,
-        content: this.formatDeviceContent(device),
-        source: 'FDA OpenAPI',
-        type: 'FDA 510(k) Clearance',
-        region: 'United States',
-        authority: 'FDA',
+        description: this.formatDeviceContent(device),
+        sourceId: 'fda_510k',
+        sourceUrl: `https://www.fda.gov/medical-devices/510k-clearances/510k-clearance-${device.k_number}`,
+        region: 'US',
+        updateType: 'approval' as const,
         priority: this.determinePriority(device),
-        device_class: device.openfda?.device_class || 'Unknown',
-        product_code: device.product_code || '',
-        regulation_number: device.regulation_number || device.openfda?.regulation_number || '',
-        published_at: this.parseDate(device.date_received),
-        decision_date: this.parseDate(device.decision_date),
-        status: device.decision || 'Pending',
-        metadata: {
-          k_number: device.k_number,
-          applicant: device.applicant,
-          review_committee: device.review_advisory_committee,
-          clearance_type: device.clearance_type,
-          third_party: device.third_party_flag === 'Y',
-          expedited_review: device.expedited_review_flag === 'Y',
-          fei_numbers: device.openfda?.fei_number || [],
-          registration_numbers: device.openfda?.registration_number || []
-        }
+        deviceClasses: device.openfda?.device_class ? [device.openfda.device_class] : [],
+        categories: await this.categorizeDevice(device),
+        rawData: device,
+        publishedAt: this.parseDate(device.decision_date) || new Date(),
       };
       
       await storage.createRegulatoryUpdate(regulatoryUpdate);
@@ -147,7 +135,7 @@ export class FDAOpenAPIService {
     }
   }
 
-  async collectRecalls(limit: number = 100): Promise<void> {
+  async collectRecalls(limit: number = 100): Promise<FDARecall[]> {
     try {
       console.log(`[FDA API] Collecting device recalls (limit: ${limit})`);
       
@@ -165,6 +153,7 @@ export class FDAOpenAPIService {
       }
       
       console.log(`[FDA API] Recall collection completed`);
+      return data.results as FDARecall[];
     } catch (error) {
       console.error('[FDA API] Error collecting recalls:', error);
       throw error;
@@ -174,35 +163,17 @@ export class FDAOpenAPIService {
   private async processRecall(recall: FDARecall): Promise<void> {
     try {
       const regulatoryUpdate = {
-        id: `fda-recall-${recall.recall_number || Math.random().toString(36).substr(2, 9)}`,
         title: `FDA Recall: ${recall.product_description || 'Medical Device Recall'}`,
-        content: this.formatRecallContent(recall),
-        source: 'FDA OpenAPI',
-        type: 'FDA Device Recall',
-        region: 'United States',
-        authority: 'FDA',
+        description: this.formatRecallContent(recall),
+        sourceId: 'fda_recalls',
+        sourceUrl: `https://www.fda.gov/medical-devices/medical-device-recalls/${recall.recall_number}`,
+        region: 'US',
+        updateType: 'recall' as const,
         priority: this.determineRecallPriority(recall),
-        device_class: recall.openfda?.device_class || 'Unknown',
-        classification: recall.classification || 'Unknown',
-        published_at: this.parseDate(recall.recall_initiation_date),
-        status: recall.status || 'Active',
-        metadata: {
-          recall_number: recall.recall_number,
-          reason: recall.reason_for_recall,
-          recalling_firm: recall.recalling_firm,
-          distribution_pattern: recall.distribution_pattern,
-          product_quantity: recall.product_quantity,
-          voluntary_mandated: recall.voluntary_mandated,
-          event_id: recall.event_id,
-          address: {
-            street: recall.address_1,
-            street2: recall.address_2,
-            city: recall.city,
-            state: recall.state_code,
-            postal_code: recall.postal_code,
-            country: recall.country
-          }
-        }
+        deviceClasses: recall.openfda?.device_class ? [recall.openfda.device_class] : [],
+        categories: ['Safety Alert', 'Device Recall'],
+        rawData: recall,
+        publishedAt: this.parseDate(recall.recall_initiation_date) || new Date(),
       };
       
       await storage.createRegulatoryUpdate(regulatoryUpdate);
@@ -213,80 +184,133 @@ export class FDAOpenAPIService {
   }
 
   private formatDeviceContent(device: FDADevice): string {
-    const parts = [];
-    
-    if (device.device_name) parts.push(`**Device:** ${device.device_name}`);
-    if (device.applicant) parts.push(`**Applicant:** ${device.applicant}`);
-    if (device.k_number) parts.push(`**K Number:** ${device.k_number}`);
-    if (device.decision) parts.push(`**Decision:** ${device.decision}`);
-    if (device.product_code) parts.push(`**Product Code:** ${device.product_code}`);
-    if (device.regulation_number) parts.push(`**Regulation:** ${device.regulation_number}`);
-    if (device.clearance_type) parts.push(`**Clearance Type:** ${device.clearance_type}`);
-    if (device.review_advisory_committee) parts.push(`**Review Committee:** ${device.review_advisory_committee}`);
-    
+    const parts = [
+      `K-Nummer: ${device.k_number || 'N/A'}`,
+      `Antragsteller: ${device.applicant || 'N/A'}`,
+      `Produktcode: ${device.product_code || 'N/A'}`,
+      `Geräteklasse: ${device.openfda?.device_class || 'N/A'}`,
+      `Regulierungsnummer: ${device.regulation_number || device.openfda?.regulation_number || 'N/A'}`,
+      `Entscheidungsdatum: ${device.decision_date || 'N/A'}`,
+      `Status: ${device.decision || 'N/A'}`
+    ];
+
     if (device.statement_or_summary) {
-      parts.push(`**Summary:** ${device.statement_or_summary}`);
+      parts.push(`Zusammenfassung: ${device.statement_or_summary}`);
     }
-    
+
     if (device.openfda?.medical_specialty_description) {
-      parts.push(`**Medical Specialty:** ${device.openfda.medical_specialty_description}`);
+      parts.push(`Medizinischer Bereich: ${device.openfda.medical_specialty_description}`);
     }
-    
-    return parts.join('\n\n');
+
+    return parts.join('\n');
   }
 
   private formatRecallContent(recall: FDARecall): string {
-    const parts = [];
+    const parts = [
+      `Recall-Nummer: ${recall.recall_number || 'N/A'}`,
+      `Grund: ${recall.reason_for_recall || 'N/A'}`,
+      `Status: ${recall.status || 'N/A'}`,
+      `Klassifizierung: ${recall.classification || 'N/A'}`,
+      `Rückrufende Firma: ${recall.recalling_firm || 'N/A'}`,
+      `Produktmenge: ${recall.product_quantity || 'N/A'}`,
+      `Verteilungsmuster: ${recall.distribution_pattern || 'N/A'}`,
+      `Freiwillig/Verpflichtend: ${recall.voluntary_mandated || 'N/A'}`
+    ];
+
+    if (recall.code_info) {
+      parts.push(`Code-Info: ${recall.code_info}`);
+    }
+
+    return parts.join('\n');
+  }
+
+  private parseDate(dateString: string | undefined): Date | null {
+    if (!dateString) return null;
     
-    if (recall.product_description) parts.push(`**Product:** ${recall.product_description}`);
-    if (recall.reason_for_recall) parts.push(`**Recall Reason:** ${recall.reason_for_recall}`);
-    if (recall.recalling_firm) parts.push(`**Recalling Firm:** ${recall.recalling_firm}`);
-    if (recall.classification) parts.push(`**Classification:** ${recall.classification}`);
-    if (recall.status) parts.push(`**Status:** ${recall.status}`);
-    if (recall.voluntary_mandated) parts.push(`**Type:** ${recall.voluntary_mandated}`);
-    if (recall.distribution_pattern) parts.push(`**Distribution:** ${recall.distribution_pattern}`);
-    if (recall.product_quantity) parts.push(`**Quantity:** ${recall.product_quantity}`);
-    if (recall.code_info) parts.push(`**Code Info:** ${recall.code_info}`);
-    
-    return parts.join('\n\n');
-  }
-
-  private determinePriority(device: FDADevice): 'low' | 'medium' | 'high' | 'critical' {
-    if (device.expedited_review_flag === 'Y') return 'high';
-    if (device.openfda?.device_class === 'III') return 'high';
-    if (device.openfda?.device_class === 'II') return 'medium';
-    return 'low';
-  }
-
-  private determineRecallPriority(recall: FDARecall): 'low' | 'medium' | 'high' | 'critical' {
-    if (recall.classification === 'Class I') return 'critical';
-    if (recall.classification === 'Class II') return 'high';
-    if (recall.classification === 'Class III') return 'medium';
-    return 'low';
-  }
-
-  private parseDate(dateString?: string): Date {
-    if (!dateString) return new Date();
-    
-    // FDA dates are typically in YYYY-MM-DD format
-    const parsed = new Date(dateString);
-    return isNaN(parsed.getTime()) ? new Date() : parsed;
-  }
-
-  async syncFDAData(): Promise<void> {
     try {
-      console.log('[FDA API] Starting comprehensive FDA data sync');
-      
-      // Collect latest 510(k) clearances
-      await this.collect510kDevices(50);
-      
-      // Collect latest recalls
-      await this.collectRecalls(25);
-      
-      console.log('[FDA API] FDA data sync completed successfully');
-    } catch (error) {
-      console.error('[FDA API] FDA data sync failed:', error);
-      throw error;
+      return new Date(dateString);
+    } catch {
+      return null;
     }
   }
+
+  private determinePriority(device: FDADevice): 'critical' | 'high' | 'medium' | 'low' {
+    const deviceClass = device.openfda?.device_class;
+    const deviceName = device.device_name?.toLowerCase() || '';
+    
+    // High-risk devices
+    if (deviceClass === 'Class III' || 
+        deviceName.includes('implant') || 
+        deviceName.includes('pacemaker') ||
+        deviceName.includes('defibrillator')) {
+      return 'critical';
+    }
+    
+    // AI/ML devices
+    if (deviceName.includes('ai') || 
+        deviceName.includes('artificial intelligence') ||
+        deviceName.includes('machine learning')) {
+      return 'high';
+    }
+    
+    // Class II devices
+    if (deviceClass === 'Class II') {
+      return 'medium';
+    }
+    
+    return 'low';
+  }
+
+  private determineRecallPriority(recall: FDARecall): 'critical' | 'high' | 'medium' | 'low' {
+    const classification = recall.classification?.toLowerCase() || '';
+    const reason = recall.reason_for_recall?.toLowerCase() || '';
+    
+    // Class I recalls (most serious)
+    if (classification.includes('class i') || 
+        reason.includes('death') || 
+        reason.includes('serious injury')) {
+      return 'critical';
+    }
+    
+    // Class II recalls
+    if (classification.includes('class ii')) {
+      return 'high';
+    }
+    
+    // Class III recalls
+    if (classification.includes('class iii')) {
+      return 'medium';
+    }
+    
+    return 'medium'; // Default for recalls
+  }
+
+  private async categorizeDevice(device: FDADevice): Promise<string[]> {
+    const categories: string[] = [];
+    const deviceName = device.device_name?.toLowerCase() || '';
+    const specialty = device.openfda?.medical_specialty_description?.toLowerCase() || '';
+    
+    // Medical specialties
+    if (specialty.includes('cardio')) categories.push('Kardiologie');
+    if (specialty.includes('neuro')) categories.push('Neurologie');
+    if (specialty.includes('ortho')) categories.push('Orthopädie');
+    if (specialty.includes('radio')) categories.push('Radiologie');
+    
+    // Device types
+    if (deviceName.includes('software') || deviceName.includes('ai')) {
+      categories.push('Software-Medizinprodukt');
+    }
+    if (deviceName.includes('implant')) categories.push('Implantat');
+    if (deviceName.includes('monitor')) categories.push('Monitoring');
+    if (deviceName.includes('diagnostic')) categories.push('Diagnostik');
+    
+    // Default category
+    if (categories.length === 0) {
+      categories.push('Medizinprodukt');
+    }
+    
+    return categories;
+  }
 }
+
+export const fdaOpenApiService = new FDAOpenAPIService();

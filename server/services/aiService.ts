@@ -1,610 +1,340 @@
 import { storage } from "../storage";
-import type { AiTask, Product, Order, Customer, MarketingCampaign } from "@shared/schema";
+import type { RegulatoryUpdate } from "@shared/schema";
 
 export class AIService {
   
-  // Product optimization using AI
-  async optimizeProduct(productId: string): Promise<any> {
+  // Enhanced regulatory content analysis
+  async analyzeRegulatoryContent(content: string): Promise<{
+    categories: string[];
+    confidence: number;
+    deviceTypes: string[];
+    riskLevel: string;
+    therapeuticArea: string;
+    complianceRequirements: string[];
+  }> {
     try {
-      const product = await storage.getProductById(productId);
-      if (!product) {
-        throw new Error("Product not found");
+      const normalizedContent = content.toLowerCase();
+      
+      const categories: string[] = [];
+      const deviceTypes: string[] = [];
+      const complianceRequirements: string[] = [];
+      let riskLevel = 'medium';
+      let confidence = 0;
+      let therapeuticArea = 'general';
+
+      // Device type analysis
+      const deviceTypeKeywords = [
+        'diagnostic', 'therapeutic', 'surgical', 'monitoring', 'imaging',
+        'implantable', 'prosthetic', 'orthopedic', 'cardiovascular', 'neurological',
+        'ophthalmic', 'dental', 'dermatological', 'respiratory', 'anesthesia',
+        'infusion pump', 'defibrillator', 'pacemaker', 'catheter', 'stent',
+        'artificial intelligence', 'machine learning', 'software', 'mobile app'
+      ];
+
+      for (const deviceType of deviceTypeKeywords) {
+        if (normalizedContent.includes(deviceType.toLowerCase())) {
+          deviceTypes.push(deviceType);
+          confidence += 0.1;
+        }
       }
 
-      // Simulate AI optimization
-      const optimization = {
-        title: this.optimizeTitle(product.name),
-        description: this.optimizeDescription(product.description || ""),
-        price: this.optimizePrice(product.price, product.cost),
-        tags: this.generateTags(product.name, product.description || ""),
-        seoTitle: this.generateSeoTitle(product.name),
-        seoDescription: this.generateSeoDescription(product.description || ""),
-        recommendedCategories: this.suggestCategories(product.name, product.description || ""),
-        marketingCopy: this.generateMarketingCopy(product.name, product.description || ""),
+      // Risk level analysis
+      if (normalizedContent.includes('class iii') || normalizedContent.includes('implantable') || 
+          normalizedContent.includes('life-sustaining') || normalizedContent.includes('critical')) {
+        riskLevel = 'high';
+        confidence += 0.3;
+      } else if (normalizedContent.includes('class ii') || normalizedContent.includes('monitoring')) {
+        riskLevel = 'medium';
+        confidence += 0.2;
+      } else if (normalizedContent.includes('class i') || normalizedContent.includes('non-invasive')) {
+        riskLevel = 'low';
+        confidence += 0.1;
+      }
+
+      // Therapeutic area analysis
+      const therapeuticAreas = [
+        'cardiology', 'neurology', 'oncology', 'orthopedics', 'ophthalmology',
+        'gastroenterology', 'urology', 'gynecology', 'dermatology', 'endocrinology'
+      ];
+
+      for (const area of therapeuticAreas) {
+        if (normalizedContent.includes(area.toLowerCase())) {
+          therapeuticArea = area;
+          categories.push(area);
+          confidence += 0.1;
+          break;
+        }
+      }
+
+      // Compliance requirements analysis
+      const complianceTerms = [
+        'cybersecurity', 'clinical evaluation', 'post-market surveillance',
+        'quality management', 'risk management', 'biocompatibility',
+        'software lifecycle', 'usability engineering', 'clinical investigation'
+      ];
+
+      for (const term of complianceTerms) {
+        if (normalizedContent.includes(term.toLowerCase())) {
+          complianceRequirements.push(term);
+          confidence += 0.1;
+        }
+      }
+
+      // Special categories
+      if (normalizedContent.includes('ai') || normalizedContent.includes('artificial intelligence')) {
+        categories.push('AI/ML Technology');
+        confidence += 0.2;
+      }
+
+      if (normalizedContent.includes('recall') || normalizedContent.includes('safety alert')) {
+        categories.push('Safety Alert');
+        confidence += 0.3;
+      }
+
+      // Ensure minimum categorization
+      if (categories.length === 0) {
+        categories.push('Medical Device');
+        confidence = Math.max(confidence, 0.5);
+      }
+
+      if (deviceTypes.length === 0) {
+        deviceTypes.push('Medical Device');
+      }
+
+      return {
+        categories: Array.from(new Set(categories)),
+        confidence: Math.min(confidence, 1.0),
+        deviceTypes: Array.from(new Set(deviceTypes)),
+        riskLevel,
+        therapeuticArea,
+        complianceRequirements: Array.from(new Set(complianceRequirements))
       };
-
-      // Update product with AI optimizations
-      await storage.updateProduct(productId, {
-        name: optimization.title,
-        description: optimization.description,
-        price: optimization.price.toString(),
-        tags: optimization.tags,
-        seoTitle: optimization.seoTitle,
-        seoDescription: optimization.seoDescription,
-        aiOptimized: true,
-      });
-
-      return optimization;
     } catch (error) {
-      // console.error("Error optimizing product:", error);
+      console.error("Error analyzing regulatory content:", error);
       throw error;
     }
   }
 
-  // Order processing automation
-  async processOrder(orderId: string): Promise<any> {
+  // Regulatory update prioritization
+  async prioritizeRegulatoryUpdate(update: RegulatoryUpdate): Promise<{
+    priority: 'critical' | 'high' | 'medium' | 'low';
+    reasoning: string;
+    actionItems: string[];
+  }> {
     try {
-      const order = await storage.getOrderById(orderId);
-      if (!order) {
-        throw new Error("Order not found");
+      const analysis = await this.analyzeRegulatoryContent(
+        `${update.title} ${update.description || ''}`
+      );
+
+      let priority: 'critical' | 'high' | 'medium' | 'low' = 'medium';
+      const reasoning: string[] = [];
+      const actionItems: string[] = [];
+
+      // Critical priority factors
+      if (analysis.categories.includes('Safety Alert') || 
+          update.updateType === 'recall' ||
+          analysis.riskLevel === 'high') {
+        priority = 'critical';
+        reasoning.push('Sicherheitsrelevante Inhalte oder Hochrisiko-Geräte');
+        actionItems.push('Sofortige Überprüfung der betroffenen Produkte');
+        actionItems.push('Benachrichtigung der relevanten Teams');
       }
 
-      const orderItems = await storage.getOrderItems(orderId);
+      // High priority factors
+      else if (analysis.categories.includes('AI/ML Technology') ||
+               update.region === 'EU' && analysis.complianceRequirements.length > 2 ||
+               analysis.confidence > 0.8) {
+        priority = 'high';
+        reasoning.push('Neue Technologien oder umfangreiche Compliance-Anforderungen');
+        actionItems.push('Detaillierte Analyse der Auswirkungen');
+        actionItems.push('Aktualisierung der internen Richtlinien prüfen');
+      }
 
-      // Fraud detection
-      const fraudScore = this.calculateFraudScore(order);
+      // Medium priority (default)
+      else if (analysis.confidence > 0.5) {
+        priority = 'medium';
+        reasoning.push('Standardmäßige regulatorische Änderungen');
+        actionItems.push('Routinemäßige Überprüfung einplanen');
+      }
+
+      // Low priority
+      else {
+        priority = 'low';
+        reasoning.push('Geringfügige oder allgemeine Informationen');
+        actionItems.push('Zur Kenntnisnahme archivieren');
+      }
+
+      return {
+        priority,
+        reasoning: reasoning.join('; '),
+        actionItems
+      };
+    } catch (error) {
+      console.error("Error prioritizing regulatory update:", error);
+      return {
+        priority: 'medium',
+        reasoning: 'Automatische Priorisierung fehlgeschlagen',
+        actionItems: ['Manuelle Überprüfung erforderlich']
+      };
+    }
+  }
+
+  // Legal case analysis
+  async analyzeLegalCase(caseData: {
+    title: string;
+    summary: string;
+    keyIssues: string[];
+  }): Promise<{
+    themes: string[];
+    riskAssessment: string;
+    precedentValue: 'high' | 'medium' | 'low';
+    actionItems: string[];
+  }> {
+    try {
+      const searchText = `${caseData.title} ${caseData.summary} ${caseData.keyIssues.join(' ')}`.toLowerCase();
       
-      // Inventory validation
-      const inventoryCheck = await this.validateInventory(orderItems);
-      
-      // Supplier order automation
-      const supplierOrders = await this.createSupplierOrders(orderItems);
-      
-      // Update order status based on AI analysis
-      let newStatus = order.status;
-      if (fraudScore < 0.3 && inventoryCheck.allAvailable) {
-        newStatus = "processing";
-        
-        // Auto-approve low-risk orders
-        await storage.updateOrder(orderId, {
-          status: newStatus,
-          aiProcessed: true,
-          supplierOrderData: supplierOrders,
-        });
+      const themes: string[] = [];
+      let precedentValue: 'high' | 'medium' | 'low' = 'medium';
+      const actionItems: string[] = [];
+
+      // Legal theme detection
+      const legalThemes = {
+        'Produkthaftung': ['product liability', 'defective device', 'manufacturer liability'],
+        'Regulatorische Compliance': ['FDA violation', 'regulatory breach', 'compliance failure'],
+        'Klinische Studien': ['clinical trial', 'informed consent', 'ethics committee'],
+        'Patente': ['patent infringement', 'intellectual property', 'licensing'],
+        'Datenschutz': ['GDPR', 'DSGVO', 'data protection', 'privacy'],
+        'KI/ML-Geräte': ['artificial intelligence', 'machine learning', 'AI device']
+      };
+
+      for (const [theme, keywords] of Object.entries(legalThemes)) {
+        if (keywords.some(keyword => searchText.includes(keyword.toLowerCase()))) {
+          themes.push(theme);
+        }
+      }
+
+      // Precedent value assessment
+      if (themes.includes('Produkthaftung') || themes.includes('Regulatorische Compliance')) {
+        precedentValue = 'high';
+        actionItems.push('Überprüfung der aktuellen Compliance-Maßnahmen');
+        actionItems.push('Risikoanalyse für ähnliche Produkte');
+      } else if (themes.includes('KI/ML-Geräte') || themes.includes('Datenschutz')) {
+        precedentValue = 'high';
+        actionItems.push('Bewertung der Auswirkungen auf digitale Gesundheitslösungen');
+      } else if (themes.length > 0) {
+        precedentValue = 'medium';
+        actionItems.push('Monitoring ähnlicher Fälle');
       } else {
-        // Flag for manual review
-        newStatus = "pending";
-        await storage.updateOrder(orderId, {
-          status: newStatus,
-          notes: `AI Review: Fraud Score: ${fraudScore}, Inventory: ${inventoryCheck.message}`,
-        });
+        precedentValue = 'low';
+        actionItems.push('Zur Kenntnisnahme archivieren');
       }
 
+      const riskAssessment = precedentValue === 'high' 
+        ? 'Hohes Risiko - Sofortige Maßnahmen erforderlich'
+        : precedentValue === 'medium'
+        ? 'Mittleres Risiko - Regelmäßige Überwachung'
+        : 'Geringes Risiko - Allgemeine Beobachtung';
+
       return {
-        fraudScore,
-        inventoryCheck,
-        supplierOrders,
-        newStatus,
-        autoProcessed: fraudScore < 0.3 && inventoryCheck.allAvailable,
+        themes: themes.length > 0 ? themes : ['Allgemein'],
+        riskAssessment,
+        precedentValue,
+        actionItems
       };
     } catch (error) {
-      // console.error("Error processing order:", error);
-      throw error;
+      console.error("Error analyzing legal case:", error);
+      return {
+        themes: ['Analysefehler'],
+        riskAssessment: 'Manuelle Überprüfung erforderlich',
+        precedentValue: 'medium',
+        actionItems: ['Detaillierte manuelle Analyse durchführen']
+      };
     }
   }
 
-  // Customer service automation
-  async handleCustomerService(conversationId: string, customerMessage: string): Promise<any> {
+  // Market trend analysis
+  async analyzeMarketTrends(regulatoryUpdates: RegulatoryUpdate[]): Promise<{
+    emergingTrends: string[];
+    deviceTypeTrends: { [key: string]: number };
+    regionActivity: { [key: string]: number };
+    recommendations: string[];
+  }> {
     try {
-      const conversation = await storage.getConversationById(conversationId);
-      if (!conversation) {
-        throw new Error("Conversation not found");
-      }
+      const emergingTrends: string[] = [];
+      const deviceTypeTrends: { [key: string]: number } = {};
+      const regionActivity: { [key: string]: number } = {};
+      const recommendations: string[] = [];
 
-      // Analyze customer message
-      const analysis = this.analyzeCustomerMessage(customerMessage);
-      
-      // Generate AI response
-      let aiResponse = "";
-      let shouldEscalate = false;
-
-      switch (analysis.intent) {
-        case "order_status":
-          aiResponse = await this.generateOrderStatusResponse(analysis.extractedData);
-          break;
-        case "refund_request":
-          aiResponse = await this.generateRefundResponse(analysis.extractedData);
-          shouldEscalate = true;
-          break;
-        case "product_inquiry":
-          aiResponse = await this.generateProductInquiryResponse(analysis.extractedData);
-          break;
-        case "complaint":
-          aiResponse = await this.generateComplaintResponse(analysis.extractedData);
-          shouldEscalate = analysis.sentiment < 0.3;
-          break;
-        default:
-          aiResponse = "Vielen Dank für Ihre Nachricht. Wir werden Ihnen schnellstmöglich antworten.";
-          shouldEscalate = true;
-      }
-
-      // Create AI response message
-      await storage.createMessage({
-        conversationId,
-        senderId: "ai-assistant",
-        senderType: "ai",
-        content: aiResponse,
-        metadata: {
-          analysis,
-          autoGenerated: true,
-          confidence: analysis.confidence,
-        },
+      // Analyze recent updates (last 30 days)
+      const recentUpdates = regulatoryUpdates.filter(update => {
+        const updateDate = new Date(update.publishedAt);
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        return updateDate > thirtyDaysAgo;
       });
 
-      // Update conversation status if escalation needed
-      if (shouldEscalate) {
-        await storage.updateConversation(conversationId, {
-          assignedToAi: false,
-          priority: analysis.sentiment < 0.3 ? "high" : "medium",
-        });
+      // Count by region
+      for (const update of recentUpdates) {
+        regionActivity[update.region] = (regionActivity[update.region] || 0) + 1;
+      }
+
+      // Analyze content for trends
+      const aiMlCount = recentUpdates.filter(u => 
+        u.title.toLowerCase().includes('ai') || 
+        u.title.toLowerCase().includes('artificial intelligence') ||
+        u.description?.toLowerCase().includes('machine learning')
+      ).length;
+
+      const cybersecurityCount = recentUpdates.filter(u => 
+        u.title.toLowerCase().includes('cybersecurity') || 
+        u.description?.toLowerCase().includes('cyber')
+      ).length;
+
+      const digitalHealthCount = recentUpdates.filter(u => 
+        u.title.toLowerCase().includes('digital') || 
+        u.title.toLowerCase().includes('telemedicine') ||
+        u.description?.toLowerCase().includes('remote monitoring')
+      ).length;
+
+      // Identify emerging trends
+      if (aiMlCount > 3) {
+        emergingTrends.push('KI/ML-Regulierung verstärkt sich');
+        recommendations.push('Verstärkte Vorbereitung auf KI-Regulierung empfohlen');
+      }
+
+      if (cybersecurityCount > 2) {
+        emergingTrends.push('Erhöhte Cybersecurity-Anforderungen');
+        recommendations.push('Cybersecurity-Maßnahmen überprüfen und verstärken');
+      }
+
+      if (digitalHealthCount > 4) {
+        emergingTrends.push('Digitale Gesundheitslösungen im Fokus');
+        recommendations.push('Digitale Strategien entwickeln oder erweitern');
+      }
+
+      // Most active regions
+      const mostActiveRegion = Object.entries(regionActivity)
+        .sort(([,a], [,b]) => b - a)[0];
+
+      if (mostActiveRegion && mostActiveRegion[1] > 5) {
+        recommendations.push(`Erhöhte Aktivität in ${mostActiveRegion[0]} - Marktchancen prüfen`);
       }
 
       return {
-        response: aiResponse,
-        analysis,
-        escalated: shouldEscalate,
+        emergingTrends,
+        deviceTypeTrends,
+        regionActivity,
+        recommendations
       };
     } catch (error) {
-      // console.error("Error handling customer service:", error);
-      throw error;
-    }
-  }
-
-  // Marketing campaign generation
-  async generateMarketingCampaign(campaignType: string, targetAudience: any, budget: number): Promise<any> {
-    try {
-      // Generate AI-powered marketing content
-      const campaign = {
-        name: this.generateCampaignName(campaignType, targetAudience),
-        content: this.generateCampaignContent(campaignType, targetAudience),
-        targetingStrategy: this.generateTargetingStrategy(targetAudience),
-        budgetAllocation: this.optimizeBudgetAllocation(budget, campaignType),
-        schedule: this.generateOptimalSchedule(campaignType),
-        expectedMetrics: this.predictCampaignMetrics(campaignType, targetAudience, budget),
-      };
-
-      // Create marketing campaign
-      const createdCampaign = await storage.createMarketingCampaign({
-        name: campaign.name,
-        type: campaignType,
-        budget: budget.toString(),
-        targetAudience: targetAudience,
-        content: campaign.content,
-        aiGenerated: true,
-        status: "draft",
-      });
-
+      console.error("Error analyzing market trends:", error);
       return {
-        campaign: createdCampaign,
-        aiRecommendations: campaign,
+        emergingTrends: ['Analyse nicht verfügbar'],
+        deviceTypeTrends: {},
+        regionActivity: {},
+        recommendations: ['Manuelle Trendanalyse durchführen']
       };
-    } catch (error) {
-      // console.error("Error generating marketing campaign:", error);
-      throw error;
     }
-  }
-
-  // Customer segmentation
-  async analyzeCustomerSegmentation(): Promise<any> {
-    try {
-      const customers = await storage.getCustomers({ limit: 1000, offset: 0 });
-      
-      const segments = {
-        highValue: customers.filter(c => parseFloat(c.lifetimeValue || "0") > 1000),
-        frequent: customers.filter(c => (c.totalOrders || 0) > 5),
-        newCustomers: customers.filter(c => {
-          const createdDate = new Date(c.createdAt);
-          const thirtyDaysAgo = new Date();
-          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-          return createdDate > thirtyDaysAgo;
-        }),
-        atRisk: customers.filter(c => parseFloat(c.riskScore || "0") > 0.7),
-      };
-
-      // Update customer AI segments
-      for (const customer of customers) {
-        let segment = "standard";
-        if (segments.highValue.includes(customer)) segment = "high_value";
-        else if (segments.frequent.includes(customer)) segment = "frequent_buyer";
-        else if (segments.newCustomers.includes(customer)) segment = "new_customer";
-        else if (segments.atRisk.includes(customer)) segment = "at_risk";
-
-        await storage.updateCustomer(customer.id, { aiSegment: segment });
-      }
-
-      return {
-        totalCustomers: customers.length,
-        segments: {
-          highValue: segments.highValue.length,
-          frequent: segments.frequent.length,
-          newCustomers: segments.newCustomers.length,
-          atRisk: segments.atRisk.length,
-        },
-        recommendations: this.generateSegmentRecommendations(segments),
-      };
-    } catch (error) {
-      // console.error("Error analyzing customer segmentation:", error);
-      throw error;
-    }
-  }
-
-  // Price optimization
-  async optimizeProductPricing(): Promise<any> {
-    try {
-      const products = await storage.getProducts({ limit: 1000, offset: 0 });
-      const optimizations = [];
-
-      for (const product of products) {
-        const currentPrice = parseFloat(product.price);
-        const cost = parseFloat(product.cost);
-        
-        // AI-based price optimization
-        const competitorPrice = this.getEstimatedCompetitorPrice(product.name);
-        const demandElasticity = this.calculateDemandElasticity(product);
-        const optimalPrice = this.calculateOptimalPrice(cost, competitorPrice, demandElasticity);
-        
-        if (Math.abs(optimalPrice - currentPrice) > 0.1) {
-          optimizations.push({
-            productId: product.id,
-            currentPrice,
-            suggestedPrice: optimalPrice,
-            expectedImpact: this.calculatePriceImpact(currentPrice, optimalPrice),
-          });
-
-          // Auto-update prices for small adjustments (< 10%)
-          const priceChange = Math.abs((optimalPrice - currentPrice) / currentPrice);
-          if (priceChange < 0.1) {
-            await storage.updateProduct(product.id, {
-              price: optimalPrice.toString(),
-              compareAtPrice: currentPrice.toString(),
-            });
-          }
-        }
-      }
-
-      return {
-        totalProductsAnalyzed: products.length,
-        optimizationsFound: optimizations.length,
-        optimizations,
-        autoUpdated: optimizations.filter(o => Math.abs((o.suggestedPrice - o.currentPrice) / o.currentPrice) < 0.1).length,
-      };
-    } catch (error) {
-      // console.error("Error optimizing product pricing:", error);
-      throw error;
-    }
-  }
-
-  // Inventory management
-  async optimizeInventory(): Promise<any> {
-    try {
-      const products = await storage.getProducts({ limit: 1000, offset: 0 });
-      const recommendations = [];
-
-      for (const product of products) {
-        const forecast = this.forecastDemand(product);
-        const reorderPoint = this.calculateReorderPoint(product, forecast);
-        const optimalStock = this.calculateOptimalStockLevel(product, forecast);
-
-        if (product.inventory < reorderPoint) {
-          recommendations.push({
-            productId: product.id,
-            productName: product.name,
-            currentStock: product.inventory,
-            reorderPoint,
-            suggestedOrder: optimalStock - product.inventory,
-            urgency: product.inventory < product.lowStockThreshold ? "high" : "medium",
-            forecast,
-          });
-        }
-      }
-
-      return {
-        totalProducts: products.length,
-        lowStockProducts: recommendations.length,
-        recommendations,
-        totalRecommendedOrders: recommendations.reduce((sum, r) => sum + r.suggestedOrder, 0),
-      };
-    } catch (error) {
-      // console.error("Error optimizing inventory:", error);
-      throw error;
-    }
-  }
-
-  // Helper methods for AI functionality
-  private optimizeTitle(title: string): string {
-    // Simple title optimization
-    return title
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ')
-      .replace(/\b(und|oder|der|die|das|ein|eine)\b/gi, (match) => match.toLowerCase());
-  }
-
-  private optimizeDescription(description: string): string {
-    if (!description) return "";
-    
-    // Enhance description with selling points
-    const sellingPoints = [
-      "Hochwertige Qualität",
-      "Schneller Versand",
-      "Kundenservice",
-      "Zufriedenheitsgarantie"
-    ];
-    
-    return `${description}\n\n✓ ${sellingPoints.join('\n✓ ')}`;
-  }
-
-  private optimizePrice(currentPrice: string, cost: string): string {
-    const price = parseFloat(currentPrice);
-    const productCost = parseFloat(cost);
-    
-    // Ensure minimum 40% margin
-    const minPrice = productCost * 1.4;
-    const psychologicalPrice = Math.ceil(Math.max(price, minPrice) * 0.99) - 0.01;
-    
-    return psychologicalPrice.toFixed(2);
-  }
-
-  private generateTags(name: string, description: string): string[] {
-    const text = `${name} ${description}`.toLowerCase();
-    const commonTags = ["hochwertig", "beliebt", "bestseller", "empfohlen"];
-    
-    return commonTags.filter(() => Math.random() > 0.5).slice(0, 3);
-  }
-
-  private generateSeoTitle(name: string): string {
-    return `${name} - Jetzt günstig online kaufen | Dropship Store`;
-  }
-
-  private generateSeoDescription(description: string): string {
-    const short = description.substring(0, 150);
-    return `${short}... ✓ Schneller Versand ✓ Beste Preise ✓ Zufriedenheitsgarantie. Jetzt bestellen!`;
-  }
-
-  private suggestCategories(name: string, description: string): string[] {
-    // Simple category suggestion based on keywords
-    const text = `${name} ${description}`.toLowerCase();
-    const categories = [];
-    
-    if (text.includes("elektronik") || text.includes("tech")) categories.push("Elektronik");
-    if (text.includes("kleidung") || text.includes("fashion")) categories.push("Kleidung");
-    if (text.includes("haus") || text.includes("home")) categories.push("Haushalt");
-    
-    return categories;
-  }
-
-  private generateMarketingCopy(name: string, description: string): string {
-    return `🔥 EXKLUSIV: ${name}\n\n${description}\n\n💫 Limitiertes Angebot - Nur solange der Vorrat reicht!\n📦 Kostenloser Versand ab 50€\n🚀 Blitzschnelle Lieferung`;
-  }
-
-  private calculateFraudScore(order: any): number {
-    // Simple fraud scoring algorithm
-    let score = 0;
-    
-    // High order value increases risk
-    if (parseFloat(order.totalAmount) > 500) score += 0.2;
-    
-    // New customer increases risk
-    if (!order.userId) score += 0.3;
-    
-    // Different billing/shipping addresses
-    if (order.billingAddress !== order.shippingAddress) score += 0.1;
-    
-    return Math.min(score, 1.0);
-  }
-
-  private async validateInventory(orderItems: any[]): Promise<{ allAvailable: boolean; message: string }> {
-    for (const item of orderItems) {
-      const product = await storage.getProductById(item.productId);
-      if (!product || product.inventory < item.quantity) {
-        return {
-          allAvailable: false,
-          message: `Insufficient inventory for product ${item.productId}`,
-        };
-      }
-    }
-    
-    return { allAvailable: true, message: "All items available" };
-  }
-
-  private async createSupplierOrders(orderItems: any[]): Promise<any> {
-    const supplierOrders = {};
-    
-    for (const item of orderItems) {
-      const product = await storage.getProductById(item.productId);
-      if (product && product.supplierId) {
-        if (!supplierOrders[product.supplierId]) {
-          supplierOrders[product.supplierId] = {
-            supplierId: product.supplierId,
-            items: [],
-            status: "pending",
-          };
-        }
-        
-        supplierOrders[product.supplierId].items.push({
-          productId: product.id,
-          supplierSku: product.supplierSku,
-          quantity: item.quantity,
-          unitPrice: product.cost,
-        });
-      }
-    }
-    
-    return Object.values(supplierOrders);
-  }
-
-  private analyzeCustomerMessage(message: string): any {
-    const text = message.toLowerCase();
-    
-    let intent = "general";
-    let sentiment = 0.5;
-    let confidence = 0.7;
-    let extractedData = {};
-    
-    // Simple intent recognition
-    if (text.includes("bestellung") || text.includes("order")) {
-      intent = "order_status";
-      extractedData = { orderNumber: this.extractOrderNumber(text) };
-    } else if (text.includes("rückerstattung") || text.includes("refund")) {
-      intent = "refund_request";
-      sentiment = 0.3;
-    } else if (text.includes("produkt") || text.includes("article")) {
-      intent = "product_inquiry";
-    } else if (text.includes("beschwerde") || text.includes("problem")) {
-      intent = "complaint";
-      sentiment = 0.2;
-      confidence = 0.9;
-    }
-    
-    return { intent, sentiment, confidence, extractedData };
-  }
-
-  private extractOrderNumber(text: string): string | null {
-    const match = text.match(/ORD-\d+-[A-Z0-9]+/);
-    return match ? match[0] : null;
-  }
-
-  private async generateOrderStatusResponse(data: any): Promise<string> {
-    if (data.orderNumber) {
-      const order = await storage.getOrderByNumber(data.orderNumber);
-      if (order) {
-        return `Ihre Bestellung ${data.orderNumber} hat den Status: ${order.status}. ${order.trackingNumber ? `Sendungsverfolgung: ${order.trackingNumber}` : 'Tracking-Informationen folgen in Kürze.'}`;
-      }
-    }
-    return "Gerne helfe ich Ihnen bei Ihrer Bestellung. Könnten Sie mir bitte Ihre Bestellnummer mitteilen?";
-  }
-
-  private async generateRefundResponse(data: any): Promise<string> {
-    return "Vielen Dank für Ihre Rückerstattungsanfrage. Wir werden diese umgehend prüfen und uns innerhalb von 24 Stunden bei Ihnen melden.";
-  }
-
-  private async generateProductInquiryResponse(data: any): Promise<string> {
-    return "Gerne beantworte ich Ihre Produktfragen. Welches Produkt interessiert Sie besonders?";
-  }
-
-  private async generateComplaintResponse(data: any): Promise<string> {
-    return "Es tut uns leid, dass Sie unzufrieden sind. Wir nehmen Ihr Feedback sehr ernst und werden uns umgehend um Ihr Anliegen kümmern.";
-  }
-
-  private generateCampaignName(type: string, audience: any): string {
-    const timestamp = new Date().toISOString().slice(0, 10);
-    return `AI-${type}-${audience.segment || 'general'}-${timestamp}`;
-  }
-
-  private generateCampaignContent(type: string, audience: any): any {
-    return {
-      headline: `Exklusive Angebote für ${audience.segment || 'unsere Kunden'}`,
-      body: "Entdecken Sie unsere neuesten Produkte mit unschlagbaren Preisen!",
-      cta: "Jetzt shoppen",
-      images: ["campaign-image-1.jpg"],
-    };
-  }
-
-  private generateTargetingStrategy(audience: any): any {
-    return {
-      demographics: audience,
-      interests: ["Shopping", "Technologie", "Lifestyle"],
-      behavior: ["Online-Käufer", "Deal-Sucher"],
-    };
-  }
-
-  private optimizeBudgetAllocation(budget: number, type: string): any {
-    return {
-      adSpend: budget * 0.7,
-      creative: budget * 0.2,
-      testing: budget * 0.1,
-    };
-  }
-
-  private generateOptimalSchedule(type: string): any {
-    return {
-      startDate: new Date(),
-      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-      optimalTimes: ["09:00", "12:00", "19:00"],
-    };
-  }
-
-  private predictCampaignMetrics(type: string, audience: any, budget: number): any {
-    return {
-      expectedReach: Math.floor(budget * 10),
-      expectedClicks: Math.floor(budget * 2),
-      expectedConversions: Math.floor(budget * 0.1),
-      expectedROI: 2.5,
-    };
-  }
-
-  private generateSegmentRecommendations(segments: any): any {
-    return {
-      highValue: "VIP-Programm einführen, exklusive Angebote",
-      frequent: "Treueprogramm, Mengenrabatte",
-      newCustomers: "Willkommensbonus, Onboarding-Serie",
-      atRisk: "Reaktivierungskampagne, persönliche Ansprache",
-    };
-  }
-
-  private getEstimatedCompetitorPrice(productName: string): number {
-    // Simulate competitor price analysis
-    return Math.random() * 100 + 20;
-  }
-
-  private calculateDemandElasticity(product: any): number {
-    // Simulate demand elasticity calculation
-    return -0.5 - Math.random() * 1.5;
-  }
-
-  private calculateOptimalPrice(cost: number, competitorPrice: number, elasticity: number): number {
-    // Simple optimal pricing algorithm
-    const markup = 1.4; // 40% minimum markup
-    const minPrice = cost * markup;
-    const marketPrice = competitorPrice * 0.95; // 5% under competitor
-    
-    return Math.max(minPrice, marketPrice);
-  }
-
-  private calculatePriceImpact(currentPrice: number, newPrice: number): any {
-    const change = (newPrice - currentPrice) / currentPrice;
-    return {
-      priceChange: change,
-      expectedVolumeChange: change * -1.5, // Price elasticity assumption
-      expectedRevenueChange: change + (change * -1.5),
-    };
-  }
-
-  private forecastDemand(product: any): any {
-    // Simple demand forecasting
-    const baselineDemand = Math.floor(Math.random() * 20) + 5;
-    return {
-      daily: baselineDemand,
-      weekly: baselineDemand * 7,
-      monthly: baselineDemand * 30,
-    };
-  }
-
-  private calculateReorderPoint(product: any, forecast: any): number {
-    const leadTime = 7; // 7 days lead time
-    const safetyStock = forecast.daily * 3; // 3 days safety stock
-    return (forecast.daily * leadTime) + safetyStock;
-  }
-
-  private calculateOptimalStockLevel(product: any, forecast: any): number {
-    const monthlyDemand = forecast.monthly;
-    const orderingCost = 50; // Fixed ordering cost
-    const holdingCostRate = 0.2; // 20% annual holding cost
-    const unitCost = parseFloat(product.cost);
-    
-    // Economic Order Quantity (EOQ) formula
-    const eoq = Math.sqrt((2 * monthlyDemand * orderingCost) / (holdingCostRate * unitCost));
-    return Math.ceil(eoq);
   }
 }
 

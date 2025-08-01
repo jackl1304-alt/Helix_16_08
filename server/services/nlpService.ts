@@ -3,6 +3,7 @@ interface CategoryResult {
   confidence: number;
   deviceTypes: string[];
   riskLevel: string;
+  therapeuticArea: string;
 }
 
 class NLPService {
@@ -39,6 +40,7 @@ class NLPService {
     const deviceTypes: string[] = [];
     let riskLevel = 'medium';
     let confidence = 0;
+    let therapeuticArea = 'general';
 
     // Identify device types
     for (const deviceType of this.medtechKeywords.deviceTypes) {
@@ -52,6 +54,7 @@ class NLPService {
     for (const area of this.medtechKeywords.therapeuticAreas) {
       if (normalizedContent.includes(area.toLowerCase())) {
         categories.push(area);
+        therapeuticArea = area;
         confidence += 0.1;
       }
     }
@@ -97,6 +100,16 @@ class NLPService {
       confidence += 0.3;
     }
 
+    if (normalizedContent.includes('mdr') || normalizedContent.includes('medical device regulation')) {
+      categories.push('MDR Compliance');
+      confidence += 0.2;
+    }
+
+    if (normalizedContent.includes('fda') || normalizedContent.includes('510k') || normalizedContent.includes('pma')) {
+      categories.push('FDA Regulation');
+      confidence += 0.2;
+    }
+
     // Ensure we have at least some basic categorization
     if (categories.length === 0) {
       categories.push('General MedTech');
@@ -111,7 +124,8 @@ class NLPService {
       categories: Array.from(new Set(categories)), // Remove duplicates
       confidence: Math.min(confidence, 1.0),
       deviceTypes: Array.from(new Set(deviceTypes)),
-      riskLevel
+      riskLevel,
+      therapeuticArea
     };
   }
 
@@ -125,7 +139,8 @@ class NLPService {
     // Extract key sentences (simple heuristic: sentences with important keywords)
     const importantKeywords = [
       'guidance', 'requirement', 'standard', 'compliance', 'approval', 'clearance',
-      'recall', 'safety', 'risk', 'clinical', 'regulatory', 'fda', 'ema', 'ce mark'
+      'recall', 'safety', 'risk', 'clinical', 'regulatory', 'fda', 'ema', 'ce mark',
+      'mdr', 'cybersecurity', 'artificial intelligence', 'machine learning'
     ];
     
     const keyPoints = sentences.filter(sentence => {
@@ -138,8 +153,8 @@ class NLPService {
     const entities = Array.from(new Set(content.match(entityPattern) || []));
 
     // Simple sentiment analysis based on keywords
-    const positiveWords = ['approval', 'clearance', 'authorized', 'improved', 'enhanced', 'breakthrough'];
-    const negativeWords = ['recall', 'violation', 'warning', 'denied', 'rejected', 'risk', 'adverse'];
+    const positiveWords = ['approval', 'clearance', 'authorized', 'improved', 'enhanced', 'breakthrough', 'innovation'];
+    const negativeWords = ['recall', 'violation', 'warning', 'denied', 'rejected', 'risk', 'adverse', 'violation'];
     
     const lowerContent = content.toLowerCase();
     const positiveCount = positiveWords.filter(word => lowerContent.includes(word)).length;
@@ -171,7 +186,7 @@ class NLPService {
       if (index < 2) score += 2;
       
       // Sentences with key terms are more important
-      const keyTerms = ['guidance', 'requirement', 'approval', 'recall', 'standard', 'compliance', 'fda', 'ema'];
+      const keyTerms = ['guidance', 'requirement', 'approval', 'recall', 'standard', 'compliance', 'fda', 'ema', 'mdr'];
       keyTerms.forEach(term => {
         if (sentence.toLowerCase().includes(term)) score += 1;
       });
@@ -187,14 +202,91 @@ class NLPService {
     
     let summary = '';
     for (const item of scoredSentences) {
-      if (summary.length + item.sentence.length + 2 <= maxLength) {
+      if (summary.length + item.sentence.length <= maxLength) {
         summary += (summary ? '. ' : '') + item.sentence;
       } else {
         break;
       }
     }
-
+    
     return summary || content.substring(0, maxLength);
+  }
+
+  async detectRegulatoryCompliance(content: string): Promise<{
+    complianceAreas: string[];
+    requirements: string[];
+    risks: string[];
+    recommendations: string[];
+  }> {
+    const normalizedContent = content.toLowerCase();
+    
+    const complianceAreas: string[] = [];
+    const requirements: string[] = [];
+    const risks: string[] = [];
+    const recommendations: string[] = [];
+
+    // Detect compliance areas
+    const compliancePatterns = {
+      'MDR': ['mdr', 'medical device regulation', 'eu 2017/745'],
+      'FDA': ['fda', '510k', 'pma', 'de novo'],
+      'ISO 13485': ['iso 13485', 'quality management'],
+      'ISO 14971': ['iso 14971', 'risk management'],
+      'IEC 62304': ['iec 62304', 'software lifecycle'],
+      'Cybersecurity': ['cybersecurity', 'cyber security', 'data protection'],
+      'Clinical Evaluation': ['clinical evaluation', 'clinical data', 'clinical investigation']
+    };
+
+    for (const [area, patterns] of Object.entries(compliancePatterns)) {
+      if (patterns.some(pattern => normalizedContent.includes(pattern))) {
+        complianceAreas.push(area);
+      }
+    }
+
+    // Detect requirements
+    if (normalizedContent.includes('clinical evaluation')) {
+      requirements.push('Klinische Bewertung erforderlich');
+    }
+    if (normalizedContent.includes('post-market surveillance')) {
+      requirements.push('Post-Market Surveillance implementieren');
+    }
+    if (normalizedContent.includes('risk management')) {
+      requirements.push('Risikomanagement nach ISO 14971');
+    }
+    if (normalizedContent.includes('cybersecurity')) {
+      requirements.push('Cybersecurity-Maßnahmen implementieren');
+    }
+
+    // Detect risks
+    if (normalizedContent.includes('recall') || normalizedContent.includes('warning')) {
+      risks.push('Sicherheitsrisiko - Überwachung erforderlich');
+    }
+    if (normalizedContent.includes('non-compliance') || normalizedContent.includes('violation')) {
+      risks.push('Compliance-Risiko - Sofortige Maßnahmen erforderlich');
+    }
+    if (normalizedContent.includes('ai') || normalizedContent.includes('machine learning')) {
+      risks.push('KI-Risiko - Spezielle Regulierung beachten');
+    }
+
+    // Generate recommendations
+    if (complianceAreas.includes('MDR')) {
+      recommendations.push('MDR-Compliance überprüfen und dokumentieren');
+    }
+    if (complianceAreas.includes('FDA')) {
+      recommendations.push('FDA-Submission-Strategie entwickeln');
+    }
+    if (complianceAreas.includes('Cybersecurity')) {
+      recommendations.push('Cybersecurity-Assessment durchführen');
+    }
+    if (risks.length > 0) {
+      recommendations.push('Risikobewertung aktualisieren');
+    }
+
+    return {
+      complianceAreas,
+      requirements,
+      risks,
+      recommendations
+    };
   }
 }
 
