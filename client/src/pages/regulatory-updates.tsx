@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { PageLayout, SectionCard } from "@/components/ui/page-layout";
 import { FilterBar } from "@/components/ui/filter-bar";
 import { DataTable } from "@/components/ui/data-table";
+import { AISummary } from "@/components/ai-summary";
 import { Bell, FileText, Download, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -296,6 +297,12 @@ Helix Regulatory Intelligence Platform
                   <DialogTitle className="text-xl font-bold">{update.title}</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-6">
+                  <AISummary 
+                    title={update.title}
+                    content={update.description}
+                    type="regulatory"
+                    priority={update.priority}
+                  />
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
                       <label className="text-sm font-medium text-gray-500">Region</label>
