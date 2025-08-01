@@ -289,181 +289,216 @@ EXPORT DETAILS:
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="min-w-[300px]">Update</TableHead>
-                      <TableHead className="w-20">Region</TableHead>
-                      <TableHead className="w-24">Typ</TableHead>
-                      <TableHead className="w-24">Priorität</TableHead>
-                      <TableHead className="w-32">Datum</TableHead>
-                      <TableHead className="w-32">Aktionen</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {isLoading ? (
-                      [...Array(5)].map((_, i) => (
-                        <TableRow key={i}>
-                          <TableCell colSpan={6}>
-                            <div className="h-16 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : filteredUpdates.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={6} className="text-center py-8">
-                          <AlertTriangle className="h-12 w-12 mx-auto mb-4 text-slate-400" />
-                          <p className="text-lg font-medium">Keine Updates gefunden</p>
-                          <p className="text-sm text-slate-600">Versuchen Sie andere Filterkriterien</p>
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      filteredUpdates.map((update) => (
-                        <TableRow key={update.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                          <TableCell>
-                            <div className="space-y-2">
-                              <p className="font-medium line-clamp-2">{update.title}</p>
-                              <FormattedText 
-                                content={update.description?.substring(0, 120) + '...' || 'Keine Beschreibung verfügbar'}
-                                className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2"
-                              />
-                              <div className="flex flex-wrap gap-1">
-                                {update.device_classes?.slice(0, 2).map((deviceClass, idx) => (
-                                  <Badge key={idx} variant="secondary" className="text-xs">
-                                    {deviceClass}
-                                  </Badge>
-                                ))}
-                                {update.device_classes?.length > 2 && (
-                                  <Badge variant="secondary" className="text-xs">
-                                    +{update.device_classes.length - 2}
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="text-xs">{update.region}</Badge>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="text-xs capitalize">{update.update_type}</Badge>
-                          </TableCell>
-                          <TableCell>
+              {isLoading ? (
+                <div className="space-y-4">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="p-6 border rounded-lg">
+                      <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-3" />
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-2" />
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse w-3/4" />
+                    </div>
+                  ))}
+                </div>
+              ) : filteredUpdates.length === 0 ? (
+                <div className="text-center py-12">
+                  <AlertTriangle className="h-16 w-16 mx-auto mb-4 text-slate-400" />
+                  <h3 className="text-xl font-semibold mb-2">Keine Updates gefunden</h3>
+                  <p className="text-slate-600 dark:text-slate-400">
+                    Versuchen Sie andere Filterkriterien oder erweitern Sie den Suchbereich.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredUpdates.map((update) => (
+                    <div 
+                      key={update.id} 
+                      className="p-6 border rounded-lg hover:shadow-md transition-all duration-200 bg-white dark:bg-slate-800/50"
+                    >
+                      <div className="flex items-start justify-between gap-4 mb-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
                             <Badge className={`${priorityColors[update.priority]} text-xs`}>
                               {priorityLabels[update.priority]}
                             </Badge>
-                          </TableCell>
-                          <TableCell className="text-xs">
-                            <div>{new Date(update.published_at).toLocaleDateString('de-DE')}</div>
-                            <div className="text-slate-500">
-                              {new Date(update.published_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
+                            <Badge variant="outline" className="text-xs">
+                              {update.region}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs capitalize">
+                              {update.update_type}
+                            </Badge>
+                          </div>
+                          <h3 className="text-lg font-semibold mb-2 line-clamp-2">
+                            {update.title}
+                          </h3>
+                          <FormattedText 
+                            content={update.description?.substring(0, 300) + '...' || 'Keine Beschreibung verfügbar'}
+                            className="text-sm text-slate-600 dark:text-slate-400 line-clamp-3 mb-3"
+                          />
+                          
+                          {update.device_classes && update.device_classes.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mb-3">
+                              <span className="text-xs text-slate-500 mr-2">Geräteklassen:</span>
+                              {update.device_classes.slice(0, 3).map((deviceClass, idx) => (
+                                <Badge key={idx} variant="secondary" className="text-xs">
+                                  {deviceClass}
+                                </Badge>
+                              ))}
+                              {update.device_classes.length > 3 && (
+                                <Badge variant="secondary" className="text-xs">
+                                  +{update.device_classes.length - 3}
+                                </Badge>
+                              )}
                             </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1">
-                              <Dialog>
-                                <DialogTrigger asChild>
-                                  <Button variant="outline" size="sm">
-                                    <Eye className="h-3 w-3" />
-                                  </Button>
-                                </DialogTrigger>
-                                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="dialog-description">
-                                  <DialogHeader>
-                                    <DialogTitle className="text-xl font-bold">{update.title}</DialogTitle>
-                                  </DialogHeader>
-                                  <div className="space-y-6">
-                                    <AISummary 
-                                      title={update.title}
-                                      content={update.description}
-                                      type="regulatory"
-                                      priority={update.priority}
-                                    />
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                      <div>
-                                        <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Region</label>
-                                        <p className="text-sm font-semibold">{update.region}</p>
-                                      </div>
-                                      <div>
-                                        <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Typ</label>
-                                        <p className="text-sm font-semibold capitalize">{update.update_type}</p>
-                                      </div>
-                                      <div>
-                                        <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Priorität</label>
-                                        <Badge className={priorityColors[update.priority]}>
-                                          {priorityLabels[update.priority]}
-                                        </Badge>
-                                      </div>
-                                      <div>
-                                        <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Veröffentlicht</label>
-                                        <p className="text-sm">{new Date(update.published_at).toLocaleDateString('de-DE')}</p>
-                                      </div>
-                                    </div>
-                                    
-                                    <div>
-                                      <h3 className="text-lg font-semibold mb-3">Vollständige Beschreibung</h3>
-                                      <FormattedText 
-                                        content={update.description || 'Keine detaillierte Beschreibung verfügbar.'}
-                                        className="text-sm leading-relaxed"
-                                      />
-                                    </div>
+                          )}
+                        </div>
+                        
+                        <div className="text-right text-sm text-slate-500">
+                          <div className="font-medium">
+                            {new Date(update.published_at).toLocaleDateString('de-DE')}
+                          </div>
+                          <div>
+                            {new Date(update.published_at).toLocaleTimeString('de-DE', { 
+                              hour: '2-digit', 
+                              minute: '2-digit' 
+                            })}
+                          </div>
+                        </div>
+                      </div>
 
-                                    {update.device_classes && update.device_classes.length > 0 && (
-                                      <div>
-                                        <h3 className="text-lg font-semibold mb-3">Betroffene Geräteklassen</h3>
-                                        <div className="flex flex-wrap gap-2">
-                                          {update.device_classes.map((deviceClass, idx) => (
-                                            <Badge key={idx} variant="secondary">
-                                              {deviceClass}
-                                            </Badge>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    )}
-
-                                    <div className="flex gap-2 pt-4">
-                                      <Button
-                                        onClick={() => handleDownload(update)}
-                                        className="flex items-center gap-2"
-                                      >
-                                        <Download className="h-4 w-4" />
-                                        Volltext herunterladen
-                                      </Button>
-                                      
-                                      <Button
-                                        variant="outline"
-                                        onClick={() => window.open(update.source_url, '_blank')}
-                                        className="flex items-center gap-2"
-                                        title="Originaldokument öffnen"
-                                      >
-                                        <ExternalLink className="h-4 w-4" />
-                                        Quelle öffnen
-                                      </Button>
+                      <div className="flex items-center justify-between pt-4 border-t">
+                        <div className="flex items-center gap-2 text-xs text-slate-500">
+                          <FileText className="h-3 w-3" />
+                          <span>Quelle: {update.source_id}</span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" size="sm" className="text-xs">
+                                <Eye className="h-3 w-3 mr-1" />
+                                Details anzeigen
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="dialog-description">
+                              <DialogHeader>
+                                <DialogTitle className="text-xl font-bold">{update.title}</DialogTitle>
+                              </DialogHeader>
+                              <div className="space-y-6">
+                                <AISummary 
+                                  title={update.title}
+                                  content={update.description}
+                                  type="regulatory"
+                                  priority={update.priority}
+                                />
+                                
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                                      Region
+                                    </label>
+                                    <p className="text-sm font-semibold mt-1">{update.region}</p>
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                                      Typ
+                                    </label>
+                                    <p className="text-sm font-semibold capitalize mt-1">{update.update_type}</p>
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                                      Priorität
+                                    </label>
+                                    <div className="mt-1">
+                                      <Badge className={priorityColors[update.priority]}>
+                                        {priorityLabels[update.priority]}
+                                      </Badge>
                                     </div>
                                   </div>
-                                </DialogContent>
-                              </Dialog>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleDownload(update)}
-                              >
-                                <Download className="h-3 w-3" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => window.open(update.source_url, '_blank')}
-                              >
-                                <ExternalLink className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                                      Veröffentlicht
+                                    </label>
+                                    <p className="text-sm font-semibold mt-1">
+                                      {new Date(update.published_at).toLocaleDateString('de-DE')}
+                                    </p>
+                                  </div>
+                                </div>
+                                
+                                <div>
+                                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                                    <FileText className="h-5 w-5" />
+                                    Vollständige Beschreibung
+                                  </h3>
+                                  <div className="prose prose-sm max-w-none">
+                                    <FormattedText 
+                                      content={update.description || 'Keine detaillierte Beschreibung verfügbar.'}
+                                      className="text-sm leading-relaxed"
+                                    />
+                                  </div>
+                                </div>
+
+                                {update.device_classes && update.device_classes.length > 0 && (
+                                  <div>
+                                    <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                                      <Shield className="h-5 w-5" />
+                                      Betroffene Geräteklassen
+                                    </h3>
+                                    <div className="flex flex-wrap gap-2">
+                                      {update.device_classes.map((deviceClass, idx) => (
+                                        <Badge key={idx} variant="secondary" className="text-sm">
+                                          {deviceClass}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+
+                                <div className="flex gap-3 pt-6 border-t">
+                                  <Button
+                                    onClick={() => handleDownload(update)}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <Download className="h-4 w-4" />
+                                    Volltext herunterladen
+                                  </Button>
+                                  
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => window.open(update.source_url, '_blank')}
+                                    className="flex items-center gap-2"
+                                    title="Originaldokument öffnen"
+                                  >
+                                    <ExternalLink className="h-4 w-4" />
+                                    Quelle öffnen
+                                  </Button>
+                                </div>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                          
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDownload(update)}
+                            title="Herunterladen"
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.open(update.source_url, '_blank')}
+                            title="Quelle öffnen"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -481,65 +516,147 @@ EXPORT DETAILS:
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveGrid cols={device.isMobile ? 1 : device.isTablet ? 2 : 3}>
-                {highPriorityUpdates.map((update) => (
-                  <Card key={update.id} className="border-l-4 border-l-red-500">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-semibold line-clamp-2 text-sm">{update.title}</h3>
-                        <Badge className={priorityColors[update.priority]}>
-                          {priorityLabels[update.priority]}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <Badge variant="outline">{update.region}</Badge>
-                        <span>•</span>
-                        <span>{new Date(update.published_at).toLocaleDateString('de-DE')}</span>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <FormattedText 
-                        content={update.description?.substring(0, 150) + '...' || 'Keine Beschreibung verfügbar'}
-                        className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3"
-                      />
-                      <div className="flex items-center gap-2 mt-4">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="sm" className="flex-1">
-                              <Eye className="h-3 w-3 mr-1" />
-                              Details
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="dialog-description">
-                            <DialogHeader>
-                              <DialogTitle>{update.title}</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                              <AISummary 
-                                title={update.title}
-                                content={update.description}
-                                type="regulatory"
-                                priority={update.priority}
-                              />
-                              <FormattedText 
-                                content={update.description || 'Keine detaillierte Beschreibung verfügbar.'}
-                                className="text-sm leading-relaxed"
-                              />
+              {highPriorityUpdates.length === 0 ? (
+                <div className="text-center py-12">
+                  <AlertTriangle className="h-16 w-16 mx-auto mb-4 text-slate-400" />
+                  <h3 className="text-xl font-semibold mb-2">Keine High-Priority Updates</h3>
+                  <p className="text-slate-600 dark:text-slate-400">
+                    Aktuell sind keine Updates mit hoher oder dringender Priorität vorhanden.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {highPriorityUpdates.map((update) => (
+                    <div 
+                      key={update.id} 
+                      className="p-6 border-l-4 border-l-red-500 bg-gradient-to-r from-red-50 to-white dark:from-red-900/20 dark:to-slate-800/50 rounded-lg hover:shadow-md transition-all duration-200"
+                    >
+                      <div className="flex items-start justify-between gap-4 mb-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge className={`${priorityColors[update.priority]} text-xs font-medium`}>
+                              {priorityLabels[update.priority]}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              {update.region}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs capitalize">
+                              {update.update_type}
+                            </Badge>
+                          </div>
+                          <h3 className="text-lg font-semibold mb-2 line-clamp-2 text-red-900 dark:text-red-100">
+                            {update.title}
+                          </h3>
+                          <FormattedText 
+                            content={update.description?.substring(0, 200) + '...' || 'Keine Beschreibung verfügbar'}
+                            className="text-sm text-slate-700 dark:text-slate-300 line-clamp-3 mb-3"
+                          />
+                          
+                          {update.device_classes && update.device_classes.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mb-3">
+                              <span className="text-xs text-slate-600 mr-2">Geräteklassen:</span>
+                              {update.device_classes.slice(0, 3).map((deviceClass, idx) => (
+                                <Badge key={idx} variant="secondary" className="text-xs">
+                                  {deviceClass}
+                                </Badge>
+                              ))}
+                              {update.device_classes.length > 3 && (
+                                <Badge variant="secondary" className="text-xs">
+                                  +{update.device_classes.length - 3}
+                                </Badge>
+                              )}
                             </div>
-                          </DialogContent>
-                        </Dialog>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => window.open(update.source_url, '_blank')}
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                        </Button>
+                          )}
+                        </div>
+                        
+                        <div className="text-right text-sm text-slate-600">
+                          <div className="font-medium">
+                            {new Date(update.published_at).toLocaleDateString('de-DE')}
+                          </div>
+                          <div>
+                            {new Date(update.published_at).toLocaleTimeString('de-DE', { 
+                              hour: '2-digit', 
+                              minute: '2-digit' 
+                            })}
+                          </div>
+                        </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </ResponsiveGrid>
+
+                      <div className="flex items-center justify-between pt-4 border-t border-red-200">
+                        <div className="flex items-center gap-2 text-xs text-slate-600">
+                          <AlertTriangle className="h-3 w-3 text-red-500" />
+                          <span>Sofortige Aufmerksamkeit erforderlich</span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" size="sm" className="text-xs border-red-300 text-red-700 hover:bg-red-50">
+                                <Eye className="h-3 w-3 mr-1" />
+                                Details anzeigen
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="dialog-description">
+                              <DialogHeader>
+                                <DialogTitle className="text-xl font-bold flex items-center gap-2">
+                                  <AlertTriangle className="h-5 w-5 text-red-500" />
+                                  {update.title}
+                                </DialogTitle>
+                              </DialogHeader>
+                              <div className="space-y-6">
+                                <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <AlertTriangle className="h-4 w-4 text-red-500" />
+                                    <span className="text-sm font-medium text-red-800 dark:text-red-200">
+                                      High-Priority Update
+                                    </span>
+                                  </div>
+                                  <p className="text-sm text-red-700 dark:text-red-300">
+                                    Dieses Update erfordert sofortige Aufmerksamkeit und möglicherweise 
+                                    umgehende Compliance-Maßnahmen.
+                                  </p>
+                                </div>
+                                
+                                <AISummary 
+                                  title={update.title}
+                                  content={update.description}
+                                  type="regulatory"
+                                  priority={update.priority}
+                                />
+                                
+                                <FormattedText 
+                                  content={update.description || 'Keine detaillierte Beschreibung verfügbar.'}
+                                  className="text-sm leading-relaxed"
+                                />
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                          
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDownload(update)}
+                            title="Herunterladen"
+                            className="text-red-600 hover:bg-red-50"
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.open(update.source_url, '_blank')}
+                            title="Quelle öffnen"
+                            className="text-red-600 hover:bg-red-50"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -557,62 +674,154 @@ EXPORT DETAILS:
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {recentUpdates.map((update) => (
-                  <div key={update.id} className="flex items-start gap-4 p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-medium line-clamp-2">{update.title}</h3>
-                        <Badge className={priorityColors[update.priority]}>
-                          {priorityLabels[update.priority]}
-                        </Badge>
-                      </div>
-                      <FormattedText 
-                        content={update.description?.substring(0, 200) + '...' || 'Keine Beschreibung verfügbar'}
-                        className="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2"
-                      />
-                      <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
-                        <Badge variant="outline">{update.region}</Badge>
-                        <span className="capitalize">{update.update_type}</span>
-                        <span>{new Date(update.published_at).toLocaleDateString('de-DE')}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="dialog-description">
-                          <DialogHeader>
-                            <DialogTitle>{update.title}</DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-4">
-                            <AISummary 
-                              title={update.title}
-                              content={update.description}
-                              type="regulatory"
-                              priority={update.priority}
-                            />
-                            <FormattedText 
-                              content={update.description || 'Keine detaillierte Beschreibung verfügbar.'}
-                              className="text-sm leading-relaxed"
-                            />
+              {recentUpdates.length === 0 ? (
+                <div className="text-center py-12">
+                  <Clock className="h-16 w-16 mx-auto mb-4 text-slate-400" />
+                  <h3 className="text-xl font-semibold mb-2">Keine aktuellen Updates</h3>
+                  <p className="text-slate-600 dark:text-slate-400">
+                    In den letzten 7 Tagen wurden keine neuen Updates veröffentlicht.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {recentUpdates.map((update) => (
+                    <div 
+                      key={update.id} 
+                      className="p-6 border-l-4 border-l-blue-500 bg-gradient-to-r from-blue-50 to-white dark:from-blue-900/20 dark:to-slate-800/50 rounded-lg hover:shadow-md transition-all duration-200"
+                    >
+                      <div className="flex items-start justify-between gap-4 mb-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-xs">
+                              Neu
+                            </Badge>
+                            <Badge className={`${priorityColors[update.priority]} text-xs`}>
+                              {priorityLabels[update.priority]}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              {update.region}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs capitalize">
+                              {update.update_type}
+                            </Badge>
                           </div>
-                        </DialogContent>
-                      </Dialog>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => window.open(update.source_url, '_blank')}
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
+                          <h3 className="text-lg font-semibold mb-2 line-clamp-2 text-blue-900 dark:text-blue-100">
+                            {update.title}
+                          </h3>
+                          <FormattedText 
+                            content={update.description?.substring(0, 250) + '...' || 'Keine Beschreibung verfügbar'}
+                            className="text-sm text-slate-700 dark:text-slate-300 line-clamp-3 mb-3"
+                          />
+                          
+                          {update.device_classes && update.device_classes.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mb-3">
+                              <span className="text-xs text-slate-600 mr-2">Geräteklassen:</span>
+                              {update.device_classes.slice(0, 3).map((deviceClass, idx) => (
+                                <Badge key={idx} variant="secondary" className="text-xs">
+                                  {deviceClass}
+                                </Badge>
+                              ))}
+                              {update.device_classes.length > 3 && (
+                                <Badge variant="secondary" className="text-xs">
+                                  +{update.device_classes.length - 3}
+                                </Badge>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="text-right text-sm text-slate-600">
+                          <div className="font-medium flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {new Date(update.published_at).toLocaleDateString('de-DE')}
+                          </div>
+                          <div className="text-xs text-slate-500">
+                            {new Date(update.published_at).toLocaleTimeString('de-DE', { 
+                              hour: '2-digit', 
+                              minute: '2-digit' 
+                            })}
+                          </div>
+                          <div className="text-xs text-blue-600 mt-1">
+                            vor {Math.ceil((Date.now() - new Date(update.published_at).getTime()) / (1000 * 60 * 60 * 24))} Tag(en)
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-4 border-t border-blue-200">
+                        <div className="flex items-center gap-2 text-xs text-slate-600">
+                          <Clock className="h-3 w-3 text-blue-500" />
+                          <span>Kürzlich veröffentlicht</span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" size="sm" className="text-xs border-blue-300 text-blue-700 hover:bg-blue-50">
+                                <Eye className="h-3 w-3 mr-1" />
+                                Details anzeigen
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="dialog-description">
+                              <DialogHeader>
+                                <DialogTitle className="text-xl font-bold flex items-center gap-2">
+                                  <Clock className="h-5 w-5 text-blue-500" />
+                                  {update.title}
+                                </DialogTitle>
+                              </DialogHeader>
+                              <div className="space-y-6">
+                                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <Clock className="h-4 w-4 text-blue-500" />
+                                    <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                                      Kürzlich veröffentlicht
+                                    </span>
+                                  </div>
+                                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                                    Dieses Update wurde in den letzten 7 Tagen veröffentlicht und 
+                                    könnte aktuelle Entwicklungen enthalten.
+                                  </p>
+                                </div>
+                                
+                                <AISummary 
+                                  title={update.title}
+                                  content={update.description}
+                                  type="regulatory"
+                                  priority={update.priority}
+                                />
+                                
+                                <FormattedText 
+                                  content={update.description || 'Keine detaillierte Beschreibung verfügbar.'}
+                                  className="text-sm leading-relaxed"
+                                />
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                          
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDownload(update)}
+                            title="Herunterladen"
+                            className="text-blue-600 hover:bg-blue-50"
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.open(update.source_url, '_blank')}
+                            title="Quelle öffnen"
+                            className="text-blue-600 hover:bg-blue-50"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
