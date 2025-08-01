@@ -19,6 +19,7 @@ import LegalRelationshipViewer from "@/components/legal-relationship-viewer";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { EnhancedLegalCard } from "@/components/enhanced-legal-card";
 import { AISummary } from "@/components/ai-summary";
+import { FormattedLegalText } from "@/components/formatted-text";
 
 // Define types
 interface ChangeDetection {
@@ -224,8 +225,6 @@ export default function LegalCases() {
           // Enhanced fields for Gerichtsentscheidungen
           verdict: item.verdict,
           damages: item.damages,
-          plaintiff: item.plaintiff,
-          defendant: item.defendant,
           legalBasis: item.legalBasis || item.legal_basis
         }));
       } catch (error) {
@@ -753,7 +752,14 @@ export default function LegalCases() {
                                           <div className="prose max-w-none text-sm leading-relaxed">
                                             <div className="bg-gray-50 p-4 rounded border-l-4 border-blue-400 mb-6">
                                               <h5 className="font-medium text-lg mb-3">{(legalCase as any).title || 'Rechtsprechung'}</h5>
-                                              <p className="mb-3"><strong>Zusammenfassung:</strong> {(legalCase as any).summary || 'Diese Gerichtsentscheidung behandelt wichtige Aspekte der Medizinprodukte-Regulierung.'}</p>
+                                              <div className="mb-4">
+                                                <strong className="text-gray-800">Zusammenfassung:</strong>
+                                                <div className="mt-2">
+                                                  <FormattedLegalText 
+                                                    content={(legalCase as any).summary || 'Diese Gerichtsentscheidung behandelt wichtige Aspekte der Medizinprodukte-Regulierung.'} 
+                                                  />
+                                                </div>
+                                              </div>
                                             </div>
                                             
                                             <div className="space-y-6">

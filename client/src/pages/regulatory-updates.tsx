@@ -7,6 +7,7 @@ import { PageLayout, SectionCard } from "@/components/ui/page-layout";
 import { FilterBar } from "@/components/ui/filter-bar";
 import { DataTable } from "@/components/ui/data-table";
 import { AISummary } from "@/components/ai-summary";
+import { FormattedRegulatoryText } from "@/components/formatted-text";
 import { Bell, FileText, Download, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -324,8 +325,8 @@ Helix Regulatory Intelligence Platform
                   
                   <div>
                     <label className="text-sm font-medium text-gray-500">Beschreibung</label>
-                    <div className="mt-1 text-sm bg-blue-50 p-3 rounded border leading-relaxed">
-                      {update.description || 'Keine Beschreibung verfügbar'}
+                    <div className="mt-1 bg-blue-50 p-4 rounded border">
+                      <FormattedRegulatoryText content={update.description || 'Keine Beschreibung verfügbar'} />
                     </div>
                   </div>
                   
