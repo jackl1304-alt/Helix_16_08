@@ -60,7 +60,7 @@ export function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 deltaways-nav shadow-lg z-50 overflow-y-auto">
       {/* DELTA WAYS Logo Header */}
-      <div className="p-6 border-b border-[#07233e]/30">
+      <div className="p-6 border-b border-gray-200">
         <Link href="/">
           <div className="flex flex-col items-center cursor-pointer space-y-2">
             <img 
@@ -69,7 +69,7 @@ export function Sidebar() {
               className="h-16 w-16 object-cover rounded-lg ring-2 ring-[#b0d4f6]"
             />
             <span className="text-lg deltaways-brand-text text-[#07233e]">HELIX</span>
-            <p className="text-xs font-medium text-gray-300">Powered by DELTA WAYS</p>
+            <p className="text-xs font-medium text-gray-600">Powered by DELTA WAYS</p>
           </div>
         </Link>
       </div>
@@ -85,7 +85,7 @@ export function Sidebar() {
                     "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer",
                     isActive
                       ? "bg-[#0b3761] text-white border border-[#0b3761] shadow-sm"
-                      : "text-[#0b3761] hover:text-white hover:bg-white/10"
+                      : "text-[#0b3761] hover:text-white hover:bg-[#0b3761]/10"
                   )}
                 >
                   <item.icon className={cn(
@@ -113,7 +113,7 @@ export function Sidebar() {
                       "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer",
                       isActive
                         ? "bg-[#0b3761] text-white border border-[#0b3761] shadow-sm"
-                        : "text-[#0b3761] hover:text-white hover:bg-white/10"
+                        : "text-[#0b3761] hover:text-white hover:bg-[#0b3761]/10"
                     )}
                   >
                     <item.icon className={cn(
@@ -142,7 +142,7 @@ export function Sidebar() {
                       "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer",
                       isActive
                         ? "bg-[#0b3761] text-white border border-[#0b3761] shadow-sm"
-                        : "text-[#0b3761] hover:text-white hover:bg-white/10"
+                        : "text-[#0b3761] hover:text-white hover:bg-[#0b3761]/10"
                     )}
                   >
                     <item.icon className={cn(
