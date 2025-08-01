@@ -113,7 +113,7 @@ body {
   line-height: 1.6;
   letter-spacing: -0.01em;
   /* Subtle background image with 50% opacity */
-  background-image: url('@assets/4d7054_4679ea2e6a0d44c5a462552acfa1d15c~mv2_1754077580048.avif');
+  background-image: url('/attached_assets/4d7054_4679ea2e6a0d44c5a462552acfa1d15c~mv2_1754077580048.avif');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -121,7 +121,7 @@ body {
 }
 
 /* Overlay for better readability with 50% opacity */
-body::before {
+body::after {
   content: '';
   position: fixed;
   top: 0;
@@ -130,7 +130,7 @@ body::before {
   height: 100%;
   background-color: rgba(255, 255, 255, 0.5);
   pointer-events: none;
-  z-index: -1;
+  z-index: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
