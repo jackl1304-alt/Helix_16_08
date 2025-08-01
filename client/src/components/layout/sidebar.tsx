@@ -66,7 +66,7 @@ export function Sidebar() {
             <img 
               src={logoPath} 
               alt="Helix Logo" 
-              className="h-16 w-16 object-cover rounded-lg ring-2 ring-[#b0d4f6]"
+              className="h-32 w-32 object-cover rounded-lg ring-2 ring-[#b0d4f6]"
             />
             <span className="text-lg deltaways-brand-text text-[#07233e]">HELIX</span>
             <p className="text-xs font-medium text-gray-600">Powered by DELTA WAYS</p>

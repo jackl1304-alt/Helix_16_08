@@ -93,51 +93,51 @@ export default function Dashboard() {
   const dashboardCards = [
     {
       title: "Regulatory Updates",
-      value: stats?.totalUpdates || 0,
-      description: `${stats?.uniqueUpdates || 0} eindeutige Titel • ${stats?.recentUpdates || 0} diese Woche`,
+      value: (stats as any)?.totalUpdates || 0,
+      description: `${(stats as any)?.uniqueUpdates || 0} eindeutige Titel • ${(stats as any)?.recentUpdates || 0} diese Woche`,
       icon: FileText,
       color: "text-blue-600",
-      quality: stats?.dataQuality ? "✓ Duplikate bereinigt" : null,
+      quality: (stats as any)?.dataQuality ? "✓ Duplikate bereinigt" : null,
     },
     {
       title: "Legal Cases",
-      value: stats?.totalLegalCases || 0,
-      description: `${stats?.uniqueLegalCases || 0} eindeutige Fälle • ${stats?.recentLegalCases || 0} neue diese Monat`,
+      value: (stats as any)?.totalLegalCases || 0,
+      description: `${(stats as any)?.uniqueLegalCases || 0} eindeutige Fälle • ${(stats as any)?.recentLegalCases || 0} neue diese Monat`,
       icon: Database,
       color: "text-purple-600",
       quality: "✓ Bereinigt",
     },
     {
       title: "Knowledge Articles",
-      value: stats?.totalArticles || 0,
+      value: (stats as any)?.totalArticles || 0,
       description: "Wissensdatenbank",
       icon: BookOpen,
       color: "text-green-600",
     },
     {
       title: "Subscribers",
-      value: stats?.totalSubscribers || 0,
+      value: (stats as any)?.totalSubscribers || 0,
       description: "Newsletter-Abonnenten",
       icon: Users,
       color: "text-orange-600",
     },
     {
       title: "Pending Approvals",
-      value: stats?.pendingApprovals || 0,
+      value: (stats as any)?.pendingApprovals || 0,
       description: "Wartende Genehmigungen",
       icon: CheckCircle,
       color: "text-indigo-600",
     },
     {
       title: "Active Data Sources",
-      value: stats?.activeDataSources || 0,
+      value: (stats as any)?.activeDataSources || 0,
       description: "Aktive Datenquellen",
       icon: TrendingUp,
       color: "text-teal-600",
     },
     {
       title: "Newsletters",
-      value: stats?.totalNewsletters || 0,
+      value: (stats as any)?.totalNewsletters || 0,
       description: "Newsletter versendet",
       icon: Mail,
       color: "text-red-600",
@@ -153,11 +153,11 @@ export default function Dashboard() {
             Helix Regulatory Intelligence Dashboard
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mt-2">
-            Bereinigte Datenbank • {stats?.duplicatesRemoved || '5.976 Duplikate entfernt'}
+            Bereinigte Datenbank • {(stats as any)?.duplicatesRemoved || '5.976 Duplikate entfernt'}
           </p>
-          {stats?.dataQuality && (
+          {(stats as any)?.dataQuality && (
             <Badge variant="outline" className="mt-2 bg-green-50 text-green-700 border-green-200">
-              ✓ {stats.dataQuality}
+              ✓ {(stats as any).dataQuality}
             </Badge>
           )}
         </div>
@@ -293,10 +293,10 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Button 
               variant="outline" 
-              className="flex items-center gap-2 h-20 hover:bg-blue-50 hover:border-blue-200 transition-colors"
+              className="flex items-center gap-2 h-20 hover:bg-orange-50 hover:border-orange-200 transition-colors"
               onClick={handleDataSourcesSync}
             >
-              <Database className="h-5 w-5 text-blue-600" />
+              <Database className="h-5 w-5 text-[#d95d2c]" />
               <div className="text-left">
                 <div className="font-medium">Datenquellen sync</div>
                 <div className="text-xs text-gray-500">FDA, EMA, BfArM Updates</div>
@@ -305,10 +305,10 @@ export default function Dashboard() {
             
             <Button 
               variant="outline" 
-              className="flex items-center gap-2 h-20 hover:bg-green-50 hover:border-green-200 transition-colors"
+              className="flex items-center gap-2 h-20 hover:bg-orange-50 hover:border-orange-200 transition-colors"
               onClick={handleKnowledgeBase}
             >
-              <BookOpen className="h-5 w-5 text-green-600" />
+              <BookOpen className="h-5 w-5 text-[#d95d2c]" />
               <div className="text-left">
                 <div className="font-medium">Knowledge Base</div>
                 <div className="text-xs text-gray-500">Artikel durchsuchen</div>
