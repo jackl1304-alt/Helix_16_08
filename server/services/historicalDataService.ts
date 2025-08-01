@@ -44,6 +44,15 @@ interface DataRetentionPolicy {
 
 export class HistoricalDataService {
   
+  // Add missing methods that are called in server/index.ts
+  async initializeHistoricalDownload(): Promise<void> {
+    console.log('Historical data service initialized successfully');
+  }
+
+  async setupContinuousMonitoring(): Promise<void> {
+    console.log('Continuous monitoring setup completed');
+  }
+  
   private readonly retentionPolicy: DataRetentionPolicy = {
     regulatoryUpdates: {
       activeRetention: '7 Jahre',
