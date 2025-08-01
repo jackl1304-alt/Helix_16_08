@@ -1,28 +1,38 @@
+/* DELTA WAYS Brand Implementation - January 2024 */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: hsl(0, 0%, 100%);
-  --foreground: hsl(20, 14.3%, 4.1%);
-  --muted: hsl(60, 4.8%, 95.9%);
-  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  /* DELTA WAYS Primary Brand Colors */
+  --deltaways-navy: hsl(220, 100%, 15%); /* Primary Navy */
+  --deltaways-gold: hsl(45, 100%, 50%); /* Accent Gold */
+  --deltaways-gray: hsl(210, 15%, 92%); /* Secondary Gray */
+  --deltaways-dark: hsl(220, 50%, 8%); /* Deep Navy */
+  
+  /* Helix Platform adapted to DELTA WAYS Brand */
+  --background: hsl(0, 0%, 98%);
+  --foreground: var(--deltaways-navy);
+  --muted: var(--deltaways-gray);
+  --muted-foreground: hsl(220, 30%, 40%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --popover-foreground: var(--deltaways-navy);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(20, 14.3%, 4.1%);
-  --border: hsl(20, 5.9%, 90%);
-  --input: hsl(20, 5.9%, 90%);
-  --primary: hsl(207, 90%, 54%);
-  --primary-foreground: hsl(211, 100%, 99%);
-  --secondary: hsl(60, 4.8%, 95.9%);
-  --secondary-foreground: hsl(24, 9.8%, 10%);
-  --accent: hsl(60, 4.8%, 95.9%);
-  --accent-foreground: hsl(24, 9.8%, 10%);
+  --card-foreground: var(--deltaways-navy);
+  --border: hsl(210, 20%, 88%);
+  --input: hsl(210, 20%, 94%);
+  --primary: var(--deltaways-navy);
+  --primary-foreground: hsl(210, 40%, 98%);
+  --secondary: var(--deltaways-gray);
+  --secondary-foreground: var(--deltaways-navy);
+  --accent: var(--deltaways-gold);
+  --accent-foreground: var(--deltaways-navy);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
-  --ring: hsl(20, 14.3%, 4.1%);
-  --radius: 0.5rem;
+  --ring: var(--deltaways-gold);
+  --radius: 0.75rem; /* Premium rounded corners */
   
   /* Custom Helix colors matching design */
   --helix-blue-50: hsl(214, 100%, 97%);
@@ -71,6 +81,115 @@
   --blue-600: hsl(221, 83%, 53%);
   --blue-700: hsl(224, 76%, 48%);
   --blue-800: hsl(226, 71%, 40%);
+}
+
+/* DELTA WAYS Dark Theme */
+.dark {
+  --background: var(--deltaways-dark);
+  --foreground: hsl(210, 40%, 98%);
+  --muted: hsl(220, 30%, 15%);
+  --muted-foreground: hsl(215, 20.2%, 65.1%);
+  --popover: hsl(220, 45%, 10%);
+  --popover-foreground: hsl(210, 40%, 98%);
+  --card: hsl(220, 45%, 10%);
+  --card-foreground: hsl(210, 40%, 98%);
+  --border: hsl(220, 30%, 18%);
+  --input: hsl(220, 30%, 18%);
+  --primary: hsl(45, 100%, 55%); /* Brighter gold in dark */
+  --primary-foreground: var(--deltaways-dark);
+  --secondary: hsl(220, 30%, 15%);
+  --secondary-foreground: hsl(210, 40%, 98%);
+  --accent: hsl(45, 100%, 55%);
+  --accent-foreground: var(--deltaways-dark);
+  --ring: hsl(45, 100%, 55%);
+}
+
+/* DELTA WAYS Typography System - Primary: Inter, Secondary: Segoe UI */
+body {
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+/* DELTA WAYS Brand Styles */
+.deltaways-brand-text {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.deltaways-card {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(210, 15%, 96%) 100%);
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.deltaways-button-primary {
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(220, 80%, 20%) 100%);
+  color: hsl(var(--primary-foreground));
+  border: none;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: all 0.3s ease;
+}
+
+.deltaways-button-primary:hover {
+  background: linear-gradient(135deg, hsl(220, 80%, 20%) 0%, hsl(var(--primary)) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.deltaways-accent-border {
+  border-left: 4px solid hsl(var(--accent));
+}
+
+.deltaways-nav {
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(220, 80%, 18%) 100%);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid hsl(var(--accent));
+}
+
+/* DELTA WAYS Gold Highlights */
+.deltaways-gold-text {
+  color: hsl(var(--accent));
+  font-weight: 600;
+}
+
+.deltaways-premium-card {
+  background: linear-gradient(135deg, 
+    hsl(var(--background)) 0%, 
+    hsl(var(--muted)) 50%, 
+    hsl(var(--background)) 100%);
+  border: 1px solid hsl(var(--accent));
+  box-shadow: 0 8px 32px rgba(45, 100, 50, 0.1);
+}
+
+/* Dark Mode Enhancements */
+.dark .deltaways-card {
+  background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(220, 40%, 12%) 100%);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+.dark .deltaways-nav {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(220, 45%, 12%) 100%);
+}
+
+.dark .deltaways-premium-card {
+  background: linear-gradient(135deg, 
+    hsl(var(--card)) 0%, 
+    hsl(220, 35%, 12%) 50%, 
+    hsl(var(--card)) 100%);
+  box-shadow: 0 8px 32px rgba(45, 100, 55, 0.2);
 }
 
 .dark {

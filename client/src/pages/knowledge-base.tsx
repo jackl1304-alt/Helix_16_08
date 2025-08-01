@@ -289,7 +289,7 @@ Helix Regulatory Intelligence Platform
           <Button
             onClick={() => newsletterMutation.mutate()}
             disabled={newsletterMutation.isPending}
-            className="bg-orange-600 hover:bg-orange-700"
+            className="deltaways-button-primary bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-navy-900"
           >
             {newsletterMutation.isPending ? (
               <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
@@ -302,7 +302,7 @@ Helix Regulatory Intelligence Platform
           <Button
             onClick={() => deepScrapingMutation.mutate()}
             disabled={deepScrapingMutation.isPending}
-            className="bg-purple-600 hover:bg-purple-700"
+            className="deltaways-button-primary"
           >
             {deepScrapingMutation.isPending ? (
               <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
@@ -315,7 +315,7 @@ Helix Regulatory Intelligence Platform
           <Button
             onClick={() => collectMutation.mutate()}
             disabled={collectMutation.isPending}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="deltaways-button-primary"
           >
             {collectMutation.isPending ? (
               <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
