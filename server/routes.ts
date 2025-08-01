@@ -4,6 +4,7 @@ import administrationRoutes from "./routes/administration";
 import { storage } from "./storage";
 import adminRoutes from "./routes/admin.routes";
 import errorRoutes from "./routes/errors";
+import gripRoutes from "./routes/grip.routes";
 import { aiApprovalService } from "./services/ai-approval-service";
 import { 
   insertUserSchema, 
@@ -2903,6 +2904,9 @@ In der Produktionsversion werden hier echte regulatorische Artikel aus verifizie
       res.status(500).json({ error: 'NLP analysis failed' });
     }
   });
+
+  // Mount GRIP routes
+  app.use('/api/grip', gripRoutes);
 
   const httpServer = createServer(app);
   return httpServer;
