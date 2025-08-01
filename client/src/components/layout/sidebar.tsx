@@ -100,7 +100,7 @@ export function Sidebar() {
         </div>
         
         <div className="mt-8 px-4">
-          <h3 className="text-xs font-semibold text-[#07233e]/80 uppercase tracking-wider deltaways-brand-text">
+          <h3 className="text-xs font-semibold text-[#0b3761] uppercase tracking-wider deltaways-brand-text">
             Knowledge Base
           </h3>
           <div className="mt-4 space-y-2">
@@ -129,7 +129,7 @@ export function Sidebar() {
         </div>
 
         <div className="mt-8 px-4">
-          <h3 className="text-xs font-semibold text-[#07233e]/80 uppercase tracking-wider deltaways-brand-text">
+          <h3 className="text-xs font-semibold text-[#0b3761] uppercase tracking-wider deltaways-brand-text">
             Administration & Entwicklung
           </h3>
           <div className="mt-4 space-y-2">
