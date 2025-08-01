@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/performance-optimized-card";
+import { FormattedText } from "@/components/formatted-text";
+import { AISummary } from "@/components/ai-summary";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -718,10 +720,9 @@ export default function LegalCases() {
                                       </DialogHeader>
                                       <div className="flex-1 overflow-auto space-y-6">
                                         <AISummary 
-                                          title={(legalCase as any).title || 'Rechtsprechung'}
                                           content={(legalCase as any).summary || 'Diese Gerichtsentscheidung behandelt wichtige Aspekte der Medizinprodukte-Regulierung.'}
-                                          type="legal"
-                                          priority={(legalCase as any).impact_level === 'High' || (legalCase as any).impact_level === 'Hoch' ? 'urgent' : 'medium'}
+                                          contentType="legal_case"
+                                          className="mb-4"
                                         />
                                         {/* Decision Summary */}
                                         <div className="bg-blue-50 p-6 rounded-lg">
@@ -756,9 +757,8 @@ export default function LegalCases() {
                                                 <strong className="text-gray-800">Zusammenfassung:</strong>
                                                 <div className="mt-2">
                                                   <FormattedText 
-                                                    content={(legalCase as any).summary || 'Diese Gerichtsentscheidung behandelt wichtige Aspekte der Medizinprodukte-Regulierung.'} 
+                                                    text={(legalCase as any).summary || 'Diese Gerichtsentscheidung behandelt wichtige Aspekte der Medizinprodukte-Regulierung.'} 
                                                     className="text-sm leading-relaxed"
-                                                    maxHeight="max-h-32"
                                                   />
                                                 </div>
                                               </div>
@@ -915,7 +915,7 @@ export default function LegalCases() {
                                 
                                 <div className="space-y-4">
                                   <FormattedText 
-                                    content={legalCase.fullText || `
+                                    text={legalCase.fullText || `
 **Zusammenfassung der Entscheidung:**
 
 ${legalCase.summary || 'Detaillierte Informationen zur Gerichtsentscheidung sind verfügbar.'}
@@ -944,7 +944,6 @@ Hersteller sollten ihre aktuellen Compliance-Prozesse überprüfen und gegebenen
 - Quelle: Legal Database
                                     `}
                                     className="text-sm leading-relaxed"
-                                    maxHeight="max-h-96"
                                   />
                                 </div>
                               </div>
@@ -960,7 +959,7 @@ Hersteller sollten ihre aktuellen Compliance-Prozesse überprüfen und gegebenen
                                 <div>
                                   <h5 className="font-medium mb-2">Compliance-Auswirkungen:</h5>
                                   <FormattedText 
-                                    content="**Sofortige Maßnahmen erforderlich:**
+                                    text="**Sofortige Maßnahmen erforderlich:**
 
 Die Rechtsprechung zeigt, dass Unternehmen ihre Compliance-Prozesse überprüfen und anpassen müssen. Eine systematische Herangehensweise ist empfohlen.
 
@@ -969,13 +968,12 @@ Die Rechtsprechung zeigt, dass Unternehmen ihre Compliance-Prozesse überprüfen
 - Anpassung der Dokumentationspraktiken
 - Schulung der Compliance-Teams"
                                     className="text-xs leading-relaxed"
-                                    maxHeight="max-h-24"
                                   />
                                 </div>
                                 <div>
                                   <h5 className="font-medium mb-2">Handlungsempfehlungen:</h5>
                                   <FormattedText 
-                                    content="**Strategische Schritte:**
+                                    text="**Strategische Schritte:**
 
 Unternehmen sollten eine proaktive Strategie entwickeln, um den neuen rechtlichen Anforderungen gerecht zu werden.
 
@@ -984,7 +982,6 @@ Unternehmen sollten eine proaktive Strategie entwickeln, um den neuen rechtliche
 - Gap-Analyse gegen neue Anforderungen  
 - Präventive Maßnahmen implementieren"
                                     className="text-xs leading-relaxed"
-                                    maxHeight="max-h-24"
                                   />
                                 </div>
                               </div>
