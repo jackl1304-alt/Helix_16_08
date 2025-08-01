@@ -35,12 +35,15 @@ function generateAISummary(title: string, content: string, type: 'regulatory' | 
 
   if (type === 'legal') {
     if (isPhilips) {
-      summary = `**Großangelegte Litigation gegen Philips** 
+      summary = `**Großangelegte Litigation gegen Philips**
 
-Diese Sammelklage betrifft defekte CPAP-Geräte, die Millionen von Patienten durch toxische Schaumstoff-Degradation gefährdet haben.
+Diese Sammelklage betrifft defekte CPAP-Geräte, die Millionen von Patienten durch toxische Schaumstoff-Degradation gefährdet haben. Die rechtlichen Verfahren konzentrieren sich auf systematische Produktfehler und unzureichende Warnsysteme.
 
-**Kernproblem:**
-Die PE-PUR Schalldämpfungsschäume in den Geräten zerfallen und setzen karzinogene Partikel frei, die Patienten einatmen.`;
+**Kernproblem der Geräte:**
+Die PE-PUR Schalldämpfungsschäume in den Geräten zerfallen und setzen karzinogene Partikel frei, die Patienten über Jahre hinweg eingeatmet haben. Dies führt zu schwerwiegenden Gesundheitsschäden und lebensbedrohlichen Komplikationen.
+
+**Rechtliche Konsequenzen:**
+Das Verfahren etabliert neue Standards für die Produkthaftung bei Medizingeräten und verschärft die Sorgfaltspflichten der Hersteller erheblich.`;
       keyPoints = [
         '**Betroffene Geräte:** 15+ Millionen Einheiten weltweit mit defektem PE-PUR Schaum',
         '**Finanzielle Auswirkungen:** $16+ Milliarden Settlement-Verhandlungen laufend',
@@ -50,14 +53,15 @@ Die PE-PUR Schalldämpfungsschäume in den Geräten zerfallen und setzen karzino
       riskLevel = 'urgent';
       actionRequired = true;
     } else if (isEthicon) {
-      summary = `**Class Action gegen Ethicon** 
+      summary = `**Class Action gegen Ethicon**
 
-Umfassende Sammelklage wegen defekter Physiomesh-Implantate, die bei Tausenden von Patienten schwerwiegende Komplikationen verursacht haben.
+Umfassende Sammelklage wegen defekter Physiomesh-Implantate, die bei Tausenden von Patienten schwerwiegende Komplikationen verursacht haben. Das Verfahren deckt systematische Mängel in Entwicklung und Überwachung auf.
 
-**Kernprobleme:**
-• Hohe Revisionsraten durch Materialversagen
-• Chronische Schmerzen und Infektionen
-• Unzureichende klinische Studien vor Markteinführung`;
+**Identifizierte Kernprobleme:**
+Die Implantate zeigen extrem hohe Revisionsraten durch Materialversagen. Patienten leiden unter chronischen Schmerzen und wiederkehrenden Infektionen. Die klinischen Studien vor Markteinführung erwiesen sich als unzureichend und nicht repräsentativ.
+
+**Regulatorische Auswirkungen:**
+Diese Entscheidung verschärft die Anforderungen an präklinische Studien und Post-Market-Surveillance erheblich. Hersteller müssen ihre Überwachungssysteme grundlegend überarbeiten.`;
       keyPoints = [
         '**Settlement-Vereinbarung:** $1.8 Milliarden Vergleichszahlung vereinbart',
         '**Versagensrate:** 49% Revisionsrate nach 6 Jahren dokumentiert',
@@ -216,8 +220,8 @@ export function AISummary({ title, content, type = 'regulatory', priority, class
             <div className="text-sm text-gray-700 dark:text-gray-300">
               <FormattedText 
                 content={aiAnalysis.summary} 
-                className="text-sm"
-                maxHeight="max-h-40"
+                className="text-sm leading-relaxed"
+                maxHeight="max-h-48"
               />
             </div>
             <div className="flex items-center gap-2 mt-2">
