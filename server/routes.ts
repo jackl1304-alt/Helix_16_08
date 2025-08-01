@@ -2385,6 +2385,53 @@ Status: Archiviertes historisches Dokument
     }
   });
 
+  // Automatic duplicate detection and removal
+  app.post("/api/quality/auto-remove-duplicates", async (req, res) => {
+    try {
+      console.log('[API] Admin: Starting automatic duplicate detection and removal...');
+      
+      const { DataQualityEnhancementService } = await import("./services/dataQualityEnhancementService");
+      const enhancementService = new DataQualityEnhancementService();
+      
+      // First detect duplicates
+      const duplicateReport = await enhancementService.detectDuplicates();
+      console.log(`[API] Found ${duplicateReport.duplicatesFound} duplicates to remove`);
+      
+      if (duplicateReport.removalCandidates.length === 0) {
+        return res.json({
+          success: true,
+          removedCount: 0,
+          message: 'No duplicates found to remove'
+        });
+      }
+
+      // Remove duplicates automatically
+      let removedCount = 0;
+      for (const id of duplicateReport.removalCandidates) {
+        try {
+          await storage.deleteRegulatoryUpdate(id);
+          removedCount++;
+          console.log(`[API] Auto-removed duplicate: ${id}`);
+        } catch (error) {
+          console.warn(`[API] Failed to auto-remove duplicate ${id}:`, error);
+        }
+      }
+      
+      console.log(`[API] Automatic duplicate removal completed: ${removedCount} removed`);
+      
+      res.json({
+        success: true,
+        removedCount,
+        candidatesFound: duplicateReport.removalCandidates.length,
+        totalRecords: duplicateReport.totalRecords,
+        message: `Successfully removed ${removedCount} of ${duplicateReport.removalCandidates.length} duplicate entries automatically`
+      });
+    } catch (error: any) {
+      console.error('[API] Automatic duplicate removal failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Standardize Data
   app.post("/api/quality/standardize", async (req, res) => {
     try {

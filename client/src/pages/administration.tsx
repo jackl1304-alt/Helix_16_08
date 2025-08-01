@@ -509,6 +509,19 @@ export default function Administration() {
                   Duplikate suchen
                 </Button>
                 
+                <Button
+                  onClick={handleAutoRemoveDuplicates}
+                  disabled={deleteLoading}
+                  className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white"
+                >
+                  {deleteLoading ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                  Automatisch bereinigen
+                </Button>
+
                 {duplicateResults && duplicateResults.duplicatesFound > 0 && (
                   <Button
                     onClick={handleDeleteDuplicates}
@@ -622,10 +635,7 @@ export default function Administration() {
   async function handleDuplicateSearch() {
     setDuplicateSearchLoading(true);
     try {
-      const response = await apiRequest('/api/quality/detect-duplicates', {
-        method: 'POST',
-        body: JSON.stringify({ threshold: 0.85 })
-      });
+      const response = await apiRequest('/api/quality/detect-duplicates', 'POST', { threshold: 0.85 });
       setDuplicateResults(response.report);
       toast({
         title: "Duplikate-Suche abgeschlossen",
@@ -640,6 +650,32 @@ export default function Administration() {
       });
     } finally {
       setDuplicateSearchLoading(false);
+    }
+  }
+
+  // Automatic duplicate removal function
+  async function handleAutoRemoveDuplicates() {
+    setDeleteLoading(true);
+    try {
+      const response = await apiRequest('/api/quality/auto-remove-duplicates', 'POST');
+      
+      toast({
+        title: "Automatische Bereinigung abgeschlossen",
+        description: `${response.removedCount || 0} Duplikate wurden automatisch entfernt.`,
+      });
+      
+      // Clear results and refresh
+      setDuplicateResults(null);
+      await handleDuplicateSearch();
+    } catch (error: any) {
+      console.error('Automatische Duplikat-Entfernung fehlgeschlagen:', error);
+      toast({
+        title: "Fehler bei automatischer Bereinigung",
+        description: error.message || "Ein unbekannter Fehler ist aufgetreten.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleteLoading(false);
     }
   }
 
@@ -663,9 +699,7 @@ export default function Administration() {
       
       for (let i = 0; i < candidates.length; i += batchSize) {
         const batch = candidates.slice(i, i + batchSize);
-        const response = await apiRequest('/api/quality/remove-duplicates', 'POST', {
-          candidateIds: batch
-        });
+        const response = await apiRequest('/api/quality/remove-duplicates', 'POST', { candidateIds: batch });
         totalRemoved += response.removedCount || 0;
       }
       
