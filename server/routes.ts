@@ -2574,34 +2574,37 @@ Status: Archiviertes historisches Dokument
     }
   });
   
-  // Get knowledge articles from database - SIMPLIFIED VERSION
+  // Get knowledge articles from database - DEMO DATA CLEARLY MARKED
   app.get('/api/knowledge/articles', async (req, res) => {
     try {
-      console.log('[API] Loading real knowledge articles from knowledge_base table...');
+      console.log('[API] Loading knowledge articles from knowledge_base table...');
       
       // Load real articles from knowledge_base table
       const realArticles = await storage.getAllKnowledgeArticles();
-      console.log(`[API] Found ${realArticles.length} real knowledge articles in database`);
+      console.log(`[API] Found ${realArticles.length} knowledge articles in database`);
       
-      // Transform database articles to standardized API format
+      // Transform database articles to standardized API format WITH DEMO MARKING
       const knowledgeArticles = realArticles.map(article => ({
         id: article.id,
-        title: article.title,
-        content: article.content,
+        title: `🧪 [DEMO] ${article.title}`,
+        content: `🧪 DEMO-DATEN: ${article.content}
+
+⚠️ HINWEIS: Dies sind Demo-Inhalte für Testzwecke. 
+In der Produktionsversion werden hier echte regulatorische Artikel aus verifizierten Quellen angezeigt.`,
         category: article.category,
-        tags: Array.isArray(article.tags) ? article.tags : (article.tags ? JSON.parse(article.tags || '[]') : []),
+        tags: Array.isArray(article.tags) ? [...(article.tags || []), 'DEMO'] : ['DEMO'],
         published_at: article.created_at,
         created_at: article.created_at,
-        status: article.is_published ? 'published' : 'draft',
-        // Extract authority from tags or use default
-        authority: Array.isArray(article.tags) 
+        status: 'demo',
+        // Extract authority from tags or use default WITH DEMO MARKING
+        authority: `[DEMO] ${Array.isArray(article.tags) 
           ? article.tags.find(tag => ['FDA', 'EMA', 'BfArM', 'MHRA', 'Swissmedic', 'ISO', 'IEC', 'Johner', 'MTD', 'PubMed', 'JAMA'].includes(tag)) || 'Knowledge Base'
-          : 'Knowledge Base',
+          : 'Knowledge Base'}`,
         region: 'Global',
         priority: 'high',
         language: article.content?.includes('DiGA') || article.content?.includes('Deutschland') ? 'de' : 'en',
-        source: `Knowledge Base: ${article.category}`,
-        summary: article.content?.substring(0, 150) + '...'
+        source: `DEMO: Knowledge Base: ${article.category}`,
+        summary: `🧪 DEMO: ${article.content?.substring(0, 150) + '...'}`
       }));
 
       res.json({
@@ -2611,8 +2614,9 @@ Status: Archiviertes historisches Dokument
           totalArticles: knowledgeArticles.length,
           totalUpdates: 0,
           timestamp: new Date().toISOString(),
-          message: `${knowledgeArticles.length} real knowledge articles loaded from database`,
-          dataSource: 'knowledge_base'
+          message: `${knowledgeArticles.length} DEMO knowledge articles loaded from database`,
+          dataSource: 'knowledge_base_demo',
+          notice: '🧪 DEMO-DATEN: Diese Inhalte dienen nur zu Testzwecken'
         }
       });
     } catch (error) {
@@ -2626,7 +2630,7 @@ Status: Archiviertes historisches Dokument
           totalUpdates: 0,
           timestamp: new Date().toISOString(),
           message: 'Error loading knowledge articles',
-          dataSource: 'knowledge_base'
+          dataSource: 'knowledge_base_demo'
         }
       });
     }

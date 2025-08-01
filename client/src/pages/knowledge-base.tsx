@@ -249,10 +249,18 @@ Helix Regulatory Intelligence Platform
     <div className="container mx-auto p-6 space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Knowledge Base</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            🧪 Knowledge Base [DEMO]
+          </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
             Medizintechnik Wissensartikel, Regulatorische Updates und Rechtsfälle
           </p>
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mt-3">
+            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+              ⚠️ <strong>DEMO-MODUS:</strong> Diese Inhalte sind Beispieldaten für Testzwecke. 
+              In der Produktionsversion werden hier echte regulatorische Artikel angezeigt.
+            </p>
+          </div>
         </div>
         <div className="flex gap-3">
           <Button
