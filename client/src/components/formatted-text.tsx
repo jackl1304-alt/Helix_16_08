@@ -9,7 +9,7 @@ interface FormattedTextProps {
 
 export function FormattedText({ content, className, maxHeight = 'max-h-96' }: FormattedTextProps) {
   return (
-    <div className={cn("prose prose-sm max-w-none", maxHeight, "overflow-y-auto", className)}>
+    <div className={cn("prose prose-sm max-w-none", maxHeight, "overflow-y-auto", "space-y-3", className)}>
       {content
         .split(/\n\s*\n/)
         .map((paragraph, index) => {
@@ -145,11 +145,14 @@ export function FormattedText({ content, className, maxHeight = 'max-h-96' }: Fo
             );
           }
           
-          // Regular paragraphs
+          // Regular paragraphs with enhanced formatting
+          const formattedParagraph = paragraph
+            .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-gray-900">$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em class="italic text-blue-700">$1</em>');
+          
           return (
-            <p key={index} className="mb-4 text-gray-700 leading-relaxed">
-              {paragraph.trim()}
-            </p>
+            <p key={index} className="mb-4 text-gray-700 leading-relaxed text-justify" 
+               dangerouslySetInnerHTML={{ __html: formattedParagraph.trim() }} />
           );
         })}
     </div>

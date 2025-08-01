@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search, Scale, DollarSign, FileText, AlertTriangle, CheckCircle, Clock, TrendingUp, Brain } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 import { EnhancedAISummary } from '@/components/enhanced-ai-summary';
+import { FormattedText } from '@/components/formatted-text';
 
 interface ComprehensiveLegalCase {
   id: string;
@@ -413,9 +414,13 @@ export default function EnhancedLegalCases() {
                             <FileText className="w-5 h-5" />
                             Complete Case Reconstruction
                           </h4>
-                          <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono leading-relaxed">
-                            {legalCase.content}
-                          </pre>
+                          <div className="text-sm text-gray-700">
+                            <FormattedText 
+                              content={legalCase.content} 
+                              className="text-sm leading-relaxed"
+                              maxHeight="max-h-80"
+                            />
+                          </div>
                         </div>
                         
                         {legalCase.documentUrl && (
@@ -481,9 +486,11 @@ export default function EnhancedLegalCases() {
                 <div className="prose max-w-none">
                   <h4 className="text-lg font-semibold mb-3">Vollständiges Gerichtsdokument</h4>
                   <div className="bg-gray-50 p-4 rounded-lg">
-                    <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed">
-                      {selectedDocument.content}
-                    </pre>
+                    <FormattedText 
+                      content={selectedDocument.content} 
+                      className="text-sm leading-relaxed"
+                      maxHeight="max-h-96"
+                    />
                   </div>
                 </div>
                 
