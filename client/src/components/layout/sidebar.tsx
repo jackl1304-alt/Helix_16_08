@@ -58,17 +58,18 @@ export function Sidebar() {
   const [location] = useLocation();
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-white shadow-sm border-r border-gray-200 z-50 overflow-y-auto">
-      {/* Logo Header */}
-      <div className="p-6 border-b border-gray-200">
+    <aside className="fixed left-0 top-0 h-screen w-64 deltaways-nav shadow-lg z-50 overflow-y-auto">
+      {/* DELTA WAYS Logo Header */}
+      <div className="p-6 border-b border-yellow-400/30">
         <Link href="/">
           <div className="flex flex-col items-center cursor-pointer space-y-2">
             <img 
               src={logoPath} 
               alt="Helix Logo" 
-              className="h-16 w-16 object-cover rounded-lg"
+              className="h-16 w-16 object-cover rounded-lg ring-2 ring-yellow-400/50"
             />
-            <p className="text-sm font-medium text-gray-700">MedTech Intelligence</p>
+            <span className="text-lg deltaways-brand-text text-yellow-400">HELIX</span>
+            <p className="text-xs font-medium text-gray-300">Powered by DELTA WAYS</p>
           </div>
         </Link>
       </div>
@@ -81,15 +82,15 @@ export function Sidebar() {
               <Link key={item.name} href={item.href}>
                 <div
                   className={cn(
-                    "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer",
+                    "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer",
                     isActive
-                      ? "text-primary bg-primary/10 border border-primary/20"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      ? "text-yellow-400 bg-yellow-400/20 border border-yellow-400/30 shadow-sm"
+                      : "text-gray-300 hover:text-white hover:bg-white/10"
                   )}
                 >
                   <item.icon className={cn(
                     "mr-3 h-5 w-5",
-                    isActive ? "text-primary" : "text-gray-400"
+                    isActive ? "text-yellow-400" : "text-gray-400 group-hover:text-yellow-300"
                   )} />
                   {item.name}
                 </div>
@@ -99,7 +100,7 @@ export function Sidebar() {
         </div>
         
         <div className="mt-8 px-4">
-          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+          <h3 className="text-xs font-semibold text-yellow-400/80 uppercase tracking-wider deltaways-brand-text">
             Knowledge Base
           </h3>
           <div className="mt-4 space-y-2">
@@ -128,7 +129,7 @@ export function Sidebar() {
         </div>
 
         <div className="mt-8 px-4">
-          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+          <h3 className="text-xs font-semibold text-yellow-400/80 uppercase tracking-wider deltaways-brand-text">
             Administration & Entwicklung
           </h3>
           <div className="mt-4 space-y-2">
