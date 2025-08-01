@@ -181,7 +181,10 @@ export default function DataCollection() {
           
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => setIsAddDialogOpen(true)}>
+              <Button 
+                onClick={() => setIsAddDialogOpen(true)}
+                className="bg-[#d95d2c] hover:bg-[#b8441f] text-white"
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Add Source
               </Button>
@@ -271,6 +274,7 @@ export default function DataCollection() {
                           size="sm"
                           onClick={() => syncMutation.mutate(source.id)}
                           disabled={syncMutation.isPending}
+                          className="bg-[#d95d2c] hover:bg-[#b8441f] text-white"
                         >
                           <FolderSync className="h-4 w-4 mr-2" />
                           Sync Now
