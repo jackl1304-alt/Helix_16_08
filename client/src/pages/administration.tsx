@@ -656,16 +656,22 @@ export default function Administration() {
 
     setDeleteLoading(true);
     try {
-      const response = await apiRequest('/api/quality/remove-duplicates', {
-        method: 'POST',
-        body: JSON.stringify({ 
-          candidateIds: duplicateResults.removalCandidates 
-        })
-      });
+      // Process duplicates in smaller batches to avoid payload limits
+      const batchSize = 100;
+      const candidates = duplicateResults.removalCandidates;
+      let totalRemoved = 0;
+      
+      for (let i = 0; i < candidates.length; i += batchSize) {
+        const batch = candidates.slice(i, i + batchSize);
+        const response = await apiRequest('/api/quality/remove-duplicates', 'POST', {
+          candidateIds: batch
+        });
+        totalRemoved += response.removedCount || 0;
+      }
       
       toast({
         title: "Duplikate erfolgreich gelöscht",
-        description: `${response.removedCount} Duplikate wurden entfernt.`,
+        description: `${totalRemoved} Duplikate wurden entfernt.`,
       });
       
       // Refresh search results
