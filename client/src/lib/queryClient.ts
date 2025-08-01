@@ -97,8 +97,8 @@ export const queryClient = new QueryClient({
       },
       refetchInterval: false,
       refetchOnWindowFocus: false,
-      staleTime: 30000, // 30 seconds for live updates
-      gcTime: 5 * 60 * 1000, // 5 minutes garbage collection
+      staleTime: 5 * 60 * 1000, // 5 minutes for better performance
+      gcTime: 10 * 60 * 1000, // 10 minutes garbage collection
       retry: (failureCount, error) => {
         console.log(`[QUERY CLIENT] Retry ${failureCount} for error:`, error);
         return failureCount < 3;

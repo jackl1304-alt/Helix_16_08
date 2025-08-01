@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/performance-optimized-card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useDevice } from "@/hooks/use-device";
 import { ResponsiveGrid } from "@/components/responsive-layout";
 import { cn } from "@/lib/utils";
+import { VirtualList } from "@/components/virtual-list";
 
 interface RegulatoryUpdate {
   id: string;
