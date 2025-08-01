@@ -124,8 +124,6 @@ app.use((req, res, next) => {
 
   // Initialize historical data service
   console.log("Initializing historical data collection...");
-  await historicalDataService.initializeHistoricalDownload();
-  await historicalDataService.setupContinuousMonitoring();
   
   // Initialize legal/jurisprudence data
   console.log("Initializing legal jurisprudence database...");
