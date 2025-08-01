@@ -148,20 +148,28 @@ Helix Regulatory Intelligence Platform
     {
       key: "title",
       header: "Update",
+      className: "min-w-[300px] max-w-[400px]",
       render: (update: RegulatoryUpdate) => (
-        <div className="space-y-1">
-          <p className="font-medium text-slate-900 dark:text-slate-100">{update.title}</p>
+        <div className="space-y-2">
+          <p className="font-medium text-slate-900 dark:text-slate-100 line-clamp-2 leading-tight">
+            {update.title}
+          </p>
           <FormattedText 
-            content={update.description?.substring(0, 150) + '...' || 'Keine Beschreibung verfügbar'}
-            className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2"
-            maxHeight="max-h-12"
+            content={update.description?.substring(0, 120) + '...' || 'Keine Beschreibung verfügbar'}
+            className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2"
+            maxHeight="max-h-10"
           />
           <div className="flex flex-wrap gap-1">
-            {update.device_classes?.map((deviceClass, idx) => (
-              <Badge key={idx} variant="secondary" className="text-xs">
+            {update.device_classes?.slice(0, 2).map((deviceClass, idx) => (
+              <Badge key={idx} variant="secondary" className="text-xs py-0 px-1">
                 {deviceClass}
               </Badge>
             ))}
+            {update.device_classes?.length > 2 && (
+              <Badge variant="secondary" className="text-xs py-0 px-1">
+                +{update.device_classes.length - 2}
+              </Badge>
+            )}
           </div>
         </div>
       )
@@ -169,15 +177,19 @@ Helix Regulatory Intelligence Platform
     {
       key: "region",
       header: "Region",
+      className: "min-w-[80px] w-[80px]",
       render: (update: RegulatoryUpdate) => (
-        <Badge variant="outline">{update.region}</Badge>
+        <Badge variant="outline" className="text-xs whitespace-nowrap">
+          {update.region}
+        </Badge>
       )
     },
     {
       key: "updateType",
       header: "Typ",
+      className: "min-w-[100px] w-[100px]",
       render: (update: RegulatoryUpdate) => (
-        <Badge variant="outline" className="capitalize">
+        <Badge variant="outline" className="text-xs capitalize whitespace-nowrap">
           {update.update_type}
         </Badge>
       )
@@ -185,8 +197,9 @@ Helix Regulatory Intelligence Platform
     {
       key: "priority",
       header: "Priorität",
+      className: "min-w-[90px] w-[90px]",
       render: (update: RegulatoryUpdate) => (
-        <Badge className={priorityColors[update.priority]}>
+        <Badge className={`${priorityColors[update.priority]} text-xs whitespace-nowrap`}>
           {priorityLabels[update.priority]}
         </Badge>
       )
@@ -194,11 +207,12 @@ Helix Regulatory Intelligence Platform
     {
       key: "publishedAt",
       header: "Datum",
+      className: "min-w-[120px] w-[120px]",
       render: (update: RegulatoryUpdate) => (
-        <div className="text-sm">
-          <div>{new Date(update.published_at).toLocaleDateString('de-DE')}</div>
+        <div className="text-xs">
+          <div className="font-medium">{new Date(update.published_at).toLocaleDateString('de-DE')}</div>
           <div className="text-slate-500 dark:text-slate-400">
-            {new Date(update.published_at).toLocaleTimeString('de-DE')}
+            {new Date(update.published_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
           </div>
         </div>
       )
@@ -276,20 +290,22 @@ Helix Regulatory Intelligence Platform
         onReset={resetFilters}
       />
 
-      <DataTable
-        title="Regulatory Updates"
-        description="Klicken Sie auf Volltext um das komplette Dokument anzuzeigen oder auf Download für Offline-Zugriff"
-        icon={Bell}
-        data={filteredUpdates}
-        columns={columns}
-        isLoading={isLoading}
-        emptyMessage="Keine Updates gefunden"
-        emptyDescription="Versuchen Sie andere Filterkriterien"
-        stats={{
-          total: (updates || []).length,
-          filtered: filteredUpdates.length
-        }}
-        rowActions={(update) => (
+      <div className="overflow-x-auto">
+        <DataTable
+          title="Regulatory Updates"
+          description="Klicken Sie auf Volltext um das komplette Dokument anzuzeigen oder auf Download für Offline-Zugriff"
+          icon={Bell}
+          data={filteredUpdates}
+          columns={columns}
+          isLoading={isLoading}
+          emptyMessage="Keine Updates gefunden"
+          emptyDescription="Versuchen Sie andere Filterkriterien"
+          className="min-w-[800px]"
+          stats={{
+            total: (updates || []).length,
+            filtered: filteredUpdates.length
+          }}
+          rowActions={(update) => (
           <>
             <Dialog>
               <DialogTrigger asChild>
@@ -499,7 +515,8 @@ Helix Regulatory Intelligence Platform
             </Button>
           </>
         )}
-      />
+        />
+      </div>
     </PageLayout>
   );
 }
