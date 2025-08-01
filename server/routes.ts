@@ -2254,16 +2254,59 @@ Status: Archiviertes historisches Dokument
 
   // ========== DATA QUALITY ENHANCEMENT ENDPOINTS ==========
   
-  // Detect Duplicates
+  // Detect Duplicates (Enhanced for Administration)
   app.post("/api/quality/detect-duplicates", async (req, res) => {
     try {
-      const { keyFields = ['title', 'authority'] } = req.body;
-      console.log('[API] Starting duplicate detection...');
+      const { threshold = 0.85, keyFields = ['title', 'authority'] } = req.body;
+      console.log(`[API] Admin: Detecting duplicates with threshold ${threshold}...`);
       
-      const report = await dataQualityService.detectDuplicates(keyFields);
-      res.json({ success: true, report });
+      // Use the enhanced service for better duplicate detection
+      const { DataQualityEnhancementService } = await import("./services/dataQualityEnhancementService");
+      const enhancementService = new DataQualityEnhancementService();
+      
+      const report = await enhancementService.detectDuplicates();
+      
+      res.json({
+        success: true,
+        report,
+        threshold,
+        timestamp: new Date().toISOString()
+      });
     } catch (error: any) {
-      console.error('[API] Duplicate detection failed:', error);
+      console.error('[API] Enhanced duplicate detection failed:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Remove duplicates endpoint for administration
+  app.post("/api/quality/remove-duplicates", async (req, res) => {
+    try {
+      const { candidateIds } = req.body;
+      console.log(`[API] Admin: Removing ${candidateIds?.length || 0} duplicate candidates...`);
+      
+      if (!candidateIds || !Array.isArray(candidateIds)) {
+        return res.status(400).json({ message: 'Invalid candidate IDs provided' });
+      }
+
+      // Remove duplicates from database
+      let removedCount = 0;
+      for (const id of candidateIds) {
+        try {
+          await storage.deleteRegulatoryUpdate(id);
+          removedCount++;
+        } catch (error) {
+          console.warn(`Failed to remove duplicate ${id}:`, error);
+        }
+      }
+      
+      res.json({
+        success: true,
+        removedCount,
+        requestedCount: candidateIds.length,
+        message: `Successfully removed ${removedCount} duplicate entries`
+      });
+    } catch (error: any) {
+      console.error('[API] Remove duplicates failed:', error);
       res.status(500).json({ message: error.message });
     }
   });

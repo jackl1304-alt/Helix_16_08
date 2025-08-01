@@ -18,7 +18,10 @@ import {
   Download,
   FileText,
   Code2,
-  Server
+  Server,
+  Search,
+  Trash2,
+  Shield
 } from 'lucide-react';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
@@ -47,6 +50,9 @@ interface PhaseTask {
 export default function Administration() {
   const { toast } = useToast();
   const [activePhase, setActivePhase] = useState<string>('phase1');
+  const [duplicateSearchLoading, setDuplicateSearchLoading] = useState(false);
+  const [duplicateResults, setDuplicateResults] = useState<any>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Fetch development phases
   const { data: phases, isLoading } = useQuery({
@@ -334,7 +340,7 @@ export default function Administration() {
       </div>
 
       <Tabs value={activePhase} onValueChange={setActivePhase} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="phase1" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
             Phase 1
@@ -346,6 +352,10 @@ export default function Administration() {
           <TabsTrigger value="phase3" className="flex items-center gap-2">
             <Rocket className="h-4 w-4" />
             Phase 3
+          </TabsTrigger>
+          <TabsTrigger value="duplicates" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Duplikate-Management
           </TabsTrigger>
         </TabsList>
 
@@ -470,7 +480,206 @@ export default function Administration() {
             </Card>
           </TabsContent>
         ))}
+        
+        {/* Duplicates Management Tab */}
+        <TabsContent value="duplicates" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                Duplikate-Management
+              </CardTitle>
+              <p className="text-gray-600 dark:text-gray-400">
+                Suche und verwalte doppelte Einträge in der Datenbank
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Search Controls */}
+              <div className="flex gap-4">
+                <Button
+                  onClick={handleDuplicateSearch}
+                  disabled={duplicateSearchLoading}
+                  className="flex items-center gap-2"
+                >
+                  {duplicateSearchLoading ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  ) : (
+                    <Search className="h-4 w-4" />
+                  )}
+                  Duplikate suchen
+                </Button>
+                
+                {duplicateResults && duplicateResults.duplicatesFound > 0 && (
+                  <Button
+                    onClick={handleDeleteDuplicates}
+                    disabled={deleteLoading}
+                    variant="destructive"
+                    className="flex items-center gap-2"
+                  >
+                    {deleteLoading ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                    Duplikate löschen ({duplicateResults.duplicatesFound})
+                  </Button>
+                )}
+              </div>
+
+              {/* Results Display */}
+              {duplicateResults && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="text-2xl font-bold text-green-600">
+                          {duplicateResults.totalRecords}
+                        </div>
+                        <div className="text-sm text-gray-600">Gesamte Einträge</div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="text-2xl font-bold text-orange-600">
+                          {duplicateResults.duplicatesFound}
+                        </div>
+                        <div className="text-sm text-gray-600">Duplikate gefunden</div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="text-2xl font-bold text-blue-600">
+                          {duplicateResults.duplicateGroups?.length || 0}
+                        </div>
+                        <div className="text-sm text-gray-600">Duplikate-Gruppen</div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Detailed Results */}
+                  {duplicateResults.duplicateGroups && duplicateResults.duplicateGroups.length > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Gefundene Duplikate-Gruppen</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3 max-h-96 overflow-y-auto">
+                          {duplicateResults.duplicateGroups.slice(0, 10).map((group: any, index: number) => (
+                            <div key={index} className="p-3 border rounded-lg">
+                              <div className="flex justify-between items-start mb-2">
+                                <div className="font-medium">Gruppe {index + 1}</div>
+                                <Badge variant="outline">
+                                  {group.records?.length || 0} Einträge
+                                </Badge>
+                              </div>
+                              <div className="text-sm text-gray-600 space-y-1">
+                                {group.records?.slice(0, 3).map((record: any, recordIndex: number) => (
+                                  <div key={recordIndex} className="truncate">
+                                    • {record.title || record.id}
+                                  </div>
+                                ))}
+                                {group.records?.length > 3 && (
+                                  <div className="text-xs text-gray-500">
+                                    ... und {group.records.length - 3} weitere
+                                  </div>
+                                )}
+                              </div>
+                              <div className="mt-2 text-xs">
+                                Ähnlichkeit: {((group.confidence || 0) * 100).toFixed(1)}%
+                              </div>
+                            </div>
+                          ))}
+                          {duplicateResults.duplicateGroups.length > 10 && (
+                            <div className="text-center text-sm text-gray-500 p-2">
+                              ... und {duplicateResults.duplicateGroups.length - 10} weitere Gruppen
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              )}
+
+              {duplicateResults && duplicateResults.duplicatesFound === 0 && (
+                <Card>
+                  <CardContent className="p-6 text-center">
+                    <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium mb-2">Keine Duplikate gefunden</h3>
+                    <p className="text-gray-600">Die Datenbank ist bereits bereinigt.</p>
+                  </CardContent>
+                </Card>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   );
+
+  // Duplicate search function
+  async function handleDuplicateSearch() {
+    setDuplicateSearchLoading(true);
+    try {
+      const response = await apiRequest('/api/quality/detect-duplicates', {
+        method: 'POST',
+        body: JSON.stringify({ threshold: 0.85 })
+      });
+      setDuplicateResults(response.report);
+      toast({
+        title: "Duplikate-Suche abgeschlossen",
+        description: `${response.report?.duplicatesFound || 0} Duplikate in ${response.report?.totalRecords || 0} Einträgen gefunden.`,
+      });
+    } catch (error: any) {
+      console.error('Duplikate-Suche fehlgeschlagen:', error);
+      toast({
+        title: "Fehler bei der Duplikate-Suche",
+        description: error.message || "Ein unbekannter Fehler ist aufgetreten.",
+        variant: "destructive",
+      });
+    } finally {
+      setDuplicateSearchLoading(false);
+    }
+  }
+
+  // Delete duplicates function
+  async function handleDeleteDuplicates() {
+    if (!duplicateResults?.removalCandidates?.length) {
+      toast({
+        title: "Keine Duplikate zum Löschen",
+        description: "Führe zuerst eine Duplikate-Suche durch.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setDeleteLoading(true);
+    try {
+      const response = await apiRequest('/api/quality/remove-duplicates', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          candidateIds: duplicateResults.removalCandidates 
+        })
+      });
+      
+      toast({
+        title: "Duplikate erfolgreich gelöscht",
+        description: `${response.removedCount} Duplikate wurden entfernt.`,
+      });
+      
+      // Refresh search results
+      await handleDuplicateSearch();
+    } catch (error: any) {
+      console.error('Duplikate-Löschung fehlgeschlagen:', error);
+      toast({
+        title: "Fehler beim Löschen der Duplikate",
+        description: error.message || "Ein unbekannter Fehler ist aufgetreten.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleteLoading(false);
+    }
+  }
 }
