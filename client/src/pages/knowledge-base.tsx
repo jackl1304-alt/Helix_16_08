@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/performance-optimized-card";
+import { FormattedText } from "@/components/formatted-text";
+import { AISummary } from "@/components/ai-summary";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -634,21 +636,29 @@ Helix Regulatory Intelligence Platform
               </DialogHeader>
               
               <div className="space-y-4">
+                <AISummary 
+                  content={selectedArticle.content}
+                  contentType="knowledge_article"
+                  className="mb-4"
+                />
+                
                 {selectedArticle.summary && (
                   <div>
                     <h4 className="font-semibold mb-2">Zusammenfassung:</h4>
-                    <p className="text-gray-700 dark:text-gray-300">
-                      {selectedArticle.summary}
-                    </p>
+                    <FormattedText 
+                      text={selectedArticle.summary} 
+                      className="text-gray-700 dark:text-gray-300"
+                    />
                   </div>
                 )}
                 
                 <div>
                   <h4 className="font-semibold mb-2">Vollständiger Inhalt:</h4>
                   <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                    <pre className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
-                      {selectedArticle.content}
-                    </pre>
+                    <FormattedText 
+                      text={selectedArticle.content} 
+                      className="text-sm text-gray-700 dark:text-gray-300"
+                    />
                   </div>
                 </div>
                 
