@@ -30,7 +30,11 @@ interface Subscriber {
   email: string;
   name?: string;
   isActive: boolean;
-  preferences?: any;
+  preferences?: {
+    frequency: string;
+    topics: string[];
+    format: string;
+  };
   subscribedAt: string;
 }
 

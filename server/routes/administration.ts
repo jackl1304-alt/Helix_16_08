@@ -263,7 +263,12 @@ router.get('/download-documentation', async (req: Request, res: Response) => {
         
         res.setHeader('Content-Type', 'text/plain');
         res.setHeader('Content-Disposition', 'attachment; filename="helix-documentation.txt"');
-        res.send(content);
+        res.json({
+          success: true,
+          content: content,
+          contentType: 'text/plain',
+          filename: 'helix-documentation.txt'
+        });
       } catch (error) {
         res.status(404).json({ error: 'Documentation file not found' });
       }
