@@ -137,8 +137,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .deltaways-button-primary {
-  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(220, 80%, 20%) 100%);
-  color: hsl(var(--primary-foreground));
+  background: linear-gradient(135deg, #d95d2c 0%, #b8441f 100%);
+  color: white;
   border: none;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -146,9 +146,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .deltaways-button-primary:hover {
-  background: linear-gradient(135deg, hsl(220, 80%, 20%) 0%, hsl(var(--primary)) 100%);
+  background: linear-gradient(135deg, #b8441f 0%, #d95d2c 100%);
   transform: translateY(-1px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 25px rgba(217, 93, 44, 0.25);
 }
 
 .deltaways-accent-border {

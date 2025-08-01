@@ -513,8 +513,7 @@ export default function Administration() {
                   <Button
                     onClick={handleDeleteDuplicates}
                     disabled={deleteLoading}
-                    variant="destructive"
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 bg-[#d95d2c] hover:bg-[#b8441f] text-white"
                   >
                     {deleteLoading ? (
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
