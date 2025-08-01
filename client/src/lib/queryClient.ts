@@ -59,8 +59,22 @@ export const queryClient = new QueryClient({
     queries: {
       // Use custom queryFn for better error handling
       queryFn: async ({ queryKey }) => {
-        console.log(`[QUERY CLIENT] Fetching: ${queryKey.join("/")}`);
-        const response = await fetch(queryKey.join("/") as string, {
+        let url = queryKey[0] as string;
+        const params = queryKey[1] as Record<string, any> || {};
+        
+        // Build query string from parameters
+        if (Object.keys(params).length > 0) {
+          const searchParams = new URLSearchParams();
+          Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+              searchParams.append(key, String(value));
+            }
+          });
+          url += `?${searchParams.toString()}`;
+        }
+        
+        console.log(`[QUERY CLIENT] Fetching: ${url}`);
+        const response = await fetch(url, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
@@ -69,7 +83,7 @@ export const queryClient = new QueryClient({
           credentials: "include",
         });
 
-        console.log(`[QUERY CLIENT] Response status: ${response.status} for ${queryKey.join("/")}`);
+        console.log(`[QUERY CLIENT] Response status: ${response.status} for ${url}`);
 
         if (!response.ok) {
           const errorText = await response.text();
@@ -78,7 +92,7 @@ export const queryClient = new QueryClient({
         }
 
         const data = await response.json();
-        console.log(`[QUERY CLIENT] Success: ${typeof data} data for ${queryKey.join("/")}`);
+        console.log(`[QUERY CLIENT] Success: ${typeof data} data for ${url}`);
         return data;
       },
       refetchInterval: false,

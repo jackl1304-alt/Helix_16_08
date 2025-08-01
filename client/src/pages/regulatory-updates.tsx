@@ -50,7 +50,7 @@ export default function RegulatoryUpdates() {
   const [selectedType, setSelectedType] = useState<string>("all");
 
   const { data: updates, isLoading, error: updatesError } = useQuery<any>({
-    queryKey: ["/api/regulatory-updates/recent"],
+    queryKey: ["/api/regulatory-updates/recent", { limit: 5000 }],
     staleTime: 30000,
     gcTime: 60000,
     refetchOnMount: true,
