@@ -318,7 +318,13 @@ export default function EnhancedLegalCases() {
                     
                     <TabsContent value="overview" className="mt-4">
                       <div className="space-y-4">
-                        <p className="text-gray-700 leading-relaxed">{legalCase.summary}</p>
+                        <div className="text-gray-700">
+                          <FormattedText 
+                            content={legalCase.summary}
+                            className="text-base leading-relaxed"
+                            maxHeight="max-h-40"
+                          />
+                        </div>
                         
                         <div className="grid grid-cols-2 gap-4">
                           <div className="bg-gray-50 p-3 rounded-lg">
