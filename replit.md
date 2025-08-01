@@ -32,6 +32,7 @@ Preferred communication style: German language - Simple, everyday language.
 - ✅ **GRIP Platform Integration**: Sichere Verbindung zur GRIP Global Intelligence Platform implementiert (2025-08-01)
 - ✅ **Vollständige Artikel-Inhalte**: 979 Regulatory Updates + 2001 Legal Cases mit detaillierten, authentischen Inhalten (2000+ Zeichen) (2025-08-01)
 - ✅ **Enhanced Legal Cases KI-Analyse**: Demo-Daten durch echte Legal Cases ersetzt, intelligente KI-Auswertung mit gut lesbaren Absätzen implementiert (2025-08-01)
+- ✅ **Dokumentenarchiv-Anpassung**: Cutoff-Datum von 01.06.2024 auf 30.07.2024 geändert - archiviert bis 30.07.2024, synchronisiert ab diesem Datum (2025-08-01)
 
 ### Performance Optimierungen (Updated 2025-08-01)
 - ✅ **Lazy Loading**: Alle Seiten außer Dashboard per Lazy Loading geladen
