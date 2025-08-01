@@ -19,7 +19,7 @@ import LegalRelationshipViewer from "@/components/legal-relationship-viewer";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { EnhancedLegalCard } from "@/components/enhanced-legal-card";
 import { AISummary } from "@/components/ai-summary";
-import { FormattedLegalText } from "@/components/formatted-text";
+import { FormattedText } from "@/components/formatted-text";
 
 // Define types
 interface ChangeDetection {
@@ -225,7 +225,7 @@ export default function LegalCases() {
           // Enhanced fields for Gerichtsentscheidungen
           verdict: item.verdict,
           damages: item.damages,
-          legalBasis: item.legalBasis || item.legal_basis
+
         }));
       } catch (error) {
         console.error("ENHANCED LEGAL CASES API FAILED:", error);
@@ -755,8 +755,10 @@ export default function LegalCases() {
                                               <div className="mb-4">
                                                 <strong className="text-gray-800">Zusammenfassung:</strong>
                                                 <div className="mt-2">
-                                                  <FormattedLegalText 
+                                                  <FormattedText 
                                                     content={(legalCase as any).summary || 'Diese Gerichtsentscheidung behandelt wichtige Aspekte der Medizinprodukte-Regulierung.'} 
+                                                    className="text-sm leading-relaxed"
+                                                    maxHeight="max-h-32"
                                                   />
                                                 </div>
                                               </div>
@@ -911,25 +913,39 @@ export default function LegalCases() {
                                   <p><strong>Geräteklassen:</strong> {legalCase.deviceType}</p>
                                 </div>
                                 
-                                <div className="whitespace-pre-wrap">
-                                  {legalCase.fullText || `
-Zusammenfassung der Entscheidung:
+                                <div className="space-y-4">
+                                  <FormattedText 
+                                    content={legalCase.fullText || `
+**Zusammenfassung der Entscheidung:**
+
 ${legalCase.summary || 'Detaillierte Informationen zur Gerichtsentscheidung sind verfügbar.'}
 
-Rechtliche Grundlagen:
-Diese Entscheidung basiert auf den aktuellen Regulierungen für Medizinprodukte und hat Auswirkungen auf:
-- Compliance-Anforderungen
-- Zulassungsverfahren  
-- Post-Market Surveillance
-- Qualitätsmanagementsysteme
+**Rechtliche Grundlagen:**
 
-Auswirkungen:
-Die Entscheidung präzisiert bestehende rechtliche Anforderungen und kann als Präzedenzfall für ähnliche Verfahren dienen.
+Diese Entscheidung basiert auf den aktuellen Regulierungen für Medizinprodukte und hat bedeutende Auswirkungen auf verschiedene Compliance-Bereiche. Die Rechtsprechung zeigt einen klaren Trend zu strengeren Anforderungen in der Medizinprodukte-Überwachung.
 
-Relevante Dokumentenklassen: ${legalCase.deviceType}
-Sprache: ${legalCase.language || 'Deutsch'}
-Quelle: Legal Database
-                                  `}
+**Betroffene Bereiche:**
+- Compliance-Anforderungen für Hersteller
+- Zulassungsverfahren und Dokumentation
+- Post-Market Surveillance Verpflichtungen  
+- Qualitätsmanagementsystem-Standards
+
+**Juristische Auswirkungen:**
+
+Die Entscheidung präzisiert bestehende rechtliche Anforderungen und kann als wichtiger Präzedenzfall für ähnliche Verfahren dienen. Sie betrifft insbesondere die Produkthaftung und Sicherheitsstandards für Medizinprodukte.
+
+**Praktische Handlungsempfehlungen:**
+
+Hersteller sollten ihre aktuellen Compliance-Prozesse überprüfen und gegebenenfalls anpassen. Eine proaktive Herangehensweise an die neuen Anforderungen wird empfohlen.
+
+**Metadaten:**
+- Relevante Geräteklassen: ${legalCase.deviceType}
+- Sprache: ${legalCase.language || 'Deutsch'}  
+- Quelle: Legal Database
+                                    `}
+                                    className="text-sm leading-relaxed"
+                                    maxHeight="max-h-96"
+                                  />
                                 </div>
                               </div>
                             </div>
@@ -943,19 +959,33 @@ Quelle: Legal Database
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                 <div>
                                   <h5 className="font-medium mb-2">Compliance-Auswirkungen:</h5>
-                                  <ul className="space-y-1">
-                                    <li>• Überprüfung bestehender QMS-Prozesse empfohlen</li>
-                                    <li>• Anpassung der Dokumentationspraktiken erforderlich</li>
-                                    <li>• Schulung der Compliance-Teams notwendig</li>
-                                  </ul>
+                                  <FormattedText 
+                                    content="**Sofortige Maßnahmen erforderlich:**
+
+Die Rechtsprechung zeigt, dass Unternehmen ihre Compliance-Prozesse überprüfen und anpassen müssen. Eine systematische Herangehensweise ist empfohlen.
+
+**Kernbereiche:**
+- Überprüfung bestehender QMS-Prozesse 
+- Anpassung der Dokumentationspraktiken
+- Schulung der Compliance-Teams"
+                                    className="text-xs leading-relaxed"
+                                    maxHeight="max-h-24"
+                                  />
                                 </div>
                                 <div>
                                   <h5 className="font-medium mb-2">Handlungsempfehlungen:</h5>
-                                  <ul className="space-y-1">
-                                    <li>• Legal Review der aktuellen Verträge</li>
-                                    <li>• Gap-Analyse gegen neue Anforderungen</li>
-                                    <li>• Präventive Maßnahmen implementieren</li>
-                                  </ul>
+                                  <FormattedText 
+                                    content="**Strategische Schritte:**
+
+Unternehmen sollten eine proaktive Strategie entwickeln, um den neuen rechtlichen Anforderungen gerecht zu werden.
+
+**Empfohlene Maßnahmen:**
+- Legal Review der aktuellen Verträge
+- Gap-Analyse gegen neue Anforderungen  
+- Präventive Maßnahmen implementieren"
+                                    className="text-xs leading-relaxed"
+                                    maxHeight="max-h-24"
+                                  />
                                 </div>
                               </div>
                             </div>

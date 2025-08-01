@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Brain, TrendingUp, AlertTriangle, CheckCircle, Shield, Target, Scale, Zap } from 'lucide-react';
+import { FormattedText } from './formatted-text';
 
 interface EnhancedAISummaryProps {
   caseContent: string;
@@ -221,9 +222,13 @@ export function EnhancedAISummary({
                   <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
                   <h5 className="font-medium text-gray-900">{takeaway.title}</h5>
                 </div>
-                <p className="text-sm text-gray-700 leading-relaxed ml-6">
-                  {takeaway.description}
-                </p>
+                <div className="ml-6">
+                  <FormattedText 
+                    content={takeaway.description}
+                    className="text-sm leading-relaxed"
+                    maxHeight="max-h-32"
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -264,9 +269,13 @@ export function EnhancedAISummary({
                     {recommendation.priority}
                   </Badge>
                 </div>
-                <p className="text-sm text-gray-700 leading-relaxed">
-                  {recommendation.description}
-                </p>
+                <div className="text-sm text-gray-700">
+                  <FormattedText 
+                    content={recommendation.description}
+                    className="text-sm leading-relaxed"
+                    maxHeight="max-h-24"
+                  />
+                </div>
               </div>
             ))}
           </div>
