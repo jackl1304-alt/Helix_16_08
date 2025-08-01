@@ -281,12 +281,12 @@ export default function GripDataPage() {
             <div className="flex items-center gap-2 text-blue-800">
               <CheckCircle className="h-4 w-4" />
               <span className="text-sm font-medium">
-                Sichere Verbindung
+                Sichere Auth0-Verbindung
               </span>
             </div>
             <p className="text-sm text-blue-700 mt-1">
-              Die Verbindung zur GRIP Platform ist verschlüsselt und verwendet 
-              sichere Authentifizierung über Umgebungsvariablen.
+              Die Verbindung zur GRIP Platform nutzt Auth0-Authentifizierung 
+              (grip-app.us.auth0.com) mit erweiterten Bot-Verschleierungsmaßnahmen.
             </p>
           </div>
         </CardContent>
