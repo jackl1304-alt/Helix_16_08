@@ -358,7 +358,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.setHeader('Content-Type', 'application/json');
       res.setHeader('Cache-Control', 'no-cache');
       
-      const updates = await storage.getRecentRegulatoryUpdates(validatedQuery.limit);
+      // CRITICAL FIX: Use ALL data, ignore artificial limits
+      const allUpdates = await storage.getAllRegulatoryUpdates();
+      // Apply reasonable default limit only if not specified
+      const effectiveLimit = validatedQuery.limit === 50 ? 5000 : validatedQuery.limit;
+      const updates = effectiveLimit ? allUpdates.slice(0, effectiveLimit) : allUpdates;
       
       // Filter by region if specified
       const filteredUpdates = validatedQuery.region 
