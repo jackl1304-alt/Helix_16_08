@@ -66,7 +66,7 @@ export function Sidebar() {
             <img 
               src={logoPath} 
               alt="Helix Logo" 
-              className="h-16 w-16 object-cover rounded-lg ring-2 ring-yellow-400/50"
+              className="h-16 w-16 object-cover rounded-lg ring-2 ring-[#b0d4f6]"
             />
             <span className="text-lg deltaways-brand-text text-yellow-400">HELIX</span>
             <p className="text-xs font-medium text-gray-300">Powered by DELTA WAYS</p>
@@ -84,13 +84,13 @@ export function Sidebar() {
                   className={cn(
                     "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer",
                     isActive
-                      ? "text-yellow-400 bg-yellow-400/20 border border-yellow-400/30 shadow-sm"
+                      ? "bg-[#0b3761] text-white border border-[#0b3761] shadow-sm"
                       : "text-gray-300 hover:text-white hover:bg-white/10"
                   )}
                 >
                   <item.icon className={cn(
                     "mr-3 h-5 w-5",
-                    isActive ? "text-yellow-400" : "text-gray-400 group-hover:text-yellow-300"
+                    isActive ? "text-white" : "text-gray-400 group-hover:text-yellow-300"
                   )} />
                   {item.name}
                 </div>
@@ -110,15 +110,15 @@ export function Sidebar() {
                 <Link key={item.name} href={item.href}>
                   <div
                     className={cn(
-                      "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer",
+                      "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer",
                       isActive
-                        ? "text-primary bg-primary/10 border border-primary/20"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                        ? "bg-[#0b3761] text-white border border-[#0b3761] shadow-sm"
+                        : "text-gray-300 hover:text-white hover:bg-white/10"
                     )}
                   >
                     <item.icon className={cn(
                       "mr-3 h-5 w-5",
-                      isActive ? "text-primary" : "text-gray-400"
+                      isActive ? "text-white" : "text-gray-400 group-hover:text-yellow-300"
                     )} />
                     {item.name}
                   </div>
@@ -139,15 +139,15 @@ export function Sidebar() {
                 <Link key={item.name} href={item.href}>
                   <div
                     className={cn(
-                      "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer",
+                      "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer",
                       isActive
-                        ? "text-primary bg-primary/10 border border-primary/20"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                        ? "bg-[#0b3761] text-white border border-[#0b3761] shadow-sm"
+                        : "text-gray-300 hover:text-white hover:bg-white/10"
                     )}
                   >
                     <item.icon className={cn(
                       "mr-3 h-5 w-5",
-                      isActive ? "text-primary" : "text-gray-400"
+                      isActive ? "text-white" : "text-gray-400 group-hover:text-yellow-300"
                     )} />
                     {item.name}
                   </div>

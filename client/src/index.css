@@ -8,6 +8,8 @@
 :root {
   /* DELTA WAYS Primary Brand Colors */
   --deltaways-navy: hsl(220, 100%, 15%); /* Primary Navy */
+  --deltaways-active: #0b3761; /* Active Navigation Elements */
+  --deltaways-ring: #b0d4f6; /* Logo Ring Color */
   --deltaways-gold: hsl(45, 100%, 50%); /* Accent Gold */
   --deltaways-gray: hsl(210, 15%, 92%); /* Secondary Gray */
   --deltaways-dark: hsl(220, 50%, 8%); /* Deep Navy */
