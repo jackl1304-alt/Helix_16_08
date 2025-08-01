@@ -85,12 +85,12 @@ export function Sidebar() {
                     "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer",
                     isActive
                       ? "bg-[#0b3761] text-white border border-[#0b3761] shadow-sm"
-                      : "text-gray-300 hover:text-white hover:bg-white/10"
+                      : "text-[#0b3761] hover:text-white hover:bg-white/10"
                   )}
                 >
                   <item.icon className={cn(
                     "mr-3 h-5 w-5",
-                    isActive ? "text-white" : "text-gray-400 group-hover:text-[#07233e]"
+                    isActive ? "text-white" : "text-[#0b3761] group-hover:text-white"
                   )} />
                   {item.name}
                 </div>
@@ -113,12 +113,12 @@ export function Sidebar() {
                       "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer",
                       isActive
                         ? "bg-[#0b3761] text-white border border-[#0b3761] shadow-sm"
-                        : "text-gray-300 hover:text-white hover:bg-white/10"
+                        : "text-[#0b3761] hover:text-white hover:bg-white/10"
                     )}
                   >
                     <item.icon className={cn(
                       "mr-3 h-5 w-5",
-                      isActive ? "text-white" : "text-gray-400 group-hover:text-[#07233e]"
+                      isActive ? "text-white" : "text-[#0b3761] group-hover:text-white"
                     )} />
                     {item.name}
                   </div>
@@ -142,12 +142,12 @@ export function Sidebar() {
                       "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer",
                       isActive
                         ? "bg-[#0b3761] text-white border border-[#0b3761] shadow-sm"
-                        : "text-gray-300 hover:text-white hover:bg-white/10"
+                        : "text-[#0b3761] hover:text-white hover:bg-white/10"
                     )}
                   >
                     <item.icon className={cn(
                       "mr-3 h-5 w-5",
-                      isActive ? "text-white" : "text-gray-400 group-hover:text-[#07233e]"
+                      isActive ? "text-white" : "text-[#0b3761] group-hover:text-white"
                     )} />
                     {item.name}
                   </div>
