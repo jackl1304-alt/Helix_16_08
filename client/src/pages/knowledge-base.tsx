@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   BookOpen, 
   RefreshCw, 
@@ -21,7 +22,9 @@ import {
   TrendingUp,
   Database,
   Zap,
-  Download
+  Download,
+  Eye,
+  ExternalLink
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { KnowledgeExtractionPanel } from "@/components/knowledge/KnowledgeExtractionPanel";
@@ -72,6 +75,8 @@ export default function KnowledgeBasePage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedRegion, setSelectedRegion] = useState<string>("all");
   const [selectedSource, setSelectedSource] = useState<string>("all");
+  const [selectedArticle, setSelectedArticle] = useState<KnowledgeArticle | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -174,6 +179,57 @@ export default function KnowledgeBasePage() {
     
     return matchesSearch && matchesCategory && matchesRegion && matchesSource;
   });
+
+  // Article actions
+  const openArticle = (article: KnowledgeArticle) => {
+    setSelectedArticle(article);
+    setIsModalOpen(true);
+  };
+
+  const downloadArticle = (article: KnowledgeArticle) => {
+    const content = `KNOWLEDGE BASE ARTIKEL - VOLLSTÄNDIGER EXPORT
+========================================
+
+Titel: ${article.title}
+Autor/Quelle: ${article.authority}
+Region: ${article.region}
+Kategorie: ${article.category}
+Priorität: ${article.priority}
+Sprache: ${article.language}
+Veröffentlicht: ${new Date(article.published_at).toLocaleDateString('de-DE')}
+
+ZUSAMMENFASSUNG:
+${article.summary || 'Keine Zusammenfassung verfügbar'}
+
+VOLLSTÄNDIGER INHALT:
+${article.content}
+
+TAGS:
+${article.tags.join(', ')}
+
+QUELLE:
+${article.source}
+
+========================================
+Export erstellt am: ${new Date().toLocaleDateString('de-DE')} um ${new Date().toLocaleTimeString('de-DE')}
+Helix Regulatory Intelligence Platform
+`;
+    
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `HELIX_KB_${article.title.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_')}_${article.id.slice(0, 8)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Download gestartet",
+      description: `Artikel "${article.title}" wurde heruntergeladen.`
+    });
+  };
 
   // Statistics
   const stats = {
@@ -419,14 +475,32 @@ export default function KnowledgeBasePage() {
                         <span className="text-sm text-gray-500">
                           Kategorie: {article.category}
                         </span>
-                        {article.url && (
-                          <Button variant="outline" size="sm" asChild>
-                            <a href={article.url} target="_blank" rel="noopener noreferrer">
-                              <Download className="h-4 w-4 mr-2" />
-                              Öffnen
-                            </a>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => openArticle(article)}
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            Volltext
                           </Button>
-                        )}
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => downloadArticle(article)}
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            Download
+                          </Button>
+                          {article.url && (
+                            <Button variant="outline" size="sm" asChild>
+                              <a href={article.url} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="h-4 w-4 mr-2" />
+                                Quelle
+                              </a>
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -480,6 +554,93 @@ export default function KnowledgeBasePage() {
           <KnowledgeExtractionPanel />
         </TabsContent>
       </Tabs>
+
+      {/* Article Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+          {selectedArticle && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-xl font-bold">
+                  {selectedArticle.title}
+                </DialogTitle>
+                <DialogDescription>
+                  <div className="flex items-center gap-4 text-sm mt-2">
+                    <span className="flex items-center gap-1">
+                      <Globe className="h-3 w-3" />
+                      {selectedArticle.authority}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      {new Date(selectedArticle.published_at).toLocaleDateString('de-DE')}
+                    </span>
+                    <Badge variant="secondary">{selectedArticle.region}</Badge>
+                    <Badge 
+                      variant={selectedArticle.priority === 'high' ? 'destructive' : 'default'}
+                    >
+                      {selectedArticle.priority}
+                    </Badge>
+                  </div>
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4">
+                {selectedArticle.summary && (
+                  <div>
+                    <h4 className="font-semibold mb-2">Zusammenfassung:</h4>
+                    <p className="text-gray-700 dark:text-gray-300">
+                      {selectedArticle.summary}
+                    </p>
+                  </div>
+                )}
+                
+                <div>
+                  <h4 className="font-semibold mb-2">Vollständiger Inhalt:</h4>
+                  <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                    <pre className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
+                      {selectedArticle.content}
+                    </pre>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold mb-2">Tags:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedArticle.tags.map((tag, index) => (
+                      <Badge key={index} variant="outline" className="text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="flex justify-between items-center pt-4 border-t">
+                  <span className="text-sm text-gray-500">
+                    Quelle: {selectedArticle.source}
+                  </span>
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={() => downloadArticle(selectedArticle)}
+                      variant="outline"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
+                    {selectedArticle.url && (
+                      <Button variant="outline" asChild>
+                        <a href={selectedArticle.url} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          Original Quelle
+                        </a>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
