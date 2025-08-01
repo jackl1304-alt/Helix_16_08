@@ -20,8 +20,6 @@ import { cn } from "@/lib/utils";
 import LegalRelationshipViewer from "@/components/legal-relationship-viewer";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { EnhancedLegalCard } from "@/components/enhanced-legal-card";
-import { AISummary } from "@/components/ai-summary";
-import { FormattedText } from "@/components/formatted-text";
 
 // Define types
 interface ChangeDetection {
