@@ -126,10 +126,15 @@ EXPORT DETAILS:
       const a = document.createElement('a');
       a.href = url;
       a.download = `HELIX_${update.title.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_')}_${update.id.slice(0, 8)}.txt`;
+      a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      setTimeout(() => {
+        if (document.body.contains(a)) {
+          document.body.removeChild(a);
+        }
+        URL.revokeObjectURL(url);
+      }, 100);
       
       toast({
         title: "Download gestartet",
@@ -362,7 +367,7 @@ EXPORT DETAILS:
                                     <Eye className="h-3 w-3" />
                                   </Button>
                                 </DialogTrigger>
-                                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="dialog-description">
                                   <DialogHeader>
                                     <DialogTitle className="text-xl font-bold">{update.title}</DialogTitle>
                                   </DialogHeader>
@@ -505,7 +510,7 @@ EXPORT DETAILS:
                               Details
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="dialog-description">
                             <DialogHeader>
                               <DialogTitle>{update.title}</DialogTitle>
                             </DialogHeader>
@@ -579,7 +584,7 @@ EXPORT DETAILS:
                             <Eye className="h-4 w-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="dialog-description">
                           <DialogHeader>
                             <DialogTitle>{update.title}</DialogTitle>
                           </DialogHeader>
