@@ -58,6 +58,10 @@ export default function RegulatoryUpdates() {
 
   // Sicherstellen, dass updates ein Array ist
   const updatesArray = Array.isArray(updates) ? updates : ((updates as any)?.data || (updates as any)?.updates || []);
+  
+  // Filter GRIP-specific data
+  const gripUpdates = (updatesArray || []).filter((update: RegulatoryUpdate) => update.source_id === 'grip_platform');
+  
   const filteredUpdates = (updatesArray || []).filter((update: RegulatoryUpdate) => {
     const matchesSearch = !searchTerm || 
       update.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
