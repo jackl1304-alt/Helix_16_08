@@ -235,8 +235,7 @@ app.use((req, res, next) => {
     }
   }
   
-  // Serve attached assets statically BEFORE API routes
-  app.use('/attached_assets', express.static(path.join(process.cwd(), 'attached_assets')));
+
 
   // CRITICAL: Block HTML fallback for ALL API routes - FORCE JSON ONLY
   app.use('/api/*', (req, res, next) => {
