@@ -69,7 +69,7 @@ export function KnowledgeExtractionPanel() {
   });
 
   // Extract data from API response wrapper
-  const status = statusResponse?.data || statusResponse;
+  const status = (statusResponse as any)?.data || statusResponse;
 
   // Hole Vorschau der extrahierbaren Artikel
   const { data: previewResponse, isLoading: previewLoading } = useQuery({
@@ -78,13 +78,14 @@ export function KnowledgeExtractionPanel() {
   });
 
   // Extract data from API response wrapper
-  const preview = previewResponse?.data || previewResponse;
+  const preview = (previewResponse as any)?.data || previewResponse;
 
   // Vollständige Extraktion
   const extractAllMutation = useMutation({
     mutationFn: async () => {
       return apiRequest('/api/knowledge-extraction/extract-all', {
         method: 'POST',
+        body: JSON.stringify({}),
       });
     },
     onMutate: () => {
@@ -334,7 +335,7 @@ export function KnowledgeExtractionPanel() {
                     <div>
                       <h4 className="font-semibold mb-2">Regulatorische Updates</h4>
                       <div className="space-y-2 max-h-40 overflow-y-auto">
-                        {preview.regulatory.slice(0, 5).map((item) => (
+                        {preview.regulatory.slice(0, 5).map((item: any) => (
                           <div key={item.id} className="flex justify-between items-center p-2 bg-muted rounded">
                             <div className="flex-1 min-w-0">
                               <p className="font-medium truncate">{item.title}</p>
@@ -353,7 +354,7 @@ export function KnowledgeExtractionPanel() {
                     <div>
                       <h4 className="font-semibold mb-2">Rechtsfälle</h4>
                       <div className="space-y-2 max-h-40 overflow-y-auto">
-                        {preview.legal.slice(0, 5).map((item) => (
+                        {preview.legal.slice(0, 5).map((item: any) => (
                           <div key={item.id} className="flex justify-between items-center p-2 bg-muted rounded">
                             <div className="flex-1 min-w-0">
                               <p className="font-medium truncate">{item.title}</p>
