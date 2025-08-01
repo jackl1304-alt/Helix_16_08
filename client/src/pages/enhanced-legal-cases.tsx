@@ -6,8 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Scale, DollarSign, FileText, AlertTriangle, CheckCircle, Clock, TrendingUp } from 'lucide-react';
+import { Search, Scale, DollarSign, FileText, AlertTriangle, CheckCircle, Clock, TrendingUp, Brain } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
+import { EnhancedAISummary } from '@/components/enhanced-ai-summary';
 
 interface ComprehensiveLegalCase {
   id: string;
@@ -109,19 +110,19 @@ export default function EnhancedLegalCases() {
 
     // Extract device name
     const deviceMatch = content.match(/\*\*Device:\*\* ([^\n]+)/);
-    if (deviceMatch) {
+    if (deviceMatch && deviceMatch[1]) {
       details.deviceName = deviceMatch[1];
     }
 
     // Extract recall status
     const recallMatch = content.match(/\*\*Recall Status:\*\* ([^\n]+)/);
-    if (recallMatch) {
+    if (recallMatch && recallMatch[1]) {
       details.recallStatus = recallMatch[1];
     }
 
     // Extract adverse events
     const adverseMatch = content.match(/• Total Reports: ([0-9,]+)/);
-    if (adverseMatch) {
+    if (adverseMatch && adverseMatch[1]) {
       details.adverseEvents = adverseMatch[1];
     }
 
@@ -150,8 +151,8 @@ export default function EnhancedLegalCases() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Enhanced Legal Cases</h1>
           <p className="text-gray-600 mt-1">
-            2018 simulierte Rechtsfälle für Demonstrationszwecke 
-            <span className="text-orange-600 font-medium ml-1">(Demo-Daten)</span>
+            {legalCases.length} Rechtsfälle mit verbesserten KI-Auswertungen 
+            <span className="text-green-600 font-medium ml-1">(Echte Daten)</span>
           </p>
         </div>
         <Button 
@@ -167,7 +168,7 @@ export default function EnhancedLegalCases() {
           ) : (
             <>
               <TrendingUp className="w-4 h-4 mr-2" />
-              Aktualisiere Datenbank (2018 Cases)
+              Aktualisiere Datenbank ({legalCases.length} Cases)
             </>
           )}
         </Button>
@@ -291,10 +292,14 @@ export default function EnhancedLegalCases() {
                 
                 <CardContent>
                   <Tabs defaultValue="overview" className="w-full">
-                    <TabsList className="grid w-full grid-cols-4">
+                    <TabsList className="grid w-full grid-cols-5">
                       <TabsTrigger value="overview" className="flex items-center gap-1">
                         <Scale className="w-4 h-4" />
                         Overview
+                      </TabsTrigger>
+                      <TabsTrigger value="ai-analysis" className="flex items-center gap-1">
+                        <Brain className="w-4 h-4" />
+                        KI-Analyse
                       </TabsTrigger>
                       <TabsTrigger value="financial" className="flex items-center gap-1">
                         <DollarSign className="w-4 h-4" />
@@ -331,6 +336,17 @@ export default function EnhancedLegalCases() {
                           </div>
                         </div>
                       </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="ai-analysis" className="mt-4">
+                      <EnhancedAISummary
+                        caseContent={legalCase.content}
+                        caseTitle={legalCase.title}
+                        caseSummary={legalCase.summary}
+                        court={legalCase.court}
+                        jurisdiction={legalCase.jurisdiction}
+                        keywords={legalCase.keywords}
+                      />
                     </TabsContent>
                     
                     <TabsContent value="financial" className="mt-4">
