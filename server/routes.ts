@@ -2763,6 +2763,196 @@ Status: Archiviertes historisches Dokument
     }
   });
 
+  // AegisIntel Services Integration - Comprehensive AI-powered regulatory analysis
+  app.post('/api/aegis/analyze-regulatory', async (req, res) => {
+    try {
+      const { content, title } = req.body;
+      const fullContent = `${title} ${content}`;
+      
+      // Load services dynamically to avoid dependency issues
+      const { aiService } = await import('./services/aiService');
+      const { nlpService } = await import('./services/nlpService');
+      
+      const analysis = await aiService.analyzeRegulatoryContent(fullContent);
+      const nlpAnalysis = await nlpService.categorizeContent(fullContent);
+      
+      res.json({
+        success: true,
+        data: {
+          ...analysis,
+          nlpAnalysis
+        }
+      });
+    } catch (error) {
+      console.error('Error analyzing regulatory content:', error);
+      res.status(500).json({ error: 'Regulatory content analysis failed' });
+    }
+  });
+
+  app.post('/api/aegis/analyze-legal-case', async (req, res) => {
+    try {
+      const legalCaseData = req.body;
+      const { legalAnalysisService } = await import('./services/legalAnalysisService');
+      const analysis = await legalAnalysisService.analyzeLegalCase(legalCaseData);
+      
+      res.json({
+        success: true,
+        data: analysis
+      });
+    } catch (error) {
+      console.error('Error analyzing legal case:', error);
+      res.status(500).json({ error: 'Legal case analysis failed' });
+    }
+  });
+
+  app.get('/api/aegis/historical-trends/:dataType', async (req, res) => {
+    try {
+      const { dataType } = req.params;
+      const { timeframe = 'monthly' } = req.query;
+      
+      if (!['regulatory', 'legal', 'all'].includes(dataType)) {
+        return res.status(400).json({ error: 'Invalid data type' });
+      }
+      
+      const { historicalDataService } = await import('./services/historicalDataService');
+      const trends = await historicalDataService.analyzeHistoricalTrends(
+        dataType as 'regulatory' | 'legal' | 'all',
+        timeframe as 'monthly' | 'quarterly' | 'yearly'
+      );
+      
+      res.json({
+        success: true,
+        data: trends
+      });
+    } catch (error) {
+      console.error('Error analyzing historical trends:', error);
+      res.status(500).json({ error: 'Historical trend analysis failed' });
+    }
+  });
+
+  app.post('/api/aegis/collect-fda-data', async (req, res) => {
+    try {
+      const { dataCollectionService } = await import('./services/dataCollectionService');
+      await dataCollectionService.collectFDAData();
+      
+      res.json({
+        success: true,
+        message: 'FDA data collection completed successfully'
+      });
+    } catch (error) {
+      console.error('Error collecting FDA data:', error);
+      res.status(500).json({ error: 'FDA data collection failed' });
+    }
+  });
+
+  app.post('/api/aegis/collect-global-data', async (req, res) => {
+    try {
+      const { dataCollectionService } = await import('./services/dataCollectionService');
+      await dataCollectionService.collectAllGlobalData();
+      
+      res.json({
+        success: true,
+        message: 'Global regulatory data collection completed successfully'
+      });
+    } catch (error) {
+      console.error('Error collecting global data:', error);
+      res.status(500).json({ error: 'Global data collection failed' });
+    }
+  });
+
+  app.get('/api/aegis/legal-trends', async (req, res) => {
+    try {
+      const legalCases = await storage.getAllLegalCases();
+      const { legalAnalysisService } = await import('./services/legalAnalysisService');
+      const trends = await legalAnalysisService.analyzeLegalTrends(legalCases);
+      
+      res.json({
+        success: true,
+        data: trends
+      });
+    } catch (error) {
+      console.error('Error analyzing legal trends:', error);
+      res.status(500).json({ error: 'Legal trend analysis failed' });
+    }
+  });
+
+  app.get('/api/aegis/market-trends', async (req, res) => {
+    try {
+      const regulatoryUpdates = await storage.getAllRegulatoryUpdates();
+      const { aiService } = await import('./services/aiService');
+      const trends = await aiService.analyzeMarketTrends(regulatoryUpdates);
+      
+      res.json({
+        success: true,
+        data: trends
+      });
+    } catch (error) {
+      console.error('Error analyzing market trends:', error);
+      res.status(500).json({ error: 'Market trend analysis failed' });
+    }
+  });
+
+  app.post('/api/aegis/archive-data', async (req, res) => {
+    try {
+      const { historicalDataService } = await import('./services/historicalDataService');
+      const result = await historicalDataService.archiveOldData();
+      
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      console.error('Error archiving data:', error);
+      res.status(500).json({ error: 'Data archival failed' });
+    }
+  });
+
+  app.get('/api/aegis/retention-policy', async (req, res) => {
+    try {
+      const { historicalDataService } = await import('./services/historicalDataService');
+      const policy = historicalDataService.getRetentionPolicy();
+      
+      res.json({
+        success: true,
+        data: policy
+      });
+    } catch (error) {
+      console.error('Error getting retention policy:', error);
+      res.status(500).json({ error: 'Failed to retrieve retention policy' });
+    }
+  });
+
+  app.post('/api/aegis/nlp-analysis', async (req, res) => {
+    try {
+      const { content } = req.body;
+      
+      if (!content) {
+        return res.status(400).json({ error: 'Content is required' });
+      }
+      
+      const { nlpService } = await import('./services/nlpService');
+      const [categorization, keyInfo, summary, compliance] = await Promise.all([
+        nlpService.categorizeContent(content),
+        nlpService.extractKeyInformation(content),
+        nlpService.generateSummary(content),
+        nlpService.detectRegulatoryCompliance(content)
+      ]);
+      
+      res.json({
+        success: true,
+        data: {
+          categorization,
+          keyInformation: keyInfo,
+          summary,
+          compliance
+        }
+      });
+    } catch (error) {
+      console.error('Error performing NLP analysis:', error);
+      res.status(500).json({ error: 'NLP analysis failed' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

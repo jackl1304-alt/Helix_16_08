@@ -26,7 +26,9 @@ class AdvancedCache<T = any> {
     // Remove oldest items if cache is full
     if (this.cache.size >= this.maxSize) {
       const oldestKey = Array.from(this.cache.keys())[0];
-      this.cache.delete(oldestKey);
+      if (oldestKey) {
+        this.cache.delete(oldestKey);
+      }
     }
 
     this.cache.set(key, {
