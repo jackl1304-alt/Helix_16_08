@@ -374,27 +374,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Enrich updates with full content for frontend display
       const enrichedUpdates = filteredUpdates.map(update => ({
         ...update,
-        // Ensure rich content for display
-        description: update.description || `Wichtige regulatorische Änderung von ${update.source_id}. Diese Aktualisierung betrifft Medizinprodukte in der Region ${update.region} und erfordert Aufmerksamkeit für Compliance-Zwecke.`,
-        content: update.content || `VOLLSTÄNDIGER INHALT:
-
-Diese regulatorische Aktualisierung stammt von ${update.source_id} und wurde am ${new Date(update.published_at || update.created_at).toLocaleDateString('de-DE')} veröffentlicht.
-
-WICHTIGE PUNKTE:
-• Betrifft Medizinprodukte der Kategorie: ${Array.isArray(update.categories) ? update.categories.join(', ') : 'Allgemein'}
-• Priorität: ${update.priority || 'Mittel'}
-• Region: ${update.region}
-• Typ: ${update.update_type || 'Allgemeine Aktualisierung'}
-
-AUSWIRKUNGEN:
-Diese Änderung kann Auswirkungen auf Zulassungsverfahren, Dokumentationsanforderungen oder Sicherheitsstandards haben.
-
-COMPLIANCE:
-Unternehmen sollten ihre aktuellen Verfahren überprüfen und gegebenenfalls anpassen.
-
-QUELLE: ${update.source_id}
-DOKUMENT-URL: ${update.document_url || 'Nicht verfügbar'}
-LETZTE AKTUALISIERUNG: ${new Date(update.updated_at || update.created_at).toLocaleDateString('de-DE')}`,
+        // Use the authentic description from database instead of template
+        description: update.description || update.title,
+        content: update.description || update.title, // Use real description as content
         source: update.source_id,
         sourceUrl: update.document_url || `https://${update.source_id?.toLowerCase()}.europa.eu/docs/${update.id}`,
         fullText: `Vollständiger Regulatory Update Text für ${update.title}. Dieser Text enthält alle relevanten Informationen für Compliance und regulatorische Anforderungen.
