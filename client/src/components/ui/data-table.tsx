@@ -122,9 +122,10 @@ export function DataTable<T = any>({
             </div>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
-            <Table>
-              <TableHeader>
+          <div className="overflow-auto rounded-lg border border-slate-200 dark:border-slate-700 max-w-full">
+            <div className="min-w-full">
+              <Table className="min-w-[900px]">
+                <TableHeader>
                 <TableRow className="bg-slate-50 dark:bg-slate-800/50">
                   {columns.map((column) => (
                     <TableHead 
@@ -167,8 +168,9 @@ export function DataTable<T = any>({
                     )}
                   </TableRow>
                 ))}
-              </TableBody>
-            </Table>
+                </TableBody>
+              </Table>
+            </div>
           </div>
         )}
       </CardContent>
