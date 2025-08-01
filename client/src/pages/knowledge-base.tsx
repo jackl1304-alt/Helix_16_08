@@ -289,7 +289,7 @@ Helix Regulatory Intelligence Platform
           <Button
             onClick={() => newsletterMutation.mutate()}
             disabled={newsletterMutation.isPending}
-            className="deltaways-button-primary bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-navy-900"
+            className="deltaways-button-primary bg-gradient-to-r from-[#07233e] to-[#0b3761] hover:from-[#0b3761] hover:to-[#07233e] text-white"
           >
             {newsletterMutation.isPending ? (
               <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
