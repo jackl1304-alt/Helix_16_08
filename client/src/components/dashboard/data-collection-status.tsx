@@ -238,8 +238,7 @@ export function DataCollectionStatus() {
                     <div className="flex items-center space-x-2">
                       <Button
                         size="sm"
-                        variant="ghost"
-                        className="h-6 text-xs"
+                        className="h-6 text-xs bg-[#d95d2c] hover:bg-[#b8441f] text-white"
                         onClick={() => syncMutation.mutate(source.id)}
                         disabled={syncMutation.isPending}
                       >

@@ -153,7 +153,7 @@ export default function SyncManager() {
         <Button 
           onClick={handleSyncAll}
           disabled={syncAllMutation.isPending}
-          className="bg-blue-600 hover:bg-blue-700"
+          className="bg-[#d95d2c] hover:bg-[#b8441f] text-white"
         >
           {syncAllMutation.isPending ? (
             <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
@@ -270,8 +270,7 @@ export default function SyncManager() {
                   <Button
                     onClick={() => handleSingleSync(source.id)}
                     disabled={!source.isActive || isCurrentlySyncing}
-                    variant="outline"
-                    className="flex-1"
+                    className="flex-1 bg-[#d95d2c] hover:bg-[#b8441f] text-white"
                   >
                     {isCurrentlySyncing ? (
                       <>

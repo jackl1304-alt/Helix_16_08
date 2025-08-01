@@ -1090,9 +1090,12 @@ Status: Archiviertes historisches Dokument
     try {
       console.log("API: Fetching real-time audit logs...");
       
+      // Extract query parameters
+      const { search, action, severity, status, user, dateFrom, dateTo } = req.query;
+      
       // Generate real-time audit logs based on actual system activity
       const currentTime = new Date();
-      const auditLogs = [
+      let auditLogs = [
         {
           id: "audit-" + Date.now() + "-1",
           timestamp: new Date(currentTime.getTime() - 1000 * 60 * 2).toISOString(), // 2 min ago
@@ -1214,6 +1217,42 @@ Status: Archiviertes historisches Dokument
           status: "success" as const
         }
       ];
+
+      // Apply filters if provided
+      if (search) {
+        const searchTerm = (search as string).toLowerCase();
+        auditLogs = auditLogs.filter(log => 
+          log.details.toLowerCase().includes(searchTerm) ||
+          log.userName.toLowerCase().includes(searchTerm) ||
+          log.action.toLowerCase().includes(searchTerm)
+        );
+      }
+
+      if (action && action !== 'all') {
+        auditLogs = auditLogs.filter(log => log.action === action);
+      }
+
+      if (severity && severity !== 'all') {
+        auditLogs = auditLogs.filter(log => log.severity === severity);
+      }
+
+      if (status && status !== 'all') {
+        auditLogs = auditLogs.filter(log => log.status === status);
+      }
+
+      if (user && user !== 'all') {
+        auditLogs = auditLogs.filter(log => log.userId === user);
+      }
+
+      if (dateFrom) {
+        const fromDate = new Date(dateFrom as string);
+        auditLogs = auditLogs.filter(log => new Date(log.timestamp) >= fromDate);
+      }
+
+      if (dateTo) {
+        const toDate = new Date(dateTo as string);
+        auditLogs = auditLogs.filter(log => new Date(log.timestamp) <= toDate);
+      }
 
       console.log(`API: Generated ${auditLogs.length} real-time audit logs`);
       res.json(auditLogs);
