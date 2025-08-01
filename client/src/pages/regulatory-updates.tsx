@@ -332,7 +332,7 @@ EXPORT DETAILS:
                             {update.title}
                           </h3>
                           <FormattedText 
-                            content={update.description?.substring(0, 300) + '...' || 'Keine Beschreibung verfügbar'}
+                            text={update.description?.substring(0, 300) + '...' || 'Keine Beschreibung verfügbar'}
                             className="text-sm text-slate-600 dark:text-slate-400 line-clamp-3 mb-3"
                           />
                           
@@ -386,10 +386,8 @@ EXPORT DETAILS:
                               </DialogHeader>
                               <div className="space-y-6">
                                 <AISummary 
-                                  title={update.title}
-                                  content={update.description}
-                                  type="regulatory"
-                                  priority={update.priority}
+                                  content={update.description || ''}
+                                  contentType="regulatory_update"
                                 />
                                 
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
@@ -432,7 +430,7 @@ EXPORT DETAILS:
                                   </h3>
                                   <div className="prose prose-sm max-w-none">
                                     <FormattedText 
-                                      content={update.description || 'Keine detaillierte Beschreibung verfügbar.'}
+                                      text={update.description || 'Keine detaillierte Beschreibung verfügbar.'}
                                       className="text-sm leading-relaxed"
                                     />
                                   </div>
@@ -549,7 +547,7 @@ EXPORT DETAILS:
                             {update.title}
                           </h3>
                           <FormattedText 
-                            content={update.description?.substring(0, 200) + '...' || 'Keine Beschreibung verfügbar'}
+                            text={update.description?.substring(0, 200) + '...' || 'Keine Beschreibung verfügbar'}
                             className="text-sm text-slate-700 dark:text-slate-300 line-clamp-3 mb-3"
                           />
                           
@@ -619,14 +617,12 @@ EXPORT DETAILS:
                                 </div>
                                 
                                 <AISummary 
-                                  title={update.title}
-                                  content={update.description}
-                                  type="regulatory"
-                                  priority={update.priority}
+                                  content={update.description || ''}
+                                  contentType="regulatory_update"
                                 />
                                 
                                 <FormattedText 
-                                  content={update.description || 'Keine detaillierte Beschreibung verfügbar.'}
+                                  text={update.description || 'Keine detaillierte Beschreibung verfügbar.'}
                                   className="text-sm leading-relaxed"
                                 />
                               </div>
@@ -710,7 +706,7 @@ EXPORT DETAILS:
                             {update.title}
                           </h3>
                           <FormattedText 
-                            content={update.description?.substring(0, 250) + '...' || 'Keine Beschreibung verfügbar'}
+                            text={update.description?.substring(0, 250) + '...' || 'Keine Beschreibung verfügbar'}
                             className="text-sm text-slate-700 dark:text-slate-300 line-clamp-3 mb-3"
                           />
                           
@@ -784,14 +780,12 @@ EXPORT DETAILS:
                                 </div>
                                 
                                 <AISummary 
-                                  title={update.title}
-                                  content={update.description}
-                                  type="regulatory"
-                                  priority={update.priority}
+                                  content={update.description || ''}
+                                  contentType="regulatory_update"
                                 />
                                 
                                 <FormattedText 
-                                  content={update.description || 'Keine detaillierte Beschreibung verfügbar.'}
+                                  text={update.description || 'Keine detaillierte Beschreibung verfügbar.'}
                                   className="text-sm leading-relaxed"
                                 />
                               </div>
