@@ -92,8 +92,8 @@ export default function KnowledgeBasePage() {
     refetchInterval: 30000
   });
 
-  // Extract articles from API response structure
-  const realArticlesData = articlesResponse?.data || [];
+  // Extract articles from API response structure - FIXED TYPE SAFETY
+  const realArticlesData = (articlesResponse as any)?.data || [];
   console.log('Knowledge Base Articles Data:', {
     response: articlesResponse,
     articles: realArticlesData,
