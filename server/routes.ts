@@ -374,9 +374,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Enrich updates with full content for frontend display
       const enrichedUpdates = filteredUpdates.map(update => ({
         ...update,
-        // Use the authentic description from database instead of template
-        description: update.description || update.title,
-        content: update.description || update.title, // Use real description as content
+        // Use the authentic content from database as description for frontend
+        description: update.content || update.description || update.title,
+        content: update.content || update.description || update.title,
         source: update.source_id,
         sourceUrl: update.document_url || `https://${update.source_id?.toLowerCase()}.europa.eu/docs/${update.id}`,
         fullText: `Vollständiger Regulatory Update Text für ${update.title}. Dieser Text enthält alle relevanten Informationen für Compliance und regulatorische Anforderungen.
