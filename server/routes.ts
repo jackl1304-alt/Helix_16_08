@@ -329,9 +329,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Regulatory updates routes
   app.get("/api/regulatory-updates", async (req, res) => {
     try {
-      console.log("API: Fetching current regulatory updates (nach 01.06.2024)...");
+      console.log("API: Fetching current regulatory updates (ab 30.07.2024)...");
       const updates = await storage.getAllRegulatoryUpdates();
-      console.log(`API: Returning ${updates.length} aktuelle regulatory updates (archivierte Daten in /api/historical/data)`);
+      console.log(`API: Returning ${updates.length} aktuelle regulatory updates (archivierte Daten vor 30.07.2024 in /api/historical/data)`);
       
       // Ensure JSON response header
       res.setHeader('Content-Type', 'application/json');
@@ -791,7 +791,7 @@ Weitere Details finden Sie in der offiziellen Dokumentation der RegulierungsbehÃ
   // Historical data API routes (as they existed at 7 AM)
   app.get("/api/historical/data", async (req, res) => {
     try {
-      console.log('Fetching archived historical data (vor 01.06.2024)...');
+      console.log('Fetching archived historical data (vor 30.07.2024)...');
       
       // Get archived data through new optimized method
       const historicalData = await storage.getHistoricalDataSources();
@@ -815,11 +815,11 @@ Weitere Details finden Sie in der offiziellen Dokumentation der RegulierungsbehÃ
       const sql = neon(process.env.DATABASE_URL!);
       
       const totalCount = await sql`SELECT COUNT(*) as count FROM regulatory_updates`;
-      const currentCount = await sql`SELECT COUNT(*) as count FROM regulatory_updates WHERE published_at >= '2024-06-01'`;
-      const archivedCount = await sql`SELECT COUNT(*) as count FROM regulatory_updates WHERE published_at < '2024-06-01'`;
+      const currentCount = await sql`SELECT COUNT(*) as count FROM regulatory_updates WHERE published_at >= '2024-07-30'`;
+      const archivedCount = await sql`SELECT COUNT(*) as count FROM regulatory_updates WHERE published_at < '2024-07-30'`;
       
       const stats = {
-        cutoffDate: '2024-06-01',
+        cutoffDate: '2024-07-30',
         total: parseInt(totalCount[0].count),
         current: parseInt(currentCount[0].count), 
         archived: parseInt(archivedCount[0].count),

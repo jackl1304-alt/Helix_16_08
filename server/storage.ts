@@ -67,8 +67,8 @@ class MorningStorage implements IStorage {
       const archiveMetrics = await sql`
         SELECT 
           COUNT(*) as total_regulatory,
-          COUNT(*) FILTER (WHERE published_at >= '2024-06-01') as current_data,
-          COUNT(*) FILTER (WHERE published_at < '2024-06-01') as archived_data
+          COUNT(*) FILTER (WHERE published_at >= '2024-07-30') as current_data,
+          COUNT(*) FILTER (WHERE published_at < '2024-07-30') as archived_data
         FROM regulatory_updates
       `;
 
@@ -302,12 +302,12 @@ class MorningStorage implements IStorage {
 
   async getHistoricalDataSources() {
     try {
-      console.log('[DB] getHistoricalDataSources called - ARCHIVIERTE DATEN (vor 01.06.2024)');
+      console.log('[DB] getHistoricalDataSources called - ARCHIVIERTE DATEN (vor 30.07.2024)');
       
       // Kombiniere archivierte Regulatory Updates mit Historical Data
-      const cutoffDate = '2024-06-01';
+      const cutoffDate = '2024-07-30';
       
-      // Hole archivierte Regulatory Updates (vor 01.06.2024)
+      // Hole archivierte Regulatory Updates (vor 30.07.2024)
       const archivedUpdates = await sql`
         SELECT 
           id,
