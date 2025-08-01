@@ -60,66 +60,107 @@ export function EnhancedAISummary({
     const takeaways = [];
     
     if (content.includes('haftung')) {
-      takeaways.push('Neue Haftungsstandards für Medizinproduktehersteller');
+      takeaways.push({
+        title: 'Verschärfte Haftungsstandards',
+        description: 'Das Urteil etabliert neue, strengere Haftungsmaßstäbe für Medizinproduktehersteller. Unternehmen müssen ihre Produktverantwortung und Sorgfaltspflichten überdenken.'
+      });
     }
     if (content.includes('qualitätsmanagementsystem') || content.includes('qms')) {
-      takeaways.push('QMS-Anforderungen verschärft');
+      takeaways.push({
+        title: 'QMS-Anforderungen erweitert',
+        description: 'Die Entscheidung zeigt auf, dass bestehende Qualitätsmanagementsysteme möglicherweise nicht ausreichen. Eine umfassende Überprüfung der QMS-Prozesse ist erforderlich.'
+      });
     }
     if (content.includes('risikoanalyse') || content.includes('risikomanagement')) {
-      takeaways.push('Risikomanagement-Prozesse überprüfen');
+      takeaways.push({
+        title: 'Risikomanagement überarbeiten',
+        description: 'Der Fall verdeutlicht Schwächen in der Risikoanalyse und -bewertung. Unternehmen sollten ihre Risikomanagement-Verfahren grundlegend überprüfen und aktualisieren.'
+      });
     }
     if (content.includes('nachmarktüberwachung')) {
-      takeaways.push('Post-Market Surveillance verstärkt');
+      takeaways.push({
+        title: 'Post-Market Surveillance kritisch',
+        description: 'Die Nachmarktüberwachung wird als unzureichend bewertet. Verstärkte Monitoring-Systeme und proaktive Überwachungsmaßnahmen sind dringend erforderlich.'
+      });
     }
     if (content.includes('klinische bewertung')) {
-      takeaways.push('Klinische Bewertung kritisch');
+      takeaways.push({
+        title: 'Klinische Bewertung mangelhaft',
+        description: 'Das Gericht sieht erhebliche Defizite in der klinischen Bewertung. Nachträgliche klinische Studien und erweiterte Evidenzsammlung werden empfohlen.'
+      });
     }
     if (content.includes('dokumentation')) {
-      takeaways.push('Technische Dokumentation unzureichend');
+      takeaways.push({
+        title: 'Dokumentation unvollständig',
+        description: 'Die technische Dokumentation wird als unzureichend eingestuft. Eine komplette Überarbeitung der Produktdokumentation ist notwendig.'
+      });
     }
     
     // Fallback wenn keine spezifischen Takeaways gefunden
     if (takeaways.length === 0) {
-      takeaways.push('Rechtliche Klarstellung für MedTech-Branche');
-      takeaways.push('Compliance-Anforderungen präzisiert');
+      takeaways.push({
+        title: 'Rechtliche Klarstellung',
+        description: 'Diese Entscheidung schafft wichtige rechtliche Klarheit für die MedTech-Branche und definiert neue Standards für die Produktverantwortung.'
+      });
+      takeaways.push({
+        title: 'Compliance-Standards präzisiert',
+        description: 'Das Urteil konkretisiert bestehende Compliance-Anforderungen und schafft verbindliche Leitlinien für die Branche.'
+      });
     }
     
-    return takeaways.slice(0, 4); // Maximal 4 Key Takeaways
+    return takeaways.slice(0, 3); // Maximal 3 ausführliche Key Takeaways
   };
   
   const generateRecommendations = (content: string, compliance: string[], devices: string[]) => {
     const recommendations = [];
     
     if (content.includes('haftung') || content.includes('schadensersatz')) {
-      recommendations.push('Haftpflichtversicherung überprüfen');
-      recommendations.push('Produkthaftungs-Strategien anpassen');
+      recommendations.push({
+        priority: 'Sofort',
+        action: 'Haftpflichtversicherung überprüfen',
+        description: 'Bestehende Versicherungspolice auf Deckungsumfang und Schadenssummen prüfen. Gegebenenfalls Deckung erweitern.'
+      });
+      recommendations.push({
+        priority: '30 Tage',
+        action: 'Produkthaftungs-Strategien überarbeiten',
+        description: 'Rechtliche Beratung einholen und Produkthaftungsrichtlinien an neue Rechtsprechung anpassen.'
+      });
     }
     
     if (compliance.length > 0) {
-      recommendations.push('Compliance-Review durchführen');
-      recommendations.push('Regulatorische Gaps identifizieren');
+      recommendations.push({
+        priority: '60 Tage',
+        action: 'Umfassendes Compliance-Audit',
+        description: 'Externe Compliance-Prüfung aller betroffenen Regulierungsbereiche durchführen und Schwachstellen identifizieren.'
+      });
     }
     
     if (devices.length > 0) {
-      recommendations.push('Produktspezifische Risikobewertung');
-      recommendations.push('Post-Market Surveillance verstärken');
+      recommendations.push({
+        priority: '90 Tage',
+        action: 'Produktportfolio-Risikobewertung',
+        description: 'Alle Medizinprodukte im Portfolio hinsichtlich der neuen rechtlichen Standards bewerten und priorisieren.'
+      });
     }
     
     if (content.includes('nachmarktüberwachung')) {
-      recommendations.push('PMCF-Studien initiieren');
-    }
-    
-    if (content.includes('klinische bewertung')) {
-      recommendations.push('Klinische Daten nacherheben');
+      recommendations.push({
+        priority: '120 Tage',
+        action: 'Post-Market Clinical Follow-up',
+        description: 'PMCF-Studien für kritische Produkte initiieren und Überwachungssysteme erweitern.'
+      });
     }
     
     // Standard-Empfehlungen als Fallback
     if (recommendations.length === 0) {
-      recommendations.push('Legal Review beauftragen');
-      recommendations.push('Präventive Maßnahmen implementieren');
+      recommendations.push({
+        priority: 'Sofort',
+        action: 'Rechtliche Einschätzung einholen',
+        description: 'Spezialisierte Anwaltskanzlei mit der Bewertung der Auswirkungen auf das Unternehmen beauftragen.'
+      });
     }
     
-    return recommendations.slice(0, 6); // Maximal 6 Empfehlungen
+    return recommendations.slice(0, 4); // Maximal 4 ausführliche Empfehlungen
   };
   
   const analysis = generateAIAnalysis(caseContent, caseTitle, caseSummary);
@@ -169,15 +210,20 @@ export function EnhancedAISummary({
         
         {/* Key Takeaways */}
         <div className="bg-white p-4 rounded-lg border">
-          <h4 className="font-semibold mb-3 flex items-center gap-2">
+          <h4 className="font-semibold mb-4 flex items-center gap-2">
             <Target className="h-4 w-4 text-green-500" />
             Zentrale Erkenntnisse
           </h4>
-          <div className="space-y-2">
+          <div className="space-y-4">
             {analysis.keyTakeaways.map((takeaway, index) => (
-              <div key={index} className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span className="text-sm text-gray-700">{takeaway}</span>
+              <div key={index} className="border-l-4 border-green-500 pl-4 py-2">
+                <div className="flex items-start gap-2 mb-2">
+                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <h5 className="font-medium text-gray-900">{takeaway.title}</h5>
+                </div>
+                <p className="text-sm text-gray-700 leading-relaxed ml-6">
+                  {takeaway.description}
+                </p>
               </div>
             ))}
           </div>
@@ -202,15 +248,25 @@ export function EnhancedAISummary({
         
         {/* Handlungsempfehlungen */}
         <div className="bg-white p-4 rounded-lg border">
-          <h4 className="font-semibold mb-3 flex items-center gap-2">
+          <h4 className="font-semibold mb-4 flex items-center gap-2">
             <Zap className="h-4 w-4 text-orange-500" />
-            Sofortige Handlungsempfehlungen
+            Handlungsempfehlungen nach Priorität
           </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {analysis.recommendedActions.map((action, index) => (
-              <div key={index} className="flex items-start gap-2">
-                <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
-                <span className="text-sm text-gray-700">{action}</span>
+          <div className="space-y-4">
+            {analysis.recommendedActions.map((recommendation, index) => (
+              <div key={index} className="border rounded-lg p-3 bg-gray-50">
+                <div className="flex items-center justify-between mb-2">
+                  <h5 className="font-medium text-gray-900">{recommendation.action}</h5>
+                  <Badge 
+                    variant={recommendation.priority === 'Sofort' ? 'destructive' : 'secondary'}
+                    className="text-xs"
+                  >
+                    {recommendation.priority}
+                  </Badge>
+                </div>
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  {recommendation.description}
+                </p>
               </div>
             ))}
           </div>
