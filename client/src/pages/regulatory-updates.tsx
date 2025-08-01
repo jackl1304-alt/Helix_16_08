@@ -60,15 +60,15 @@ export default function RegulatoryUpdates() {
   });
 
   // Fetch regulatory updates
-  const { data: updates, isLoading } = useQuery<RegulatoryUpdate[]>({
+  const { data: response, isLoading } = useQuery<{success: boolean, data: RegulatoryUpdate[], timestamp: string}>({
     queryKey: ['/api/regulatory-updates/recent?limit=5000'],
     staleTime: 5 * 60 * 1000,
   });
 
-  const updatesArray = Array.isArray(updates) ? updates : [];
+  const updatesArray = Array.isArray(response?.data) ? response.data : [];
   
   // Debug output für Datenverbindung
-  console.log(`REGULATORY UPDATES LOADED: ${updatesArray.length} Updates verfügbar`);
+  console.log(`REGULATORY UPDATES LOADED: ${updatesArray.length} Updates verfügbar`, response?.success, response?.data?.length);
 
   // Filter logic
   const filteredUpdates = updatesArray.filter((update) => {
