@@ -47,7 +47,7 @@ export default function RegulatoryUpdates() {
   const [selectedPriority, setSelectedPriority] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<string>("all");
 
-  const { data: updates, isLoading, error: updatesError } = useQuery<RegulatoryUpdate[]>({
+  const { data: updates, isLoading, error: updatesError } = useQuery<any>({
     queryKey: ["/api/regulatory-updates/recent"],
     staleTime: 30000,
     gcTime: 60000,
@@ -56,7 +56,9 @@ export default function RegulatoryUpdates() {
 
   // Echte Regulatory Updates mit authentischen Inhalten werden geladen
 
-  const filteredUpdates = (updates || []).filter(update => {
+  // Sicherstellen, dass updates ein Array ist
+  const updatesArray = Array.isArray(updates) ? updates : ((updates as any)?.updates || (updates as any)?.data || []);
+  const filteredUpdates = (updatesArray || []).filter((update: RegulatoryUpdate) => {
     const matchesSearch = !searchTerm || 
       update.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       update.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -234,10 +236,10 @@ Helix Regulatory Intelligence Platform
   ];
 
   // Calculate statistics
-  const totalUpdates = updates?.length || 0;
+  const totalUpdates = updatesArray?.length || 0;
   const filteredCount = filteredUpdates.length;
-  const highPriorityCount = (updates || []).filter(u => u.priority === 'high' || u.priority === 'urgent').length;
-  const todayCount = (updates || []).filter(u => {
+  const highPriorityCount = (updatesArray || []).filter((u: any) => u.priority === 'high' || u.priority === 'urgent').length;
+  const todayCount = (updatesArray || []).filter((u: any) => {
     const today = new Date().toDateString();
     const updateDate = new Date(u.published_at).toDateString();
     return updateDate === today;
