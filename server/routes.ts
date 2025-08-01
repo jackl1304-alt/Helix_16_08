@@ -2560,6 +2560,48 @@ Status: Archiviertes historisches Dokument
     }
   });
 
+  // Newsletter Extraction - MedTech Information Sources
+  app.post('/api/knowledge/extract-newsletters', async (req, res) => {
+    try {
+      logger.info('API: Starting newsletter extraction from MedTech information sources');
+      
+      const { NewsletterExtractionService } = await import('./services/newsletterExtractionService');
+      const newsletterService = new NewsletterExtractionService();
+      
+      const result = await newsletterService.extractFromAllNewsletterSources();
+      
+      res.json({ 
+        success: true, 
+        message: `Newsletter extraction completed: ${result.articlesExtracted} articles from ${result.processedSources} sources`,
+        stats: result,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      logger.error('API: Newsletter extraction failed', error);
+      res.status(500).json({ 
+        success: false, 
+        message: error.message || 'Failed to extract newsletter content'
+      });
+    }
+  });
+
+  // Get Newsletter Sources Status
+  app.get('/api/knowledge/newsletter-sources-status', async (req, res) => {
+    try {
+      const { NewsletterExtractionService } = await import('./services/newsletterExtractionService');
+      const newsletterService = new NewsletterExtractionService();
+      
+      const status = await newsletterService.getNewsletterSourcesStatus();
+      res.json(status);
+    } catch (error: any) {
+      logger.error('API: Failed to get newsletter sources status', error);
+      res.status(500).json({ 
+        success: false, 
+        message: error.message || 'Failed to get newsletter sources status'
+      });
+    }
+  });
+
   // Get Knowledge Sources Status
   app.get('/api/knowledge/sources-status', async (req, res) => {
     try {

@@ -24,7 +24,9 @@ import {
   Zap,
   Download,
   Eye,
-  ExternalLink
+  ExternalLink,
+  Mail,
+  Tag
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { KnowledgeExtractionPanel } from "@/components/knowledge/KnowledgeExtractionPanel";
@@ -33,7 +35,7 @@ interface KnowledgeSource {
   id: string;
   name: string;
   url: string;
-  category: 'medtech_knowledge' | 'regulatory_updates' | 'legal_cases';
+  category: 'medtech_knowledge' | 'regulatory_updates' | 'legal_cases' | 'industry_newsletter' | 'regulatory_newsletter';
   authority: string;
   region: string;
   language: string;
@@ -49,7 +51,7 @@ interface KnowledgeArticle {
   content: string;
   authority: string;
   region: string;
-  category: string;
+  category: 'medtech_knowledge' | 'regulatory_updates' | 'legal_cases' | 'industry_newsletter' | 'regulatory_newsletter' | 'legal_research' | 'technical_standards' | 'medical_research' | string;
   published_at: string;
   priority: string;
   tags: string[];
@@ -128,19 +130,40 @@ export default function KnowledgeBasePage() {
 
   // Collection mutation
   const collectMutation = useMutation({
-    mutationFn: () => fetch('/api/knowledge/collect-articles', { method: 'POST' }).then(res => res.json()),
-    onSuccess: (data: CollectionResult) => {
+    mutationFn: () => fetch('/api/knowledge/extract-all-sources', { method: 'POST' }).then(res => res.json()),
+    onSuccess: (data: any) => {
       if (data.success) {
         toast({
           title: "Knowledge Collection Erfolgreich",
-          description: `${data.summary.totalArticles} Artikel von ${data.summary.successfulSources} Quellen gesammelt`,
+          description: `${data.stats.articlesExtracted} Artikel von ${data.stats.processedSources} Quellen gesammelt`,
         });
-        queryClient.invalidateQueries({ queryKey: ['/api/regulatory-updates'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/knowledge/articles'] });
         queryClient.invalidateQueries({ queryKey: ['/api/knowledge/sources-status'] });
       } else {
         toast({
           title: "Collection Fehler",
           description: "Fehler beim Sammeln der Knowledge Articles",
+          variant: "destructive"
+        });
+      }
+    }
+  });
+
+  // Newsletter extraction mutation
+  const newsletterMutation = useMutation({
+    mutationFn: () => fetch('/api/knowledge/extract-newsletters', { method: 'POST' }).then(res => res.json()),
+    onSuccess: (data: any) => {
+      if (data.success) {
+        toast({
+          title: "Newsletter Extraktion Erfolgreich",
+          description: `${data.stats.articlesExtracted} Newsletter-Artikel von ${data.stats.processedSources} MedTech-Quellen extrahiert`,
+        });
+        queryClient.invalidateQueries({ queryKey: ['/api/knowledge/articles'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/knowledge/sources-status'] });
+      } else {
+        toast({
+          title: "Newsletter Extraktion Fehler",
+          description: "Fehler beim Extrahieren der Newsletter-Inhalte",
           variant: "destructive"
         });
       }
@@ -264,6 +287,19 @@ Helix Regulatory Intelligence Platform
         </div>
         <div className="flex gap-3">
           <Button
+            onClick={() => newsletterMutation.mutate()}
+            disabled={newsletterMutation.isPending}
+            className="bg-orange-600 hover:bg-orange-700"
+          >
+            {newsletterMutation.isPending ? (
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Mail className="h-4 w-4 mr-2" />
+            )}
+            Newsletter Extraktion
+          </Button>
+
+          <Button
             onClick={() => deepScrapingMutation.mutate()}
             disabled={deepScrapingMutation.isPending}
             className="bg-purple-600 hover:bg-purple-700"
@@ -374,6 +410,11 @@ Helix Regulatory Intelligence Platform
                 <SelectItem value="medtech_knowledge">MedTech Wissen</SelectItem>
                 <SelectItem value="regulatory_updates">Regulatorische Updates</SelectItem>
                 <SelectItem value="legal_cases">Rechtsfälle</SelectItem>
+                <SelectItem value="industry_newsletter">📧 Branchen-Newsletter</SelectItem>
+                <SelectItem value="regulatory_newsletter">📋 Regulatory Newsletter</SelectItem>
+                <SelectItem value="legal_research">⚖️ Rechtswissenschaft</SelectItem>
+                <SelectItem value="technical_standards">🔧 Technische Standards</SelectItem>
+                <SelectItem value="medical_research">🧬 Medizinische Forschung</SelectItem>
               </SelectContent>
             </Select>
 
