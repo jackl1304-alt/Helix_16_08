@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import administrationRoutes from "./routes/administration";
 import { storage } from "./storage";
 import adminRoutes from "./routes/admin.routes";
+import errorRoutes from "./routes/errors";
 import { aiApprovalService } from "./services/ai-approval-service";
 import { 
   insertUserSchema, 
@@ -149,6 +150,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin routes
   app.use('/api/admin', adminRoutes);
   app.use('/api/admin', administrationRoutes);
+  
+  // Error monitoring routes
+  app.use('/api/errors', errorRoutes);
   
   // Dashboard API routes
   app.get("/api/dashboard/stats", async (req, res) => {

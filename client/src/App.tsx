@@ -3,90 +3,115 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/not-found";
-import Landing from "@/pages/landing";
-import Dashboard from "@/pages/dashboard";
-import DataCollection from "@/pages/data-collection";
-import GlobalSources from "@/pages/global-sources";
-import Analytics from "@/pages/analytics";
-import RegulatoryUpdates from "@/pages/regulatory-updates";
-import NewsletterManager from "@/pages/newsletter-manager";
-import ApprovalWorkflow from "@/pages/approval-workflow";
-import UserManagement from "@/pages/user-management";
-import SystemSettings from "@/pages/system-settings";
-import AuditLogs from "@/pages/audit-logs";
-import AIInsights from "@/pages/ai-insights";
-import KnowledgeBase from "@/pages/knowledge-base";
-import EnhancedLegalCases from "@/pages/enhanced-legal-cases";
-import AIApprovalDemo from "@/pages/ai-approval-demo";
-import HistoricalData from "@/pages/historical-data-simple";
-import LegalCases from "@/pages/legal-cases";
-import IntelligentSearch from "@/pages/intelligent-search";
-import DocumentViewer from "@/pages/document-viewer";
-import SyncManager from "@/pages/sync-manager";
-import Phase1Integration from "@/pages/phase1-integration";
-import Phase2Integration from "@/pages/phase2-integration";
-import Phase3Advanced from "@/pages/phase3-advanced";
-import RealTimeIntegration from "@/pages/real-time-integration";
-import DataSourcesAdmin from "@/pages/admin/data-sources";
-import Administration from "@/pages/administration";
+import { lazy, Suspense } from "react";
 import { ResponsiveLayout } from "@/components/responsive-layout";
+import { performanceMonitor, preloadCriticalResources } from "@/utils/performance";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
+
+// Initialize performance monitoring and preload resources
+if (typeof window !== 'undefined') {
+  preloadCriticalResources();
+}
+
+// Critical pages loaded immediately
+import Dashboard from "@/pages/dashboard";
+import NotFound from "@/pages/not-found";
+
+// Lazy load non-critical pages for better performance
+const Landing = lazy(() => import("@/pages/landing"));
+const DataCollection = lazy(() => import("@/pages/data-collection"));
+const GlobalSources = lazy(() => import("@/pages/global-sources"));
+const Analytics = lazy(() => import("@/pages/analytics"));
+const RegulatoryUpdates = lazy(() => import("@/pages/regulatory-updates"));
+const NewsletterManager = lazy(() => import("@/pages/newsletter-manager"));
+const ApprovalWorkflow = lazy(() => import("@/pages/approval-workflow"));
+const UserManagement = lazy(() => import("@/pages/user-management"));
+const SystemSettings = lazy(() => import("@/pages/system-settings"));
+const AuditLogs = lazy(() => import("@/pages/audit-logs"));
+const AIInsights = lazy(() => import("@/pages/ai-insights"));
+const KnowledgeBase = lazy(() => import("@/pages/knowledge-base"));
+const EnhancedLegalCases = lazy(() => import("@/pages/enhanced-legal-cases"));
+const AIApprovalDemo = lazy(() => import("@/pages/ai-approval-demo"));
+const HistoricalData = lazy(() => import("@/pages/historical-data-simple"));
+const LegalCases = lazy(() => import("@/pages/legal-cases"));
+const IntelligentSearch = lazy(() => import("@/pages/intelligent-search"));
+const DocumentViewer = lazy(() => import("@/pages/document-viewer"));
+const SyncManager = lazy(() => import("@/pages/sync-manager"));
+const Phase1Integration = lazy(() => import("@/pages/phase1-integration"));
+const Phase2Integration = lazy(() => import("@/pages/phase2-integration"));
+const Phase3Advanced = lazy(() => import("@/pages/phase3-advanced"));
+const RealTimeIntegration = lazy(() => import("@/pages/real-time-integration"));
+const DataSourcesAdmin = lazy(() => import("@/pages/admin/data-sources"));
+const Administration = lazy(() => import("@/pages/administration"));
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+  </div>
+);
 
 function Router() {
   return (
-    <Switch>
-      {/* Pages with Sidebar */}
-      <Route path="/" component={Dashboard} />
-      <Route path="/data-collection" component={DataCollection} />
-      <Route path="/global-sources" component={GlobalSources} />
-      <Route path="/analytics" component={Analytics} />
-      <Route path="/regulatory-updates" component={RegulatoryUpdates} />
-      <Route path="/sync-manager" component={SyncManager} />
-      <Route path="/newsletter-manager" component={NewsletterManager} />
-      <Route path="/approval-workflow" component={ApprovalWorkflow} />
-      <Route path="/user-management" component={UserManagement} />
-      <Route path="/system-settings" component={SystemSettings} />
-      <Route path="/audit-logs" component={AuditLogs} />
-      <Route path="/ai-insights" component={AIInsights} />
-      <Route path="/knowledge-base" component={KnowledgeBase} />
-      <Route path="/enhanced-legal-cases" component={EnhancedLegalCases} />
-      <Route path="/historical-data" component={HistoricalData} />
-      <Route path="/legal-cases" component={LegalCases} />
-      <Route path="/intelligent-search" component={IntelligentSearch} />
-      <Route path="/ai-approval-demo" component={AIApprovalDemo} />
-      <Route path="/phase1-integration" component={Phase1Integration} />
-      <Route path="/phase2-integration" component={Phase2Integration} />
-      <Route path="/phase3-advanced" component={Phase3Advanced} />
-      <Route path="/real-time-integration" component={RealTimeIntegration} />
-      <Route path="/administration/data-sources" component={DataSourcesAdmin} />
-      <Route path="/administration" component={Administration} />
-      <Route path="/documents/:sourceType/:documentId" component={DocumentViewer} />
-      
-      {/* Fallback to 404 */}
-      <Route component={NotFound} />
-    </Switch>
+    <Suspense fallback={<LoadingFallback />}>
+      <Switch>
+        {/* Critical pages loaded immediately */}
+        <Route path="/" component={Dashboard} />
+        
+        {/* Lazy-loaded pages */}
+        <Route path="/data-collection" component={DataCollection} />
+        <Route path="/global-sources" component={GlobalSources} />
+        <Route path="/analytics" component={Analytics} />
+        <Route path="/regulatory-updates" component={RegulatoryUpdates} />
+        <Route path="/sync-manager" component={SyncManager} />
+        <Route path="/newsletter-manager" component={NewsletterManager} />
+        <Route path="/approval-workflow" component={ApprovalWorkflow} />
+        <Route path="/user-management" component={UserManagement} />
+        <Route path="/system-settings" component={SystemSettings} />
+        <Route path="/audit-logs" component={AuditLogs} />
+        <Route path="/ai-insights" component={AIInsights} />
+        <Route path="/knowledge-base" component={KnowledgeBase} />
+        <Route path="/enhanced-legal-cases" component={EnhancedLegalCases} />
+        <Route path="/historical-data" component={HistoricalData} />
+        <Route path="/legal-cases" component={LegalCases} />
+        <Route path="/intelligent-search" component={IntelligentSearch} />
+        <Route path="/ai-approval-demo" component={AIApprovalDemo} />
+        <Route path="/phase1-integration" component={Phase1Integration} />
+        <Route path="/phase2-integration" component={Phase2Integration} />
+        <Route path="/phase3-advanced" component={Phase3Advanced} />
+        <Route path="/real-time-integration" component={RealTimeIntegration} />
+        <Route path="/administration/data-sources" component={DataSourcesAdmin} />
+        <Route path="/administration" component={Administration} />
+        <Route path="/documents/:sourceType/:documentId" component={DocumentViewer} />
+        
+        {/* Fallback to 404 */}
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
   );
 }
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Switch>
-          {/* Pages without Sidebar */}
-          <Route path="/landing" component={Landing} />
-          <Route path="/404" component={NotFound} />
-          
-          {/* All other pages with Sidebar */}
-          <Route>
-            <ResponsiveLayout>
-              <Router />
-            </ResponsiveLayout>
-          </Route>
-        </Switch>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Switch>
+            {/* Pages without Sidebar */}
+            <Route path="/landing" component={Landing} />
+            <Route path="/404" component={NotFound} />
+            
+            {/* All other pages with Sidebar */}
+            <Route>
+              <ResponsiveLayout>
+                <Router />
+              </ResponsiveLayout>
+            </Route>
+          </Switch>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

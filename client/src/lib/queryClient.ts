@@ -1,4 +1,5 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { createCacheKey } from "@/utils/performance";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -12,12 +13,17 @@ export async function apiRequest(
   method: string,
   data?: unknown | undefined,
 ): Promise<any> {
-  const res = await fetch(url, {
+  const options: RequestInit = {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
-    body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
-  });
+  };
+  
+  if (data) {
+    options.body = JSON.stringify(data);
+  }
+  
+  const res = await fetch(url, options);
 
   await throwIfResNotOk(res);
   
@@ -77,6 +83,7 @@ export const queryClient = new QueryClient({
       refetchInterval: false,
       refetchOnWindowFocus: false,
       staleTime: 30000, // 30 seconds for live updates
+      gcTime: 5 * 60 * 1000, // 5 minutes garbage collection
       retry: (failureCount, error) => {
         console.log(`[QUERY CLIENT] Retry ${failureCount} for error:`, error);
         return failureCount < 3;
