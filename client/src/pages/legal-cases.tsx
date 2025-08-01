@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import LegalRelationshipViewer from "@/components/legal-relationship-viewer";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { EnhancedLegalCard } from "@/components/enhanced-legal-card";
+import { AISummary } from "@/components/ai-summary";
 
 // Define types
 interface ChangeDetection {
@@ -717,6 +718,12 @@ export default function LegalCases() {
                                         </DialogTitle>
                                       </DialogHeader>
                                       <div className="flex-1 overflow-auto space-y-6">
+                                        <AISummary 
+                                          title={(legalCase as any).title || 'Rechtsprechung'}
+                                          content={(legalCase as any).summary || 'Diese Gerichtsentscheidung behandelt wichtige Aspekte der Medizinprodukte-Regulierung.'}
+                                          type="legal"
+                                          priority={(legalCase as any).impact_level === 'High' || (legalCase as any).impact_level === 'Hoch' ? 'urgent' : 'medium'}
+                                        />
                                         {/* Decision Summary */}
                                         <div className="bg-blue-50 p-6 rounded-lg">
                                           <h3 className="font-semibold mb-3 flex items-center gap-2">
