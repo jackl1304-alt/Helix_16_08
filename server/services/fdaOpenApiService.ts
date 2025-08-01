@@ -59,30 +59,59 @@ interface FDARecall {
 
 export class FDAOpenAPIService {
   private baseUrl = 'https://api.fda.gov';
-  private rateLimitDelay = 1000; // 1 second between requests
+  private rateLimitDelay = 250; // 250ms between requests (240 requests/minute limit)
+  private maxRetries = 3;
+  private retryDelay = 2000; // 2 second retry delay
 
   private async delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  private async makeRequest(endpoint: string): Promise<any> {
+  private async exponentialBackoff(attempt: number): Promise<void> {
+    const delay = this.retryDelay * Math.pow(2, attempt);
+    await this.delay(delay);
+  }
+
+  private async makeRequest(endpoint: string, retryAttempt: number = 0): Promise<any> {
     try {
-      console.log(`[FDA API] Requesting: ${endpoint}`);
+      console.log(`🔄 [FDA API] Requesting: ${endpoint} (attempt ${retryAttempt + 1})`);
       
-      const response = await fetch(endpoint);
+      const response = await fetch(endpoint, {
+        headers: {
+          'User-Agent': 'Helix-Regulatory-Intelligence/1.0',
+          'Accept': 'application/json'
+        }
+      });
       
       if (!response.ok) {
+        if (response.status === 429 && retryAttempt < this.maxRetries) {
+          console.log(`⏱️ [FDA API] Rate limited, retrying after backoff...`);
+          await this.exponentialBackoff(retryAttempt);
+          return this.makeRequest(endpoint, retryAttempt + 1);
+        }
         throw new Error(`FDA API error: ${response.status} ${response.statusText}`);
       }
       
       const data = await response.json();
       
+      // Validate response structure
+      if (!data || typeof data !== 'object') {
+        throw new Error('Invalid FDA API response format');
+      }
+      
       // Rate limiting
       await this.delay(this.rateLimitDelay);
       
+      console.log(`✅ [FDA API] Request successful`);
       return data;
     } catch (error) {
-      console.error(`[FDA API] Request failed:`, error);
+      if (retryAttempt < this.maxRetries && !(error as Error).message.includes('Rate limited')) {
+        console.log(`🔄 [FDA API] Retrying request (attempt ${retryAttempt + 2})...`);
+        await this.exponentialBackoff(retryAttempt);
+        return this.makeRequest(endpoint, retryAttempt + 1);
+      }
+      
+      console.error(`❌ [FDA API] Request failed after ${retryAttempt + 1} attempts:`, error);
       throw error;
     }
   }
