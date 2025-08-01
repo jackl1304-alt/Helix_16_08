@@ -57,7 +57,7 @@ export default function RegulatoryUpdates() {
   // Echte Regulatory Updates mit authentischen Inhalten werden geladen
 
   // Sicherstellen, dass updates ein Array ist
-  const updatesArray = Array.isArray(updates) ? updates : ((updates as any)?.updates || (updates as any)?.data || []);
+  const updatesArray = Array.isArray(updates) ? updates : ((updates as any)?.data || (updates as any)?.updates || []);
   const filteredUpdates = (updatesArray || []).filter((update: RegulatoryUpdate) => {
     const matchesSearch = !searchTerm || 
       update.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
