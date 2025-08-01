@@ -10,7 +10,7 @@ interface KnowledgeSource {
   authority: string;
   region: string;
   priority: 'high' | 'medium' | 'low';
-  extractorType: 'medical_journal' | 'regulatory_guidance' | 'legal_database' | 'technical_standards';
+  extractorType: 'medical_journal' | 'regulatory_guidance' | 'legal_database' | 'technical_standards' | 'newsletter' | 'industry_news';
 }
 
 interface ExtractionStats {
@@ -160,6 +160,127 @@ export class UniversalKnowledgeExtractor {
       region: 'Germany',
       priority: 'medium',
       extractorType: 'medical_journal'
+    },
+    // Newsletter & Industry Information Sources
+    {
+      id: 'medtech_dive',
+      name: 'MedTech Dive - Industry Newsletter',
+      url: 'https://www.medtechdive.com/',
+      category: 'industry_newsletter',
+      authority: 'Industry Dive',
+      region: 'Global',
+      priority: 'high',
+      extractorType: 'newsletter'
+    },
+    {
+      id: 'medtech_breakthrough',
+      name: 'MedTech Breakthrough News',
+      url: 'https://medtechbreakthrough.com/news/',
+      category: 'industry_newsletter',
+      authority: 'MedTech Breakthrough',
+      region: 'Global',
+      priority: 'high',
+      extractorType: 'industry_news'
+    },
+    {
+      id: 'meddevice_online',
+      name: 'Medical Device and Diagnostic Industry',
+      url: 'https://www.mddionline.com/',
+      category: 'industry_newsletter',
+      authority: 'MDDI',
+      region: 'Global',
+      priority: 'high',
+      extractorType: 'industry_news'
+    },
+    {
+      id: 'massdevice_news',
+      name: 'MassDevice Industry News',
+      url: 'https://www.massdevice.com/',
+      category: 'industry_newsletter',
+      authority: 'MassDevice',
+      region: 'Global',
+      priority: 'medium',
+      extractorType: 'industry_news'
+    },
+    {
+      id: 'medtech_europe',
+      name: 'MedTech Europe Newsletter',
+      url: 'https://www.medtecheurope.org/news-and-events/news/',
+      category: 'industry_newsletter',
+      authority: 'MedTech Europe',
+      region: 'European Union',
+      priority: 'high',
+      extractorType: 'newsletter'
+    },
+    {
+      id: 'bvmed_newsletter',
+      name: 'BVMed - Bundesverband Medizintechnologie',
+      url: 'https://www.bvmed.de/de/aktuelles/pressemitteilungen',
+      category: 'industry_newsletter',
+      authority: 'BVMed',
+      region: 'Germany',
+      priority: 'high',
+      extractorType: 'newsletter'
+    },
+    {
+      id: 'spectaris_medtech',
+      name: 'SPECTARIS - MedTech News Deutschland',
+      url: 'https://www.spectaris.de/presse-medien/pressemitteilungen/',
+      category: 'industry_newsletter',
+      authority: 'SPECTARIS',
+      region: 'Germany',
+      priority: 'medium',
+      extractorType: 'newsletter'
+    },
+    {
+      id: 'medica_magazine',
+      name: 'MEDICA Magazine Newsletter',
+      url: 'https://www.medica.de/de/News',
+      category: 'industry_newsletter',
+      authority: 'MEDICA',
+      region: 'Germany',
+      priority: 'high',
+      extractorType: 'newsletter'
+    },
+    {
+      id: 'mt_medizintechnik',
+      name: 'mt-medizintechnik Newsletter',
+      url: 'https://mt-medizintechnik.de/news/',
+      category: 'industry_newsletter',
+      authority: 'mt-medizintechnik',
+      region: 'Germany',
+      priority: 'medium',
+      extractorType: 'newsletter'
+    },
+    {
+      id: 'devicemed_newsletter',
+      name: 'DeviceMed Industry Updates',
+      url: 'https://www.devicemed.com/',
+      category: 'industry_newsletter',
+      authority: 'DeviceMed',
+      region: 'Global',
+      priority: 'medium',
+      extractorType: 'industry_news'
+    },
+    {
+      id: 'emergo_newsletter',
+      name: 'Emergo by UL Newsletter',
+      url: 'https://www.emergobyul.com/newsletter',
+      category: 'regulatory_newsletter',
+      authority: 'Emergo by UL',
+      region: 'Global',
+      priority: 'high',
+      extractorType: 'newsletter'
+    },
+    {
+      id: 'rephine_newsletter',
+      name: 'Rephine Regulatory Newsletter',
+      url: 'https://www.rephine.com/newsletter/',
+      category: 'regulatory_newsletter',
+      authority: 'Rephine',
+      region: 'European Union',
+      priority: 'high',
+      extractorType: 'newsletter'
     }
   ];
 
@@ -468,7 +589,9 @@ export class UniversalKnowledgeExtractor {
         medical_journal: this.knowledgeSources.filter(s => s.extractorType === 'medical_journal').length,
         regulatory_guidance: this.knowledgeSources.filter(s => s.extractorType === 'regulatory_guidance').length,
         technical_standards: this.knowledgeSources.filter(s => s.extractorType === 'technical_standards').length,
-        legal_database: this.knowledgeSources.filter(s => s.extractorType === 'legal_database').length
+        legal_database: this.knowledgeSources.filter(s => s.extractorType === 'legal_database').length,
+        newsletter: this.knowledgeSources.filter(s => s.extractorType === 'newsletter').length,
+        industry_news: this.knowledgeSources.filter(s => s.extractorType === 'industry_news').length
       },
       sourcesByRegion: {
         Global: this.knowledgeSources.filter(s => s.region === 'Global').length,
