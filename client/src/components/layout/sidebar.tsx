@@ -60,7 +60,7 @@ export function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 deltaways-nav shadow-lg z-50 overflow-y-auto">
       {/* DELTA WAYS Logo Header */}
-      <div className="p-6 border-b border-yellow-400/30">
+      <div className="p-6 border-b border-[#07233e]/30">
         <Link href="/">
           <div className="flex flex-col items-center cursor-pointer space-y-2">
             <img 
@@ -68,7 +68,7 @@ export function Sidebar() {
               alt="Helix Logo" 
               className="h-16 w-16 object-cover rounded-lg ring-2 ring-[#b0d4f6]"
             />
-            <span className="text-lg deltaways-brand-text text-yellow-400">HELIX</span>
+            <span className="text-lg deltaways-brand-text text-[#07233e]">HELIX</span>
             <p className="text-xs font-medium text-gray-300">Powered by DELTA WAYS</p>
           </div>
         </Link>
@@ -90,7 +90,7 @@ export function Sidebar() {
                 >
                   <item.icon className={cn(
                     "mr-3 h-5 w-5",
-                    isActive ? "text-white" : "text-gray-400 group-hover:text-yellow-300"
+                    isActive ? "text-white" : "text-gray-400 group-hover:text-[#07233e]"
                   )} />
                   {item.name}
                 </div>
@@ -100,7 +100,7 @@ export function Sidebar() {
         </div>
         
         <div className="mt-8 px-4">
-          <h3 className="text-xs font-semibold text-yellow-400/80 uppercase tracking-wider deltaways-brand-text">
+          <h3 className="text-xs font-semibold text-[#07233e]/80 uppercase tracking-wider deltaways-brand-text">
             Knowledge Base
           </h3>
           <div className="mt-4 space-y-2">
@@ -118,7 +118,7 @@ export function Sidebar() {
                   >
                     <item.icon className={cn(
                       "mr-3 h-5 w-5",
-                      isActive ? "text-white" : "text-gray-400 group-hover:text-yellow-300"
+                      isActive ? "text-white" : "text-gray-400 group-hover:text-[#07233e]"
                     )} />
                     {item.name}
                   </div>
@@ -129,7 +129,7 @@ export function Sidebar() {
         </div>
 
         <div className="mt-8 px-4">
-          <h3 className="text-xs font-semibold text-yellow-400/80 uppercase tracking-wider deltaways-brand-text">
+          <h3 className="text-xs font-semibold text-[#07233e]/80 uppercase tracking-wider deltaways-brand-text">
             Administration & Entwicklung
           </h3>
           <div className="mt-4 space-y-2">
@@ -147,7 +147,7 @@ export function Sidebar() {
                   >
                     <item.icon className={cn(
                       "mr-3 h-5 w-5",
-                      isActive ? "text-white" : "text-gray-400 group-hover:text-yellow-300"
+                      isActive ? "text-white" : "text-gray-400 group-hover:text-[#07233e]"
                     )} />
                     {item.name}
                   </div>
@@ -159,16 +159,16 @@ export function Sidebar() {
             <Link href="/ai-approval-demo">
               <div
                 className={cn(
-                  "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer mt-2",
+                  "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer mt-2",
                   location === "/ai-approval-demo"
-                    ? "text-primary bg-primary/10 border border-primary/20"
-                    : "text-gray-400 hover:text-blue-600 hover:bg-blue-50 opacity-60 hover:opacity-100"
+                    ? "bg-[#0b3761] text-white border border-[#0b3761] shadow-sm"
+                    : "text-gray-400 hover:text-[#07233e] hover:bg-white/10 opacity-60 hover:opacity-100"
                 )}
                 title="Advanced System"
               >
                 <Bot className={cn(
                   "mr-3 h-5 w-5",
-                  location === "/ai-approval-demo" ? "text-primary" : "text-gray-400 hover:text-blue-600"
+                  location === "/ai-approval-demo" ? "text-white" : "text-gray-400 hover:text-[#07233e]"
                 )} />
               </div>
             </Link>

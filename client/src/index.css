@@ -10,7 +10,7 @@
   --deltaways-navy: hsl(220, 100%, 15%); /* Primary Navy */
   --deltaways-active: #0b3761; /* Active Navigation Elements */
   --deltaways-ring: #b0d4f6; /* Logo Ring Color */
-  --deltaways-gold: hsl(45, 100%, 50%); /* Accent Gold */
+  --deltaways-gold: #07233e; /* Accent Color (was Gold) */
   --deltaways-gray: hsl(210, 15%, 92%); /* Secondary Gray */
   --deltaways-dark: hsl(220, 50%, 8%); /* Deep Navy */
   
@@ -30,7 +30,7 @@
   --secondary: var(--deltaways-gray);
   --secondary-foreground: var(--deltaways-navy);
   --accent: var(--deltaways-gold);
-  --accent-foreground: var(--deltaways-navy);
+  --accent-foreground: hsl(210, 40%, 98%);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
   --ring: var(--deltaways-gold);
@@ -97,13 +97,13 @@
   --card-foreground: hsl(210, 40%, 98%);
   --border: hsl(220, 30%, 18%);
   --input: hsl(220, 30%, 18%);
-  --primary: hsl(45, 100%, 55%); /* Brighter gold in dark */
-  --primary-foreground: var(--deltaways-dark);
+  --primary: #07233e; /* Dark accent in dark mode */
+  --primary-foreground: hsl(210, 40%, 98%);
   --secondary: hsl(220, 30%, 15%);
   --secondary-foreground: hsl(210, 40%, 98%);
-  --accent: hsl(45, 100%, 55%);
-  --accent-foreground: var(--deltaways-dark);
-  --ring: hsl(45, 100%, 55%);
+  --accent: #07233e;
+  --accent-foreground: hsl(210, 40%, 98%);
+  --ring: #07233e;
 }
 
 /* DELTA WAYS Typography System - Primary: Inter, Secondary: Segoe UI */
@@ -161,9 +161,9 @@ h1, h2, h3, h4, h5, h6 {
   border-bottom: 1px solid hsl(var(--accent));
 }
 
-/* DELTA WAYS Gold Highlights */
+/* DELTA WAYS Accent Highlights */
 .deltaways-gold-text {
-  color: hsl(var(--accent));
+  color: #07233e;
   font-weight: 600;
 }
 
