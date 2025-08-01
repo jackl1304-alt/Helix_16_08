@@ -2483,7 +2483,7 @@ Status: Archiviertes historisches Dokument
     }
   });
   
-  // Get real knowledge articles from database
+  // Get knowledge articles from database - SIMPLIFIED VERSION
   app.get('/api/knowledge/articles', async (req, res) => {
     try {
       console.log('[API] Loading real knowledge articles from knowledge_base table...');
@@ -2492,284 +2492,59 @@ Status: Archiviertes historisches Dokument
       const realArticles = await storage.getAllKnowledgeArticles();
       console.log(`[API] Found ${realArticles.length} real knowledge articles in database`);
       
-      if (realArticles.length > 0) {
-        // Transform database articles to API format
-        const knowledgeArticles = realArticles.map(article => ({
-          id: article.id,
-          title: article.title,
-          content: article.content,
-          category: article.category,
-          tags: Array.isArray(article.tags) ? article.tags : (article.tags ? JSON.parse(article.tags) : []),
-          published_at: article.created_at,
-          status: article.is_published ? 'published' : 'draft',
-          created_at: article.created_at,
-          updated_at: article.updated_at || article.created_at,
-          // Extract authority from tags
-          authority: Array.isArray(article.tags) 
-            ? article.tags.find(tag => ['FDA', 'EMA', 'BfArM', 'MHRA', 'Swissmedic', 'ISO', 'IEC', 'Johner', 'MTD', 'PubMed', 'JAMA'].includes(tag))
-            : 'Knowledge Base',
-          region: 'Global',
-          priority: 'high',
-          language: article.content?.includes('DiGA') || article.content?.includes('Deutschland') ? 'de' : 'en',
-          source: `Knowledge Base: ${article.category}`,
-          summary: article.content?.substring(0, 150) + '...'
-        }));
+      // Transform database articles to standardized API format
+      const knowledgeArticles = realArticles.map(article => ({
+        id: article.id,
+        title: article.title,
+        content: article.content,
+        category: article.category,
+        tags: Array.isArray(article.tags) ? article.tags : (article.tags ? JSON.parse(article.tags || '[]') : []),
+        published_at: article.created_at,
+        created_at: article.created_at,
+        status: article.is_published ? 'published' : 'draft',
+        // Extract authority from tags or use default
+        authority: Array.isArray(article.tags) 
+          ? article.tags.find(tag => ['FDA', 'EMA', 'BfArM', 'MHRA', 'Swissmedic', 'ISO', 'IEC', 'Johner', 'MTD', 'PubMed', 'JAMA'].includes(tag)) || 'Knowledge Base'
+          : 'Knowledge Base',
+        region: 'Global',
+        priority: 'high',
+        language: article.content?.includes('DiGA') || article.content?.includes('Deutschland') ? 'de' : 'en',
+        source: `Knowledge Base: ${article.category}`,
+        summary: article.content?.substring(0, 150) + '...'
+      }));
 
-        res.json({
-          success: true,
-          data: knowledgeArticles,
-          meta: {
-            totalArticles: knowledgeArticles.length,
-            totalUpdates: 0,
-            timestamp: new Date().toISOString(),
-            message: `${knowledgeArticles.length} real knowledge articles loaded from database`,
-            dataSource: 'knowledge_base'
-          }
-        });
-        return;
-      }
-      
-      // Fallback: Get ALL regulatory updates and find knowledge-related content
-      const allUpdates = await storage.getAllRegulatoryUpdates();
-      
-      // Filter for knowledge articles - include all guidance type updates
-      console.log(`[API] Filtering ${allUpdates.length} updates for knowledge articles...`);
-      
-      // Debug: Check what data we have
-      const sampleUpdates = allUpdates.slice(0, 3);
-      console.log('[API] Sample updates:', sampleUpdates.map(u => ({
-        update_type: u.update_type,
-        source_id: u.source_id,
-        title: u.title?.substring(0, 50)
-      })));
-      
-      // Enhanced filtering for extracted knowledge articles
-      let knowledgeArticles = allUpdates
-        .filter(update => {
-          // Check for extracted knowledge sources from our Universal Extractor
-          const isExtractedSource = update.source_id && (
-            update.source_id.includes('jama_') ||
-            update.source_id.includes('nejm_') ||
-            update.source_id.includes('lancet_') ||
-            update.source_id.includes('fda_guidance_') ||
-            update.source_id.includes('ema_guidelines') ||
-            update.source_id.includes('bfarm_') ||
-            update.source_id.includes('swissmedic_') ||
-            update.source_id.includes('mhra_') ||
-            update.source_id.includes('iso_') ||
-            update.source_id.includes('iec_') ||
-            update.source_id.includes('pubmed_') ||
-            update.source_id.includes('johner_') ||
-            update.source_id.includes('mtd_') ||
-            update.source_id.includes('network_medical_devices')
-          );
-          
-          const isResearchCategory = update.category && (
-            update.category.includes('medtech_research') ||
-            update.category.includes('regulatory_guidance') ||
-            update.category.includes('technical_standards') ||
-            update.category.includes('legal_research')
-          );
-          
-          const hasKnowledgeTags = update.tags && Array.isArray(update.tags) && 
-            update.tags.some(tag => 
-              tag.includes('medical-devices') ||
-              tag.includes('research') ||
-              tag.includes('jama') ||
-              tag.includes('regulatory') ||
-              tag.includes('standards') ||
-              tag.includes('legal')
-            );
-          
-          const isKnowledgeArticle = isExtractedSource || isResearchCategory || hasKnowledgeTags;
-          
-          if (isKnowledgeArticle) {
-            console.log(`[API] Found knowledge article: ${update.title} (${update.source_id}) - Category: ${update.category}`);
-          }
-          
-          return isKnowledgeArticle;
-        })
-        .map(update => ({
-          id: update.id,
-          title: update.title || 'Knowledge Article',
-          content: update.content || update.summary || 'Medical technology knowledge content from extracted source',
-          authority: update.authority || 'Unknown Authority',
-          region: update.region || 'Global',
-          category: update.category || 'medtech_knowledge',
-          published_at: update.published_at || update.created_at || new Date().toISOString(),
-          priority: update.priority || 'medium',
-          tags: Array.isArray(update.tags) ? update.tags : ['medical-devices', 'knowledge'],
-          url: update.url || '#',
-          summary: update.summary || (update.content ? update.content.slice(0, 200) + '...' : 'Knowledge article from extracted source'),
-          language: 'en',
-          source: `${update.authority || 'Knowledge'}: ${update.source_id || 'Database'}`,
-          source_id: update.source_id || 'unknown',
-          device_classes: Array.isArray(update.device_classes) ? update.device_classes : [],
-          status: 'published',
-          created_at: update.created_at || new Date().toISOString(),
-          updated_at: update.updated_at || new Date().toISOString()
-        }));
-
-      console.log(`[API] Retrieved ${knowledgeArticles.length} knowledge articles from ${allUpdates.length} total updates`);
-      
-      // If no knowledge articles found in real data, create demo knowledge articles
-      if (knowledgeArticles.length === 0) {
-        console.log('[API] No knowledge articles found in database, creating demo articles');
-        const demoKnowledgeArticles = [
-          {
-            id: 'knowledge-demo-1',
-            title: 'EU MDR Implementation Guidelines for Class III Devices',
-            content: 'Comprehensive guidance for medical device manufacturers on EU MDR compliance requirements.',
-            authority: 'EMA',
-            region: 'Europe',
-            category: 'medtech_knowledge',
-            published_at: new Date().toISOString(),
-            priority: 'high',
-            tags: ['eu-mdr', 'class-iii', 'compliance'],
-            url: 'https://ema.europa.eu/guidance/mdr',
-            summary: 'Essential guidelines for EU MDR compliance focusing on Class III medical devices...',
-            language: 'en',
-            source: 'Knowledge: EMA Guidelines'
-          },
-          {
-            id: 'knowledge-demo-2',
-            title: 'FDA 510(k) Submission Best Practices',
-            content: 'Best practices and recommendations for successful FDA 510(k) submissions.',
-            authority: 'FDA',
-            region: 'USA',
-            category: 'medtech_knowledge',
-            published_at: new Date().toISOString(),
-            priority: 'high',
-            tags: ['510k', 'fda', 'submissions'],
-            url: 'https://fda.gov/medical-devices/510k',
-            summary: 'Comprehensive guide to FDA 510(k) submission requirements and best practices...',
-            language: 'en',
-            source: 'Knowledge: FDA Guidelines'
-          },
-          {
-            id: 'knowledge-demo-3',
-            title: 'BfArM Medizinprodukte-Verordnung Leitfaden',
-            content: 'Deutscher Leitfaden zur Medizinprodukte-Verordnung für Hersteller.',
-            authority: 'BFARM',
-            region: 'Germany',
-            category: 'medtech_knowledge',
-            published_at: new Date().toISOString(),
-            priority: 'medium',
-            tags: ['mdr', 'bfarm', 'deutschland'],
-            url: 'https://bfarm.de/medizinprodukte',
-            summary: 'Praktischer Leitfaden für deutsche Medizinproduktehersteller zur MDR-Umsetzung...',
-            language: 'de',
-            source: 'Knowledge: BfArM Leitfäden'
-          },
-          {
-            id: 'knowledge-demo-4',
-            title: 'MHRA Post-Brexit Device Regulations',
-            content: 'Updated guidance on medical device regulations in the UK following Brexit.',
-            authority: 'MHRA',
-            region: 'UK',
-            category: 'medtech_knowledge',
-            published_at: new Date().toISOString(),
-            priority: 'high',
-            tags: ['brexit', 'mhra', 'uk-regulations'],
-            url: 'https://mhra.gov.uk/medical-devices',
-            summary: 'Essential information about UK medical device regulations post-Brexit...',
-            language: 'en',
-            source: 'Knowledge: MHRA Guidelines'
-          },
-          {
-            id: 'knowledge-demo-5',
-            title: 'Swissmedic Innovation Office Guidance',
-            content: 'Guidance from Swissmedic Innovation Office for novel medical technologies.',
-            authority: 'SWISSMEDIC',
-            region: 'Switzerland',
-            category: 'medtech_knowledge',
-            published_at: new Date().toISOString(),
-            priority: 'medium',
-            tags: ['innovation', 'swissmedic', 'novel-technologies'],
-            url: 'https://swissmedic.ch/innovation',
-            summary: 'Comprehensive guidance for innovative medical device technologies in Switzerland...',
-            language: 'en',
-            source: 'Knowledge: Swissmedic Innovation'
-          }
-        ];
-        
-        // Enhanced response with demo data
-        res.json({
-          success: true,
-          data: demoKnowledgeArticles,
-          meta: {
-            totalArticles: demoKnowledgeArticles.length,
-            totalUpdates: allUpdates.length,
-            timestamp: new Date().toISOString(),
-            message: 'Demo knowledge articles provided - real articles will be available after data synchronization',
-            dataSource: 'demo'
-          }
-        });
-      } else {
-        // Enhanced response with real data
-        res.json({
-          success: true,
-          data: knowledgeArticles,
-          meta: {
-            totalArticles: knowledgeArticles.length,
-            totalUpdates: allUpdates.length,
-            timestamp: new Date().toISOString(),
-            message: 'Knowledge articles retrieved successfully',
-            dataSource: 'database'
-          }
-        });
-      }
+      res.json({
+        success: true,
+        data: knowledgeArticles,
+        meta: {
+          totalArticles: knowledgeArticles.length,
+          totalUpdates: 0,
+          timestamp: new Date().toISOString(),
+          message: `${knowledgeArticles.length} real knowledge articles loaded from database`,
+          dataSource: 'knowledge_base'
+        }
+      });
     } catch (error) {
       console.error('[API] Error fetching knowledge articles:', error);
-      res.status(500).json({ error: 'Failed to fetch knowledge articles' });
-    }
-  });
-  
-  // Collect Knowledge Articles
-  app.post("/api/knowledge/collect-articles", async (req, res) => {
-    try {
-      console.log('[API] Starting knowledge article collection...');
-      
-      const result = await knowledgeArticleService.collectKnowledgeArticles();
-      res.json(result);
-    } catch (error: any) {
-      console.error('[API] Knowledge article collection failed:', error);
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  // Get Knowledge Sources Status
-  app.get("/api/knowledge/sources-status", async (req, res) => {
-    try {
-      const sourcesStatus = await knowledgeArticleService.getSourcesStatus();
-      res.json({ success: true, sources: sourcesStatus });
-    } catch (error: any) {
-      console.error('[API] Failed to get knowledge sources status:', error);
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  // Sync Specific Knowledge Source
-  app.post("/api/knowledge/sync-source/:sourceId", async (req, res) => {
-    try {
-      const { sourceId } = req.params;
-      console.log(`[API] Syncing specific knowledge source: ${sourceId}`);
-      
-      const result = await knowledgeArticleService.syncSpecificSource(sourceId);
-      res.json({ success: result.success, result });
-    } catch (error: any) {
-      console.error('[API] Knowledge source sync failed:', error);
-      res.status(500).json({ message: error.message });
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to fetch knowledge articles',
+        data: [],
+        meta: {
+          totalArticles: 0,
+          totalUpdates: 0,
+          timestamp: new Date().toISOString(),
+          message: 'Error loading knowledge articles',
+          dataSource: 'knowledge_base'
+        }
+      });
     }
   });
 
   // AegisIntel Services Integration - Comprehensive AI-powered regulatory analysis
-  app.post('/api/aegis/analyze-regulatory', async (req, res) => {
+  app.post('/api/aegis/analyze-regulatory-content', async (req, res) => {
     try {
-      const { content, title } = req.body;
-      const fullContent = `${title} ${content}`;
-      
-      // Load services dynamically to avoid dependency issues
+      const fullContent = req.body;
       const { aiService } = await import('./services/aiService');
       const { nlpService } = await import('./services/nlpService');
       
