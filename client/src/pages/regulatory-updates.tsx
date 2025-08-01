@@ -151,7 +151,11 @@ Helix Regulatory Intelligence Platform
       render: (update: RegulatoryUpdate) => (
         <div className="space-y-1">
           <p className="font-medium text-slate-900 dark:text-slate-100">{update.title}</p>
-          <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">{update.description}</p>
+          <FormattedText 
+            content={update.description?.substring(0, 150) + '...' || 'Keine Beschreibung verfügbar'}
+            className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2"
+            maxHeight="max-h-12"
+          />
           <div className="flex flex-wrap gap-1">
             {update.device_classes?.map((deviceClass, idx) => (
               <Badge key={idx} variant="secondary" className="text-xs">
