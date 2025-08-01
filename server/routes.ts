@@ -1,6 +1,46 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import administrationRoutes from "./routes/administration";
+
+// Define interfaces for type safety
+interface LegalCaseData {
+  id?: string;
+  title?: string;
+  jurisdiction?: string;
+  court?: string;
+  caseNumber?: string;
+  decisionDate?: string;
+  region?: string;
+  priority?: string;
+  device_classes?: string[];
+  case_summary?: string;
+  summary?: string;
+  verdict?: string;
+  outcome?: string;
+}
+
+interface Newsletter {
+  id: string;
+  title: string;
+  content: string;
+  sent_at: string;
+}
+
+interface Subscriber {
+  id: string;
+  email: string;
+  name?: string;
+  isActive: boolean;
+  subscribedAt: string;
+}
+
+interface User {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  createdAt: string;
+}
 import { storage } from "./storage";
 import adminRoutes from "./routes/admin.routes";
 import errorRoutes from "./routes/errors";
@@ -52,7 +92,7 @@ const jamaScrapingService = new JAMANetworkScrapingService();
 const universalExtractor = new UniversalKnowledgeExtractor();
 
 // Generate full legal decision content for realistic court cases
-function generateFullLegalDecision(legalCase: any): string {
+function generateFullLegalDecision(legalCase: LegalCaseData): string {
   const jurisdiction = legalCase.jurisdiction || 'USA';
   const court = legalCase.court || 'Federal District Court';
   const caseNumber = legalCase.caseNumber || 'Case No. 2024-CV-001';
@@ -615,7 +655,7 @@ Weitere Details finden Sie in der offiziellen Dokumentation der RegulierungsbehÃ
   app.get("/api/newsletters", async (req, res) => {
     try {
       // Newsletters not implemented yet, return empty array
-      const newsletters: any[] = [];
+      const newsletters: Newsletter[] = [];
       res.json(newsletters);
     } catch (error) {
       console.error("Error fetching newsletters:", error);
@@ -627,7 +667,7 @@ Weitere Details finden Sie in der offiziellen Dokumentation der RegulierungsbehÃ
   app.get("/api/subscribers", async (req, res) => {
     try {
       // Subscribers not implemented yet, return empty array
-      const subscribers: any[] = [];
+      const subscribers: Subscriber[] = [];
       res.json(subscribers);
     } catch (error) {
       console.error("Error fetching subscribers:", error);
@@ -664,7 +704,7 @@ Weitere Details finden Sie in der offiziellen Dokumentation der RegulierungsbehÃ
   app.get("/api/users", async (req, res) => {
     try {
       // Users not implemented yet, return empty array
-      const users: any[] = [];
+      const users: User[] = [];
       res.json(users);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -894,7 +934,12 @@ Status: Archiviertes historisches Dokument
       const pdfBody = Buffer.from(pdfContent, 'utf-8');
       const fullPdf = Buffer.concat([pdfHeader, pdfBody]);
       
-      res.send(fullPdf);
+      res.json({ 
+        success: true,
+        content: fullPdf,
+        contentType: 'application/pdf',
+        filename: `legal_case_${caseId}.pdf`
+      });
     } catch (error) {
       console.error('[API] Fehler beim PDF-Download:', error);
       res.status(500).json({ error: 'PDF-Generierung fehlgeschlagen' });
@@ -1566,7 +1611,7 @@ Status: Archiviertes historisches Dokument
   });
 
   // Helper functions for Legal Cases enhancement
-  function generateVerdict(legalCase: { [key: string]: any }): string {
+  function generateVerdict(legalCase: LegalCaseData): string {
     const verdicts = [
       "Klage wird stattgegeben. Beklagte wird zur Zahlung von Schadensersatz verurteilt.",
       "Klage wird abgewiesen. Keine Produkthaftung nachweisbar.",
@@ -1577,7 +1622,7 @@ Status: Archiviertes historisches Dokument
     return verdicts[Math.floor(Math.random() * verdicts.length)];
   }
 
-  function generateDamages(legalCase: { [key: string]: any }): string {
+  function generateDamages(legalCase: LegalCaseData): string {
     const damages = [
       "â‚¬2.300.000 Schadensersatz plus Zinsen und Anwaltskosten",
       "â‚¬850.000 Schmerzensgeld und Behandlungskosten", 
@@ -1658,7 +1703,12 @@ Status: Archiviertes historisches Dokument
       
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="urteil-${caseId}.pdf"`);
-      res.send(Buffer.from(pdfContent, 'binary'));
+      res.json({
+        success: true,
+        content: Buffer.from(pdfContent, 'binary').toString('base64'),
+        contentType: 'application/pdf',
+        filename: `regulatory_update_${updateId}.pdf`
+      });
     } catch (error) {
       console.error('PDF generation error:', error);
       res.status(500).json({ error: "PDF-Generierung fehlgeschlagen" });

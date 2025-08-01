@@ -45,7 +45,12 @@ router.get('/documents/:documentId/download', async (req, res) => {
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
         
-        return res.send(document.content);
+        return res.json({
+          success: true,
+          content: document.content,
+          contentType: 'text/plain',
+          filename: filename
+        });
       }
     }
     

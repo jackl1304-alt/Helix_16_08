@@ -53,10 +53,20 @@ interface LegalAnalysis {
 }
 
 interface CaseRelationshipData {
-  targetCase: any;
-  relatedCases: any[];
+  targetCase: LegalCase;
+  relatedCases: LegalCase[];
   relationships: CaseRelationship[];
   themes: LegalTheme[];
+}
+
+interface LegalCase {
+  id: string;
+  title: string;
+  caseNumber: string;
+  court: string;
+  jurisdiction: string;
+  dateDecided: string;
+  summary: string;
 }
 
 interface ThemesData {
