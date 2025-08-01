@@ -8,6 +8,15 @@ interface DuplicateReport {
   removalCandidates: string[];
 }
 
+interface DuplicateRemovalReport {
+  timestamp: string;
+  removedCount: number;
+  keptCount: number;
+  removedIds: string[];
+  totalProcessed: number;
+  message: string;
+}
+
 interface DuplicateGroup {
   key: string;
   records: any[];
