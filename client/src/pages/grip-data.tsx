@@ -216,7 +216,7 @@ export default function GripDataPage() {
           <div className="flex gap-2 pt-4">
             <Button
               onClick={() => extractDataMutation.mutate()}
-              disabled={extractDataMutation.isPending || gripStatus?.status !== 'connected'}
+              disabled={extractDataMutation.isPending}
               className="bg-[#d95d2c] hover:bg-[#b8491f] text-white"
             >
               {extractDataMutation.isPending ? (
@@ -228,19 +228,20 @@ export default function GripDataPage() {
             </Button>
           </div>
 
-          {gripStatus?.status !== 'connected' && (
-            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-              <div className="flex items-center gap-2 text-yellow-800">
-                <AlertCircle className="h-4 w-4" />
-                <span className="text-sm font-medium">
-                  Verbindung zur GRIP Platform erforderlich
-                </span>
-              </div>
-              <p className="text-sm text-yellow-700 mt-1">
-                Bitte testen Sie die Verbindung bevor Sie Daten extrahieren.
-              </p>
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+            <div className="flex items-center gap-2 text-blue-800">
+              <AlertCircle className="h-4 w-4" />
+              <span className="text-sm font-medium">
+                GRIP Platform Information
+              </span>
             </div>
-          )}
+            <p className="text-sm text-blue-700 mt-1">
+              {gripStatus?.status !== 'connected' 
+                ? "Das System versucht verschiedene Authentifizierungsmethoden und kann trotzdem Daten extrahieren. Ein Verbindungstest ist optional."
+                : "Verbindung aktiv - bereit für Datenextraktion."
+              }
+            </p>
+          </div>
         </CardContent>
       </Card>
 
