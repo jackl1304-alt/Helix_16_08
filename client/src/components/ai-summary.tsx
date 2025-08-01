@@ -1,6 +1,7 @@
 import { Brain, Sparkles, Clock, AlertTriangle, Info } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { FormattedText } from "@/components/formatted-text";
 import { cn } from "@/lib/utils";
 
 interface AISummaryProps {
@@ -34,22 +35,34 @@ function generateAISummary(title: string, content: string, type: 'regulatory' | 
 
   if (type === 'legal') {
     if (isPhilips) {
-      summary = 'Großangelegte Litigation gegen Philips wegen defekter CPAP-Geräte. Millionen Patienten betroffen durch toxische Schaumstoff-Degradation.';
+      summary = `**Großangelegte Litigation gegen Philips** 
+
+Diese Sammelklage betrifft defekte CPAP-Geräte, die Millionen von Patienten durch toxische Schaumstoff-Degradation gefährdet haben.
+
+**Kernproblem:**
+Die PE-PUR Schalldämpfungsschäume in den Geräten zerfallen und setzen karzinogene Partikel frei, die Patienten einatmen.`;
       keyPoints = [
-        '15+ Millionen defekte Geräte weltweit',
-        '$16+ Milliarden Settlement-Verhandlungen',
-        'Karzinogene Partikel durch PE-PUR Foam',
-        'Class I Recall aller betroffenen Modelle'
+        '**Betroffene Geräte:** 15+ Millionen Einheiten weltweit mit defektem PE-PUR Schaum',
+        '**Finanzielle Auswirkungen:** $16+ Milliarden Settlement-Verhandlungen laufend',
+        '**Gesundheitsrisiko:** Karzinogene Partikel und toxische chemische Degradation',
+        '**Regulatorische Maßnahmen:** Class I Recall aller betroffenen CPAP/BiPAP Modelle'
       ];
       riskLevel = 'urgent';
       actionRequired = true;
     } else if (isEthicon) {
-      summary = 'Class Action gegen Ethicon wegen defekter Physiomesh-Implantate. Schwerwiegende Komplikationen bei Tausenden Patienten.';
+      summary = `**Class Action gegen Ethicon** 
+
+Umfassende Sammelklage wegen defekter Physiomesh-Implantate, die bei Tausenden von Patienten schwerwiegende Komplikationen verursacht haben.
+
+**Kernprobleme:**
+• Hohe Revisionsraten durch Materialversagen
+• Chronische Schmerzen und Infektionen
+• Unzureichende klinische Studien vor Markteinführung`;
       keyPoints = [
-        '$1.8 Milliarden Settlement-Vereinbarung',
-        '49% Revisionsrate nach 6 Jahren',
-        'Chronische Schmerzen bei 78% der Patienten',
-        'MDL 2782 mit 14.847 Einzelklagen'
+        '**Settlement-Vereinbarung:** $1.8 Milliarden Vergleichszahlung vereinbart',
+        '**Versagensrate:** 49% Revisionsrate nach 6 Jahren dokumentiert',
+        '**Patientenschäden:** Chronische Schmerzen bei 78% der betroffenen Patienten',
+        '**Rechtsverfahren:** MDL 2782 mit 14.847 individuellen Einzelklagen'
       ];
       riskLevel = 'high';
       actionRequired = true;
@@ -86,12 +99,19 @@ function generateAISummary(title: string, content: string, type: 'regulatory' | 
   } else {
     // Regulatory content
     if (isFDA) {
-      summary = 'FDA-Guidance mit neuen Anforderungen für Medizinprodukte. Compliance-Anpassungen in der US-Regulierung erforderlich.';
+      summary = `**FDA-Guidance Update** 
+
+Neue Anforderungen für Medizinprodukte in den USA. Diese Richtlinien erfordern umfassende Compliance-Anpassungen.
+
+**Wichtige Änderungen:**
+• Erweiterte Dokumentationsanforderungen
+• Neue klinische Studien-Standards  
+• Verstärkte Post-Market-Surveillance`;
       keyPoints = [
-        'Neue FDA-Richtlinien veröffentlicht',
-        'Compliance-Fristen beachten',
-        'Auswirkungen auf US-Marktzugang',
-        'Dokumentationsanforderungen erweitert'
+        '**Neue Richtlinien:** FDA-Guidance mit aktualisierten Zulassungsanforderungen',
+        '**Compliance-Fristen:** Bestehende Produkte müssen bis [Datum] angepasst werden',
+        '**Marktzugang:** Direkte Auswirkungen auf US-Markteinführungen',
+        '**Dokumentation:** Erweiterte technische Dokumentationsanforderungen'
       ];
       riskLevel = 'high';
       actionRequired = true;
@@ -193,9 +213,13 @@ export function AISummary({ title, content, type = 'regulatory', priority, class
             aiAnalysis.riskLevel === 'medium' ? 'text-yellow-600' : 'text-green-600'
           )} />
           <div className="flex-1">
-            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-              {aiAnalysis.summary}
-            </p>
+            <div className="text-sm text-gray-700 dark:text-gray-300">
+              <FormattedText 
+                content={aiAnalysis.summary} 
+                className="text-sm"
+                maxHeight="max-h-40"
+              />
+            </div>
             <div className="flex items-center gap-2 mt-2">
               <Badge className={riskColors[aiAnalysis.riskLevel]}>
                 Risiko: {riskLabels[aiAnalysis.riskLevel]}
@@ -213,29 +237,55 @@ export function AISummary({ title, content, type = 'regulatory', priority, class
           <h4 className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
             Schlüsselpunkte
           </h4>
-          <ul className="space-y-1">
+          <div className="space-y-1">
             {aiAnalysis.keyPoints.map((point, index) => (
-              <li key={index} className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
-                <span className="text-blue-500 mt-1">•</span>
-                <span>{point}</span>
-              </li>
+              <div key={index} className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
+                <span className="text-blue-500 mt-1 flex-shrink-0">•</span>
+                <div className="flex-1">
+                  <FormattedText 
+                    content={point} 
+                    className="text-xs prose-sm"
+                    maxHeight="max-h-20"
+                  />
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
 
         {type === 'regulatory' && aiAnalysis.actionRequired && (
           <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-lg">
-            <p className="text-xs text-blue-800 dark:text-blue-200">
-              <strong>Empfehlung:</strong> Compliance-Überprüfung durchführen und Dokumentation entsprechend anpassen.
-            </p>
+            <div className="text-xs text-blue-800 dark:text-blue-200">
+              <FormattedText 
+                content="**Empfehlung:** Compliance-Überprüfung durchführen und Dokumentation entsprechend anpassen. 
+
+Überprüfen Sie:
+• Relevante Produktdokumentation
+• CE-Kennzeichnungsunterlagen  
+• Technische Dokumentation
+• Post-Market-Surveillance-Berichte"
+                className="text-xs prose-xs"
+                maxHeight="max-h-32"
+              />
+            </div>
           </div>
         )}
 
         {type === 'legal' && aiAnalysis.riskLevel === 'urgent' && (
           <div className="bg-red-100 dark:bg-red-900 p-3 rounded-lg">
-            <p className="text-xs text-red-800 dark:text-red-200">
-              <strong>Wichtiger Hinweis:</strong> Dieser Fall kann direkte Auswirkungen auf Ihre Produkte haben. Rechtliche Beratung empfohlen.
-            </p>
+            <div className="text-xs text-red-800 dark:text-red-200">
+              <FormattedText 
+                content="**Wichtiger Hinweis:** Dieser Fall kann direkte Auswirkungen auf Ihre Produkte haben.
+
+Sofortige Maßnahmen:
+• Rechtliche Beratung konsultieren
+• Produkthaftungsversicherung prüfen
+• Dokumentation sichern
+• Risk Management aktualisieren"
+                className="text-xs prose-xs"
+                maxHeight="max-h-32"
+              />
+            </div>
           </div>
         )}
       </CardContent>
