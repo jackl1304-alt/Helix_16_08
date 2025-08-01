@@ -29,6 +29,7 @@ import Phase2Integration from "@/pages/phase2-integration";
 import Phase3Advanced from "@/pages/phase3-advanced";
 import RealTimeIntegration from "@/pages/real-time-integration";
 import DataSourcesAdmin from "@/pages/admin/data-sources";
+import Administration from "@/pages/administration";
 import { ResponsiveLayout } from "@/components/responsive-layout";
 
 function Router() {
@@ -58,6 +59,7 @@ function Router() {
       <Route path="/phase3-advanced" component={Phase3Advanced} />
       <Route path="/real-time-integration" component={RealTimeIntegration} />
       <Route path="/administration/data-sources" component={DataSourcesAdmin} />
+      <Route path="/administration" component={Administration} />
       <Route path="/documents/:sourceType/:documentId" component={DocumentViewer} />
       
       {/* Fallback to 404 */}
