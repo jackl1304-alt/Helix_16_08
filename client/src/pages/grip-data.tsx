@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, CheckCircle, Download, Loader2, RefreshCw } from "lucide-react";
+import { AlertCircle, CheckCircle, Download, Loader2, RefreshCw, TestTube } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -225,6 +225,42 @@ export default function GripDataPage() {
                 <Download className="h-4 w-4 mr-2" />
               )}
               Daten extrahieren
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={async () => {
+                try {
+                  const response = await fetch('/api/grip/extract', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                  });
+                  const result = await response.json();
+                  
+                  if (result.success) {
+                    toast({
+                      title: "GRIP Extraktion erfolgreich",
+                      description: `${result.count || 0} Einträge extrahiert`,
+                    });
+                  } else {
+                    toast({
+                      title: "GRIP Extraktion fehlgeschlagen",
+                      description: result.message || "Unbekannter Fehler",
+                      variant: "destructive"
+                    });
+                  }
+                } catch (error) {
+                  toast({
+                    title: "Fehler bei GRIP Extraktion",
+                    description: "Netzwerk- oder Serverfehler",
+                    variant: "destructive"
+                  });
+                }
+              }}
+              className="ml-2"
+            >
+              <TestTube className="h-4 w-4 mr-2" />
+              Test Extraktion
             </Button>
           </div>
 
