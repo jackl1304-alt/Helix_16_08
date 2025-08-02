@@ -75,20 +75,43 @@ interface ANVISAItem {
 // Erweiterte Datenquellen für globale regulatorische Überwachung
 interface GlobalDataSources {
   // Deutschland
-  bfarm: string;
+  bfarm: string; // Bundesinstitut für Arzneimittel und Medizinprodukte
+  dimdi: string; // Deutsches Institut für Medizinische Dokumentation
+  dguv: string; // Deutsche Gesetzliche Unfallversicherung
+  din: string; // DIN-Normen
+  
   // Europa
-  ema: string;
+  ema: string; // European Medicines Agency
+  mdcg: string; // Medical Device Coordination Group
+  eurLex: string; // EU-Recht
+  cen: string; // Europäische Normung
+  
   // Schweiz
-  swissmedic: string;
+  swissmedic: string; // Schweizerische Zulassungsbehörde
+  saq: string; // Swiss Association for Quality
+  
   // England/UK
-  mhra: string;
+  mhra: string; // Medicines and Healthcare products Regulatory Agency
+  bsi: string; // British Standards Institution
+  
   // USA
-  fda: string;
+  fda: string; // Food and Drug Administration
+  nist: string; // National Institute of Standards and Technology
+  
+  // Kanada
+  healthCanada: string;
+  
   // Asien
-  pmda: string;
-  nmpa: string;
+  pmda: string; // Japan - Pharmaceuticals and Medical Devices Agency
+  nmpa: string; // China - National Medical Products Administration
+  cdsco: string; // Indien - Central Drugs Standard Control Organization
+  
+  // Russland
+  roszdravnadzor: string; // Russische Gesundheitsaufsicht
+  
   // Südamerika
-  anvisa: string;
+  anvisa: string; // Brasilien
+  anmat: string; // Argentinien
 }
 
 export class DataCollectionService {
@@ -104,14 +127,44 @@ export class DataCollectionService {
   
   // Globale Datenquellen-URLs
   private readonly dataSources: GlobalDataSources = {
+    // Deutschland
     bfarm: "https://www.bfarm.de/DE/Medizinprodukte/_node.html",
+    dimdi: "https://www.dimdi.de/dynamic/de/klassifikationen/",
+    dguv: "https://www.dguv.de/de/praevention/themen-a-z/index.jsp",
+    din: "https://www.din.de/de/mitwirken/normenausschuesse/nasg",
+    
+    // Europa
     ema: "https://www.ema.europa.eu/en/medicines/download-medicine-data",
+    mdcg: "https://ec.europa.eu/health/md_sector/new-regulations/guidance_en",
+    eurLex: "https://eur-lex.europa.eu/homepage.html",
+    cen: "https://www.cen.eu/standards/",
+    
+    // Schweiz
     swissmedic: "https://www.swissmedic.ch/swissmedic/de/home.html",
+    saq: "https://www.saq.ch/de/",
+    
+    // England/UK
     mhra: "https://www.gov.uk/government/organisations/medicines-and-healthcare-products-regulatory-agency",
+    bsi: "https://www.bsigroup.com/en-GB/standards/",
+    
+    // USA
     fda: "https://api.fda.gov/device",
+    nist: "https://www.nist.gov/standardsgov/",
+    
+    // Kanada
+    healthCanada: "https://www.canada.ca/en/health-canada.html",
+    
+    // Asien
     pmda: "https://www.pmda.go.jp/english/",
     nmpa: "https://www.nmpa.gov.cn/",
-    anvisa: "https://www.gov.br/anvisa/"
+    cdsco: "https://cdsco.gov.in/opencms/opencms/",
+    
+    // Russland
+    roszdravnadzor: "https://roszdravnadzor.gov.ru/",
+    
+    // Südamerika
+    anvisa: "https://www.gov.br/anvisa/pt-br",
+    anmat: "https://www.argentina.gob.ar/anmat"
   };
 
   // Enhanced rate limiting with proper typing
@@ -136,14 +189,14 @@ export class DataCollectionService {
     
     try {
       await this.rateLimit('fda');
-      const devices = await fdaOpenApiService.collect510kDevices(100);
-      console.log(`✅ Successfully collected ${devices.length} FDA 510(k) devices`);
+      await fdaOpenApiService.collect510kDevices(100);
+      console.log(`✅ Successfully collected FDA 510(k) devices`);
       
       // Also collect recalls with rate limiting
       try {
         await this.rateLimit('fda');
-        const recalls = await fdaOpenApiService.collectRecalls(50);
-        console.log(`✅ Successfully collected ${recalls.length} FDA recalls`);
+        await fdaOpenApiService.collectRecalls(50);
+        console.log(`✅ Successfully collected FDA recalls`);
       } catch (recallError) {
         console.error("⚠️ Error collecting FDA recalls (continuing with main sync):", recallError);
       }
