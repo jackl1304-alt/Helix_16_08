@@ -6,6 +6,17 @@ interface CategoryResult {
   therapeuticArea: string;
 }
 
+interface ExtractionResult {
+  keyPoints: string[];
+  entities: string[];
+  sentiment: 'positive' | 'negative' | 'neutral';
+}
+
+interface SummaryOptions {
+  maxLength: number;
+  extractKeywords: boolean;
+}
+
 class NLPService {
   private medtechKeywords = {
     deviceTypes: [
