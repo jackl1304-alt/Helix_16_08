@@ -22,7 +22,7 @@ const Landing = lazy(() => import("@/pages/landing"));
 const DataCollection = lazy(() => import("@/pages/data-collection"));
 const GlobalSources = lazy(() => import("@/pages/global-sources"));
 const Analytics = lazy(() => import("@/pages/analytics"));
-const RegulatoryUpdatesNew = lazy(() => import("@/pages/regulatory-updates-new"));
+const RegulatoryUpdatesNew = lazy(() => import("@/pages/regulatory-updates-clean"));
 const NewsletterManager = lazy(() => import("@/pages/newsletter-manager"));
 const ApprovalWorkflow = lazy(() => import("@/pages/approval-workflow"));
 const UserManagement = lazy(() => import("@/pages/user-management"));
