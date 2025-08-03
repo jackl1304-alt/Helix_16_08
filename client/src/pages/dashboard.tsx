@@ -44,6 +44,12 @@ export default function Dashboard() {
     gcTime: 60000,
   });
 
+  const { data: newsletterSources } = useQuery({
+    queryKey: ['/api/newsletter-sources'],
+    staleTime: 300000, // 5 minutes
+    gcTime: 600000, // 10 minutes
+  });
+
   // Newsletter Sync Mutation
   const newsletterSyncMutation = useMutation({
     mutationFn: async () => {
@@ -229,7 +235,7 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Recent Regulatory Updates */}
         <Card>
@@ -239,7 +245,7 @@ export default function Dashboard() {
               Aktuelle Regulatory Updates
             </CardTitle>
             <CardDescription>
-              Neueste Vorschriften und Richtlinien
+              Automatische Synchronisation aus 46 globalen Behörden (FDA, EMA, BfArM, MHRA, Swissmedic) + KI-gestützte Inhaltsanalyse
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -275,6 +281,76 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
+        {/* Active Newsletter Sources */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Mail className="h-5 w-5 text-green-600" />
+              Aktive Newsletter-Quellen
+            </CardTitle>
+            <CardDescription>
+              Authentische MedTech-Newsletter für automatische Inhaltsextraktion aus führenden Branchenquellen
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {newsletterSources && newsletterSources.sources ? (
+              <>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="text-center p-3 bg-green-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-700">
+                      {newsletterSources.stats?.activeSources || 0}
+                    </div>
+                    <div className="text-xs text-green-600">Aktive Quellen</div>
+                  </div>
+                  <div className="text-center p-3 bg-blue-50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-700">
+                      {newsletterSources.stats?.totalSources || 0}
+                    </div>
+                    <div className="text-xs text-blue-600">Konfiguriert</div>
+                  </div>
+                </div>
+                
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {newsletterSources.sources.slice(0, 8).map((source: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">
+                          {source.name}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {source.description}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 ml-2">
+                        {source.requiresAuth && (
+                          <Badge variant="outline" className="text-xs">
+                            Auth
+                          </Badge>
+                        )}
+                        <Badge 
+                          variant={source.status === 'active' ? 'default' : 'secondary'}
+                          className="text-xs"
+                        >
+                          {source.status === 'active' ? 'Aktiv' : 'Konfiguriert'}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="pt-2 border-t text-xs text-gray-500">
+                  Kategorien: {newsletterSources.stats?.categories?.industry_newsletter || 0} Branche, {newsletterSources.stats?.categories?.regulatory_newsletter || 0} Regulatorisch, {newsletterSources.stats?.categories?.market_analysis || 0} Marktanalyse
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-8">
+                <Mail className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">Newsletter-Quellen werden geladen...</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Pending Approvals */}
         <Card>
           <CardHeader>
@@ -283,7 +359,7 @@ export default function Dashboard() {
               Wartende Genehmigungen
             </CardTitle>
             <CardDescription>
-              Newsletter und Artikel zur Freigabe
+              KI-gestützte Inhaltsvalidierung mit automatischer Genehmigung basierend auf Compliance-Richtlinien und Qualitätskriterien
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

@@ -936,6 +936,42 @@ Weitere Details finden Sie in der offiziellen Dokumentation der RegulierungsbehÃ
     }
   });
 
+  // Active Newsletter sources for dashboard
+  app.get('/api/newsletter-sources', async (req, res) => {
+    console.log('[CRITICAL] API ROUTE DETECTED: /api/newsletter-sources - FORCING JSON ONLY');
+    res.setHeader('Content-Type', 'application/json');
+    try {
+      const { simpleNewsletterService } = await import('./services/simpleNewsletterService');
+      const sources = simpleNewsletterService.getActiveNewsletterSources();
+      
+      const stats = {
+        totalSources: sources.length,
+        activeSources: sources.filter(s => s.status === 'active').length,
+        configuredSources: sources.filter(s => s.status === 'configured').length,
+        authRequired: sources.filter(s => s.requiresAuth).length,
+        categories: {
+          industry_newsletter: sources.filter(s => s.category === 'industry_newsletter').length,
+          regulatory_newsletter: sources.filter(s => s.category === 'regulatory_newsletter').length,
+          market_analysis: sources.filter(s => s.category === 'market_analysis').length
+        }
+      };
+      
+      res.json({
+        success: true,
+        sources,
+        stats,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error('Failed to get newsletter sources:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get newsletter sources',
+        error: error.message
+      });
+    }
+  });
+
   app.post('/api/newsletter/sources', async (req, res) => {
     try {
       const sourceData = req.body;
