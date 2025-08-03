@@ -77,7 +77,6 @@ function Router() {
         <Route path="/ai-approval-test" component={AIApprovalTest} />
         <Route path="/knowledge-base" component={KnowledgeBase} />
         <Route path="/enhanced-legal-cases" component={EnhancedLegalCases} />
-        <Route path="/legal-case/:id" component={LegalCaseDetail} />
         <Route path="/rechtsprechung" component={EnhancedLegalCases} />
         <Route path="/historical-data" component={HistoricalData} />
         <Route path="/legal-cases" component={LegalCases} />
