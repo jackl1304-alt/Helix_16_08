@@ -19,7 +19,8 @@ import {
   Scale,
   FileSearch,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Mail
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoPath from "@assets/ICON Helix_1753735921077.jpg";
@@ -108,6 +109,7 @@ const navigationStructure: Record<string, NavigationSection> = {
       { name: "System-Verwaltung", href: "/administration", icon: Settings },
       { name: "Benutzerverwaltung", href: "/user-management", icon: Users },
       { name: "Datenquellen-Admin", href: "/administration/data-sources", icon: Database },
+      { name: "Newsletter-Verwaltung", href: "/newsletter-admin", icon: Mail },
       { name: "Audit-Protokolle", href: "/audit-logs", icon: FileSearch },
     ],
     defaultOpen: false

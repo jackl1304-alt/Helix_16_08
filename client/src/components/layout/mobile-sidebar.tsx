@@ -16,7 +16,8 @@ import {
   Menu,
   X,
   Scale,
-  Activity
+  Activity,
+  Mail
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ const knowledgeBase = [
 const administration = [
   { name: "User Management", href: "/user-management", icon: Users },
   { name: "Data Sources Admin", href: "/administration/data-sources", icon: Database },
+  { name: "Newsletter Admin", href: "/newsletter-admin", icon: Mail },
   { name: "System Settings", href: "/system-settings", icon: Settings },
   { name: "Audit Logs", href: "/audit-logs", icon: FileText },
 ];

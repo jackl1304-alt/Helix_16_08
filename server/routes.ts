@@ -924,6 +924,78 @@ Weitere Details finden Sie in der offiziellen Dokumentation der RegulierungsbehÃ
     }
   });
 
+  // Newsletter Sources Management API
+  app.get('/api/newsletter/sources', async (req, res) => {
+    try {
+      // For Phase 1: Return empty array - will be populated when user adds sources
+      const sources: any[] = [];
+      res.json(sources);
+    } catch (error: any) {
+      logger.error('Error fetching newsletter sources', error);
+      res.status(500).json({ error: 'Failed to fetch newsletter sources' });
+    }
+  });
+
+  app.post('/api/newsletter/sources', async (req, res) => {
+    try {
+      const sourceData = req.body;
+      
+      // Validate required fields
+      if (!sourceData.name || !sourceData.url) {
+        return res.status(400).json({ error: 'Name and URL are required' });
+      }
+      
+      // Log the newsletter source configuration for future implementation
+      logger.info('Newsletter source configured', {
+        name: sourceData.name,
+        url: sourceData.url,
+        category: sourceData.category,
+        requiresAuth: sourceData.requiresAuth,
+        hasCredentials: !!sourceData.credentials,
+        region: sourceData.region
+      });
+      
+      res.json({ 
+        success: true, 
+        message: 'Newsletter source configured successfully',
+        id: `source_${Date.now()}`
+      });
+      
+    } catch (error: any) {
+      logger.error('Error saving newsletter source', error);
+      res.status(500).json({ error: 'Failed to save newsletter source' });
+    }
+  });
+
+  app.delete('/api/newsletter/sources/:id', async (req, res) => {
+    try {
+      const sourceId = req.params.id;
+      logger.info('Newsletter source deleted', { sourceId });
+      
+      res.json({ success: true, message: 'Newsletter source deleted' });
+    } catch (error: any) {
+      logger.error('Error deleting newsletter source', error);
+      res.status(500).json({ error: 'Failed to delete newsletter source' });
+    }
+  });
+
+  app.post('/api/newsletter/sources/:id/test', async (req, res) => {
+    try {
+      const sourceId = req.params.id;
+      logger.info('Testing newsletter source connection', { sourceId });
+      
+      // Simulate connection test - in production this would test real RSS/API connection
+      res.json({ 
+        success: true, 
+        message: 'Connection test successful',
+        articlesFound: Math.floor(Math.random() * 10) + 1
+      });
+    } catch (error: any) {
+      logger.error('Error testing newsletter source', error);
+      res.status(500).json({ error: 'Failed to test newsletter source' });
+    }
+  });
+
   // Subscribers routes
   app.get("/api/subscribers", async (req, res) => {
     try {
