@@ -42,13 +42,13 @@ router.get('/documents/:documentId/download', async (req, res) => {
       if (document) {
         const filename = `${document.documentTitle.replace(/[^a-z0-9]/gi, '_')}.txt`;
         
-        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        res.setHeader('Content-Type', 'application/json');
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
         
         return res.json({
           success: true,
           content: document.content,
-          contentType: 'text/plain',
+          contentType: 'application/json',
           filename: filename
         });
       }

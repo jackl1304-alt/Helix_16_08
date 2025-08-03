@@ -387,8 +387,13 @@ helix_service_status{service="external_apis"} ${healthResult.services.externalAP
 helix_service_status{service="data_collection"} ${healthResult.services.dataCollection.status === 'up' ? 1 : healthResult.services.dataCollection.status === 'degraded' ? 0.5 : 0}
 `;
 
-    res.set('Content-Type', 'text/plain; version=0.0.4; charset=utf-8');
-    res.send(prometheusMetrics);
+    res.set('Content-Type', 'application/json');
+    res.json({
+      success: true,
+      metrics: prometheusMetrics,
+      contentType: 'prometheus/metrics',
+      timestamp: new Date().toISOString()
+    });
   } catch (error) {
     console.error('[Metrics] Handler error:', error);
     res.status(500).send('# Metrics unavailable\n');
