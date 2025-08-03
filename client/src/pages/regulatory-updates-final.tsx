@@ -243,7 +243,7 @@ export default function RegulatoryUpdatesFinal() {
                 <div>
                   <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">Quellen</p>
                   <p className="text-3xl font-bold text-purple-900 dark:text-purple-100">
-                    {new Set((updates || []).map(u => u.source_id || u.source || 'Unbekannt')).size}
+                    {new Set((updates || []).map((u: RegulatoryUpdate) => u.source_id || u.source || 'Unbekannt')).size}
                   </p>
                 </div>
                 <Globe className="h-12 w-12 text-purple-500" />
@@ -257,7 +257,7 @@ export default function RegulatoryUpdatesFinal() {
                 <div>
                   <p className="text-sm text-orange-600 dark:text-orange-400 font-medium">Kategorien</p>
                   <p className="text-3xl font-bold text-orange-900 dark:text-orange-100">
-                    {new Set((updates || []).map(u => u.update_type || 'Sonstiges')).size}
+                    {new Set((updates || []).map((u: RegulatoryUpdate) => u.update_type || 'Sonstiges')).size}
                   </p>
                 </div>
                 <BarChart3 className="h-12 w-12 text-orange-500" />
@@ -270,7 +270,8 @@ export default function RegulatoryUpdatesFinal() {
         <div className="space-y-3 mb-8">
           {paginatedUpdates.map((update: RegulatoryUpdate) => (
             <Card key={update.id} className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
-              <div className="flex items-start justify-between">
+              <CardContent className="p-0">
+                <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                     {update.title}
@@ -488,6 +489,7 @@ export default function RegulatoryUpdatesFinal() {
                       )}
                     </DialogContent>
                   </Dialog>
+                </div>
                 </div>
               </CardContent>
             </Card>
