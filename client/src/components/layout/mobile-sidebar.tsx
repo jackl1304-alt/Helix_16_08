@@ -30,7 +30,6 @@ const navigation = [
   { name: "Data Collection", href: "/data-collection", icon: Database },
   { name: "Global Sources", href: "/global-sources", icon: Globe },
   { name: "Regulatory Updates", href: "/regulatory-updates", icon: FileText },
-  { name: "Newsletter Manager", href: "/newsletter-manager", icon: Newspaper },
   { name: "Approval Workflow", href: "/approval-workflow", icon: CheckCircle },
   { name: "Analytics", href: "/analytics", icon: TrendingUp },
 ];
@@ -45,7 +44,7 @@ const knowledgeBase = [
 const administration = [
   { name: "User Management", href: "/user-management", icon: Users },
   { name: "Data Sources Admin", href: "/administration/data-sources", icon: Database },
-  { name: "Newsletter Admin", href: "/newsletter-admin", icon: Mail },
+  { name: "Newsletter-Verwaltung", href: "/newsletter-admin", icon: Mail },
   { name: "System Settings", href: "/system-settings", icon: Settings },
   { name: "Audit Logs", href: "/audit-logs", icon: FileText },
 ];
