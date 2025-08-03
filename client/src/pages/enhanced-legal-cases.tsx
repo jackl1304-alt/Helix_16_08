@@ -41,16 +41,15 @@ export default function EnhancedLegalCases() {
   const [selectedDocument, setSelectedDocument] = useState<ComprehensiveLegalCase | null>(null);
   const queryClient = useQueryClient();
 
-  // Fetch comprehensive legal cases from Enhanced API
+  // Fetch authentic legal cases from database
   const { data: legalCases = [], isLoading: isLoadingCases } = useQuery<ComprehensiveLegalCase[]>({
-    queryKey: ['/api/legal-cases/enhanced'],
+    queryKey: ['/api/legal-cases'],
     queryFn: async (): Promise<ComprehensiveLegalCase[]> => {
-      const response = await fetch('/api/legal-cases/enhanced');
-      if (!response.ok) throw new Error('Failed to fetch enhanced legal cases');
+      const response = await fetch('/api/legal-cases');
+      if (!response.ok) throw new Error('Failed to fetch legal cases');
       const data = await response.json();
       
-      // Transform data to match ComprehensiveLegalCase interface
-      console.log("Enhanced Legal Cases - Raw data sample:", data.slice(0, 2));
+      console.log("Legal Cases - Raw data sample:", data.slice(0, 2));
       return data.map((item: any): ComprehensiveLegalCase => ({
         id: item.id,
         caseNumber: item.caseNumber || item.case_number,
@@ -59,20 +58,11 @@ export default function EnhancedLegalCases() {
         jurisdiction: item.jurisdiction,
         decisionDate: item.decisionDate || item.decision_date,
         summary: item.summary,
-        content: item.content || item.fullDecisionText || item.verdict || 'Comprehensive legal case details',
+        content: item.content,
         documentUrl: item.documentUrl || item.document_url,
         impactLevel: (item.impactLevel || item.impact_level || 'medium') as 'high' | 'medium' | 'low',
-        // Originaldatenfelder beibehalten
-        case_summary: item.case_summary,
-        verdict: item.verdict,
-        outcome: item.outcome,
-        status: item.status,
-        priority: item.priority,
-        device_classes: item.device_classes,
-        full_content: item.full_content,
-        original_text: item.original_text,
         keywords: item.keywords || [],
-        // Originaldatenfelder beibehalten
+        // Originaldatenfelder direkt aus Datenbank
         case_summary: item.case_summary,
         verdict: item.verdict,
         outcome: item.outcome,
@@ -88,10 +78,10 @@ export default function EnhancedLegalCases() {
   // Enhanced legal cases generation mutation - connects to existing database
   const generateEnhancedCasesMutation = useMutation({
     mutationFn: async () => {
-      console.log("Triggering Enhanced Cases refresh from database...");
+      console.log("Triggering Legal Cases refresh from database...");
       // Just refresh the data from database - no generation needed
-      queryClient.invalidateQueries({ queryKey: ['/api/legal-cases/enhanced'] });
-      return { success: true, message: "Enhanced cases refreshed from database" };
+      queryClient.invalidateQueries({ queryKey: ['/api/legal-cases'] });
+      return { success: true, message: "Legal cases refreshed from database" };
     },
     onSuccess: () => {
       console.log("Enhanced cases successfully refreshed");
@@ -510,11 +500,11 @@ export default function EnhancedLegalCases() {
                         <div className="bg-yellow-50 p-6 rounded-lg">
                           <h4 className="font-semibold text-yellow-900 mb-4 flex items-center gap-2">
                             <Scale className="w-5 h-5" />
-                            Vollständiger Originalinhalt (alle Quelldaten)
+                            Vollständiger Originalinhalt ({legalCase.content?.length || 0} Zeichen)
                           </h4>
                           <div className="bg-white p-4 rounded border max-h-[600px] overflow-y-auto">
                             <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
-                              {legalCase.content || legalCase.original_text || legalCase.full_content || "Vollständiger Inhalt wird geladen..."}
+                              {legalCase.content || "Vollständiger Inhalt wird geladen..."}
                             </div>
                           </div>
                         </div>
