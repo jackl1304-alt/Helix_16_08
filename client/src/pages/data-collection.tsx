@@ -77,7 +77,7 @@ export default function DataCollection() {
     },
   });
 
-  // Newsletter Sync Mutation
+  // Newsletter Sync Mutation - für die mittlere Sektion
   const newsletterSyncMutation = useMutation({
     mutationFn: async () => {
       console.log("Frontend: Starting newsletter sync");
@@ -99,6 +99,35 @@ export default function DataCollection() {
       console.error("Frontend: Newsletter sync error:", error);
       toast({
         title: "Newsletter Sync Fehlgeschlagen",
+        description: `Fehler: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Regulatory Data Sync Mutation
+  const regulatoryDataSyncMutation = useMutation({
+    mutationFn: async () => {
+      console.log("Frontend: Starting regulatory data extraction");
+      const result = await apiRequest('/api/knowledge/extract-regulatory', 'POST');
+      console.log("Frontend: Regulatory data extraction completed", result);
+      return result;
+    },
+    onSuccess: (data) => {
+      console.log("Frontend: Regulatory data sync successful", data);
+      queryClient.invalidateQueries({ queryKey: ["/api/data-sources"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/knowledge-base"] });
+      
+      toast({
+        title: "✅ Regulatorische Daten Synchronisiert",
+        description: `${data.totalEntries || 0} regulatorische Einträge aus ${data.processedSources?.length || 0} Quellen extrahiert`,
+      });
+    },
+    onError: (error: any) => {
+      console.error("Frontend: Regulatory data sync error:", error);
+      toast({
+        title: "Regulatorische Synchronisation Fehlgeschlagen",
         description: `Fehler: ${error.message}`,
         variant: "destructive",
       });
@@ -225,19 +254,6 @@ export default function DataCollection() {
           </TabsList>
           
           <div className="flex gap-2">
-            <Button 
-              onClick={() => newsletterSyncMutation.mutate()}
-              disabled={newsletterSyncMutation.isPending}
-              variant="outline"
-              className="border-blue-200 hover:bg-blue-50"
-            >
-              {newsletterSyncMutation.isPending ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <FolderSync className="h-4 w-4 mr-2" />
-              )}
-              Newsletter Sync
-            </Button>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
               <Button 
@@ -327,10 +343,15 @@ export default function DataCollection() {
                     </div>
                     <Button
                       size="sm"
-                      onClick={() => fetch('/api/knowledge/extract-regulatory', { method: 'POST' })}
+                      onClick={() => regulatoryDataSyncMutation.mutate()}
+                      disabled={regulatoryDataSyncMutation.isPending}
                       className="bg-red-600 hover:bg-red-700 text-white"
                     >
-                      <Database className="h-4 w-4 mr-2" />
+                      {regulatoryDataSyncMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Database className="h-4 w-4 mr-2" />
+                      )}
                       Regulatorische Daten
                     </Button>
                   </div>
