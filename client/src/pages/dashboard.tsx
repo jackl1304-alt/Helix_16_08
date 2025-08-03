@@ -311,7 +311,7 @@ export default function Dashboard() {
                 </div>
                 
                 <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {newsletterSources.sources.slice(0, 8).map((source: any, index: number) => (
+                  {newsletterSources.sources.filter((source: any) => source.status === 'active').map((source: any, index: number) => (
                     <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm truncate">
