@@ -12,7 +12,7 @@ import {
   Clock, 
   Globe, 
   Key, 
-  Refresh,
+  RefreshCw,
   Shield,
   Zap,
   Database,
@@ -85,7 +85,7 @@ export default function DataSourcesAdmin() {
     mutationFn: ({ sourceId, apiKey }: { sourceId: string; apiKey: string }) => 
       apiRequest(`/api/admin/data-sources/${sourceId}/configure`, {
         method: 'POST',
-        body: { apiKey }
+        body: JSON.stringify({ apiKey })
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/data-sources'] });
@@ -146,7 +146,7 @@ export default function DataSourcesAdmin() {
           onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/admin/data-sources'] })}
           variant="outline"
         >
-          <Refresh className="h-4 w-4 mr-2" />
+          <RefreshCw className="h-4 w-4 mr-2" />
           Aktualisieren
         </Button>
       </div>

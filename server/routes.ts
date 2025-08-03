@@ -2995,6 +2995,11 @@ In der Produktionsversion werden hier echte regulatorische Artikel aus verifizie
   // Mount Admin Data Sources routes
   app.use('/api/admin', adminDataSourcesRoutes);
 
+  // Health Check and Metrics endpoints
+  const { healthCheckHandler, metricsHandler } = await import('./middleware/healthCheck');
+  app.get('/api/health', healthCheckHandler);
+  app.get('/api/metrics', metricsHandler);
+
   const httpServer = createServer(app);
   return httpServer;
 }
