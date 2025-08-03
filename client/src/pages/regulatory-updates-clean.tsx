@@ -431,15 +431,7 @@ export default function RegulatoryUpdatesClean() {
                 {update.description || update.summary || (update.fullText ? update.fullText.substring(0, 300) + '...' : 'Keine Beschreibung verfügbar')}
               </p>
 
-              {/* Direkter Datentest für Debugging */}
-              <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded text-xs mb-4">
-                <strong>Debug - Verfügbare Felder:</strong><br/>
-                Title: {update.title ? '✓' : '✗'}<br/>
-                Description: {update.description ? '✓' : '✗'}<br/>
-                FullText: {update.fullText ? '✓ (' + update.fullText.length + ' Zeichen)' : '✗'}<br/>
-                Content: {update.content ? '✓' : '✗'}<br/>
-                Summary: {update.summary ? '✓' : '✗'}
-              </div>
+
 
               {update.tags && update.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-4">
@@ -508,7 +500,9 @@ export default function RegulatoryUpdatesClean() {
                           </div>
                           <div className="mt-4">
                             <strong>Beschreibung:</strong>
-                            <CleanText text={update.description || 'Keine Beschreibung verfügbar'} />
+                            <div className="whitespace-pre-wrap text-gray-800 dark:text-gray-200 leading-relaxed mt-2">
+                              {update.description || 'Keine Beschreibung verfügbar'}
+                            </div>
                           </div>
                         </div>
                       </TabsContent>
@@ -518,11 +512,9 @@ export default function RegulatoryUpdatesClean() {
                           <h4 className="font-semibold mb-4 text-blue-800 dark:text-blue-300">
                             Zusammenfassung
                           </h4>
-                          <CleanText text={
-                            update.summary || 
-                            update.description || 
-                            (update.fullText ? update.fullText.substring(0, 500) + '...' : 'Keine Zusammenfassung verfügbar')
-                          } />
+                          <div className="whitespace-pre-wrap text-gray-800 dark:text-gray-200 leading-relaxed">
+                            {update.summary || update.description || (update.fullText ? update.fullText.substring(0, 500) + '...' : 'Keine Zusammenfassung verfügbar')}
+                          </div>
                         </div>
                       </TabsContent>
 
@@ -532,47 +524,13 @@ export default function RegulatoryUpdatesClean() {
                             <FileText className="h-5 w-5" />
                             Vollständiger Inhalt
                           </h4>
-                          {/* DIREKTER VOLLTEXT OHNE KOMPONENTE */}
-                          <div className="bg-green-50 p-4 rounded mb-4">
-                            <h5 className="font-bold text-green-800 mb-2">VOLLTEXT DIREKT (ohne Komponente):</h5>
-                            <div className="whitespace-pre-wrap text-sm">
-                              {update.fullText || "KEIN FULLTEXT"}
+                          <div className="prose max-w-none">
+                            <div className="whitespace-pre-wrap text-gray-800 dark:text-gray-200 leading-relaxed">
+                              {update.fullText || update.content || update.description || 'Kein vollständiger Inhalt verfügbar'}
                             </div>
                           </div>
-
-                          <div className="bg-blue-50 p-4 rounded mb-4">
-                            <h5 className="font-bold text-blue-800 mb-2">CONTENT DIREKT:</h5>
-                            <div className="whitespace-pre-wrap text-sm">
-                              {update.content || "KEIN CONTENT"}
-                            </div>
-                          </div>
-
-                          <div className="bg-yellow-50 p-4 rounded mb-4">
-                            <h5 className="font-bold text-yellow-800 mb-2">DESCRIPTION DIREKT:</h5>
-                            <div className="whitespace-pre-wrap text-sm">
-                              {update.description || "KEINE DESCRIPTION"}
-                            </div>
-                          </div>
-
-                          <CleanText text={
-                            update.fullText || 
-                            update.content || 
-                            update.description || 
-                            'Kein Inhalt verfügbar'
-                          } />
                           
-                          {/* Debug-Info wenn keine Daten */}
-                          {!update.fullText && !update.content && (
-                            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded">
-                              <p className="text-yellow-800 text-sm">
-                                <strong>Debug:</strong><br/>
-                                Title: {update.title}<br/>
-                                Description: {update.description ? 'Verfügbar' : 'Nicht verfügbar'}<br/>
-                                FullText: {update.fullText ? 'Verfügbar' : 'Nicht verfügbar'}<br/>
-                                Content: {update.content ? 'Verfügbar' : 'Nicht verfügbar'}
-                              </p>
-                            </div>
-                          )}
+
 
                           {/* Action Buttons */}
                           <div className="flex gap-4 pt-4 border-t mt-6">
