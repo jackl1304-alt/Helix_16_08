@@ -56,6 +56,7 @@ interface RegulatoryUpdate {
   title: string;
   content?: string;
   description?: string;
+  fullText?: string;
   summary?: string;
   source_id?: string;
   authority?: string;
@@ -70,6 +71,7 @@ interface RegulatoryUpdate {
   created_at: string;
   tags?: string[];
   source_url?: string;
+  sourceUrl?: string;
   document_url?: string;
   device_classes?: any[];
   categories?: any;
@@ -461,7 +463,7 @@ export default function RegulatoryUpdatesPage() {
                               </div>
 
                               <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-                                {update.summary || update.description || (update.content ? update.content.substring(0, 300) + '...' : 'Keine Beschreibung verfügbar')}
+                                {update.description || update.summary || (update.fullText ? update.fullText.substring(0, 300) + '...' : 'Keine Beschreibung verfügbar')}
                               </p>
 
                               {update.tags && update.tags.length > 0 && (
@@ -602,10 +604,10 @@ export default function RegulatoryUpdatesPage() {
                                             <Download className="h-4 w-4" />
                                             Update herunterladen
                                           </Button>
-                                          {(update.source_url || update.document_url) && (
+                                          {(update.source_url || update.sourceUrl || update.document_url) && (
                                             <Button 
                                               variant="outline"
-                                              onClick={() => window.open(update.source_url || update.document_url, '_blank')}
+                                              onClick={() => window.open(update.source_url || update.sourceUrl || update.document_url, '_blank')}
                                               className="flex items-center gap-2"
                                             >
                                               <ExternalLink className="h-4 w-4" />
@@ -619,7 +621,7 @@ export default function RegulatoryUpdatesPage() {
                                     <TabsContent value="summary" className="mt-4">
                                       <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border-l-4 border-blue-400">
                                         <h4 className="font-semibold mb-4 text-blue-800 dark:text-blue-300 text-lg">Zusammenfassung</h4>
-                                        <FormattedText text={update.summary || update.description || 'Keine Zusammenfassung verfügbar'} className="text-sm leading-relaxed" />
+                                        <FormattedText text={update.description || update.summary || (update.fullText ? update.fullText.substring(0, 500) + '...' : 'Keine Zusammenfassung verfügbar')} className="text-sm leading-relaxed" />
                                       </div>
                                     </TabsContent>
 
@@ -630,7 +632,7 @@ export default function RegulatoryUpdatesPage() {
                                           Vollständiges Update
                                         </h4>
                                         <div className="prose max-w-none text-sm leading-relaxed">
-                                          <FormattedText text={update.content || update.description || 'Kein Inhalt verfügbar'} />
+                                          <FormattedText text={update.fullText || update.content || update.description || 'Kein Inhalt verfügbar'} />
                                         </div>
                                       </div>
                                     </TabsContent>
@@ -669,7 +671,7 @@ export default function RegulatoryUpdatesPage() {
                                           <div><strong>Update-ID:</strong> {update.id}</div>
                                           <div><strong>Erstellt am:</strong> {new Date(update.created_at).toLocaleDateString('de-DE')}</div>
                                           <div><strong>Datenformat:</strong> JSON</div>
-                                          <div><strong>Quelle:</strong> {update.source_url ? 'Externe URL' : 'Interne Datenbank'}</div>
+                                          <div><strong>Quelle:</strong> {(update.source_url || update.sourceUrl) ? 'Externe URL' : 'Interne Datenbank'}</div>
                                         </div>
                                       </div>
                                     </TabsContent>
