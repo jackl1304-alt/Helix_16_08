@@ -30,7 +30,7 @@ const SystemSettings = lazy(() => import("@/pages/system-settings"));
 const AuditLogs = lazy(() => import("@/pages/audit-logs"));
 const AIInsights = lazy(() => import("@/pages/ai-insights"));
 const AIApprovalTest = lazy(() => import("@/pages/ai-approval-test"));
-const KnowledgeBase = lazy(() => import("@/pages/knowledge-base"));
+const KnowledgeBaseNew = lazy(() => import("@/pages/knowledge-base-new"));
 const EnhancedLegalCases = lazy(() => import("@/pages/enhanced-legal-cases"));
 const EnhancedLegalCasesNew = lazy(() => import("@/pages/enhanced-legal-cases-new"));
 const LegalCasesSimple = lazy(() => import("@/pages/legal-cases-simple"));
@@ -77,7 +77,7 @@ function Router() {
         <Route path="/audit-logs" component={AuditLogs} />
         <Route path="/ai-insights" component={AIInsights} />
         <Route path="/ai-approval-test" component={AIApprovalTest} />
-        <Route path="/knowledge-base" component={KnowledgeBase} />
+        <Route path="/knowledge-base" component={KnowledgeBaseNew} />
         <Route path="/enhanced-legal-cases" component={EnhancedLegalCases} />
         <Route path="/enhanced-legal-cases-new" component={EnhancedLegalCasesNew} />
         <Route path="/legal-cases-simple" component={LegalCasesSimple} />
