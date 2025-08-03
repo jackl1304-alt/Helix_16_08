@@ -261,12 +261,12 @@ router.get('/download-documentation', async (req: Request, res: Response) => {
         const docPath = path.join(process.cwd(), 'SOFTWARE_DOKUMENTATION_HELIX.md');
         const content = await fs.readFile(docPath, 'utf8');
         
-        res.setHeader('Content-Type', 'text/plain');
+        res.setHeader('Content-Type', 'application/json');
         res.setHeader('Content-Disposition', 'attachment; filename="helix-documentation.txt"');
         res.json({
           success: true,
           content: content,
-          contentType: 'text/plain',
+          contentType: 'application/json',
           filename: 'helix-documentation.txt'
         });
       } catch (error) {

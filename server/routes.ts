@@ -993,19 +993,16 @@ Datum: ${new Date().toLocaleDateString('de-DE')}
 Status: Archiviertes historisches Dokument
 `;
 
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="historisches-dokument-${documentId}.pdf"`);
-      
-      // PDF-Binary für Production-System
-      const pdfHeader = Buffer.from('%PDF-1.4\n');
-      const pdfBody = Buffer.from(pdfContent, 'utf-8');
-      const fullPdf = Buffer.concat([pdfHeader, pdfBody]);
+      // Return PDF data as JSON response
+      res.setHeader('Content-Type', 'application/json');
       
       res.json({ 
         success: true,
-        content: fullPdf,
+        documentId: documentId,
+        filename: `historisches-dokument-${documentId}.pdf`,
         contentType: 'application/pdf',
-        filename: `legal_case_${caseId}.pdf`
+        content: pdfContent,
+        downloadUrl: `/api/historical/document/${documentId}/download`
       });
     } catch (error) {
       console.error('[API] Fehler beim PDF-Download:', error);
@@ -1768,13 +1765,16 @@ Status: Archiviertes historisches Dokument
       
       const pdfContent = PDFService.generateLegalDecisionPDF(legalCase);
       
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="urteil-${caseId}.pdf"`);
+      // Return PDF data as JSON response
+      res.setHeader('Content-Type', 'application/json');
       res.json({
         success: true,
+        caseId: caseId,
+        filename: `urteil-${caseId}.pdf`,
         content: Buffer.from(pdfContent, 'binary').toString('base64'),
         contentType: 'application/pdf',
-        filename: `regulatory_update_${updateId}.pdf`
+        legalCase: legalCase,
+        downloadUrl: `/api/legal-cases/${caseId}/download`
       });
     } catch (error) {
       console.error('PDF generation error:', error);
