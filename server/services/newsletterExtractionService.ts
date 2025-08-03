@@ -157,21 +157,52 @@ export class NewsletterExtractionService {
   ];
 
   /**
-   * NEWSLETTER EXTRACTION KOMPLETT DEAKTIVIERT
-   * Keine Demo-Daten mehr - nur echte Newsletter-APIs
+   * Newsletter-Extraktion von authentischen MedTech-Quellen
+   * Aktiviert echte RSS-Feeds und Newsletter-APIs
    */
   async extractFromAllNewsletterSources(): Promise<{
     processedSources: number;
     articlesExtracted: number;
     errors: string[];
   }> {
-    this.logger.info('NEWSLETTER EXTRACTION DEAKTIVIERT - Keine Demo-Artikel mehr');
+    this.logger.info('Starting authentic newsletter extraction from MedTech sources');
 
-    return {
+    const results = {
       processedSources: 0,
       articlesExtracted: 0,
-      errors: ['Newsletter extraction disabled - waiting for authentic RSS/API access']
+      errors: [] as string[]
     };
+
+    // Aktiviere echte Newsletter-Quellen
+    const activeNewsletterSources = this.newsletterSources.filter(source => 
+      source.priority === 'high' && source.rssUrl
+    );
+
+    for (const source of activeNewsletterSources.slice(0, 3)) {
+      try {
+        this.logger.info(`Processing authentic newsletter source: ${source.name}`);
+        
+        // Echte RSS-Feed-Extraktion
+        const articles = await this.extractFromRSSFeed(source);
+        
+        for (const article of articles) {
+          await this.saveNewsletterToKnowledgeBase(article, source);
+          results.articlesExtracted++;
+        }
+        
+        results.processedSources++;
+        
+        await this.delay(2000);
+        
+      } catch (error: any) {
+        const errorMsg = `Error processing ${source.name}: ${error.message}`;
+        results.errors.push(errorMsg);
+        this.logger.error(errorMsg, error);
+      }
+    }
+
+    this.logger.info('Authentic newsletter extraction completed', results);
+    return results;
   }
 
   /**
@@ -312,6 +343,88 @@ export class NewsletterExtractionService {
       },
       highPrioritySources: this.newsletterSources.filter(s => s.priority === 'high').length
     };
+  }
+
+  /**
+   * Einfacher RSS-Feed-Parser für echte Newsletter-Extraktion
+   */
+  private parseRSSContent(feedContent: string, source: NewsletterSource): any[] {
+    const articles: any[] = [];
+    
+    try {
+      // Einfache XML-Parsing für RSS-Feeds
+      const itemMatches = feedContent.match(/<item[^>]*>([\s\S]*?)<\/item>/gi);
+      
+      if (!itemMatches) {
+        this.logger.warn(`No RSS items found in feed from ${source.name}`);
+        return [];
+      }
+      
+      for (const item of itemMatches.slice(0, 5)) { // Begrenzt auf 5 Artikel pro Quelle
+        const title = this.extractXMLContent(item, 'title');
+        const description = this.extractXMLContent(item, 'description');
+        const link = this.extractXMLContent(item, 'link');
+        const pubDate = this.extractXMLContent(item, 'pubDate');
+        
+        if (title && description) {
+          articles.push({
+            title: title.substring(0, 200),
+            content: description.substring(0, 1000),
+            summary: description.substring(0, 300),
+            url: link,
+            publishedAt: pubDate ? new Date(pubDate) : new Date(),
+            category: source.category,
+            tags: ['Newsletter', source.authority, 'RSS Feed'],
+            authority: source.authority,
+            region: source.region,
+            language: source.language,
+            newsletterSource: source.name
+          });
+        }
+      }
+      
+      this.logger.info(`Parsed ${articles.length} articles from RSS feed ${source.name}`);
+      return articles;
+      
+    } catch (error) {
+      this.logger.error(`Error parsing RSS content from ${source.name}:`, error);
+      return [];
+    }
+  }
+
+  /**
+   * Hilfsfunktion zum Extrahieren von XML-Inhalten
+   */
+  private extractXMLContent(xml: string, tag: string): string {
+    const regex = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i');
+    const match = xml.match(regex);
+    return match ? match[1].replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1').trim() : '';
+  }
+
+  /**
+   * Speichert Newsletter-Artikel in der Knowledge Base
+   */
+  private async saveNewsletterToKnowledgeBase(article: any, source: NewsletterSource): Promise<void> {
+    try {
+      await storage.createKnowledgeArticle({
+        title: article.title,
+        content: article.content,
+        summary: article.summary,
+        url: article.url,
+        authority: article.authority,
+        region: article.region,
+        category: article.category,
+        published_at: article.publishedAt.toISOString(),
+        priority: source.priority,
+        tags: article.tags,
+        language: article.language,
+        source: article.newsletterSource
+      });
+      
+      this.logger.info(`Saved newsletter article: ${article.title}`);
+    } catch (error) {
+      this.logger.error(`Error saving newsletter article: ${error}`);
+    }
   }
 
   /**
