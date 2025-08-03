@@ -202,11 +202,13 @@ export default function RegulatoryUpdatesFinal() {
                     </span>
                   </div>
 
-                  <Dialog>
+                  <Dialog onOpenChange={(open) => {
+                    if (open) setSelectedUpdate(update);
+                    else setSelectedUpdate(null);
+                  }}>
                     <DialogTrigger asChild>
                       <Button 
-                        variant="outline" 
-                        onClick={() => setSelectedUpdate(update)}
+                        variant="outline"
                       >
                         <Eye className="h-4 w-4 mr-2" />
                         Details & Analyse
@@ -268,6 +270,13 @@ export default function RegulatoryUpdatesFinal() {
                               Vollständiger Inhalt
                             </h4>
                             
+                            {/* DEBUG INFO */}
+                            <div className="bg-red-100 p-3 rounded mb-4 text-xs">
+                              <strong>DEBUG - Modal Update ID:</strong> {selectedUpdate.id}<br/>
+                              <strong>Title:</strong> {selectedUpdate.title}<br/>
+                              <strong>FullText Length:</strong> {selectedUpdate.fullText?.length || 0}
+                            </div>
+
                             {/* DIREKTER VOLLTEXT */}
                             <div className="prose max-w-none">
                               <div className="whitespace-pre-wrap text-gray-800 dark:text-gray-200 leading-relaxed text-sm">
