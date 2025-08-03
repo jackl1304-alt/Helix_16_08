@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import administrationRoutes from "./routes/administration";
+import adminDataSourcesRoutes from "./routes/adminDataSourcesRoutes";
 
 // Define interfaces for type safety
 interface LegalCaseData {
@@ -2990,6 +2991,9 @@ In der Produktionsversion werden hier echte regulatorische Artikel aus verifizie
 
   // Mount GRIP routes
   app.use('/api/grip', gripRoutes);
+
+  // Mount Admin Data Sources routes
+  app.use('/api/admin', adminDataSourcesRoutes);
 
   const httpServer = createServer(app);
   return httpServer;
