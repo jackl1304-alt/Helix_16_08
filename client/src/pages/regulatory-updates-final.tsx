@@ -266,9 +266,9 @@ export default function RegulatoryUpdatesFinal() {
           </Card>
         </div>
 
-        {/* Main Content Tabs - Einheitliches Design wie bei Rechtsfällen */}
+        {/* Main Content Tabs - Direkt in der Frontansicht */}
         <Tabs defaultValue="updates" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 h-14 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1">
+          <TabsList className="grid w-full grid-cols-6 h-14 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1">
             <TabsTrigger 
               value="updates" 
               className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
@@ -278,7 +278,7 @@ export default function RegulatoryUpdatesFinal() {
             </TabsTrigger>
             <TabsTrigger 
               value="summary" 
-              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
+              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-purple-900/20 dark:data-[state=active]:text-purple-300"
             >
               <Brain className="h-4 w-4" />
               Zusammenfassung
@@ -291,15 +291,22 @@ export default function RegulatoryUpdatesFinal() {
               Vollständiger Inhalt
             </TabsTrigger>
             <TabsTrigger 
-              value="ai-analysis" 
+              value="finance" 
               className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-orange-50 data-[state=active]:text-orange-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-orange-900/20 dark:data-[state=active]:text-orange-300"
             >
+              <TrendingUp className="h-4 w-4" />
+              Finanzanalyse
+            </TabsTrigger>
+            <TabsTrigger 
+              value="ai-analysis" 
+              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-purple-900/20 dark:data-[state=active]:text-purple-300"
+            >
               <Brain className="h-4 w-4" />
-              🔥 KI-Analyse
+              KI-Analyse
             </TabsTrigger>
             <TabsTrigger 
               value="metadata" 
-              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
+              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-gray-50 data-[state=active]:text-gray-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-gray-900/20 dark:data-[state=active]:text-gray-300"
             >
               <Globe className="h-4 w-4" />
               Metadaten
@@ -378,315 +385,15 @@ export default function RegulatoryUpdatesFinal() {
                 </div>
                 
                 <div className="ml-4">
-                  <Dialog onOpenChange={(open) => {
-                    if (open) setSelectedUpdate(update);
-                    else setSelectedUpdate(null);
-                  }}>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-2 text-xs"
-                      >
-                        <Eye className="h-3 w-3" />
-                        Details & Analyse
-                      </Button>
-                    </DialogTrigger>
-
-                    <DialogContent className="max-w-4xl w-[95vw] h-[90vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle className="text-xl font-bold flex items-center gap-2">
-                          <FileText className="h-5 w-5 text-blue-600" />
-                          {selectedUpdate?.title}
-                        </DialogTitle>
-                      </DialogHeader>
-
-                      {selectedUpdate && (
-                        <Tabs defaultValue="overview" className="w-full mt-6">
-                        <TabsList className="grid w-full grid-cols-6">
-                          <TabsTrigger value="overview">Übersicht</TabsTrigger>
-                          <TabsTrigger value="summary">Zusammenfassung</TabsTrigger>
-                          <TabsTrigger value="content">Vollständiger Inhalt</TabsTrigger>
-                          <TabsTrigger value="finance">Finanzanalyse</TabsTrigger>
-                          <TabsTrigger value="ai">KI-Analyse</TabsTrigger>
-                          <TabsTrigger value="metadata">Metadaten</TabsTrigger>
-                        </TabsList>
-
-                        <TabsContent value="overview" className="mt-4">
-                          <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
-                            <h4 className="font-semibold mb-4">Übersicht</h4>
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                              <div><strong>Region:</strong> {selectedUpdate.region}</div>
-                              <div><strong>Priorität:</strong> {selectedUpdate.priority}</div>
-                              <div><strong>Veröffentlicht:</strong> {new Date(selectedUpdate.published_at).toLocaleDateString('de-DE')}</div>
-                              <div><strong>Update-ID:</strong> {selectedUpdate.id}</div>
-                            </div>
-                            <div className="mt-4">
-                              <strong>Beschreibung:</strong>
-                              <div className="whitespace-pre-wrap text-gray-800 dark:text-gray-200 leading-relaxed mt-2">
-                                {selectedUpdate.description || 'Keine Beschreibung verfügbar'}
-                              </div>
-                            </div>
-                          </div>
-                        </TabsContent>
-
-                        <TabsContent value="summary" className="mt-4">
-                          <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg">
-                            <h4 className="font-semibold mb-4 text-blue-800 dark:text-blue-300">
-                              Zusammenfassung
-                            </h4>
-                            <div className="whitespace-pre-wrap text-gray-800 dark:text-gray-200 leading-relaxed">
-                              {selectedUpdate.summary || selectedUpdate.description || (selectedUpdate.fullText ? selectedUpdate.fullText.substring(0, 500) + '...' : 'Keine Zusammenfassung verfügbar')}
-                            </div>
-                          </div>
-                        </TabsContent>
-
-                        <TabsContent value="content" className="mt-4">
-                          <div className="bg-white dark:bg-gray-800 border p-6 rounded-lg">
-                            <h4 className="font-semibold mb-4 flex items-center gap-2">
-                              <FileText className="h-5 w-5" />
-                              Vollständiger Inhalt
-                            </h4>
-                            
-
-
-                            {/* DIREKTER VOLLTEXT */}
-                            <div className="prose max-w-none">
-                              <div className="whitespace-pre-wrap text-gray-800 dark:text-gray-200 leading-relaxed text-sm">
-                                {selectedUpdate.fullText || selectedUpdate.content || selectedUpdate.description || 'Kein vollständiger Inhalt verfügbar'}
-                              </div>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="flex gap-4 pt-4 border-t mt-6">
-                              <Button 
-                                onClick={() => {
-                                  try {
-                                    const content = `${selectedUpdate.title}\n\n${selectedUpdate.summary || selectedUpdate.description || ''}\n\n${selectedUpdate.fullText || selectedUpdate.content || selectedUpdate.description || 'Kein Inhalt verfügbar'}`;
-                                    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-                                    const url = URL.createObjectURL(blob);
-                                    const a = document.createElement('a');
-                                    a.href = url;
-                                    a.download = `Regulatorisches_Update_${selectedUpdate.title?.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_') || 'update'}.txt`;
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    document.body.removeChild(a);
-                                    URL.revokeObjectURL(url);
-                                    toast({
-                                      title: "Download gestartet",
-                                      description: "Das regulatorische Update wird heruntergeladen.",
-                                    });
-                                  } catch (error) {
-                                    console.error('Download error:', error);
-                                    toast({
-                                      title: "Download fehlgeschlagen",
-                                      description: "Es gab ein Problem beim Herunterladen der Datei.",
-                                      variant: "destructive",
-                                    });
-                                  }
-                                }}
-                                className="flex items-center gap-2"
-                              >
-                                <Download className="h-4 w-4" />
-                                Update herunterladen
-                              </Button>
-                              {(selectedUpdate.source_url || selectedUpdate.sourceUrl || selectedUpdate.document_url) && (
-                                <Button 
-                                  variant="outline"
-                                  onClick={() => window.open(selectedUpdate.source_url || selectedUpdate.sourceUrl || selectedUpdate.document_url, '_blank')}
-                                  className="flex items-center gap-2"
-                                >
-                                  <ExternalLink className="h-4 w-4" />
-                                  Original-Quelle öffnen
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        </TabsContent>
-
-                        <TabsContent value="finance" className="mt-4">
-                          <div className="bg-orange-50 dark:bg-orange-900/20 p-6 rounded-lg">
-                            <h4 className="font-semibold mb-4 text-orange-800 dark:text-orange-300 flex items-center gap-2">
-                              <TrendingUp className="h-5 w-5" />
-                              Finanzanalyse
-                            </h4>
-                            <div className="space-y-4">
-                              {/* Kostenschätzung basierend auf Inhalt */}
-                              {selectedUpdate.description?.includes('ML-') || selectedUpdate.title?.toLowerCase().includes('machine learning') ? (
-                                <div className="space-y-3">
-                                  <div className="bg-white dark:bg-gray-800 p-4 rounded border-l-4 border-orange-400">
-                                    <h5 className="font-medium text-orange-800 dark:text-orange-300 mb-2">Geschätzte Implementierungskosten (ML-Validierung)</h5>
-                                    <div className="grid grid-cols-2 gap-4 text-sm">
-                                      <div><strong>Personal & Schulung:</strong> €75.000 - €150.000</div>
-                                      <div><strong>Software-Updates:</strong> €25.000 - €50.000</div>
-                                      <div><strong>Dokumentation:</strong> €15.000 - €30.000</div>
-                                      <div><strong>Compliance-Audit:</strong> €20.000 - €40.000</div>
-                                    </div>
-                                    <div className="mt-3 pt-3 border-t">
-                                      <strong className="text-orange-700">Gesamtkosten: €135.000 - €270.000</strong>
-                                    </div>
-                                  </div>
-                                  <div className="text-sm text-gray-600">
-                                    <strong>Zeitrahmen:</strong> Q2 2025 (wie im Update angegeben)
-                                  </div>
-                                </div>
-                              ) : selectedUpdate.description?.includes('ÄNDERUNGEN:') ? (
-                                <div className="space-y-3">
-                                  <div className="bg-white dark:bg-gray-800 p-4 rounded border-l-4 border-orange-400">
-                                    <h5 className="font-medium text-orange-800 dark:text-orange-300 mb-2">Geschätzte Compliance-Kosten</h5>
-                                    <div className="grid grid-cols-2 gap-4 text-sm">
-                                      <div><strong>Prozessanpassungen:</strong> €30.000 - €60.000</div>
-                                      <div><strong>Schulungsmaßnahmen:</strong> €15.000 - €25.000</div>
-                                      <div><strong>Dokumentationsupdate:</strong> €10.000 - €20.000</div>
-                                      <div><strong>Externe Beratung:</strong> €20.000 - €40.000</div>
-                                    </div>
-                                    <div className="mt-3 pt-3 border-t">
-                                      <strong className="text-orange-700">Gesamtkosten: €75.000 - €145.000</strong>
-                                    </div>
-                                  </div>
-                                </div>
-                              ) : (
-                                <div className="bg-white dark:bg-gray-800 p-4 rounded border-l-4 border-orange-400">
-                                  <h5 className="font-medium text-orange-800 dark:text-orange-300 mb-2">Standard Compliance-Kosten</h5>
-                                  <div className="text-sm space-y-2">
-                                    <div><strong>Bewertung & Analyse:</strong> €5.000 - €15.000</div>
-                                    <div><strong>Umsetzungsplanung:</strong> €10.000 - €25.000</div>
-                                    <div><strong>Implementierung:</strong> €20.000 - €50.000</div>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </TabsContent>
-
-                        <TabsContent value="ai" className="mt-4">
-                          <div className="bg-purple-50 dark:bg-purple-900/20 p-6 rounded-lg">
-                            <h4 className="font-semibold mb-4 text-purple-800 dark:text-purple-300 flex items-center gap-2">
-                              <Brain className="h-5 w-5" />
-                              KI-Analyse
-                            </h4>
-                            <div className="space-y-4">
-                              {/* KI-Analyse basierend auf Update-Inhalt */}
-                              {selectedUpdate.priority === 'high' && (
-                                <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded border-l-4 border-red-400">
-                                  <h5 className="font-medium text-red-800 dark:text-red-300 mb-2">🚨 Hohe Priorität - Sofortiger Handlungsbedarf</h5>
-                                  <div className="text-sm space-y-2">
-                                    <div><strong>Risikobewertung:</strong> Kritisch - Sofortige Compliance-Anpassungen erforderlich</div>
-                                    <div><strong>Betroffene Bereiche:</strong> QM-System, Dokumentation, Prozesse</div>
-                                    <div><strong>Empfohlene Maßnahmen:</strong> Sofortige Bewertung bestehender Systeme, Team-Briefing, Umsetzungsplan erstellen</div>
-                                  </div>
-                                </div>
-                              )}
-                              
-                              {/* Spezifische ML-Analyse */}
-                              {(selectedUpdate.description?.includes('ML-') || selectedUpdate.title?.toLowerCase().includes('machine learning')) && (
-                                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded border-l-4 border-blue-400">
-                                  <h5 className="font-medium text-blue-800 dark:text-blue-300 mb-2">🤖 Machine Learning Compliance-Analyse</h5>
-                                  <div className="text-sm space-y-2">
-                                    <div><strong>Betroffene Systeme:</strong> Bildgebung, Diagnostik mit KI-Komponenten</div>
-                                    <div><strong>Validierungsanforderungen:</strong> Algorithmus-Performance, Trainingsdaten-Qualität</div>
-                                    <div><strong>Monitoring:</strong> Kontinuierliche Performance-Überwachung implementieren</div>
-                                    <div><strong>Risk Management:</strong> Adaptive Systeme erfordern erweiterte Risikobewertung</div>
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Allgemeine Compliance-Analyse */}
-                              <div className="bg-white dark:bg-gray-800 p-4 rounded border">
-                                <h5 className="font-medium mb-2">📊 Compliance-Impact-Analyse</h5>
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                  <div>
-                                    <strong>Update-Typ:</strong> {selectedUpdate.update_type}
-                                    <br />
-                                    <strong>Region:</strong> {selectedUpdate.region}
-                                  </div>
-                                  <div>
-                                    <strong>Priorität:</strong> {selectedUpdate.priority}
-                                    <br />
-                                    <strong>Umsetzungsfrist:</strong> {selectedUpdate.description?.includes('2025') ? 'Bis 2025' : 'Nach Veröffentlichung'}
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Nächste Schritte aus dem Content extrahieren */}
-                              {selectedUpdate.description?.includes('NÄCHSTE SCHRITTE:') && (
-                                <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded border-l-4 border-green-400">
-                                  <h5 className="font-medium text-green-800 dark:text-green-300 mb-2">✅ Empfohlene nächste Schritte</h5>
-                                  <div className="text-sm space-y-1">
-                                    {selectedUpdate.description.split('NÄCHSTE SCHRITTE:')[1]?.split('\n').filter(line => line.trim().match(/^\d+\./)).map((step, idx) => (
-                                      <div key={idx} className="flex items-start gap-2">
-                                        <span className="text-green-600 font-medium">{idx + 1}.</span>
-                                        <span>{step.replace(/^\d+\.\s*/, '')}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </TabsContent>
-
-                        <TabsContent value="metadata" className="mt-4">
-                          <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
-                            <h4 className="font-semibold mb-4 flex items-center gap-2">
-                              <Globe className="h-5 w-5" />
-                              Metadaten
-                            </h4>
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                              <div><strong>Update-ID:</strong> {selectedUpdate.id}</div>
-                              <div><strong>Quelle:</strong> {selectedUpdate.source_id || selectedUpdate.source || 'Unbekannt'}</div>
-                              <div><strong>Region:</strong> {selectedUpdate.region}</div>
-                              <div><strong>Update-Typ:</strong> {selectedUpdate.update_type}</div>
-                              <div><strong>Priorität:</strong> {selectedUpdate.priority}</div>
-                              <div><strong>Veröffentlicht:</strong> {new Date(selectedUpdate.published_at).toLocaleDateString('de-DE')}</div>
-                              <div><strong>Erstellt:</strong> {new Date(selectedUpdate.created_at).toLocaleDateString('de-DE')}</div>
-                              <div><strong>Sprache:</strong> {selectedUpdate.language || 'DE'}</div>
-                            </div>
-                            
-                            {/* Zusätzliche Metadaten falls vorhanden */}
-                            {selectedUpdate.device_classes && selectedUpdate.device_classes.length > 0 && (
-                              <div className="mt-4">
-                                <strong>Geräteklassen:</strong>
-                                <div className="flex flex-wrap gap-1 mt-2">
-                                  {selectedUpdate.device_classes.map((deviceClass, idx) => (
-                                    <Badge key={idx} variant="outline" className="text-xs">
-                                      {deviceClass}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-
-                            {/* URLs falls vorhanden */}
-                            {(selectedUpdate.source_url || selectedUpdate.document_url) && (
-                              <div className="mt-4">
-                                <strong>Verknüpfungen:</strong>
-                                <div className="space-y-2 mt-2">
-                                  {selectedUpdate.source_url && (
-                                    <div className="text-xs">
-                                      <span className="text-gray-600">Quelle:</span> 
-                                      <a href={selectedUpdate.source_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-2">
-                                        {selectedUpdate.source_url}
-                                      </a>
-                                    </div>
-                                  )}
-                                  {selectedUpdate.document_url && (
-                                    <div className="text-xs">
-                                      <span className="text-gray-600">Dokument:</span> 
-                                      <a href={selectedUpdate.document_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-2">
-                                        {selectedUpdate.document_url}
-                                      </a>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </TabsContent>
-                      </Tabs>
-                      )}
-                    </DialogContent>
-                  </Dialog>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2 text-xs"
+                    onClick={() => setSelectedUpdate(update)}
+                  >
+                    <Eye className="h-3 w-3" />
+                    Details anzeigen
+                  </Button>
                 </div>
                 </div>
               </CardContent>
@@ -699,73 +406,399 @@ export default function RegulatoryUpdatesFinal() {
             </Card>
           </TabsContent>
 
-          {/* Weitere Tab-Inhalte für die Übersichtsseite */}
+          {/* Zusammenfassung Tab - Individuelle Inhalte aller Artikel */}
           <TabsContent value="summary" className="mt-6">
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/10 dark:to-blue-900/10 border-b">
-                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Zusammenfassung der regulatorischen Updates
+            <Card className="border-2 border-purple-200 shadow-lg bg-white dark:bg-gray-900">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-b border-purple-200">
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Brain className="h-6 w-6 text-purple-600" />
+                  Zusammenfassungen aller Updates
                 </CardTitle>
                 <CardDescription className="text-gray-600 dark:text-gray-400">
-                  Übersichtliche Zusammenfassung der wichtigsten Änderungen
+                  Kompakte Übersicht aller {filteredUpdates.length} regulatorischen Updates
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="text-center py-8">
-                  <Brain className="h-12 w-12 mx-auto text-blue-500 mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Zusammenfassung wird generiert</h3>
-                  <p className="text-gray-600">KI-gestützte Zusammenfassung aller regulatorischen Änderungen</p>
+                <div className="space-y-4">
+                  {paginatedUpdates.map((update: RegulatoryUpdate, index: number) => (
+                    <Card key={update.id} className="p-4 border border-purple-200 dark:border-purple-700 bg-gradient-to-r from-purple-50/30 to-white dark:from-purple-900/10 dark:to-gray-800 rounded-lg">
+                      <div className="space-y-3">
+                        <div className="flex items-start justify-between">
+                          <h4 className="font-semibold text-gray-900 dark:text-white text-lg">
+                            {update.title}
+                          </h4>
+                          <div className="flex gap-2">
+                            <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                              {update.region}
+                            </Badge>
+                            <Badge variant="outline" className={cn(
+                              "text-xs border",
+                              update.priority === 'high' ? "bg-red-50 text-red-700 border-red-200" :
+                              update.priority === 'medium' ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
+                              "bg-gray-50 text-gray-700 border-gray-200"
+                            )}>
+                              {update.priority}
+                            </Badge>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                          <h5 className="font-medium text-purple-800 dark:text-purple-300 mb-2">Zusammenfassung</h5>
+                          <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                            {update.summary || update.description?.split('\n').slice(0, 3).join('\n') || update.content?.substring(0, 300) + '...' || 'Keine Zusammenfassung verfügbar'}
+                          </div>
+                        </div>
+
+                        {/* Wichtige Punkte extrahieren */}
+                        {update.description?.includes('WICHTIGE ÄNDERUNGEN:') && (
+                          <div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-purple-400">
+                            <h6 className="font-medium text-purple-700 dark:text-purple-300 mb-2">Wichtige Änderungen</h6>
+                            <div className="text-sm space-y-1">
+                              {update.description.split('\n').slice(2, 6).map((line, idx) => 
+                                line.trim().startsWith('•') && (
+                                  <div key={idx} className="text-gray-700 dark:text-gray-300">{line}</div>
+                                )
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex items-center justify-between text-xs text-gray-500">
+                          <span>Veröffentlicht: {new Date(update.published_at).toLocaleDateString('de-DE')}</span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSelectedUpdate(update)}
+                            className="text-xs"
+                          >
+                            Details anzeigen
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
+          {/* Vollständiger Inhalt Tab */}
           <TabsContent value="content" className="mt-6">
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/10 dark:to-blue-800/10 border-b">
-                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+            <Card className="border-2 border-blue-200 shadow-lg bg-white dark:bg-gray-900">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-b border-blue-200">
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <FileText className="h-6 w-6 text-blue-600" />
                   Vollständiger Inhalt aller Updates
                 </CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-400">
+                  Detaillierter Inhalt aller {filteredUpdates.length} regulatorischen Updates
+                </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="text-center py-8">
-                  <FileText className="h-12 w-12 mx-auto text-blue-500 mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Vollständiger Inhalt</h3>
-                  <p className="text-gray-600">Detaillierte Ansicht aller regulatorischen Updates</p>
+                <div className="space-y-6">
+                  {paginatedUpdates.map((update: RegulatoryUpdate, index: number) => (
+                    <Card key={update.id} className="p-6 border border-blue-200 dark:border-blue-700 bg-gradient-to-r from-blue-50/30 to-white dark:from-blue-900/10 dark:to-gray-800 rounded-lg">
+                      <div className="space-y-4">
+                        <div className="flex items-start justify-between">
+                          <h4 className="font-semibold text-gray-900 dark:text-white text-xl">
+                            {update.title}
+                          </h4>
+                          <div className="flex gap-2">
+                            <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                              {new Date(update.published_at).toLocaleDateString('de-DE')}
+                            </Badge>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-white dark:bg-gray-800 border p-4 rounded-lg">
+                          <h5 className="font-medium mb-3 flex items-center gap-2">
+                            <FileText className="h-4 w-4 text-blue-600" />
+                            Vollständiger Inhalt
+                          </h5>
+                          <div className="prose max-w-none">
+                            <div className="whitespace-pre-wrap text-gray-800 dark:text-gray-200 leading-relaxed text-sm">
+                              {update.fullText || update.content || update.description || 'Kein vollständiger Inhalt verfügbar'}
+                            </div>
+                          </div>
+                          
+                          <div className="flex gap-4 pt-4 border-t mt-4">
+                            <Button 
+                              size="sm"
+                              onClick={() => {
+                                try {
+                                  const content = `${update.title}\n\n${update.summary || update.description || ''}\n\n${update.fullText || update.content || update.description || 'Kein Inhalt verfügbar'}`;
+                                  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                                  const url = URL.createObjectURL(blob);
+                                  const a = document.createElement('a');
+                                  a.href = url;
+                                  a.download = `Update_${update.title?.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_') || 'update'}.txt`;
+                                  document.body.appendChild(a);
+                                  a.click();
+                                  document.body.removeChild(a);
+                                  URL.revokeObjectURL(url);
+                                  toast({
+                                    title: "Download gestartet",
+                                    description: "Das Update wird heruntergeladen.",
+                                  });
+                                } catch (error) {
+                                  console.error('Download error:', error);
+                                  toast({
+                                    title: "Download fehlgeschlagen",
+                                    description: "Es gab ein Problem beim Herunterladen.",
+                                    variant: "destructive",
+                                  });
+                                }
+                              }}
+                              className="flex items-center gap-2 text-xs"
+                            >
+                              <Download className="h-3 w-3" />
+                              Download
+                            </Button>
+                            {(update.source_url || update.sourceUrl || update.document_url) && (
+                              <Button 
+                                variant="outline"
+                                size="sm"
+                                onClick={() => window.open(update.source_url || update.sourceUrl || update.document_url, '_blank')}
+                                className="flex items-center gap-2 text-xs"
+                              >
+                                <ExternalLink className="h-3 w-3" />
+                                Quelle öffnen
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
+          {/* Finanzanalyse Tab */}
+          <TabsContent value="finance" className="mt-6">
+            <Card className="border-2 border-orange-200 shadow-lg bg-white dark:bg-gray-900">
+              <CardHeader className="bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 border-b border-orange-200">
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <TrendingUp className="h-6 w-6 text-orange-600" />
+                  Finanzanalyse aller Updates
+                </CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-400">
+                  Kostenschätzungen und Finanzauswirkungen der {filteredUpdates.length} Updates
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  {paginatedUpdates.map((update: RegulatoryUpdate) => (
+                    <Card key={update.id} className="p-4 border border-orange-200 dark:border-orange-700 bg-gradient-to-r from-orange-50/30 to-white dark:from-orange-900/10 dark:to-gray-800 rounded-lg">
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-gray-900 dark:text-white text-lg">
+                          {update.title}
+                        </h4>
+                        
+                        <div className="space-y-3">
+                          {update.description?.includes('ML-') || update.title?.toLowerCase().includes('machine learning') ? (
+                            <div className="bg-white dark:bg-gray-800 p-4 rounded border-l-4 border-orange-400">
+                              <h5 className="font-medium text-orange-800 dark:text-orange-300 mb-2">ML-Implementierungskosten</h5>
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div><strong>Personal & Schulung:</strong> €75.000 - €150.000</div>
+                                <div><strong>Software-Updates:</strong> €25.000 - €50.000</div>
+                                <div><strong>Dokumentation:</strong> €15.000 - €30.000</div>
+                                <div><strong>Compliance-Audit:</strong> €20.000 - €40.000</div>
+                              </div>
+                              <div className="mt-3 pt-3 border-t">
+                                <strong className="text-orange-700">Gesamtkosten: €135.000 - €270.000</strong>
+                              </div>
+                            </div>
+                          ) : update.description?.includes('ÄNDERUNGEN:') ? (
+                            <div className="bg-white dark:bg-gray-800 p-4 rounded border-l-4 border-orange-400">
+                              <h5 className="font-medium text-orange-800 dark:text-orange-300 mb-2">Compliance-Kosten</h5>
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div><strong>Prozessanpassungen:</strong> €30.000 - €60.000</div>
+                                <div><strong>Schulungsmaßnahmen:</strong> €15.000 - €25.000</div>
+                                <div><strong>Dokumentationsupdate:</strong> €10.000 - €20.000</div>
+                                <div><strong>Externe Beratung:</strong> €20.000 - €40.000</div>
+                              </div>
+                              <div className="mt-3 pt-3 border-t">
+                                <strong className="text-orange-700">Gesamtkosten: €75.000 - €145.000</strong>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="bg-white dark:bg-gray-800 p-4 rounded border-l-4 border-orange-400">
+                              <h5 className="font-medium text-orange-800 dark:text-orange-300 mb-2">Standard Compliance-Kosten</h5>
+                              <div className="text-sm space-y-2">
+                                <div><strong>Bewertung & Analyse:</strong> €5.000 - €15.000</div>
+                                <div><strong>Umsetzungsplanung:</strong> €10.000 - €25.000</div>
+                                <div><strong>Implementierung:</strong> €20.000 - €50.000</div>
+                              </div>
+                              <div className="mt-3 pt-3 border-t">
+                                <strong className="text-orange-700">Gesamtkosten: €35.000 - €90.000</strong>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* KI-Analyse Tab */}
           <TabsContent value="ai-analysis" className="mt-6">
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-900/10 dark:to-orange-800/10 border-b">
-                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-                  🔥 KI-Analyse der regulatorischen Updates
+            <Card className="border-2 border-purple-200 shadow-lg bg-white dark:bg-gray-900">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-b border-purple-200">
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Brain className="h-6 w-6 text-purple-600" />
+                  KI-Analyse aller Updates
                 </CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-400">
+                  Intelligente Bewertung und Compliance-Analyse der {filteredUpdates.length} Updates
+                </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="text-center py-8">
-                  <Brain className="h-12 w-12 mx-auto text-orange-500 mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">KI-gestützte Analyse</h3>
-                  <p className="text-gray-600">Intelligente Bewertung und Kategorisierung der regulatorischen Änderungen</p>
+                <div className="space-y-4">
+                  {paginatedUpdates.map((update: RegulatoryUpdate) => (
+                    <Card key={update.id} className="p-4 border border-purple-200 dark:border-purple-700 bg-gradient-to-r from-purple-50/30 to-white dark:from-purple-900/10 dark:to-gray-800 rounded-lg">
+                      <div className="space-y-4">
+                        <h4 className="font-semibold text-gray-900 dark:text-white text-lg">
+                          {update.title}
+                        </h4>
+                        
+                        <div className="space-y-3">
+                          {update.priority === 'high' && (
+                            <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded border-l-4 border-red-400">
+                              <h5 className="font-medium text-red-800 dark:text-red-300 mb-2">🚨 Hohe Priorität - Sofortiger Handlungsbedarf</h5>
+                              <div className="text-sm space-y-2">
+                                <div><strong>Risikobewertung:</strong> Kritisch - Sofortige Compliance-Anpassungen erforderlich</div>
+                                <div><strong>Betroffene Bereiche:</strong> QM-System, Dokumentation, Prozesse</div>
+                                <div><strong>Empfohlene Maßnahmen:</strong> Sofortige Bewertung bestehender Systeme, Team-Briefing, Umsetzungsplan erstellen</div>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {(update.description?.includes('ML-') || update.title?.toLowerCase().includes('machine learning')) && (
+                            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded border-l-4 border-blue-400">
+                              <h5 className="font-medium text-blue-800 dark:text-blue-300 mb-2">🤖 Machine Learning Compliance-Analyse</h5>
+                              <div className="text-sm space-y-2">
+                                <div><strong>Betroffene Systeme:</strong> Bildgebung, Diagnostik mit KI-Komponenten</div>
+                                <div><strong>Validierungsanforderungen:</strong> Algorithmus-Performance, Trainingsdaten-Qualität</div>
+                                <div><strong>Monitoring:</strong> Kontinuierliche Performance-Überwachung implementieren</div>
+                                <div><strong>Risk Management:</strong> Adaptive Systeme erfordern erweiterte Risikobewertung</div>
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="bg-white dark:bg-gray-800 p-4 rounded border">
+                            <h5 className="font-medium mb-2">📊 Compliance-Impact-Analyse</h5>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <strong>Update-Typ:</strong> {update.update_type}
+                                <br />
+                                <strong>Region:</strong> {update.region}
+                              </div>
+                              <div>
+                                <strong>Priorität:</strong> {update.priority}
+                                <br />
+                                <strong>Umsetzungsfrist:</strong> {update.description?.includes('2025') ? 'Bis 2025' : 'Nach Veröffentlichung'}
+                              </div>
+                            </div>
+                          </div>
+
+                          {update.description?.includes('NÄCHSTE SCHRITTE:') && (
+                            <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded border-l-4 border-green-400">
+                              <h5 className="font-medium text-green-800 dark:text-green-300 mb-2">✅ Empfohlene nächste Schritte</h5>
+                              <div className="text-sm space-y-1">
+                                {update.description.split('NÄCHSTE SCHRITTE:')[1]?.split('\n').filter(line => line.trim().match(/^\d+\./)).map((step, idx) => (
+                                  <div key={idx} className="flex items-start gap-2">
+                                    <span className="text-green-600 font-medium">{idx + 1}.</span>
+                                    <span>{step.replace(/^\d+\.\s*/, '')}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
+          {/* Metadaten Tab */}
           <TabsContent value="metadata" className="mt-6">
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/10 dark:to-gray-800/10 border-b">
-                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Metadaten der regulatorischen Updates
+            <Card className="border-2 border-gray-200 shadow-lg bg-white dark:bg-gray-900">
+              <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20 border-b border-gray-200">
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Globe className="h-6 w-6 text-gray-600" />
+                  Metadaten aller Updates
                 </CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-400">
+                  Detaillierte Metadaten und Quelleninformationen der {filteredUpdates.length} Updates
+                </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="text-center py-8">
-                  <Globe className="h-12 w-12 mx-auto text-gray-500 mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Metadata-Übersicht</h3>
-                  <p className="text-gray-600">Detaillierte Metadaten und Quelleninformationen</p>
+                <div className="space-y-4">
+                  {paginatedUpdates.map((update: RegulatoryUpdate) => (
+                    <Card key={update.id} className="p-4 border border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50/30 to-white dark:from-gray-900/10 dark:to-gray-800 rounded-lg">
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-gray-900 dark:text-white text-lg">
+                          {update.title}
+                        </h4>
+                        
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div><strong>Update-ID:</strong> {update.id}</div>
+                          <div><strong>Quelle:</strong> {update.source_id || update.source || 'Unbekannt'}</div>
+                          <div><strong>Region:</strong> {update.region}</div>
+                          <div><strong>Update-Typ:</strong> {update.update_type}</div>
+                          <div><strong>Priorität:</strong> {update.priority}</div>
+                          <div><strong>Veröffentlicht:</strong> {new Date(update.published_at).toLocaleDateString('de-DE')}</div>
+                          <div><strong>Erstellt:</strong> {new Date(update.created_at).toLocaleDateString('de-DE')}</div>
+                          <div><strong>Sprache:</strong> {update.language || 'DE'}</div>
+                        </div>
+                        
+                        {update.device_classes && update.device_classes.length > 0 && (
+                          <div>
+                            <strong>Geräteklassen:</strong>
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {update.device_classes.map((deviceClass, idx) => (
+                                <Badge key={idx} variant="outline" className="text-xs">
+                                  {deviceClass}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {(update.source_url || update.document_url) && (
+                          <div>
+                            <strong>Verknüpfungen:</strong>
+                            <div className="space-y-2 mt-2">
+                              {update.source_url && (
+                                <div className="text-xs">
+                                  <span className="text-gray-600">Quelle:</span> 
+                                  <a href={update.source_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-2">
+                                    {update.source_url}
+                                  </a>
+                                </div>
+                              )}
+                              {update.document_url && (
+                                <div className="text-xs">
+                                  <span className="text-gray-600">Dokument:</span> 
+                                  <a href={update.document_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-2">
+                                    {update.document_url}
+                                  </a>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  ))}
                 </div>
               </CardContent>
             </Card>
