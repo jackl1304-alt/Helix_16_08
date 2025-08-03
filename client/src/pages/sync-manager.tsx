@@ -71,38 +71,75 @@ export default function SyncManager() {
     loadRecentUpdatesForModal();
   };
 
-  // Live Sync Statistics - Direct Implementation
+  // Live Sync Statistics - Zeigt nur neue Updates bei echten Sync-Vorgängen
   const [liveStats, setLiveStats] = useState({
     lastSync: "vor 2 Minuten",
     runningSyncs: 0,
-    newUpdates: "5000+",
+    newUpdates: "0", // Startet mit 0 - zeigt nur neue Updates
     activeSources: 46
   });
 
-  // Update live stats basierend auf echten Daten - KEINE laufenden Syncs
+  // Update live stats - nur neue Updates anzeigen, nicht bestehende Daten
   useEffect(() => {
-    setLiveStats({
-      lastSync: "vor 2 Minuten",
+    setLiveStats(prev => ({
+      ...prev,
       runningSyncs: 0, // Immer 0 - kein Live-Sync
-      newUpdates: "5000+",
+      newUpdates: "0", // Nur neue Updates, nicht bestehende 5000+
       activeSources: dataSources.filter(s => s.isActive).length || 46
-    });
+    }));
   }, [dataSources]);
 
   const syncMutation = useMutation({
     mutationFn: async (sourceId: string) => {
+      // Zeige temporär laufenden Sync an
+      setLiveStats(prev => ({
+        ...prev,
+        runningSyncs: prev.runningSyncs + 1
+      }));
+      
       // Dokumentation statt Live-Sync
-      return apiRequest(`/api/data-sources/${sourceId}/document`, 'POST');
+      const result = await apiRequest(`/api/data-sources/${sourceId}/document`, 'POST');
+      
+      // Reduziere laufende Syncs wieder
+      setLiveStats(prev => ({
+        ...prev,
+        runningSyncs: Math.max(0, prev.runningSyncs - 1)
+      }));
+      
+      return result;
     },
     onSuccess: (data, sourceId) => {
-      toast({
-        title: "Datenquelle dokumentiert",
-        description: `Bestehende Daten für ${sourceId} wurden dokumentiert - kein Live-Sync durchgeführt`,
-      });
+      // Prüfe ob neue Updates gefunden wurden
+      const newUpdatesFound = data?.newUpdatesCount || 0;
+      
+      if (newUpdatesFound > 0) {
+        setLiveStats(prev => ({
+          ...prev,
+          newUpdates: String(parseInt(prev.newUpdates) + newUpdatesFound),
+          lastSync: "gerade eben"
+        }));
+        
+        toast({
+          title: "Neue Updates gefunden",
+          description: `${newUpdatesFound} neue Updates von ${sourceId} gefunden`,
+        });
+      } else {
+        toast({
+          title: "Keine neuen Updates",
+          description: `${sourceId} dokumentiert - keine neuen Daten gefunden`,
+        });
+      }
+      
       queryClient.invalidateQueries({ queryKey: ['/api/data-sources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
     },
     onError: (error: any, sourceId) => {
+      // Reduziere laufende Syncs auch bei Fehlern
+      setLiveStats(prev => ({
+        ...prev,
+        runningSyncs: Math.max(0, prev.runningSyncs - 1)
+      }));
+      
       toast({
         title: "Dokumentation fehlgeschlagen", 
         description: `Fehler bei der Dokumentation von ${sourceId}: ${error.message}`,
@@ -117,6 +154,12 @@ export default function SyncManager() {
       const activeSources = dataSources.filter(source => source.isActive);
       const results = [];
       
+      // Setze alle als laufend
+      setLiveStats(prev => ({
+        ...prev,
+        runningSyncs: activeSources.length
+      }));
+      
       for (const source of activeSources) {
         console.log(`Starting bulk documentation for: ${source.id}`);
         try {
@@ -126,23 +169,51 @@ export default function SyncManager() {
           console.error(`Bulk documentation failed for ${source.id}:`, error);
           results.push({ id: source.id, status: 'error', error });
         }
+        
+        // Reduziere laufende Syncs nach jedem abgeschlossenen
+        setLiveStats(prev => ({
+          ...prev,
+          runningSyncs: Math.max(0, prev.runningSyncs - 1)
+        }));
       }
       
       return { results, total: activeSources.length };
     },
     onSuccess: (data) => {
-      const documentedCount = data.results.filter(r => r.status === 'documented').length;
-      toast({
-        title: "Vollständige Dokumentation abgeschlossen",
-        description: `${documentedCount} von ${data.total} Datenquellen dokumentiert - kein Live-Sync durchgeführt`,
-      });
+      const totalNewUpdates = data.results.reduce((sum: number, result: any) => 
+        sum + (result.newUpdatesCount || 0), 0);
+      
+      if (totalNewUpdates > 0) {
+        setLiveStats(prev => ({
+          ...prev,
+          newUpdates: String(parseInt(prev.newUpdates) + totalNewUpdates),
+          lastSync: "gerade eben"
+        }));
+        
+        toast({
+          title: "Bulk-Synchronisation: Neue Updates gefunden",
+          description: `${totalNewUpdates} neue Updates aus ${data.total} Quellen gefunden`,
+        });
+      } else {
+        toast({
+          title: "Bulk-Synchronisation: Keine neuen Updates",
+          description: `${data.total} Quellen dokumentiert - keine neuen Daten gefunden`,
+        });
+      }
+      
       queryClient.invalidateQueries({ queryKey: ['/api/data-sources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/sync/stats'] });
     },
     onError: (error: any) => {
+      // Setze laufende Syncs auf 0 bei Fehlern
+      setLiveStats(prev => ({
+        ...prev,
+        runningSyncs: 0
+      }));
+      
       toast({
-        title: "Komplett-Synchronisation fehlgeschlagen",
-        description: `Fehler beim Synchronisieren: ${error.message}`,
+        title: "Komplett-Dokumentation fehlgeschlagen",
+        description: `Fehler bei der Dokumentation: ${error.message}`,
         variant: "destructive",
       });
     }
