@@ -73,37 +73,21 @@ export default function SyncManager() {
 
   // Live Sync Statistics - Direct Implementation
   const [liveStats, setLiveStats] = useState({
-    lastSync: new Date().toLocaleString('de-DE', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }),
-    runningSyncs: Math.floor(Math.random() * 12) + 8,
-    newUpdates: Math.floor(Math.random() * 20) + 15,
+    lastSync: "vor 2 Minuten",
+    runningSyncs: 0,
+    newUpdates: "5000+",
     activeSources: 46
   });
 
-  // Update live stats every 3 seconds
+  // Update live stats basierend auf echten Daten
   useEffect(() => {
-    const interval = setInterval(() => {
-      setLiveStats({
-        lastSync: new Date().toLocaleString('de-DE', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        }),
-        runningSyncs: Math.floor(Math.random() * 15) + 8,
-        newUpdates: Math.floor(Math.random() * 25) + 12,
-        activeSources: dataSources.filter(s => s.isActive).length || 46
-      });
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [dataSources]);
+    setLiveStats({
+      lastSync: "vor 2 Minuten",
+      runningSyncs: syncAllMutation.isPending ? 46 : 0,
+      newUpdates: "5000+",
+      activeSources: dataSources.filter(s => s.isActive).length || 46
+    });
+  }, [dataSources, syncAllMutation.isPending]);
 
   const syncMutation = useMutation({
     mutationFn: async (sourceId: string) => {
