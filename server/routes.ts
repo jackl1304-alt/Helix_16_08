@@ -623,26 +623,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         content: update.content || update.description || update.title,
         source: update.source_id,
         sourceUrl: update.document_url || `https://${update.source_id?.toLowerCase()}.europa.eu/docs/${update.id}`,
-        fullText: `Vollständiger Regulatory Update Text für ${update.title}. Dieser Text enthält alle relevanten Informationen für Compliance und regulatorische Anforderungen.
+        fullText: update.description || `${update.title}
 
-DETAILLIERTE ANALYSE:
-${update.title}
-
-Diese Aktualisierung wurde durch ${update.source_id} herausgegeben und bezieht sich auf wichtige Änderungen in der Medizinprodukte-Regulierung.
-
-SCHLÜSSELASPEKTE:
-• Regulatorische Behörde: ${update.source_id}
-• Betroffene Region: ${update.region}
-• Prioritätsstufe: ${update.priority || 'Standard'}
-• Geräteklassen: ${Array.isArray(update.device_classes) ? update.device_classes.join(', ') : 'Alle Klassen'}
-
-HANDLUNGSEMPFEHLUNGEN:
-1. Überprüfung der aktuellen Compliance-Verfahren
-2. Bewertung der Auswirkungen auf bestehende Produkte  
-3. Anpassung der Dokumentation falls erforderlich
-4. Schulung des Personals zu neuen Anforderungen
-
-Weitere Details finden Sie in der offiziellen Dokumentation der Regulierungsbehörde.`
+Weitere Details werden noch verarbeitet. Bitte wenden Sie sich an die offizielle Quelle für vollständige Informationen.`
       }));
 
       res.json({
