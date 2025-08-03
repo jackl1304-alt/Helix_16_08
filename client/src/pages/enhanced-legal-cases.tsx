@@ -23,6 +23,15 @@ interface ComprehensiveLegalCase {
   documentUrl?: string;
   impactLevel: 'high' | 'medium' | 'low';
   keywords: string[];
+  // Zusätzliche Originaldatenfelder
+  case_summary?: string;
+  verdict?: string;
+  outcome?: string;
+  status?: string;
+  priority?: string;
+  device_classes?: string[];
+  full_content?: string;
+  original_text?: string;
 }
 
 export default function EnhancedLegalCases() {
@@ -53,7 +62,25 @@ export default function EnhancedLegalCases() {
         content: item.content || item.fullDecisionText || item.verdict || 'Comprehensive legal case details',
         documentUrl: item.documentUrl || item.document_url,
         impactLevel: (item.impactLevel || item.impact_level || 'medium') as 'high' | 'medium' | 'low',
-        keywords: item.keywords || []
+        // Originaldatenfelder beibehalten
+        case_summary: item.case_summary,
+        verdict: item.verdict,
+        outcome: item.outcome,
+        status: item.status,
+        priority: item.priority,
+        device_classes: item.device_classes,
+        full_content: item.full_content,
+        original_text: item.original_text,
+        keywords: item.keywords || [],
+        // Originaldatenfelder beibehalten
+        case_summary: item.case_summary,
+        verdict: item.verdict,
+        outcome: item.outcome,
+        status: item.status,
+        priority: item.priority,
+        device_classes: item.device_classes,
+        full_content: item.full_content,
+        original_text: item.original_text,
       }));
     }
   });
@@ -436,37 +463,90 @@ export default function EnhancedLegalCases() {
                           </div>
                         </div>
 
-                        {/* Vollständige Fallbeschreibung */}
+                        {/* ORIGINALE ZUSAMMENFASSUNG AUS DATENBANK */}
+                        {legalCase.case_summary && (
+                          <div className="bg-blue-50 p-6 rounded-lg">
+                            <h4 className="font-semibold text-blue-900 mb-4 flex items-center gap-2">
+                              <FileText className="w-5 h-5" />
+                              Original Case Summary (Quelle: Datenbank)
+                            </h4>
+                            <div className="bg-white p-4 rounded border max-h-[400px] overflow-y-auto">
+                              <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
+                                {legalCase.case_summary}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* VOLLSTÄNDIGE FALLBESCHREIBUNG */}
                         <div className="bg-gray-50 p-6 rounded-lg">
                           <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                             <FileText className="w-5 h-5" />
-                            Vollständige Fallbeschreibung aus Originaldatenbank
+                            Vollständige Fallbeschreibung (Originaldaten)
                           </h4>
-                          <div className="prose max-w-none">
-                            <div className="text-sm text-gray-700 leading-relaxed max-h-[500px] overflow-y-auto bg-white p-4 rounded border">
-                              {legalCase.summary ? (
-                                <div className="whitespace-pre-wrap">
-                                  {legalCase.summary}
-                                </div>
-                              ) : (
-                                <p className="italic text-gray-500">Keine detaillierte Zusammenfassung verfügbar.</p>
-                              )}
+                          <div className="bg-white p-4 rounded border max-h-[500px] overflow-y-auto">
+                            <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                              {legalCase.summary || "Keine Zusammenfassung verfügbar"}
                             </div>
                           </div>
                         </div>
 
-                        {/* Vollständiger Originalinhalt */}
+                        {/* URTEIL/VERDICT AUS DATENBANK */}
+                        {legalCase.verdict && (
+                          <div className="bg-green-50 p-6 rounded-lg">
+                            <h4 className="font-semibold text-green-900 mb-4 flex items-center gap-2">
+                              <Scale className="w-5 h-5" />
+                              Urteil/Verdict (Original aus Quelle)
+                            </h4>
+                            <div className="bg-white p-4 rounded border max-h-[400px] overflow-y-auto">
+                              <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
+                                {legalCase.verdict}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* VOLLSTÄNDIGER CONTENT/ORIGINAL TEXT */}
                         <div className="bg-yellow-50 p-6 rounded-lg">
                           <h4 className="font-semibold text-yellow-900 mb-4 flex items-center gap-2">
                             <Scale className="w-5 h-5" />
-                            Vollständiger Originalinhalt der Rechtsprechung
+                            Vollständiger Originalinhalt (alle Quelldaten)
                           </h4>
                           <div className="bg-white p-4 rounded border max-h-[600px] overflow-y-auto">
                             <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
-                              {legalCase.content || "Vollständiger Inhalt wird geladen..."}
+                              {legalCase.content || legalCase.original_text || legalCase.full_content || "Vollständiger Inhalt wird geladen..."}
                             </div>
                           </div>
                         </div>
+
+                        {/* OUTCOME/ERGEBNIS */}
+                        {legalCase.outcome && (
+                          <div className="bg-orange-50 p-6 rounded-lg">
+                            <h4 className="font-semibold text-orange-900 mb-4 flex items-center gap-2">
+                              <CheckCircle className="w-5 h-5" />
+                              Fallausgang/Outcome (Original)
+                            </h4>
+                            <div className="bg-white p-4 rounded border">
+                              <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
+                                {legalCase.outcome}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* BETROFFENE GERÄTEKLASSEN */}
+                        {legalCase.device_classes && legalCase.device_classes.length > 0 && (
+                          <div className="bg-red-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-red-900 mb-2">Betroffene Geräteklassen</h4>
+                            <div className="flex flex-wrap gap-2">
+                              {legalCase.device_classes.map((deviceClass, index) => (
+                                <Badge key={index} variant="outline" className="bg-white">
+                                  {deviceClass}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
 
                         {/* Zusätzliche Metadaten */}
                         {(legalCase.impactLevel || legalCase.status || legalCase.priority) && (
