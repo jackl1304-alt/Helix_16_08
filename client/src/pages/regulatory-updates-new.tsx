@@ -241,7 +241,7 @@ export default function RegulatoryUpdatesPage() {
                     <SelectItem value="all">Alle Behörden</SelectItem>
                     {authorities.map((authority) => (
                       <SelectItem key={authority} value={authority}>
-                        {authority}
+                        {authority || 'Unbekannt'}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -258,7 +258,7 @@ export default function RegulatoryUpdatesPage() {
                     <SelectItem value="all">Alle Typen</SelectItem>
                     {types.map((type) => (
                       <SelectItem key={type} value={type}>
-                        {type}
+                        {type || 'Unbekannt'}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -275,7 +275,7 @@ export default function RegulatoryUpdatesPage() {
                     <SelectItem value="all">Alle Status</SelectItem>
                     {statuses.map((status) => (
                       <SelectItem key={status} value={status}>
-                        {status}
+                        {status || 'Unbekannt'}
                       </SelectItem>
                     ))}
                   </SelectContent>
