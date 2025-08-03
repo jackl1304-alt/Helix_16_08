@@ -32,9 +32,16 @@ export default function EnhancedLegalCasesNew() {
 
   // Fetch legal cases with cache busting
   const { data: legalCases = [], isLoading: isLoadingCases, refetch } = useQuery({
-    queryKey: ['legal-cases-new', Date.now()], // Cache busting
+    queryKey: ['legal-cases-new-v2', Math.random()], // Complete cache busting
     queryFn: async (): Promise<LegalCase[]> => {
-      const response = await fetch('/api/legal-cases?_=' + Date.now());
+      // Force fresh API call with no caching
+      const timestamp = Date.now();
+      const response = await fetch(`/api/legal-cases?v=2&_=${timestamp}`, {
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       if (!response.ok) throw new Error('Failed to fetch legal cases');
       const data = await response.json();
       console.log("NEUE KOMPONENTE - Legal Cases geladen:", data.length);
@@ -44,11 +51,12 @@ export default function EnhancedLegalCasesNew() {
         summaryStart: c.summary?.substring(0, 80) + "...",
         contentStart: c.content?.substring(0, 80) + "...",
         summaryLength: c.summary?.length,
-        contentLength: c.content?.length
+        contentLength: c.content?.length,
+        summaryUnique: c.summary !== c.content ? 'DIFFERENT' : 'IDENTICAL'
       })));
       return data;
     },
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
     refetchOnMount: true,
     staleTime: 0, // Always fresh
     gcTime: 0 // No cache (gcTime replaces cacheTime in v5)
