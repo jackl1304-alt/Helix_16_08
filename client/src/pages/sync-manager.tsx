@@ -79,14 +79,21 @@ export default function SyncManager() {
     activeSources: 46
   });
 
-  // Update live stats - nur neue Updates anzeigen, nicht bestehende Daten
+  // Update live stats - verhindere Endlosschleife
   useEffect(() => {
-    setLiveStats(prev => ({
-      ...prev,
-      runningSyncs: 0, // Immer 0 - kein Live-Sync
-      newUpdates: "0", // Nur neue Updates, nicht bestehende 5000+
-      activeSources: dataSources.filter(s => s.isActive).length || 46
-    }));
+    if (dataSources.length > 0) {
+      const activeCount = dataSources.filter(s => s.isActive).length;
+      setLiveStats(prev => {
+        // Nur update wenn sich activeCount geändert hat
+        if (prev.activeSources !== activeCount) {
+          return {
+            ...prev,
+            activeSources: activeCount
+          };
+        }
+        return prev; // Keine Änderung = keine Re-Render
+      });
+    }
   }, [dataSources]);
 
   const syncMutation = useMutation({
