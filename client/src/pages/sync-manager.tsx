@@ -37,6 +37,8 @@ export default function SyncManager() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const [showUpdatesSummary, setShowUpdatesSummary] = useState(false);
+
   const { data: dataSources = [], isLoading } = useQuery<DataSource[]>({
     queryKey: ['/api/data-sources'],
   });
@@ -49,7 +51,6 @@ export default function SyncManager() {
   });
 
   // Live Sync Statistics - Direct Implementation
-  const [showUpdatesSummary, setShowUpdatesSummary] = useState(false);
   const [liveStats, setLiveStats] = useState({
     lastSync: new Date().toLocaleString('de-DE', {
       day: '2-digit',
