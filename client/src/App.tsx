@@ -29,6 +29,7 @@ const UserManagement = lazy(() => import("@/pages/user-management"));
 const SystemSettings = lazy(() => import("@/pages/system-settings"));
 const AuditLogs = lazy(() => import("@/pages/audit-logs"));
 const AIInsights = lazy(() => import("@/pages/ai-insights"));
+const AIApprovalTest = lazy(() => import("@/pages/ai-approval-test"));
 const KnowledgeBase = lazy(() => import("@/pages/knowledge-base"));
 const EnhancedLegalCases = lazy(() => import("@/pages/enhanced-legal-cases"));
 
@@ -72,6 +73,7 @@ function Router() {
         <Route path="/system-settings" component={SystemSettings} />
         <Route path="/audit-logs" component={AuditLogs} />
         <Route path="/ai-insights" component={AIInsights} />
+        <Route path="/ai-approval-test" component={AIApprovalTest} />
         <Route path="/knowledge-base" component={KnowledgeBase} />
         <Route path="/enhanced-legal-cases" component={EnhancedLegalCases} />
         <Route path="/historical-data" component={HistoricalData} />

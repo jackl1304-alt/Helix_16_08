@@ -87,7 +87,7 @@ export default function AnalyticsPage() {
       { category: "Knowledge Articles", count: stats.totalArticles || 0, color: COLORS.warning }
     ],
     timelineData: Array.from({ length: 30 }, (_, i) => ({
-      date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0] || '',
       updates: Math.floor(Math.random() * 25) + 5,
       approvals: Math.floor(Math.random() * 15) + 2
     })),
@@ -254,20 +254,20 @@ export default function AnalyticsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Kategorie-Aufschlüsselung</CardTitle>
-            <CardDescription>Updates nach Typ</CardDescription>
+            <CardTitle>Kategorie Breakdown</CardTitle>
+            <CardDescription>Verteilung nach Datentypen</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
                   data={analyticsData.categoryBreakdown}
-                  dataKey="count"
-                  nameKey="category"
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
-                  label
+                  fill="#8884d8"
+                  dataKey="count"
+                  label={({ category, count }) => `${category}: ${count}`}
                 >
                   {analyticsData.categoryBreakdown.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -280,11 +280,11 @@ export default function AnalyticsPage() {
         </Card>
       </div>
 
-      {/* Timeline */}
+      {/* Timeline Chart */}
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Zeitverlauf der Updates</CardTitle>
-          <CardDescription>Tägliche Updates und Genehmigungen</CardDescription>
+          <CardTitle>30-Tage Trend</CardTitle>
+          <CardDescription>Updates und Genehmigungen über Zeit</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
@@ -293,18 +293,32 @@ export default function AnalyticsPage() {
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
-              <Area type="monotone" dataKey="updates" stackId="1" stroke={COLORS.primary} fill={COLORS.primary} />
-              <Area type="monotone" dataKey="approvals" stackId="1" stroke={COLORS.secondary} fill={COLORS.secondary} />
+              <Area 
+                type="monotone" 
+                dataKey="updates" 
+                stackId="1" 
+                stroke={COLORS.primary} 
+                fill={COLORS.primary} 
+                fillOpacity={0.6}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="approvals" 
+                stackId="1" 
+                stroke={COLORS.secondary} 
+                fill={COLORS.secondary} 
+                fillOpacity={0.6}
+              />
             </AreaChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
 
-      {/* Source Performance */}
+      {/* Source Performance Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Datenquellen-Performance</CardTitle>
-          <CardDescription>Status und Leistung der einzelnen Quellen</CardDescription>
+          <CardTitle>Datenquellen Performance</CardTitle>
+          <CardDescription>Status und Aktivität der verschiedenen Quellen</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -313,17 +327,15 @@ export default function AnalyticsPage() {
                 <div className="flex items-center space-x-4">
                   {getStatusIcon(source.status)}
                   <div>
-                    <div className="font-medium">{source.source}</div>
+                    <div className="font-semibold">{source.source}</div>
                     <div className="text-sm text-muted-foreground">
-                      Letzter Sync: {new Date(source.lastSync).toLocaleString('de-DE')}
+                      Letzter Sync: {new Date(source.lastSync).toLocaleDateString('de-DE')}
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-medium">{source.updates} Updates</div>
-                  <Badge variant={source.status === 'active' ? 'default' : 'secondary'}>
-                    {source.status === 'active' ? 'Aktiv' : 'Inaktiv'}
-                  </Badge>
+                  <div className="font-semibold">{source.updates.toLocaleString()}</div>
+                  <div className="text-sm text-muted-foreground">Updates</div>
                 </div>
               </div>
             ))}
