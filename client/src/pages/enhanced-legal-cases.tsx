@@ -267,15 +267,11 @@ export default function EnhancedLegalCases() {
             const caseDetails = extractCaseDetails(legalCase.content);
             
             return (
-              <Card 
-                key={legalCase.id} 
-                className="hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => window.location.href = `/legal-case/${legalCase.id}`}
-              >
+              <Card key={legalCase.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <CardTitle className="text-xl mb-2 flex items-center gap-2 hover:text-blue-600 transition-colors">
+                      <CardTitle className="text-xl mb-2 flex items-center gap-2">
                         <span className="text-2xl">{getJurisdictionIcon(legalCase.jurisdiction)}</span>
                         {legalCase.title}
                       </CardTitle>
@@ -418,20 +414,77 @@ export default function EnhancedLegalCases() {
                     </TabsContent>
                     
                     <TabsContent value="details" className="mt-4">
-                      <div className="space-y-4">
-                        <div className="bg-gray-50 p-4 rounded-lg max-h-96 overflow-y-auto">
-                          <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                            <FileText className="w-5 h-5" />
-                            Complete Case Reconstruction
-                          </h4>
-                          <div className="text-sm text-gray-700">
-                            <FormattedText 
-                              content={legalCase.content} 
-                              className="text-sm leading-relaxed"
-                              maxHeight="max-h-80"
-                            />
+                      <div className="space-y-6">
+                        {/* Basis-Informationen */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="bg-blue-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-blue-900 mb-2">Fall-Identifikation</h4>
+                            <div className="space-y-1 text-sm">
+                              <div><strong>ID:</strong> {legalCase.id}</div>
+                              <div><strong>Fall-Nummer:</strong> {legalCase.caseNumber}</div>
+                              <div><strong>Titel:</strong> {legalCase.title}</div>
+                            </div>
+                          </div>
+                          
+                          <div className="bg-green-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-green-900 mb-2">Gerichtsdaten</h4>
+                            <div className="space-y-1 text-sm">
+                              <div><strong>Gericht:</strong> {legalCase.court}</div>
+                              <div><strong>Jurisdiktion:</strong> {legalCase.jurisdiction}</div>
+                              <div><strong>Entscheidungsdatum:</strong> {new Date(legalCase.decisionDate).toLocaleDateString('de-DE')}</div>
+                            </div>
                           </div>
                         </div>
+
+                        {/* Vollständige Fallbeschreibung */}
+                        <div className="bg-gray-50 p-6 rounded-lg">
+                          <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <FileText className="w-5 h-5" />
+                            Vollständige Fallbeschreibung aus Originaldatenbank
+                          </h4>
+                          <div className="prose max-w-none">
+                            <div className="text-sm text-gray-700 leading-relaxed max-h-[500px] overflow-y-auto bg-white p-4 rounded border">
+                              {legalCase.summary ? (
+                                <div className="whitespace-pre-wrap">
+                                  {legalCase.summary}
+                                </div>
+                              ) : (
+                                <p className="italic text-gray-500">Keine detaillierte Zusammenfassung verfügbar.</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Vollständiger Originalinhalt */}
+                        <div className="bg-yellow-50 p-6 rounded-lg">
+                          <h4 className="font-semibold text-yellow-900 mb-4 flex items-center gap-2">
+                            <Scale className="w-5 h-5" />
+                            Vollständiger Originalinhalt der Rechtsprechung
+                          </h4>
+                          <div className="bg-white p-4 rounded border max-h-[600px] overflow-y-auto">
+                            <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
+                              {legalCase.content || "Vollständiger Inhalt wird geladen..."}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Zusätzliche Metadaten */}
+                        {(legalCase.impactLevel || legalCase.status || legalCase.priority) && (
+                          <div className="bg-purple-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-purple-900 mb-2">Zusätzliche Eigenschaften</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                              {legalCase.impactLevel && (
+                                <div><strong>Impact Level:</strong> {legalCase.impactLevel}</div>
+                              )}
+                              {legalCase.status && (
+                                <div><strong>Status:</strong> {legalCase.status}</div>
+                              )}
+                              {legalCase.priority && (
+                                <div><strong>Priorität:</strong> {legalCase.priority}</div>
+                              )}
+                            </div>
+                          </div>
+                        )}
                         
                         {legalCase.documentUrl && (
                           <div className="flex justify-end">
