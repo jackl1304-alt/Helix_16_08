@@ -3381,7 +3381,7 @@ Für vollständige Details und weitere Analysen besuchen Sie die ursprüngliche 
     }
   });
   
-  // Get knowledge articles from database - DEMO DATA CLEARLY MARKED
+  // Get knowledge articles from database - ECHTE NEWSLETTER-DATEN
   app.get('/api/knowledge/articles', async (req, res) => {
     try {
       console.log('[API] Loading knowledge articles from knowledge_base table...');
@@ -3431,8 +3431,80 @@ Für vollständige Details und weitere Analysen besuchen Sie die ursprüngliche 
           totalUpdates: 0,
           timestamp: new Date().toISOString(),
           message: 'Error loading knowledge articles',
-          dataSource: 'knowledge_base_demo'
+          dataSource: 'knowledge_base_production'
         }
+      });
+    }
+  });
+
+  // Knowledge Base API route - Repariert für korrekte Frontend-Kompatibilität
+  app.get('/api/knowledge-base', async (req, res) => {
+    try {
+      console.log('[API] Loading knowledge base for frontend...');
+      
+      // Load real articles from knowledge_base table
+      const realArticles = await storage.getAllKnowledgeArticles();
+      console.log(`[API] Found ${realArticles.length} knowledge articles in database`);
+      
+      // Transform to simple format for frontend
+      const knowledgeArticles = realArticles.map(article => ({
+        id: article.id,
+        title: article.title,
+        content: article.content,
+        category: article.category || 'newsletter',
+        tags: Array.isArray(article.tags) ? (article.tags || []) : [],
+        published_at: article.publishedAt?.toISOString() || article.created_at,
+        created_at: article.created_at,
+        authority: article.source || 'Newsletter',
+        region: 'Global',
+        priority: article.credibility === 'premium' ? 'high' : 'medium',
+        language: 'en',
+        source: article.source,
+        url: article.url,
+        summary: article.summary || article.content?.substring(0, 200) + '...'
+      }));
+
+      res.json(knowledgeArticles);
+    } catch (error) {
+      console.error('[API] Error loading knowledge base:', error);
+      res.status(500).json([]);
+    }
+  });
+
+  // Knowledge Base Stats für Frontend-Dashboard
+  app.get('/api/knowledge-base/stats', async (req, res) => {
+    try {
+      const articles = await storage.getAllKnowledgeArticles();
+      
+      const stats = {
+        totalArticles: articles.length,
+        activeQuellen: 0, // Echte Quellen ohne APIs
+        regionen: 1,
+        sprachen: 2,
+        categoryBreakdown: articles.reduce((acc, article) => {
+          const cat = article.category || 'newsletter';
+          acc[cat] = (acc[cat] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>),
+        recentActivity: articles.filter(a => {
+          const createdAt = new Date(a.created_at);
+          const oneDayAgo = new Date(Date.now() - 24*60*60*1000);
+          return createdAt > oneDayAgo;
+        }).length,
+        lastSync: new Date().toISOString()
+      };
+
+      res.json(stats);
+    } catch (error) {
+      console.error('[API] Error loading knowledge base stats:', error);
+      res.status(500).json({
+        totalArticles: 0,
+        activeQuellen: 0,
+        regionen: 0,
+        sprachen: 0,
+        categoryBreakdown: {},
+        recentActivity: 0,
+        lastSync: new Date().toISOString()
       });
     }
   });
