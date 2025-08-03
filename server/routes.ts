@@ -1875,8 +1875,8 @@ Status: Archiviertes historisches Dokument
       try {
         console.log(`[API] Starting real-time sync for ${source.name}...`);
         
-        // Minimum 5-15 Sekunden Sync-Zeit für realistische Anzeige
-        const minSyncTime = 5000 + Math.random() * 10000; // 5-15 Sekunden
+        // Reduzierte aber realistische Sync-Zeit (3-8 Sekunden)
+        const minSyncTime = 3000 + Math.random() * 5000; // 3-8 Sekunden
         
         const dataCollectionModule = await import("./services/dataCollectionService");
         const dataService = new dataCollectionModule.DataCollectionService();
