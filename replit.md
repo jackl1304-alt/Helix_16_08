@@ -55,7 +55,8 @@ Preferred communication style: German language - Simple, everyday language.
 - ✅ **Newsletter-System in Datenerfassung integriert**: Authentische MedTech-Newsletter-Quellen vollständig in Sync-Verwaltung und Wissensdatenbank integriert (2025-08-03)
 - ✅ **Newsletter-Sync Buttons hinzugefügt**: Newsletter-Synchronisation sowohl in Datenerfassung als auch im Dashboard Quick Actions integriert (2025-08-03)
 - ✅ **Newsletter-Quellen Dashboard-Integration**: Vollständige Anzeige aktiver Newsletter-Quellen mit 10 konfigurierten Quellen (4 aktiv, 6 konfiguriert) im 3-Spalten Dashboard-Layout (2025-08-03)
-- ✅ **Newsletter-Quellen in Datenerfassung**: Separate Newsletter-Sektion in Datenquellen-Synchronisation mit detaillierter Anzeige aller 10 Newsletter-Quellen inkl. Status-Badges und Kategorien (2025-08-03)
+- ✅ **Newsletter-Quellen in Datenerfassung**: Separate Newsletter-Sektion in Datenquellen-Synchronisation mit detaillierter Anzeige aller Newsletter-Quellen inkl. Status-Badges und Kategorien (2025-08-03)
+- ✅ **Erweiterte Newsletter-Quellen**: 23 authentische MedTech-Newsletter-Quellen mit Premium-Anbietern (Emergo by UL, KPMG, McKinsey, PwC, BioWorld, FierceBiotech, MassDevice, Regulatory Focus, etc.) inkl. Anmeldedaten-Management (2025-08-03)
 
 ### Performance Optimierungen (Updated 2025-08-01)
 - ✅ **Lazy Loading**: Alle Seiten außer Dashboard per Lazy Loading geladen
