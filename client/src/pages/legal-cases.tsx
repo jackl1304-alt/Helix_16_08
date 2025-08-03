@@ -601,16 +601,19 @@ export default function LegalCases() {
           </TabsList>
 
           <TabsContent value="cases" className="mt-6">
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/10 dark:to-red-800/10 border-b">
-                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+            <Card className="border-2 border-red-200 shadow-lg bg-white dark:bg-gray-900">
+              <CardHeader className="bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 border-b border-red-200">
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Gavel className="h-6 w-6 text-red-600" />
                   Rechtsfälle Übersicht
                 </CardTitle>
                 <CardDescription className="text-gray-600 dark:text-gray-400">
                   {filteredData.length} von {legalData.length} authentische Rechtsfälle verfügbar
                 </CardDescription>
               </CardHeader>
-                  <CardContent className="p-6">
+              <CardContent className="p-6">
+                <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+                  <div className="space-y-4">
                     {isLoadingData ? (
                       <div className="flex items-center justify-center py-12">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -696,7 +699,9 @@ export default function LegalCases() {
                         )}
                       </div>
                     )}
-                  </CardContent>
+                  </div>
+                </div>
+              </CardContent>
             </Card>
           </TabsContent>
 
