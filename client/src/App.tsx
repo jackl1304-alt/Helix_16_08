@@ -41,7 +41,7 @@ const Phase1Integration = lazy(() => import("@/pages/phase1-integration"));
 const Phase2Integration = lazy(() => import("@/pages/phase2-integration"));
 const Phase3Advanced = lazy(() => import("@/pages/phase3-advanced"));
 const RealTimeIntegration = lazy(() => import("@/pages/real-time-integration"));
-const DataSourcesAdmin = lazy(() => import("@/pages/admin/data-sources"));
+const DataSourcesAdmin = lazy(() => import("@/pages/DataSourcesAdmin"));
 const Administration = lazy(() => import("@/pages/administration"));
 const GripData = lazy(() => import("@/pages/grip-data"));
 
