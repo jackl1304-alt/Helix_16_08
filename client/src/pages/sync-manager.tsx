@@ -104,15 +104,28 @@ export default function SyncManager() {
         runningSyncs: prev.runningSyncs + 1
       }));
       
-      console.log(`Starting real-time sync for: ${sourceId}`);
+      console.log(`[SYNC-MANAGER] Starting optimized real-time sync for: ${sourceId}`);
       
       try {
-        // Echter Live-Sync mit realistischer Dauer (5-15 Sekunden)
-        const result = await apiRequest(`/api/data-sources/${sourceId}/document`, { 
+        // Optimierte API-Requests mit korrekter Formatierung
+        const result = await apiRequest(`/api/data-sources/${sourceId}/sync`, { 
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            sourceId,
+            realTime: true,
+            optimized: true
+          })
         });
+        
+        console.log(`[SYNC-MANAGER] Sync completed for ${sourceId}:`, result);
         return result;
+      } catch (error) {
+        console.error(`[SYNC-MANAGER] Sync failed for ${sourceId}:`, error);
+        throw error;
       } finally {
         // Reduziere laufende Syncs nach Abschluss
         setLiveStats(prev => ({
@@ -122,10 +135,13 @@ export default function SyncManager() {
       }
     },
     onSuccess: (data, sourceId) => {
+      console.log(`[SYNC-MANAGER] Success response for ${sourceId}:`, data);
+      
       // Prüfe ob neue Updates gefunden wurden
       const newUpdatesFound = data?.newUpdatesCount || 0;
-      
-      const existingDataCount = data?.existingDataCount || 0;
+      const existingDataCount = data?.existingDataCount || 0; 
+      const performanceMetrics = data?.performanceMetrics || {};
+      const syncSuccess = data?.success !== false;
       
       if (newUpdatesFound > 0) {
         setLiveStats(prev => ({
@@ -135,13 +151,23 @@ export default function SyncManager() {
         }));
         
         toast({
-          title: "✅ Synchronisation erfolgreich",
-          description: `${sourceId}: ${newUpdatesFound} neue Updates gesammelt (${existingDataCount + newUpdatesFound} gesamt)`,
+          title: syncSuccess ? "✅ Optimierte Synchronisation erfolgreich" : "⚠️ Sync mit Warnungen",
+          description: `${sourceId}: ${newUpdatesFound} neue Updates (${existingDataCount + newUpdatesFound} gesamt) | ${performanceMetrics.syncDuration || 0}ms`,
         });
       } else {
         toast({
-          title: "ℹ️ Sync abgeschlossen",
-          description: `${sourceId}: Keine neuen Updates verfügbar (${existingDataCount} bestehende)`,
+          title: syncSuccess ? "ℹ️ Optimierter Sync abgeschlossen" : "⚠️ Sync abgeschlossen",
+          description: `${sourceId}: Keine neuen Updates (${existingDataCount} bestehende) | Performance: ${performanceMetrics.throughput || 0} items/sec`,
+        });
+      }
+      
+      // Performance-Logging für Monitoring
+      if (performanceMetrics.syncDuration) {
+        console.log(`[SYNC-MANAGER] Performance metrics for ${sourceId}:`, {
+          duration: `${performanceMetrics.syncDuration}ms`,
+          memory: `${performanceMetrics.memoryUsage || 0}MB`,
+          throughput: `${performanceMetrics.throughput || 0} items/sec`,
+          errorRate: `${Math.round((performanceMetrics.errorRate || 0) * 100)}%`
         });
       }
       
@@ -149,6 +175,8 @@ export default function SyncManager() {
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
     },
     onError: (error: any, sourceId) => {
+      console.error(`[SYNC-MANAGER] Error for ${sourceId}:`, error);
+      
       // Reduziere laufende Syncs auch bei Fehlern
       setLiveStats(prev => ({
         ...prev,
@@ -156,8 +184,8 @@ export default function SyncManager() {
       }));
       
       toast({
-        title: "Dokumentation fehlgeschlagen", 
-        description: `Fehler bei der Dokumentation von ${sourceId}: ${error.message}`,
+        title: "❌ Optimierte Synchronisation fehlgeschlagen", 
+        description: `${sourceId}: ${error.message || 'Unbekannter Fehler'}`,
         variant: "destructive",
       });
     }
