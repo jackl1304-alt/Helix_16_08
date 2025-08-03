@@ -666,12 +666,12 @@ class MorningStorage implements IStorage {
   }
   async countRegulatoryUpdatesBySource(sourceId: string): Promise<number> {
     try {
-      const result = await this.db.execute(sql`
+      const result = await sql`
         SELECT COUNT(*) as count 
         FROM regulatory_updates 
         WHERE source_id = ${sourceId}
-      `);
-      return Number(result.rows[0]?.count || 0);
+      `;
+      return parseInt(result[0]?.count || '0');
     } catch (error) {
       console.error('[DB ERROR] Count regulatory updates by source failed:', error);
       return 0;
