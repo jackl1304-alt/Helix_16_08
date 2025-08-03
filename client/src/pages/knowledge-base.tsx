@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -45,7 +45,7 @@ function KnowledgeBasePage() {
   });
 
   // Defensive parsing: Handle both array and object responses
-  const articles: KnowledgeArticle[] = React.useMemo(() => {
+  const articles: KnowledgeArticle[] = useMemo(() => {
     if (!realArticlesData) return [];
     if (Array.isArray(realArticlesData)) return realArticlesData;
     if (realArticlesData && typeof realArticlesData === 'object' && 'articles' in realArticlesData) {
