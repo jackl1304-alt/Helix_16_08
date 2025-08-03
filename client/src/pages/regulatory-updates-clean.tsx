@@ -91,24 +91,7 @@ async function fetchRegulatoryUpdates(): Promise<RegulatoryUpdate[]> {
   return data.data;
 }
 
-// Neue Text-Komponente
-function CleanText({ text }: { text: string }) {
-  if (!text) {
-    return <p className="text-gray-500 italic">Kein Inhalt verfügbar</p>;
-  }
-
-  const cleanedText = text
-    .replace(/<[^>]*>/g, '')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .trim();
-
-  return (
-    <div className="whitespace-pre-wrap text-gray-800 dark:text-gray-200">
-      {cleanedText}
-    </div>
-  );
-}
+// Entfernt - wird nicht mehr verwendet
 
 export default function RegulatoryUpdatesClean() {
   const device = useDeviceDetection();
@@ -427,9 +410,10 @@ export default function RegulatoryUpdatesClean() {
             </CardHeader>
 
             <CardContent>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-                {update.description || update.summary || (update.fullText ? update.fullText.substring(0, 300) + '...' : 'Keine Beschreibung verfügbar')}
-              </p>
+              <div className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4 whitespace-pre-wrap">
+                {update.fullText ? update.fullText.substring(0, 300) + '...' : 
+                 update.description || update.summary || 'Keine Beschreibung verfügbar'}
+              </div>
 
 
 
