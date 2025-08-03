@@ -30,37 +30,66 @@ export default function EnhancedLegalCasesNew() {
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-  // Fetch legal cases with cache busting
-  const { data: legalCases = [], isLoading: isLoadingCases, refetch } = useQuery({
-    queryKey: ['legal-cases-new-v2', Math.random()], // Complete cache busting
+  // Fetch legal cases with cache busting - DEEP DEBUG
+  const { data: legalCases = [], isLoading: isLoadingCases, refetch, error, isSuccess, dataUpdatedAt } = useQuery({
+    queryKey: ['legal-cases-deep-debug', Date.now()], // Always unique key
     queryFn: async (): Promise<LegalCase[]> => {
-      // Force fresh API call with no caching
+      console.log("🔥 QUERY FUNCTION STARTED - Fetching data...");
       const timestamp = Date.now();
-      const response = await fetch(`/api/legal-cases?v=2&_=${timestamp}`, {
+      const response = await fetch(`/api/legal-cases?debug=true&_=${timestamp}`, {
         headers: {
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache'
         }
       });
-      if (!response.ok) throw new Error('Failed to fetch legal cases');
+      if (!response.ok) {
+        console.error("❌ API RESPONSE ERROR:", response.status, response.statusText);
+        throw new Error(`Failed to fetch: ${response.status}`);
+      }
       const data = await response.json();
-      console.log("NEUE KOMPONENTE - Legal Cases geladen:", data.length);
-      console.log("ERSTE 3 FÄLLE PREVIEW:", data.slice(0, 3).map((c: any) => ({
-        id: c.id,
-        title: c.title,
-        summaryStart: c.summary?.substring(0, 80) + "...",
-        contentStart: c.content?.substring(0, 80) + "...",
-        summaryLength: c.summary?.length,
-        contentLength: c.content?.length,
-        summaryUnique: c.summary !== c.content ? 'DIFFERENT' : 'IDENTICAL'
-      })));
+      console.log("🔥 RAW API DATA RECEIVED:", {
+        length: data.length,
+        type: typeof data,
+        isArray: Array.isArray(data),
+        first3: data.slice(0, 3).map((c: any) => ({
+          id: c.id,
+          title: c.title,
+          jurisdiction: c.jurisdiction,
+          hasTitle: !!c.title,
+          hasJurisdiction: !!c.jurisdiction
+        }))
+      });
       return data;
     },
-    refetchOnWindowFocus: true,
+    enabled: true,
+    retry: false,
+    refetchOnWindowFocus: false,
     refetchOnMount: true,
-    staleTime: 0, // Always fresh
-    gcTime: 0 // No cache (gcTime replaces cacheTime in v5)
+    staleTime: 0,
+    gcTime: 0
   });
+
+  console.log("🔥 REACT QUERY STATE:", {
+    isLoading: isLoadingCases,
+    isSuccess,
+    error: error?.message,
+    dataLength: legalCases?.length || 0,
+    dataUpdatedAt,
+    actualData: legalCases?.slice(0, 2)
+  });
+
+  // EMERGENCY FIX: Force state update after successful data fetch
+  const [forcedCases, setForcedCases] = useState<LegalCase[]>([]);
+  
+  useEffect(() => {
+    if (isSuccess && legalCases && legalCases.length > 0) {
+      console.log("🚀 FORCE UPDATING STATE with", legalCases.length, "cases");
+      setForcedCases([...legalCases]);
+    }
+  }, [isSuccess, legalCases]);
+
+  // Use forced cases if available, otherwise use query data
+  const actualCases = forcedCases.length > 0 ? forcedCases : legalCases;
 
   // Refresh mutation
   const refreshCasesMutation = useMutation({
@@ -75,22 +104,20 @@ export default function EnhancedLegalCasesNew() {
     }
   });
 
-  // Filter cases - FIX: Ensure proper filtering
-  const filteredCases = legalCases.filter((legalCase: LegalCase) => {
-    if (!legalCase || !legalCase.title) return false;
-    
-    const matchesSearch = !searchTerm || 
-      (legalCase.title && legalCase.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (legalCase.caseNumber && legalCase.caseNumber.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (legalCase.court && legalCase.court.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesJurisdiction = selectedJurisdiction === 'all' || 
-      (legalCase.jurisdiction && legalCase.jurisdiction === selectedJurisdiction);
-    
-    const matchesImpactLevel = selectedImpactLevel === 'all' || 
-      (legalCase.impactLevel && legalCase.impactLevel === selectedImpactLevel);
-    
-    return matchesSearch && matchesJurisdiction && matchesImpactLevel;
+  // Use actual cases (forced state or query data)
+  const filteredCases = Array.isArray(actualCases) ? actualCases : [];
+  
+  console.log("🔥 FILTERING DEBUG:", {
+    actualCasesLength: actualCases?.length || 0,
+    forcedCasesLength: forcedCases.length,
+    queryDataLength: legalCases?.length || 0,
+    filteredLength: filteredCases.length,
+    usingForcedState: forcedCases.length > 0,
+    first3Filtered: filteredCases.slice(0, 3).map(c => ({
+      id: c?.id,
+      title: c?.title,
+      jurisdiction: c?.jurisdiction
+    }))
   });
 
   // Get individual case data with forced refresh
