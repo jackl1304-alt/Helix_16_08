@@ -57,6 +57,7 @@ Preferred communication style: German language - Simple, everyday language.
 - ✅ **Newsletter-Quellen Dashboard-Integration**: Vollständige Anzeige aktiver Newsletter-Quellen mit 10 konfigurierten Quellen (4 aktiv, 6 konfiguriert) im 3-Spalten Dashboard-Layout (2025-08-03)
 - ✅ **Newsletter-Quellen in Datenerfassung**: Separate Newsletter-Sektion in Datenquellen-Synchronisation mit detaillierter Anzeige aller Newsletter-Quellen inkl. Status-Badges und Kategorien (2025-08-03)
 - ✅ **Erweiterte Newsletter-Quellen**: 23 authentische MedTech-Newsletter-Quellen mit Premium-Anbietern (Emergo by UL, KPMG, McKinsey, PwC, BioWorld, FierceBiotech, MassDevice, Regulatory Focus, etc.) inkl. Anmeldedaten-Management (2025-08-03)
+- ✅ **Newsletter-Quellen vollständig sichtbar**: Alle 23 Newsletter-Quellen (12 aktiv, 11 konfiguriert) werden in 3-Spalten Grid mit Scroll-Bereich in Datenerfassung angezeigt (2025-08-03)
 
 ### Performance Optimierungen (Updated 2025-08-01)
 - ✅ **Lazy Loading**: Alle Seiten außer Dashboard per Lazy Loading geladen
