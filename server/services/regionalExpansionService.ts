@@ -143,70 +143,9 @@ export class RegionalExpansionService {
     }
   }
 
+  // ALLE MOCK-DATEN ENTFERNT - Nur echte APIs verwenden
   private getMockRegionalData(url: string): RegionalUpdate[] {
-    const mockData: Record<string, RegionalUpdate[]> = {
-      'mfds-korea': [
-        {
-          authorityId: 'mfds-korea',
-          title: 'MFDS Medical Device Approval - Advanced Cardiac Monitor',
-          content: 'The Ministry of Food and Drug Safety has approved a new advanced cardiac monitoring system for clinical use in Korean hospitals.',
-          type: 'Device Approval',
-          publishedAt: new Date('2024-01-20'),
-          language: 'ko',
-          translatedContent: 'South Korean regulatory approval for innovative cardiac monitoring technology'
-        },
-        {
-          authorityId: 'mfds-korea',
-          title: 'MFDS Safety Alert - Insulin Pump Recall',
-          content: 'Safety alert issued for specific insulin pump models due to software malfunction affecting dosage accuracy.',
-          type: 'Safety Alert',
-          publishedAt: new Date('2024-01-18'),
-          language: 'ko',
-          translatedContent: 'Korean FDA issues safety alert for insulin pump devices'
-        }
-      ],
-      'thailand-fda': [
-        {
-          authorityId: 'thailand-fda',
-          title: 'Thailand FDA Device Registration - Ultrasound System',
-          content: 'New portable ultrasound system registered for use in Thai medical facilities.',
-          type: 'Device Registration',
-          publishedAt: new Date('2024-01-22'),
-          language: 'th',
-          translatedContent: 'Thailand approves portable ultrasound system for medical use'
-        }
-      ],
-      'saudi-fda': [
-        {
-          authorityId: 'saudi-fda',
-          title: 'SFDA MDMA Registration - Robotic Surgery System',
-          content: 'Saudi FDA approves advanced robotic surgery system for use in Saudi hospitals.',
-          type: 'MDMA Registration',
-          publishedAt: new Date('2024-01-25'),
-          language: 'ar',
-          translatedContent: 'Saudi Arabia approves robotic surgery system for hospital use'
-        }
-      ],
-      'sahpra': [
-        {
-          authorityId: 'sahpra',
-          title: 'SAHPRA Medical Device Registration - Telemedicine Platform',
-          content: 'South African health authority approves telemedicine platform for remote patient monitoring.',
-          type: 'Device Registration',
-          publishedAt: new Date('2024-01-23'),
-          language: 'en',
-          translatedContent: 'South Africa approves telemedicine platform for remote monitoring'
-        }
-      ]
-    };
-
-    // Extract authority ID from URL for mock data
-    for (const [authorityId, data] of Object.entries(mockData)) {
-      if (url.includes(authorityId)) {
-        return data;
-      }
-    }
-
+    console.log(`[Regional] MOCK DATA DELETED - No artificial data for ${url}`);
     return [];
   }
 
@@ -227,12 +166,13 @@ export class RegionalExpansionService {
           const apiData = await this.makeRequest(`${authority.apiUrl}/updates`);
           updates = Array.isArray(apiData) ? apiData : [apiData];
         } catch (error) {
-          console.log(`[Regional] API failed for ${authority.name}, using mock data`);
-          updates = this.getMockRegionalData(authority.id);
+          console.log(`[Regional] API failed for ${authority.name} - NO MOCK DATA FALLBACK`);
+          updates = [];
         }
       } else {
-        // Use mock data for development
-        updates = this.getMockRegionalData(authority.id);
+        // ALLE MOCK-DATEN ENTFERNT - Nur echte APIs verwenden
+        console.log(`[Regional] No API available for ${authority.name} - skipping (no mock data)`);
+        updates = [];
       }
 
       console.log(`[Regional] Found ${updates.length} updates from ${authority.name}`);

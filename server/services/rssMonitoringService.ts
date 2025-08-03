@@ -163,7 +163,7 @@ export class RSSMonitoringService {
         link: this.cleanText(linkMatch?.[1] || ''),
         description: this.cleanText(descriptionMatch?.[1] || ''),
         pubDate: pubDateMatch?.[1] || new Date().toISOString(),
-        guid: guidMatch?.[1] || `rss-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        guid: guidMatch?.[1] || `rss-${Date.now()}-${crypto.randomUUID().substr(0, 9)}`,
         categories,
         author: authorMatch ? this.cleanText(authorMatch[1]) : undefined
       };
