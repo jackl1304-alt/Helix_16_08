@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { FolderSync, Plus, Trash2, Edit, AlertCircle, History, Settings, ExternalLink } from "lucide-react";
+import { FolderSync, Plus, Trash2, Edit, AlertCircle, History, Settings, ExternalLink, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { DataSource } from "@shared/schema";
@@ -66,6 +66,34 @@ export default function DataCollection() {
       toast({
         title: "Dokumentation fehlgeschlagen", 
         description: `Fehler bei der Dokumentation von ${sourceId}: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Newsletter Sync Mutation
+  const newsletterSyncMutation = useMutation({
+    mutationFn: async () => {
+      console.log("Frontend: Starting newsletter sync");
+      const result = await apiRequest('/api/knowledge/extract-newsletters', 'POST');
+      console.log("Frontend: Newsletter sync completed", result);
+      return result;
+    },
+    onSuccess: (data) => {
+      console.log("Frontend: Newsletter sync successful", data);
+      queryClient.invalidateQueries({ queryKey: ["/api/data-sources"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      
+      toast({
+        title: "✅ Newsletter Sync Erfolgreich",
+        description: `${data.stats?.articlesExtracted || 0} Artikel aus ${data.stats?.processedSources || 0} Newsletter-Quellen extrahiert`,
+      });
+    },
+    onError: (error: any) => {
+      console.error("Frontend: Newsletter sync error:", error);
+      toast({
+        title: "Newsletter Sync Fehlgeschlagen",
+        description: `Fehler: ${error.message}`,
         variant: "destructive",
       });
     },
@@ -190,7 +218,21 @@ export default function DataCollection() {
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
           
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <div className="flex gap-2">
+            <Button 
+              onClick={() => newsletterSyncMutation.mutate()}
+              disabled={newsletterSyncMutation.isPending}
+              variant="outline"
+              className="border-blue-200 hover:bg-blue-50"
+            >
+              {newsletterSyncMutation.isPending ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <FolderSync className="h-4 w-4 mr-2" />
+              )}
+              Newsletter Sync
+            </Button>
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
               <Button 
                 onClick={() => setIsAddDialogOpen(true)}
@@ -255,7 +297,8 @@ export default function DataCollection() {
                 </Button>
               </div>
             </DialogContent>
-          </Dialog>
+            </Dialog>
+          </div>
         </div>
 
         <TabsContent value="sources">

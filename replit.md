@@ -53,6 +53,7 @@ Preferred communication style: German language - Simple, everyday language.
 - ✅ **WISSENSDATENBANK VOLLSTÄNDIG BEREINIGT**: Alle Demo-Artikel/Newsletter entfernt, nur noch echte Web-Quellen bei verfügbaren APIs (2025-08-03)
 - ✅ **Newsletter-Admin-Panel implementiert**: Vollständige Verwaltung für authentische Newsletter-Quellen mit Anmeldedaten-Management (2025-08-03)
 - ✅ **Newsletter-System in Datenerfassung integriert**: Authentische MedTech-Newsletter-Quellen vollständig in Sync-Verwaltung und Wissensdatenbank integriert (2025-08-03)
+- ✅ **Newsletter-Sync Buttons hinzugefügt**: Newsletter-Synchronisation sowohl in Datenerfassung als auch im Dashboard Quick Actions integriert (2025-08-03)
 
 ### Performance Optimierungen (Updated 2025-08-01)
 - ✅ **Lazy Loading**: Alle Seiten außer Dashboard per Lazy Loading geladen
