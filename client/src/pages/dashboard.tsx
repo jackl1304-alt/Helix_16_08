@@ -38,11 +38,7 @@ export default function Dashboard() {
     gcTime: 60000,
   });
 
-  const { data: pendingApprovals, error: approvalsError } = useQuery({
-    queryKey: ['/api/approvals/pending'],
-    staleTime: 30000,
-    gcTime: 60000,
-  });
+
 
   const { data: newsletterSources } = useQuery({
     queryKey: ['/api/newsletter-sources'],
@@ -90,9 +86,6 @@ export default function Dashboard() {
   }
   if (updatesError) {
     console.error('[FRONTEND] Updates error:', updatesError);
-  }
-  if (approvalsError) {
-    console.error('[FRONTEND] Approvals error:', approvalsError);
   }
 
   if (isLoading) {
@@ -235,7 +228,7 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Recent Regulatory Updates */}
         <Card>
@@ -351,44 +344,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Pending Approvals */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-indigo-600" />
-              Wartende Genehmigungen
-            </CardTitle>
-            <CardDescription>
-              KI-gestützte Inhaltsvalidierung mit automatischer Genehmigung basierend auf Compliance-Richtlinien und Qualitätskriterien
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {pendingApprovals && pendingApprovals.length > 0 ? (
-              pendingApprovals.slice(0, 5).map((approval: any, index: number) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <div>
-                    <p className="font-medium text-sm">
-                      {approval.itemType === 'newsletter' ? 'Newsletter' : 
-                       approval.itemType === 'article' ? 'Knowledge Article' : approval.itemType}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Angefragt: {new Date(approval.requestedAt).toLocaleDateString('de-DE')}
-                    </p>
-                  </div>
-                  <Badge variant="secondary">
-                    Wartend
-                  </Badge>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-8">
-                <CheckCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">Keine wartenden Genehmigungen</p>
-                <p className="text-sm text-gray-400">Alle Inhalte sind genehmigt</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+
       </div>
 
       {/* Quick Actions */}
