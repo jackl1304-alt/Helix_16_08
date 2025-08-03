@@ -46,18 +46,13 @@ export default function DataCollection() {
       console.log("Frontend: Documentation successful", data);
       queryClient.invalidateQueries({ queryKey: ["/api/data-sources"] });
       
+      const existingDataCount = data?.existingDataCount || 0;
       const newUpdatesFound = data?.newUpdatesCount || 0;
-      if (newUpdatesFound > 0) {
-        toast({
-          title: "✅ Synchronisation erfolgreich",
-          description: `${newUpdatesFound} neue Updates von ${sourceId} gefunden und synchronisiert`,
-        });
-      } else {
-        toast({
-          title: "ℹ️ Synchronisation abgeschlossen",
-          description: `${sourceId} synchronisiert - keine neuen Updates verfügbar`,
-        });
-      }
+      
+      toast({
+        title: "Dokumentation abgeschlossen",
+        description: `${sourceId}: ${existingDataCount} bestehende Updates dokumentiert, ${newUpdatesFound} neue Updates gefunden`,
+      });
     },
     onError: (error, sourceId) => {
       console.error("Frontend: Documentation error:", error);
