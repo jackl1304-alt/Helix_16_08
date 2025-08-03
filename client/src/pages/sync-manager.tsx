@@ -445,7 +445,7 @@ export default function SyncManager() {
                           {update.summary || update.description?.substring(0, 200) + '...' || update.content?.substring(0, 200) + '...'}
                         </p>
                         <div className="flex items-center space-x-4 text-xs text-gray-500">
-                          <span>{update.sourceId}</span>
+                          <span>{update.source_id || update.source || 'FDA'}</span>
                           <span>•</span>
                           <span>{new Date(update.published_at || update.publishedAt || update.created_at).toLocaleDateString('de-DE')}</span>
                           {update.region && (
@@ -458,11 +458,11 @@ export default function SyncManager() {
                           )}
                         </div>
                       </div>
-                      {update.url && (
+                      {(update.url || update.source_url || update.sourceUrl) && (
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => window.open(update.url, '_blank')}
+                          onClick={() => window.open(update.url || update.source_url || update.sourceUrl, '_blank')}
                           className="ml-4"
                         >
                           <ExternalLink className="h-4 w-4" />
