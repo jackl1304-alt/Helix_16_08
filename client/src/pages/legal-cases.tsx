@@ -286,172 +286,125 @@ export default function LegalCases() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30 dark:from-gray-900 dark:via-blue-900/10 dark:to-indigo-900/10">
-      <div className="flex">
-        {/* Enhanced Sidebar */}
-        <div className="w-80 bg-white dark:bg-gray-800 shadow-xl border-r border-gray-200 dark:border-gray-700">
-          <div className="p-6">
-            <div className="flex items-center space-x-3 mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                <div className="text-white font-bold text-lg">⚖️</div>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">HELIX</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Legal Intelligence</p>
-              </div>
+      <div className={cn(
+        "space-y-6",
+        device.isMobile ? "p-4" : device.isTablet ? "p-6" : "p-8"
+      )}>
+        {/* Enhanced Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center space-x-3 mb-2">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                ⚖️ MedTech Rechtssprechung
+              </h1>
+              <Badge className="bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900 dark:text-purple-300">
+                Erweitert
+              </Badge>
             </div>
-            
-            <div className="space-y-4">
-              <Button 
-                onClick={() => syncMutation.mutate()}
-                disabled={isSyncing || syncMutation.isPending}
-                variant="outline"
-                className="w-full justify-start hover:bg-blue-50 hover:border-blue-300 dark:hover:bg-blue-900/20"
-              >
-                {(isSyncing || syncMutation.isPending) ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
-                    Synchronisiere...
-                  </>
-                ) : (
-                  <>
-                    <Download className="h-4 w-4 mr-2" />
-                    Daten synchronisieren
-                  </>
-                )}
-              </Button>
-              
-              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
-                  Statistiken
-                </div>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Gesamte Fälle</span>
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                      {legalData.length}
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Gefiltert</span>
-                    <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                      {filteredData.length}
-                    </Badge>
-                  </div>
-                  {isLoadingData && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Status</span>
-                      <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
-                        Lädt...
-                      </Badge>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+            <p className="text-lg text-gray-600 dark:text-gray-400">
+              {isLoadingData ? (
+                <span className="flex items-center">
+                  <Clock className="w-4 h-4 mr-2 animate-pulse" />
+                  Lade Gerichtsentscheidungen und juristische Präzedenzfälle...
+                </span>
+              ) : (
+                `${filteredData.length} von ${legalData.length} Gerichtsentscheidungen und juristische Präzedenzfälle`
+              )}
+            </p>
           </div>
+          <Button 
+            onClick={() => syncMutation.mutate()}
+            disabled={isSyncing || syncMutation.isPending}
+            className="min-w-[180px] bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+          >
+            {(isSyncing || syncMutation.isPending) ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Synchronisiere...
+              </>
+            ) : (
+              <>
+                <Download className="h-4 w-4 mr-2" />
+                Daten synchronisieren
+              </>
+            )}
+          </Button>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 p-8">
-          <div className="max-w-7xl mx-auto">
-            {/* Enhanced Header */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+        {/* Enhanced Filter Controls */}
+        <Card className="shadow-lg border-l-4 border-l-purple-500">
+          <CardHeader className="pb-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-t-lg">
+            <CardTitle className="text-xl font-semibold flex items-center">
+              <Search className="w-5 h-5 mr-2 text-purple-600" />
+              Erweiterte Filteroptionen
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <div className="flex items-center space-x-3 mb-2">
-                  <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                    ⚖️ MedTech Rechtssprechung
-                  </h1>
-                  <Badge className="bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900 dark:text-purple-300">
-                    Erweitert
-                  </Badge>
-                </div>
-                <p className="text-lg text-gray-600 dark:text-gray-400">
-                  {isLoadingData ? (
-                    <span className="flex items-center">
-                      <Clock className="w-4 h-4 mr-2 animate-pulse" />
-                      Lade Gerichtsentscheidungen und juristische Präzedenzfälle...
-                    </span>
-                  ) : (
-                    `${filteredData.length} von ${legalData.length} Gerichtsentscheidungen und juristische Präzedenzfälle`
-                  )}
-                </p>
+                <label className="text-sm font-medium">Rechtsquelle</label>
+                <Select value={selectedSource} onValueChange={setSelectedSource}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Quelle wählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.isArray(legalSources) ? legalSources.map((source: any) => (
+                      <SelectItem key={source.id} value={source.id}>
+                        {source.name} ({source.jurisdiction})
+                      </SelectItem>
+                    )) : null}
+                  </SelectContent>
+                </Select>
               </div>
-            </div>
-
-            {/* Enhanced Filter Controls */}
-            <Card className="mb-8 shadow-lg border-l-4 border-l-purple-500">
-              <CardHeader className="pb-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-t-lg">
-                <CardTitle className="text-xl font-semibold flex items-center">
-                  <Search className="w-5 h-5 mr-2 text-purple-600" />
-                  Erweiterte Filteroptionen
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-              <label className="text-sm font-medium">Rechtsquelle</label>
-              <Select value={selectedSource} onValueChange={setSelectedSource}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Quelle wählen" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Array.isArray(legalSources) ? legalSources.map((source: any) => (
-                    <SelectItem key={source.id} value={source.id}>
-                      {source.name} ({source.jurisdiction})
-                    </SelectItem>
-                  )) : null}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <label className="text-sm font-medium">Startdatum</label>
-              <Input
-                type="date"
-                value={dateRange.start}
-                onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-              />
-            </div>
-            
-            <div>
-              <label className="text-sm font-medium">Enddatum</label>
-              <Input
-                type="date"
-                value={dateRange.end}
-                onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-              />
-            </div>
-            
-            <div>
-              <label className="text-sm font-medium">Suche</label>
-              <div className="relative">
-                <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
+              
+              <div>
+                <label className="text-sm font-medium">Startdatum</label>
                 <Input
-                  placeholder="Fall, Gericht oder Entscheidung suchen..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  type="date"
+                  value={dateRange.start}
+                  onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
                 />
               </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Statistics */}
-      {report && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Scale className="h-8 w-8 text-blue-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Gesamte Fälle</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{legalData?.length || 0}</p>
+              
+              <div>
+                <label className="text-sm font-medium">Enddatum</label>
+                <Input
+                  type="date"
+                  value={dateRange.end}
+                  onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+                />
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium">Suche</label>
+                <div className="relative">
+                  <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
+                  <Input
+                    placeholder="Fall, Gericht oder Entscheidung suchen..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Statistics */}
+        {report && (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200">
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <Scale className="h-8 w-8 text-blue-600" />
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Gesamte Fälle</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{legalData?.length || 0}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           
           <Dialog>
             <DialogTrigger asChild>
@@ -591,30 +544,30 @@ export default function LegalCases() {
             </DialogContent>
           </Dialog>
           
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Globe className="h-8 w-8 text-green-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Sprachen</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                    {report?.languageDistribution ? Object.keys(report.languageDistribution).length : 0}
-                  </p>
+            <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200">
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <Globe className="h-8 w-8 text-green-600" />
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Sprachen</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                      {report?.languageDistribution ? Object.keys(report.languageDistribution).length : 0}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-            </div>
-          )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
-            {/* Enhanced Main Content Tabs */}
-            <Tabs defaultValue="cases" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="cases">Rechtsfälle</TabsTrigger>
-          <TabsTrigger value="analysis">Rechtssprechungsanalyse</TabsTrigger>
-          <TabsTrigger value="changes">Änderungen</TabsTrigger>
-          <TabsTrigger value="analytics">Analyse</TabsTrigger>
-        </TabsList>
+        {/* Enhanced Main Content Tabs */}
+        <Tabs defaultValue="cases" className="w-full">
+          <TabsList className="grid w-full grid-cols-4 bg-gradient-to-r from-gray-100 to-blue-100 dark:from-gray-800 dark:to-blue-900/30">
+            <TabsTrigger value="cases" className="data-[state=active]:bg-white data-[state=active]:shadow-lg">Rechtsfälle</TabsTrigger>
+            <TabsTrigger value="analysis" className="data-[state=active]:bg-white data-[state=active]:shadow-lg">Rechtssprechungsanalyse</TabsTrigger>
+            <TabsTrigger value="changes" className="data-[state=active]:bg-white data-[state=active]:shadow-lg">Änderungen</TabsTrigger>
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-white data-[state=active]:shadow-lg">Analyse</TabsTrigger>
+          </TabsList>
 
               <TabsContent value="cases">
                 <Card className="shadow-lg">
@@ -1227,8 +1180,6 @@ Unternehmen sollten eine proaktive Strategie entwickeln, um den neuen rechtliche
           </div>
         </TabsContent>
             </Tabs>
-          </div>
-        </div>
       </div>
     </div>
   );
