@@ -83,11 +83,11 @@ export default function SyncManager() {
   useEffect(() => {
     setLiveStats({
       lastSync: "vor 2 Minuten",
-      runningSyncs: syncAllMutation.isPending ? 46 : 0,
+      runningSyncs: 0,
       newUpdates: "5000+",
       activeSources: dataSources.filter(s => s.isActive).length || 46
     });
-  }, [dataSources, syncAllMutation.isPending]);
+  }, [dataSources]);
 
   const syncMutation = useMutation({
     mutationFn: async (sourceId: string) => {

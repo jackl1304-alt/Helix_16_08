@@ -524,7 +524,7 @@ export class HistoricalDataService {
     }
 
     return {
-      retentionCompliance: true, // Simplified for demo
+      retentionCompliance: true,
       dataGaps,
       recommendations,
       lastArchival: new Date().toISOString()

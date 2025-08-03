@@ -68,8 +68,8 @@ export class EUDAMEDService {
       return data;
     } catch (error) {
       console.error(`[EUDAMED] Request failed:`, error);
-      // Return mock data for development until real API is available
-      return this.getMockEUDAMEDData(endpoint);
+      // Return empty array until real API is available
+      return { data: [], message: 'EUDAMED API not yet available' };
     }
   }
 

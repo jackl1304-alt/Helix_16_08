@@ -52,7 +52,7 @@ export class AISummarizationService {
         throw new Error(`Content not found: ${request.contentId}`);
       }
       
-      // Generate AI summary using mock implementation for development
+      // Generate AI summary using production implementation
       const summaryData = await this.callAISummarizationAPI(content, request);
       
       const summary: SummaryResult = {

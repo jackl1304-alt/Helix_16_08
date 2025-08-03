@@ -138,8 +138,8 @@ export class RegionalExpansionService {
       }
     } catch (error) {
       console.error(`[Regional] Request failed for ${url}:`, error);
-      // Return mock data for development
-      return this.getMockRegionalData(url);
+      // Return empty array until real API is available
+      return [];
     }
   }
 
