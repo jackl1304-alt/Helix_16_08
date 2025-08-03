@@ -2826,7 +2826,7 @@ Status: Archiviertes historisches Dokument
   // JAMA Network Article Extraction
   app.post('/api/knowledge/extract-jama', async (req, res) => {
     try {
-      logger.info('API: Starting JAMA Network article extraction');
+      console.log('API: Starting JAMA Network article extraction');
       
       await jamaScrapingService.saveArticlesToKnowledgeBase();
       
@@ -2836,7 +2836,7 @@ Status: Archiviertes historisches Dokument
         timestamp: new Date().toISOString()
       });
     } catch (error: any) {
-      logger.error('API: JAMA Network extraction failed', error);
+      console.error('API: JAMA Network extraction failed:', error);
       res.status(500).json({ 
         success: false, 
         message: error.message || 'Failed to extract JAMA Network articles'
@@ -2847,7 +2847,7 @@ Status: Archiviertes historisches Dokument
   // Universal Knowledge Extraction - All Sources
   app.post('/api/knowledge/extract-all-sources', async (req, res) => {
     try {
-      logger.info('API: Starting universal knowledge extraction from all sources');
+      console.log('API: Starting universal knowledge extraction from all sources');
       
       const stats = await universalExtractor.extractFromAllSources();
       
@@ -2858,7 +2858,7 @@ Status: Archiviertes historisches Dokument
         timestamp: new Date().toISOString()
       });
     } catch (error: any) {
-      logger.error('API: Universal knowledge extraction failed', error);
+      console.error('API: Universal knowledge extraction failed:', error);
       res.status(500).json({ 
         success: false, 
         message: error.message || 'Failed to extract from all sources'
@@ -2869,7 +2869,7 @@ Status: Archiviertes historisches Dokument
   // Newsletter Extraction - MedTech Information Sources
   app.post('/api/knowledge/extract-newsletters', async (req, res) => {
     try {
-      logger.info('API: Starting newsletter extraction from MedTech information sources');
+      console.log('API: Starting newsletter extraction from MedTech information sources');
       
       const { NewsletterExtractionService } = await import('./services/newsletterExtractionService');
       const newsletterService = new NewsletterExtractionService();
@@ -2883,7 +2883,7 @@ Status: Archiviertes historisches Dokument
         timestamp: new Date().toISOString()
       });
     } catch (error: any) {
-      logger.error('API: Newsletter extraction failed', error);
+      console.error('API: Newsletter extraction failed:', error);
       res.status(500).json({ 
         success: false, 
         message: error.message || 'Failed to extract newsletter content'
@@ -2900,7 +2900,7 @@ Status: Archiviertes historisches Dokument
       const status = await newsletterService.getNewsletterSourcesStatus();
       res.json(status);
     } catch (error: any) {
-      logger.error('API: Failed to get newsletter sources status', error);
+      console.error('API: Failed to get newsletter sources status:', error);
       res.status(500).json({ 
         success: false, 
         message: error.message || 'Failed to get newsletter sources status'
