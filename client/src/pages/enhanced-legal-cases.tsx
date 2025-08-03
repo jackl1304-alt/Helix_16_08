@@ -38,6 +38,14 @@ export default function EnhancedLegalCases() {
       
       console.log("Legal Cases - Raw data:", data.length, "cases loaded");
       console.log("Sample case structure:", data[0] ? Object.keys(data[0]) : "No data");
+      console.log("First 3 cases content preview:", data.slice(0, 3).map(c => ({
+        id: c.id,
+        title: c.title,
+        summaryPreview: c.summary?.substring(0, 100) + "...",
+        contentPreview: c.content?.substring(0, 100) + "...",
+        summaryLength: c.summary?.length,
+        contentLength: c.content?.length
+      })));
       return data;
     }
   });
@@ -280,6 +288,9 @@ export default function EnhancedLegalCases() {
                         <p className="text-gray-700 text-sm">
                           {legalCase.summary ? legalCase.summary.substring(0, 300) + '...' : 'Keine Kurzbeschreibung verfügbar'}
                         </p>
+                        <p className="text-xs text-gray-500 mt-2">
+                          Fall-ID: {legalCase.id} | Länge: {legalCase.summary?.length || 0} Zeichen
+                        </p>
                       </div>
                     </div>
                   </TabsContent>
@@ -296,7 +307,8 @@ export default function EnhancedLegalCases() {
                         </div>
                       </div>
                       <p className="text-xs text-blue-600 mt-2">
-                        Länge: {legalCase.summary?.length || 0} Zeichen
+                        Fall-ID: {legalCase.id} | Länge: {legalCase.summary?.length || 0} Zeichen | 
+                        Einzigartig: {legalCase.summary?.substring(0, 50)}...
                       </p>
                     </div>
                   </TabsContent>
@@ -313,7 +325,8 @@ export default function EnhancedLegalCases() {
                         </div>
                       </div>
                       <p className="text-xs text-yellow-600 mt-2">
-                        Länge: {legalCase.content?.length || 0} Zeichen | Quelle: Originaldatenbank
+                        Fall-ID: {legalCase.id} | Länge: {legalCase.content?.length || 0} Zeichen | 
+                        Quelle: Originaldatenbank | Einzigartig: {legalCase.content?.substring(0, 50)}...
                       </p>
                     </div>
                   </TabsContent>
