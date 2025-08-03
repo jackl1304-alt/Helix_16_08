@@ -332,11 +332,11 @@ export default function LegalCases() {
         </div>
 
         {/* Enhanced Filter Controls */}
-        <Card className="shadow-lg border-l-4 border-l-purple-500">
-          <CardHeader className="pb-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-t-lg">
+        <Card className="shadow-lg border-l-4 border-l-red-500">
+          <CardHeader className="pb-4 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-t-lg">
             <CardTitle className="text-xl font-semibold flex items-center">
-              <Search className="w-5 h-5 mr-2 text-purple-600" />
-              Erweiterte Filteroptionen
+              <Search className="w-5 h-5 mr-2 text-red-600" />
+              Suche & Filter
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
@@ -394,10 +394,10 @@ export default function LegalCases() {
         {/* Statistics */}
         {report && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200">
+            <Card className="bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 border-red-200">
               <CardContent className="p-6">
                 <div className="flex items-center">
-                  <Scale className="h-8 w-8 text-blue-600" />
+                  <Scale className="h-8 w-8 text-red-600" />
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Gesamte Fälle</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{legalData?.length || 0}</p>
@@ -544,10 +544,10 @@ export default function LegalCases() {
             </DialogContent>
           </Dialog>
           
-            <Card className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200">
+            <Card className="bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 border-red-200">
               <CardContent className="p-6">
                 <div className="flex items-center">
-                  <Globe className="h-8 w-8 text-blue-600" />
+                  <Globe className="h-8 w-8 text-red-600" />
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Sprachen</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -565,21 +565,21 @@ export default function LegalCases() {
           <TabsList className="grid w-full grid-cols-5 h-14 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1">
             <TabsTrigger 
               value="cases" 
-              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
+              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-red-50 data-[state=active]:text-red-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-red-900/20 dark:data-[state=active]:text-red-300"
             >
               <Gavel className="h-4 w-4" />
               Übersicht
             </TabsTrigger>
             <TabsTrigger 
               value="analysis" 
-              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
+              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-red-50 data-[state=active]:text-red-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-red-900/20 dark:data-[state=active]:text-red-300"
             >
               <Brain className="h-4 w-4" />
               Zusammenfassung
             </TabsTrigger>
             <TabsTrigger 
               value="content" 
-              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
+              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-red-50 data-[state=active]:text-red-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-red-900/20 dark:data-[state=active]:text-red-300"
             >
               <FileText className="h-4 w-4" />
               Vollständiger Inhalt
@@ -593,7 +593,7 @@ export default function LegalCases() {
             </TabsTrigger>
             <TabsTrigger 
               value="metadata" 
-              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
+              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-red-50 data-[state=active]:text-red-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-red-900/20 dark:data-[state=active]:text-red-300"
             >
               <Globe className="h-4 w-4" />
               Metadaten
@@ -602,7 +602,7 @@ export default function LegalCases() {
 
           <TabsContent value="cases" className="mt-6">
             <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 border-b">
+              <CardHeader className="bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/10 dark:to-red-800/10 border-b">
                 <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
                   Rechtsfälle Übersicht
                 </CardTitle>
@@ -619,7 +619,7 @@ export default function LegalCases() {
                     ) : (
                       <div className="space-y-4">
                         {filteredData.map((record) => (
-                          <Card key={record.id} className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-blue-500">
+                          <Card key={record.id} className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-red-500">
                             <CardContent className="p-6">
                               <div className="flex justify-between items-start mb-4">
                                 <div className="flex-1">
@@ -1043,7 +1043,7 @@ Hersteller sollten ihre aktuellen Compliance-Prozesse überprüfen und gegebenen
                             </div>
 
                             {/* AI Impact Analysis */}
-                            <div className="bg-blue-50 p-4 rounded-lg">
+                            <div className="bg-red-50 p-4 rounded-lg">
                               <h4 className="font-semibold mb-2 flex items-center gap-2">
                                 <Brain className="h-4 w-4" />
                                 KI-Auswirkungsanalyse
