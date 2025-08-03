@@ -54,20 +54,26 @@ const FormattedText = ({ text, className = "" }: { text: string; className?: str
 interface RegulatoryUpdate {
   id: string;
   title: string;
-  content: string;
+  content?: string;
+  description?: string;
   summary?: string;
-  authority: string;
+  source_id?: string;
+  authority?: string;
   region: string;
-  type: string;
-  status: string;
+  type?: string;
+  update_type?: string;
+  status?: string;
   priority: string;
-  language: string;
+  language?: string;
   published_at: string;
   effective_date?: string;
   created_at: string;
   tags?: string[];
   source_url?: string;
   document_url?: string;
+  device_classes?: any[];
+  categories?: any;
+  raw_data?: any;
 }
 
 export default function RegulatoryUpdatesPage() {
@@ -82,34 +88,44 @@ export default function RegulatoryUpdatesPage() {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedPriority, setSelectedPriority] = useState('all');
 
-  // Fetch regulatory updates
-  const { data: updatesData, isLoading: isLoadingData, error: dataError } = useQuery({
-    queryKey: ['/api/regulatory-updates'],
+  // Fetch regulatory updates - use the same endpoint as the old page
+  const { data: updatesResponse, isLoading: isLoadingData, error: dataError } = useQuery({
+    queryKey: ['/api/regulatory-updates/recent?limit=5000'],
     staleTime: 300000, // 5 minutes
   });
 
-  // Process updates data
+  // Process updates data - handle the API response structure
   const updates: RegulatoryUpdate[] = useMemo(() => {
-    if (!updatesData) return [];
-    if (Array.isArray(updatesData)) return updatesData;
-    if (updatesData && typeof updatesData === 'object' && 'updates' in updatesData) {
-      return Array.isArray(updatesData.updates) ? updatesData.updates : [];
+    if (!updatesResponse) return [];
+    
+    // Handle the API response structure: {success: boolean, data: array, timestamp: string}
+    if (updatesResponse && typeof updatesResponse === 'object') {
+      if ('data' in updatesResponse && Array.isArray(updatesResponse.data)) {
+        return updatesResponse.data;
+      }
+      if ('success' in updatesResponse && updatesResponse.success && 'data' in updatesResponse) {
+        return Array.isArray(updatesResponse.data) ? updatesResponse.data : [];
+      }
     }
+    
+    // Fallback: if it's already an array
+    if (Array.isArray(updatesResponse)) return updatesResponse;
+    
     return [];
-  }, [updatesData]);
+  }, [updatesResponse]);
 
   // Filter updates
   const filteredData = useMemo(() => {
     return updates.filter(update => {
       const matchesSearch = !searchTerm || 
-        update.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        update.authority.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        update.content?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        update.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (update.authority || update.source_id || '')?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (update.content || update.description || '')?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         update.summary?.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesRegion = selectedRegion === "all" || update.region === selectedRegion;
-      const matchesAuthority = selectedAuthority === "all" || update.authority === selectedAuthority;
-      const matchesType = selectedType === "all" || update.type === selectedType;
+      const matchesAuthority = selectedAuthority === "all" || (update.authority || update.source_id) === selectedAuthority;
+      const matchesType = selectedType === "all" || (update.type || update.update_type) === selectedType;
       const matchesStatus = selectedStatus === "all" || update.status === selectedStatus;
       const matchesPriority = selectedPriority === "all" || update.priority === selectedPriority;
       
@@ -117,12 +133,12 @@ export default function RegulatoryUpdatesPage() {
     });
   }, [updates, searchTerm, selectedRegion, selectedAuthority, selectedType, selectedStatus, selectedPriority]);
 
-  // Get unique values for filters
-  const regions = useMemo(() => [...new Set(updates.map(u => u.region))], [updates]);
-  const authorities = useMemo(() => [...new Set(updates.map(u => u.authority))], [updates]);
-  const types = useMemo(() => [...new Set(updates.map(u => u.type))], [updates]);
-  const statuses = useMemo(() => [...new Set(updates.map(u => u.status))], [updates]);
-  const priorities = useMemo(() => [...new Set(updates.map(u => u.priority))], [updates]);
+  // Get unique values for filters - handle optional fields safely
+  const regions = useMemo(() => [...new Set(updates.map(u => u.region).filter(Boolean))], [updates]);
+  const authorities = useMemo(() => [...new Set(updates.map(u => u.authority || u.source_id).filter(Boolean))], [updates]);
+  const types = useMemo(() => [...new Set(updates.map(u => u.type || u.update_type).filter(Boolean))], [updates]);
+  const statuses = useMemo(() => [...new Set(updates.map(u => u.status).filter(Boolean))], [updates]);
+  const priorities = useMemo(() => [...new Set(updates.map(u => u.priority).filter(Boolean))], [updates]);
 
   // Priority badge styling
   const getPriorityBadgeStyle = (priority: string) => {
@@ -452,7 +468,7 @@ export default function RegulatoryUpdatesPage() {
                               <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400 mb-3">
                                 <span className="flex items-center">
                                   <Globe className="w-4 h-4 mr-1" />
-                                  {update.authority}
+                                  {update.authority || update.source_id || 'Unbekannte Quelle'}
                                 </span>
                                 <span className="flex items-center">
                                   <FileText className="w-4 h-4 mr-1" />
@@ -472,13 +488,13 @@ export default function RegulatoryUpdatesPage() {
                               
                               <div className="flex items-center space-x-2 mb-3">
                                 <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                                  {update.type}
+                                  {update.type || update.update_type || 'Unbekannt'}
                                 </Badge>
                                 <Badge 
                                   variant="secondary" 
-                                  className={getStatusBadgeStyle(update.status)}
+                                  className={getStatusBadgeStyle(update.status || 'unbekannt')}
                                 >
-                                  {update.status}
+                                  {update.status || 'Unbekannt'}
                                 </Badge>
                                 <Badge 
                                   variant="outline" 
@@ -487,12 +503,12 @@ export default function RegulatoryUpdatesPage() {
                                   {update.priority}
                                 </Badge>
                                 <Badge variant="outline" className="text-gray-600">
-                                  {update.language}
+                                  {update.language || 'DE'}
                                 </Badge>
                               </div>
 
                               <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-                                {update.summary || update.content.substring(0, 300) + '...'}
+                                {update.summary || update.description || (update.content ? update.content.substring(0, 300) + '...' : 'Keine Beschreibung verfügbar')}
                               </p>
 
                               {update.tags && update.tags.length > 0 && (
@@ -534,12 +550,12 @@ export default function RegulatoryUpdatesPage() {
                                     <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
                                       <h4 className="font-semibold mb-3">Update-Informationen</h4>
                                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                                        <div><strong>Behörde:</strong> {update.authority}</div>
+                                        <div><strong>Behörde:</strong> {update.authority || update.source_id || 'Unbekannt'}</div>
                                         <div><strong>Region:</strong> {update.region}</div>
-                                        <div><strong>Typ:</strong> {update.type}</div>
-                                        <div><strong>Status:</strong> {update.status}</div>
+                                        <div><strong>Typ:</strong> {update.type || update.update_type || 'Unbekannt'}</div>
+                                        <div><strong>Status:</strong> {update.status || 'Unbekannt'}</div>
                                         <div><strong>Priorität:</strong> {update.priority}</div>
-                                        <div><strong>Sprache:</strong> {update.language}</div>
+                                        <div><strong>Sprache:</strong> {update.language || 'DE'}</div>
                                         <div><strong>Veröffentlicht:</strong> {new Date(update.published_at).toLocaleDateString('de-DE')}</div>
                                         {update.effective_date && (
                                           <div><strong>Wirksam ab:</strong> {new Date(update.effective_date).toLocaleDateString('de-DE')}</div>
@@ -548,10 +564,10 @@ export default function RegulatoryUpdatesPage() {
                                     </div>
 
                                     {/* Summary */}
-                                    {update.summary && (
+                                    {(update.summary || update.description) && (
                                       <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border-l-4 border-blue-400">
                                         <h4 className="font-semibold mb-2 text-blue-800 dark:text-blue-300">Zusammenfassung</h4>
-                                        <FormattedText text={update.summary} className="text-sm leading-relaxed" />
+                                        <FormattedText text={update.summary || update.description || ''} className="text-sm leading-relaxed" />
                                       </div>
                                     )}
 
@@ -562,7 +578,7 @@ export default function RegulatoryUpdatesPage() {
                                         Vollständiges Update
                                       </h4>
                                       <div className="prose max-w-none text-sm leading-relaxed">
-                                        <FormattedText text={update.content} />
+                                        <FormattedText text={update.content || update.description || 'Kein Inhalt verfügbar'} />
                                       </div>
                                     </div>
 
@@ -585,12 +601,12 @@ export default function RegulatoryUpdatesPage() {
                                       <Button 
                                         onClick={() => {
                                           try {
-                                            const content = `${update.title}\n\n${update.summary || ''}\n\n${update.content}`;
+                                            const content = `${update.title}\n\n${update.summary || update.description || ''}\n\n${update.content || update.description || 'Kein Inhalt verfügbar'}`;
                                             const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
                                             const url = URL.createObjectURL(blob);
                                             const a = document.createElement('a');
                                             a.href = url;
-                                            a.download = `Regulatorisches_Update_${update.title.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_')}.txt`;
+                                            a.download = `Regulatorisches_Update_${update.title?.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_') || 'update'}.txt`;
                                             document.body.appendChild(a);
                                             a.click();
                                             document.body.removeChild(a);
@@ -624,12 +640,12 @@ export default function RegulatoryUpdatesPage() {
                                 size="sm"
                                 onClick={() => {
                                   try {
-                                    const content = `${update.title}\n\n${update.summary || ''}\n\n${update.content}`;
+                                    const content = `${update.title}\n\n${update.summary || update.description || ''}\n\n${update.content || update.description || 'Kein Inhalt verfügbar'}`;
                                     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
                                     const url = URL.createObjectURL(blob);
                                     const a = document.createElement('a');
                                     a.href = url;
-                                    a.download = `${update.title.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_')}.txt`;
+                                    a.download = `${update.title?.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_') || 'update'}.txt`;
                                     document.body.appendChild(a);
                                     a.click();
                                     document.body.removeChild(a);
