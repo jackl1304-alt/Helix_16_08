@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -39,12 +39,20 @@ function KnowledgeBasePage() {
   const { toast } = useToast();
 
   // Fetch knowledge articles - ECHTE NEWSLETTER-DATEN
-  const { data: realArticlesData, isLoading: articlesLoading } = useQuery({
+  const { data: realArticlesData, isLoading: articlesLoading, error } = useQuery({
     queryKey: ['/api/knowledge-base'],
     staleTime: 300000, // 5 minutes
   });
 
-  const articles: KnowledgeArticle[] = Array.isArray(realArticlesData) ? realArticlesData : [];
+  // Defensive parsing: Handle both array and object responses
+  const articles: KnowledgeArticle[] = React.useMemo(() => {
+    if (!realArticlesData) return [];
+    if (Array.isArray(realArticlesData)) return realArticlesData;
+    if (realArticlesData && typeof realArticlesData === 'object' && 'articles' in realArticlesData) {
+      return Array.isArray(realArticlesData.articles) ? realArticlesData.articles : [];
+    }
+    return [];
+  }, [realArticlesData]);
 
   // Filter articles
   const filteredArticles = articles.filter(article => {
