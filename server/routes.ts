@@ -220,35 +220,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Data source sync endpoint
+  // Optimierte Sync-Endpoint mit Enterprise Error Handling
   app.post("/api/data-sources/:id/sync", async (req, res) => {
+    const { id } = req.params;
+    const { realTime = false, optimized = false } = req.body || {};
+    
     try {
-      const { id } = req.params;
-      console.log(`Starting real sync for data source: ${id}`);
+      console.log(`[API] Starting ${optimized ? 'optimized' : 'standard'} sync for data source: ${id}`);
       
-      // Import and use the data collection service
+      // Performance-optimierte Service-Instanziierung
       const dataCollectionModule = await import("./services/dataCollectionService");
       const dataService = new dataCollectionModule.DataCollectionService();
       
-      // Perform actual sync
-      await dataService.syncDataSource(id);
+      // Performance-Tracking mit detailliertem Monitoring
+      const startTime = Date.now();
+      const memStart = process.memoryUsage();
       
-      // Update the last sync time
-      await storage.updateDataSourceLastSync(id, new Date());
+      // Verwende optimierten Sync-Service
+      const { optimizedSyncService } = await import('./services/optimizedSyncService');
       
-      const result = {
-        success: true,
-        message: `Synchronisation für ${id} erfolgreich abgeschlossen`,
+      const syncResult = await optimizedSyncService.syncDataSourceWithMetrics(id, {
+        realTime,
+        optimized,
+        backgroundProcessing: true,
+        timeout: realTime ? 30000 : 60000 // 30s für realTime, 60s für Standard
+      });
+      
+      const syncDuration = Date.now() - startTime;
+      console.log(`[API] Optimized sync completed for ${id}:`, syncResult.metrics);
+      
+      res.json({
+        success: syncResult.success,
+        sourceId: id,
+        newUpdatesCount: syncResult.newUpdatesCount,
+        existingDataCount: syncResult.existingDataCount,
+        totalProcessed: syncResult.metrics.processedItems,
+        errors: syncResult.errors.length,
+        performanceMetrics: {
+          syncDuration: syncResult.metrics.duration,
+          memoryUsage: syncResult.metrics.memoryDelta,
+          throughput: syncResult.metrics.throughput,
+          errorRate: syncResult.metrics.errors / Math.max(syncResult.metrics.processedItems, 1)
+        },
+        source: await storage.getDataSourceById(id),
+        message: `Optimized sync für ${id} ${syncResult.success ? 'erfolgreich abgeschlossen' : 'mit Fehlern abgeschlossen'}`,
         timestamp: new Date().toISOString()
-      };
+      });
       
-      console.log(`Sync completed for ${id}`);
-      res.json(result);
     } catch (error: any) {
-      console.error("Error syncing data source:", error);
-      res.status(500).json({ 
-        message: "Failed to sync data source", 
-        error: error.message 
+      console.error(`[API] Optimized sync failed for ${id}:`, error);
+      
+      // Strukturierte Error-Response
+      res.status(500).json({
+        success: false,
+        error: {
+          message: error.message,
+          code: error.code || 'SYNC_ERROR',
+          sourceId: id,
+          timestamp: new Date().toISOString()
+        }
       });
     }
   });
