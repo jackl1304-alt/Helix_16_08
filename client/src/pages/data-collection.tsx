@@ -105,30 +105,34 @@ export default function DataCollection() {
     },
   });
 
-  // Regulatory Data Sync Mutation
+  // Regulatory Data Sync Mutation - Nutzt bewährte /api/data-sources/sync-all Route
   const regulatoryDataSyncMutation = useMutation({
     mutationFn: async () => {
-      console.log("Frontend: Starting regulatory data extraction");
-      const result = await apiRequest('/api/knowledge/extract-regulatory', 'POST');
-      console.log("Frontend: Regulatory data extraction completed", result);
+      console.log("Frontend: Starting regulatory data sync using proven sync-all endpoint");
+      const result = await apiRequest('/api/data-sources/sync-all', 'POST');
+      console.log("Frontend: Regulatory data sync completed", result);
       return result;
     },
     onSuccess: (data) => {
       console.log("Frontend: Regulatory data sync successful", data);
       queryClient.invalidateQueries({ queryKey: ["/api/data-sources"] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/knowledge-base"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/regulatory-updates"] });
+      
+      const successful = data.successful || 0;
+      const total = data.total || 0;
+      const newUpdates = data.totalNewUpdates || 0;
       
       toast({
         title: "✅ Regulatorische Daten Synchronisiert",
-        description: `${data.totalEntries || 0} regulatorische Einträge aus ${data.processedSources?.length || 0} Quellen extrahiert`,
+        description: `${successful}/${total} Quellen erfolgreich synchronisiert, ${newUpdates} neue Updates gefunden`,
       });
     },
     onError: (error: any) => {
       console.error("Frontend: Regulatory data sync error:", error);
       toast({
         title: "Regulatorische Synchronisation Fehlgeschlagen",
-        description: `Fehler: ${error.message}`,
+        description: `Fehler: ${error.message || 'Unbekannter Fehler'}`,
         variant: "destructive",
       });
     },
