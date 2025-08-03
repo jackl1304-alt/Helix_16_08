@@ -270,12 +270,7 @@ export default function RegulatoryUpdatesFinal() {
                               Vollständiger Inhalt
                             </h4>
                             
-                            {/* DEBUG INFO */}
-                            <div className="bg-red-100 p-3 rounded mb-4 text-xs">
-                              <strong>DEBUG - Modal Update ID:</strong> {selectedUpdate.id}<br/>
-                              <strong>Title:</strong> {selectedUpdate.title}<br/>
-                              <strong>FullText Length:</strong> {selectedUpdate.fullText?.length || 0}
-                            </div>
+
 
                             {/* DIREKTER VOLLTEXT */}
                             <div className="prose max-w-none">
