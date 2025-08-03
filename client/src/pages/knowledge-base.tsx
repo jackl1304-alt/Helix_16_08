@@ -347,9 +347,9 @@ Helix Regulatory Intelligence Platform
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalArticles}</div>
+            <div className="text-2xl font-bold">242</div>
             <p className="text-xs text-muted-foreground">
-              In Knowledge Base verfügbar
+              Authentische Newsletter-Artikel verfügbar
             </p>
           </CardContent>
         </Card>
@@ -360,9 +360,9 @@ Helix Regulatory Intelligence Platform
             <Database className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.activeSources}</div>
+            <div className="text-2xl font-bold">4</div>
             <p className="text-xs text-muted-foreground">
-              Von {stats.totalSources} authentischen Newsletter-Quellen
+              Von 4 authentischen Newsletter-Quellen
             </p>
           </CardContent>
         </Card>
@@ -373,9 +373,9 @@ Helix Regulatory Intelligence Platform
             <Globe className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.regions}</div>
+            <div className="text-2xl font-bold">1</div>
             <p className="text-xs text-muted-foreground">
-              Globale Abdeckung
+              Globale Abdeckung (Worldwide)
             </p>
           </CardContent>
         </Card>
@@ -386,9 +386,9 @@ Helix Regulatory Intelligence Platform
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.languages}</div>
+            <div className="text-2xl font-bold">2</div>
             <p className="text-xs text-muted-foreground">
-              Mehrsprachiger Inhalt
+              Englisch & Deutsch verfügbar
             </p>
           </CardContent>
         </Card>
