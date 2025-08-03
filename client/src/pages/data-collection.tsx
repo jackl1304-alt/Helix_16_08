@@ -324,7 +324,7 @@ export default function DataCollection() {
                     {newsletterSources?.stats && (
                       <div className="text-sm text-blue-700 text-right">
                         <div className="font-medium">{newsletterSources.stats.activeSources} aktiv</div>
-                        <div className="text-xs">{newsletterSources.stats.totalSources} konfiguriert</div>
+                        <div className="text-xs">{newsletterSources.stats.totalSources} gesamt</div>
                       </div>
                     )}
                     <Button
@@ -345,8 +345,8 @@ export default function DataCollection() {
               </CardHeader>
               <CardContent>
                 {newsletterSources?.sources ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {newsletterSources.sources.slice(0, 8).map((source: any, index: number) => (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96 overflow-y-auto">
+                    {newsletterSources.sources.map((source: any, index: number) => (
                       <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
