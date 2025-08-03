@@ -96,7 +96,6 @@ const navigationStructure: Record<string, NavigationSection> = {
   communication: {
     title: "Kommunikation & Berichte",
     items: [
-      { name: "Newsletter-Verwaltung", href: "/newsletter-manager", icon: Newspaper },
       { name: "Analytics & Reporting", href: "/analytics", icon: TrendingUp },
     ],
     defaultOpen: false
