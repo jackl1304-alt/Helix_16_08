@@ -3121,8 +3121,8 @@ Status: Archiviertes historisches Dokument
       
       const { realNewsletterScraper } = await import('./services/realNewsletterScraper');
       
-      // Echtes Web-Scraping von öffentlich zugänglichen Quellen
-      const scrapedArticles = await realNewsletterScraper.scrapePublicSources();
+      // Echtes Web-Scraping von ALLEN aktiven Quellen (öffentlich + premium mit Fallback)
+      const scrapedArticles = await realNewsletterScraper.scrapeAllSources();
       console.log(`Scraped ${scrapedArticles.length} articles from public sources`);
       
       let totalArticles = 0;
