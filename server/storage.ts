@@ -40,6 +40,7 @@ export interface IStorage {
   getDataSources(): Promise<any[]>;
   getDataSourceByType(type: string): Promise<any>;
   deleteKnowledgeArticle(id: string): Promise<boolean>;
+  countRegulatoryUpdatesBySource(sourceId: string): Promise<number>;
 }
 
 // Direct SQL Storage Implementation for 7AM Morning State
@@ -661,6 +662,19 @@ class MorningStorage implements IStorage {
     } catch (error) {
       console.error('[DB] Error deleting knowledge article:', error);
       return false;
+    }
+  }
+  async countRegulatoryUpdatesBySource(sourceId: string): Promise<number> {
+    try {
+      const result = await sql`
+        SELECT COUNT(*) as count 
+        FROM regulatory_updates 
+        WHERE source_id = ${sourceId} OR source ILIKE ${'%' + sourceId + '%'}
+      `;
+      return parseInt(result[0]?.count || '0');
+    } catch (error) {
+      console.error('[DB ERROR] Count regulatory updates by source failed:', error);
+      return 0;
     }
   }
 }

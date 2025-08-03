@@ -120,13 +120,13 @@ export default function SyncManager() {
         }));
         
         toast({
-          title: "Neue Updates gefunden",
-          description: `${newUpdatesFound} neue Updates von ${sourceId} gefunden`,
+          title: "✅ Synchronisation erfolgreich",
+          description: `${newUpdatesFound} neue Updates von ${sourceId} gefunden und synchronisiert`,
         });
       } else {
         toast({
-          title: "Keine neuen Updates",
-          description: `${sourceId} dokumentiert - keine neuen Daten gefunden`,
+          title: "ℹ️ Synchronisation abgeschlossen",
+          description: `${sourceId} synchronisiert - keine neuen Updates verfügbar`,
         });
       }
       
