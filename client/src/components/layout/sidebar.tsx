@@ -20,7 +20,8 @@ import {
   FileSearch,
   ChevronDown,
   ChevronRight,
-  Mail
+  Mail,
+  Bot
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoPath from "@assets/ICON Helix_1753735921077.jpg";
@@ -39,76 +40,61 @@ interface NavigationSection {
 }
 
 const navigationStructure: Record<string, NavigationSection> = {
-  // 1. Dashboard & Übersicht
-  dashboard: {
-    title: "Übersicht",
+  // 1. ÜBERSICHT & STEUERUNG
+  overview: {
+    title: "ÜBERSICHT & STEUERUNG",
     items: [
       { name: "Dashboard", href: "/", icon: BarChart3 },
+      { name: "Berichte & Analysen", href: "/analytics", icon: TrendingUp },
     ],
     defaultOpen: true
   },
 
-  // 2. Daten & Integrationen 
-  dataIntegrations: {
-    title: "Daten & Integrationen",
+  // 2. DATENMANAGEMENT 
+  dataManagement: {
+    title: "DATENMANAGEMENT",
     items: [
-      { name: "Datenerfassung", href: "/data-collection", icon: Database },
+      { name: "Datenquellen", href: "/data-collection", icon: Database },
+      { name: "Newsletter-Verwaltung", href: "/newsletter-admin", icon: Mail },
+      { name: "Wissensdatenbank", href: "/knowledge-base", icon: Book },
+    ],
+    defaultOpen: true
+  },
+
+  // 3. COMPLIANCE & REGULIERUNG
+  compliance: {
+    title: "COMPLIANCE & REGULIERUNG",
+    items: [
+      { name: "Regulatorische Updates", href: "/regulatory-updates", icon: FileText },
+      { name: "Rechtsprechung", href: "/enhanced-legal-cases", icon: Scale },
+    ],
+    defaultOpen: true
+  },
+
+  // 4. KI & AUTOMATISIERUNG
+  aiAutomation: {
+    title: "KI & AUTOMATISIERUNG",
+    items: [
+      { name: "KI-Erkenntnisse", href: "/ai-insights", icon: Brain },
+      { name: "KI-Bewertung", href: "/ai-approval-test", icon: Bot },
+    ],
+    defaultOpen: true
+  },
+
+  // 5. ERWEITERT (kollabierbar)
+  advanced: {
+    title: "ERWEITERT",
+    items: [
       { name: "Sync-Verwaltung", href: "/sync-manager", icon: RefreshCw },
       { name: "Globale Quellen", href: "/global-sources", icon: Globe },
       { name: "GRIP Integration", href: "/grip-data", icon: Shield },
-    ],
-    defaultOpen: true
-  },
-
-  // 3. Regulatorik & Compliance
-  regulatory: {
-    title: "Regulatorik & Compliance",
-    items: [
-      { name: "Regulatory Updates", href: "/regulatory-updates", icon: FileText },
+      { name: "Newsletter Manager", href: "/newsletter-manager", icon: Newspaper },
       { name: "Genehmigungsprozess", href: "/approval-workflow", icon: CheckCircle },
-    ],
-    defaultOpen: true
-  },
-
-  // 4. Rechtsfälle & Analysen
-  legal: {
-    title: "Rechtsfälle & Analysen",
-    items: [
       { name: "Legal Cases", href: "/legal-cases", icon: Scale },
-      { name: "Erweiterte Analysen", href: "/enhanced-legal-cases", icon: TrendingUp },
-    ],
-    defaultOpen: false
-  },
-
-  // 5. Wissen & KI-Insights
-  knowledge: {
-    title: "Wissen & KI-Insights",
-    items: [
-      { name: "Intelligente Suche", href: "/intelligent-search", icon: Search },
-      { name: "AI Insights", href: "/ai-insights", icon: Brain },
-      { name: "Wissensdatenbank", href: "/knowledge-base", icon: Book },
       { name: "Historische Daten", href: "/historical-data", icon: Archive },
-    ],
-    defaultOpen: false
-  },
-
-  // 6. Kommunikation & Berichte
-  communication: {
-    title: "Kommunikation & Berichte",
-    items: [
-      { name: "Analytics & Reporting", href: "/analytics", icon: TrendingUp },
-    ],
-    defaultOpen: false
-  },
-
-  // 7. Administration & Einstellungen
-  administration: {
-    title: "Administration & Einstellungen",
-    items: [
-      { name: "System-Verwaltung", href: "/administration", icon: Settings },
       { name: "Benutzerverwaltung", href: "/user-management", icon: Users },
+      { name: "System-Verwaltung", href: "/administration", icon: Settings },
       { name: "Datenquellen-Admin", href: "/administration/data-sources", icon: Database },
-      { name: "Newsletter-Verwaltung", href: "/newsletter-admin", icon: Mail },
       { name: "Audit-Protokolle", href: "/audit-logs", icon: FileSearch },
     ],
     defaultOpen: false
