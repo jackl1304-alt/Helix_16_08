@@ -1,112 +1,108 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Eye, FileText, Calendar, Clock, Brain, Download, ExternalLink, Search, Filter, Globe, BarChart3, TrendingUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { 
+  FileText, 
+  Filter, 
+  Globe, 
+  BarChart3, 
+  Calendar,
+  Brain,
+  TrendingUp,
+  Download,
+  ExternalLink,
+  Eye,
+  X
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface RegulatoryUpdate {
   id: string;
   title: string;
-  description?: string;
-  content?: string;
-  fullText?: string;
+  description: string;
   summary?: string;
+  fullText?: string;
+  content?: string;
   source_id?: string;
+  source?: string;
   source_url?: string;
   sourceUrl?: string;
   document_url?: string;
   region: string;
   update_type: string;
-  priority: string;
+  priority: 'high' | 'medium' | 'low';
   device_classes?: string[];
-  categories?: any;
-  raw_data?: any;
+  categories?: Record<string, any>;
   published_at: string;
   created_at: string;
-  source?: string;
-  tags?: string[];
   language?: string;
 }
 
-export default function RegulatoryUpdatesFinal() {
-  const { toast } = useToast();
-  const [selectedUpdate, setSelectedUpdate] = useState<RegulatoryUpdate | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+export default function RegulatoryUpdatesPage() {
   const [selectedRegion, setSelectedRegion] = useState('all');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedSource, setSelectedSource] = useState('all');
+  const [selectedType, setSelectedType] = useState('all');
   const [selectedPriority, setSelectedPriority] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedUpdate, setSelectedUpdate] = useState<RegulatoryUpdate | null>(null);
   const itemsPerPage = 10;
+  const { toast } = useToast();
 
-  // Direkte API-Verbindung
-  const { data: updates = [], isLoading, error } = useQuery({
-    queryKey: ['regulatory-updates-final'],
-    queryFn: async () => {
-      console.log('[FINAL] Fetching updates...');
-      const response = await fetch('/api/regulatory-updates/recent?limit=5000');
-      if (!response.ok) throw new Error('Failed to fetch');
-      const data = await response.json();
-      console.log('[FINAL] Raw response:', data);
-      return data.data || [];
-    },
-    refetchOnWindowFocus: false
+  const { data: updates, isLoading } = useQuery({
+    queryKey: ['/api/regulatory-updates'],
+    select: (data: any) => data?.data || []
   });
 
-  // Filter und Suche - sicherstellen dass updates existiert
-  const filteredUpdates = (updates || []).filter((update: RegulatoryUpdate) => {
-    const matchesSearch = !searchTerm || 
-      update.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      update.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      update.fullText?.toLowerCase().includes(searchTerm.toLowerCase());
+  // Filter-Logik
+  const filteredUpdates = useMemo(() => {
+    if (!updates) return [];
     
-    const matchesRegion = selectedRegion === 'all' || update.region === selectedRegion;
-    
-    const matchesCategory = selectedCategory === 'all' || 
-      update.update_type?.toLowerCase() === selectedCategory.toLowerCase();
-    
-    const matchesSource = selectedSource === 'all' || 
-      update.source_id?.toLowerCase().includes(selectedSource.toLowerCase()) ||
-      update.source?.toLowerCase().includes(selectedSource.toLowerCase());
-    
-    const matchesPriority = selectedPriority === 'all' || 
-      update.priority?.toLowerCase() === selectedPriority.toLowerCase();
-    
-    return matchesSearch && matchesRegion && matchesCategory && matchesSource && matchesPriority;
-  });
+    return updates.filter((update: RegulatoryUpdate) => {
+      const matchesRegion = selectedRegion === 'all' || update.region === selectedRegion;
+      const matchesType = selectedType === 'all' || update.update_type === selectedType;
+      const matchesPriority = selectedPriority === 'all' || update.priority === selectedPriority;
+      const matchesSearch = searchTerm === '' || 
+        update.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        update.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (update.content && update.content.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      return matchesRegion && matchesType && matchesPriority && matchesSearch;
+    });
+  }, [updates, selectedRegion, selectedType, selectedPriority, searchTerm]);
 
   // Paginierung
   const totalPages = Math.ceil(filteredUpdates.length / itemsPerPage);
-  const paginatedUpdates = filteredUpdates.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const paginatedUpdates = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredUpdates.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredUpdates, currentPage, itemsPerPage]);
+
+  // Unique values für Filter
+  const regions = useMemo(() => {
+    if (!updates) return [];
+    return Array.from(new Set(updates.map((u: RegulatoryUpdate) => u.region)));
+  }, [updates]);
+
+  const updateTypes = useMemo(() => {
+    if (!updates) return [];
+    return Array.from(new Set(updates.map((u: RegulatoryUpdate) => u.update_type)));
+  }, [updates]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center py-20">
-            <div className="text-xl">Lade regulatorische Updates...</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center py-20">
-            <div className="text-xl text-red-600">Fehler beim Laden der Updates</div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-400">Lade regulatorische Updates...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -114,43 +110,21 @@ export default function RegulatoryUpdatesFinal() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
-      <div className="max-w-7xl mx-auto">
-        
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
             Regulatorische Updates
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            {filteredUpdates.length} von {updates?.length || 0} Updates verfügbar
+          <p className="text-xl text-gray-600 dark:text-gray-400">
+            Aktuelle Entwicklungen in der Medizintechnik-Regulierung
           </p>
         </div>
 
-        {/* Erweiterte Filteroptionen */}
-        <div className="mb-6 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-6 rounded-xl border border-blue-200 dark:border-blue-700">
-          <div className="flex items-center gap-2 mb-4">
-            <Search className="h-5 w-5 text-blue-600" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Erweiterte Filteroptionen</h3>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kategorie</label>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Alle Kategorien" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle Kategorien</SelectItem>
-                  <SelectItem value="approval">Zulassungen</SelectItem>
-                  <SelectItem value="guidance">Leitfäden</SelectItem>
-                  <SelectItem value="regulation">Verordnungen</SelectItem>
-                  <SelectItem value="alert">Warnungen</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
+        {/* Filter-Bereich */}
+        <div className="mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Region</label>
               <Select value={selectedRegion} onValueChange={setSelectedRegion}>
@@ -159,26 +133,24 @@ export default function RegulatoryUpdatesFinal() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Alle Regionen</SelectItem>
-                  <SelectItem value="Global">Global</SelectItem>
-                  <SelectItem value="Europe">Europa</SelectItem>
-                  <SelectItem value="North America">Nordamerika</SelectItem>
-                  <SelectItem value="Asia">Asien</SelectItem>
+                  {regions.map(region => (
+                    <SelectItem key={region} value={region}>{region}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quelle</label>
-              <Select value={selectedSource} onValueChange={setSelectedSource}>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Typ</label>
+              <Select value={selectedType} onValueChange={setSelectedType}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Alle Quellen" />
+                  <SelectValue placeholder="Alle Typen" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Alle Quellen</SelectItem>
-                  <SelectItem value="EMA">EMA</SelectItem>
-                  <SelectItem value="FDA">FDA</SelectItem>
-                  <SelectItem value="BfArM">BfArM</SelectItem>
-                  <SelectItem value="Swissmedic">Swissmedic</SelectItem>
+                  <SelectItem value="all">Alle Typen</SelectItem>
+                  {updateTypes.map(type => (
+                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -191,7 +163,6 @@ export default function RegulatoryUpdatesFinal() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Alle Prioritäten</SelectItem>
-                  <SelectItem value="critical">Kritisch</SelectItem>
                   <SelectItem value="high">Hoch</SelectItem>
                   <SelectItem value="medium">Mittel</SelectItem>
                   <SelectItem value="low">Niedrig</SelectItem>
@@ -266,7 +237,7 @@ export default function RegulatoryUpdatesFinal() {
           </Card>
         </div>
 
-        {/* Main Content Tabs - Direkt in der Frontansicht */}
+        {/* Haupt-Tab-Navigation - Direkt in der Frontansicht */}
         <Tabs defaultValue="updates" className="w-full">
           <TabsList className="grid w-full grid-cols-6 h-14 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1">
             <TabsTrigger 
@@ -313,6 +284,7 @@ export default function RegulatoryUpdatesFinal() {
             </TabsTrigger>
           </TabsList>
 
+          {/* Tab 1: Übersicht */}
           <TabsContent value="updates" className="mt-6">
             <Card className="border-2 border-blue-200 shadow-lg bg-white dark:bg-gray-900">
               <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-b border-blue-200">
@@ -325,88 +297,60 @@ export default function RegulatoryUpdatesFinal() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
-                  <div className="space-y-4">
-                    <div className="space-y-3">
-          {paginatedUpdates.map((update: RegulatoryUpdate) => (
-            <Card key={update.id} className="p-4 hover:shadow-lg transition-all duration-200 border border-blue-200 dark:border-blue-700 bg-gradient-to-r from-blue-50/30 to-white dark:from-blue-900/10 dark:to-gray-800 rounded-lg shadow-sm">
-              <CardContent className="p-0">
-                <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    {update.title}
-                  </h3>
-                  
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-                      {update.region}
-                    </Badge>
-                    <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-                      {update.update_type}
-                    </Badge>
-                    <Badge variant="outline" className={cn(
-                      "text-xs border",
-                      update.priority === 'high' ? "bg-red-50 text-red-700 border-red-200" :
-                      update.priority === 'medium' ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
-                      "bg-gray-50 text-gray-700 border-gray-200"
-                    )}>
-                      {update.priority}
-                    </Badge>
-                  </div>
+                <div className="space-y-4">
+                  {paginatedUpdates.map((update: RegulatoryUpdate) => (
+                    <Card key={update.id} className="p-4 hover:shadow-lg transition-all duration-200 border border-blue-200 dark:border-blue-700 bg-gradient-to-r from-blue-50/30 to-white dark:from-blue-900/10 dark:to-gray-800 rounded-lg shadow-sm">
+                      <CardContent className="p-0">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                              {update.title}
+                            </h3>
+                            
+                            <div className="flex flex-wrap gap-2 mb-2">
+                              <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                                {update.region}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                                {update.update_type}
+                              </Badge>
+                              <Badge variant="outline" className={cn(
+                                "text-xs border",
+                                update.priority === 'high' ? "bg-red-50 text-red-700 border-red-200" :
+                                update.priority === 'medium' ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
+                                "bg-gray-50 text-gray-700 border-gray-200"
+                              )}>
+                                {update.priority}
+                              </Badge>
+                            </div>
 
-                  {/* Kompakte Beschreibung */}
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                    {update.description?.split('\n')[0] || update.content?.substring(0, 100) + '...' || 'Keine Beschreibung verfügbar'}
-                  </div>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-3">
+                              {update.description}
+                            </p>
 
-                  {/* Wichtige Punkte anzeigen */}
-                  {update.description?.includes('WICHTIGE ÄNDERUNGEN:') && (
-                    <div className="text-sm space-y-1 mb-2">
-                      {update.description.split('\n').slice(2, 6).map((line, idx) => 
-                        line.trim().startsWith('•') && (
-                          <div key={idx} className="text-gray-700 dark:text-gray-300">{line}</div>
-                        )
-                      )}
-                    </div>
-                  )}
-                  
-                  <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      {new Date(update.published_at).toLocaleDateString('de-DE')}
-                    </div>
-                    {update.source_id && (
-                      <div className="flex items-center gap-1">
-                        <FileText className="h-3 w-3" />
-                        {update.source_id}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="ml-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex items-center gap-2 text-xs"
-                    onClick={() => setSelectedUpdate(update)}
-                  >
-                    <Eye className="h-3 w-3" />
-                    Details anzeigen
-                  </Button>
-                </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-                    </div>
-                  </div>
+                            <div className="flex items-center gap-4 text-xs text-gray-500">
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                {new Date(update.published_at).toLocaleDateString('de-DE')}
+                              </div>
+                              {update.source_id && (
+                                <div className="flex items-center gap-1">
+                                  <FileText className="h-3 w-3" />
+                                  {update.source_id}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* Zusammenfassung Tab - Individuelle Inhalte aller Artikel */}
+          {/* Tab 2: Zusammenfassung */}
           <TabsContent value="summary" className="mt-6">
             <Card className="border-2 border-purple-200 shadow-lg bg-white dark:bg-gray-900">
               <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-b border-purple-200">
@@ -420,7 +364,7 @@ export default function RegulatoryUpdatesFinal() {
               </CardHeader>
               <CardContent className="p-6">
                 <div className="space-y-4">
-                  {paginatedUpdates.map((update: RegulatoryUpdate, index: number) => (
+                  {paginatedUpdates.map((update: RegulatoryUpdate) => (
                     <Card key={update.id} className="p-4 border border-purple-200 dark:border-purple-700 bg-gradient-to-r from-purple-50/30 to-white dark:from-purple-900/10 dark:to-gray-800 rounded-lg">
                       <div className="space-y-3">
                         <div className="flex items-start justify-between">
@@ -449,7 +393,6 @@ export default function RegulatoryUpdatesFinal() {
                           </div>
                         </div>
 
-                        {/* Wichtige Punkte extrahieren */}
                         {update.description?.includes('WICHTIGE ÄNDERUNGEN:') && (
                           <div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-purple-400">
                             <h6 className="font-medium text-purple-700 dark:text-purple-300 mb-2">Wichtige Änderungen</h6>
@@ -465,14 +408,6 @@ export default function RegulatoryUpdatesFinal() {
 
                         <div className="flex items-center justify-between text-xs text-gray-500">
                           <span>Veröffentlicht: {new Date(update.published_at).toLocaleDateString('de-DE')}</span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setSelectedUpdate(update)}
-                            className="text-xs"
-                          >
-                            Details anzeigen
-                          </Button>
                         </div>
                       </div>
                     </Card>
@@ -482,7 +417,7 @@ export default function RegulatoryUpdatesFinal() {
             </Card>
           </TabsContent>
 
-          {/* Vollständiger Inhalt Tab */}
+          {/* Tab 3: Vollständiger Inhalt */}
           <TabsContent value="content" className="mt-6">
             <Card className="border-2 border-blue-200 shadow-lg bg-white dark:bg-gray-900">
               <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-b border-blue-200">
@@ -496,7 +431,7 @@ export default function RegulatoryUpdatesFinal() {
               </CardHeader>
               <CardContent className="p-6">
                 <div className="space-y-6">
-                  {paginatedUpdates.map((update: RegulatoryUpdate, index: number) => (
+                  {paginatedUpdates.map((update: RegulatoryUpdate) => (
                     <Card key={update.id} className="p-6 border border-blue-200 dark:border-blue-700 bg-gradient-to-r from-blue-50/30 to-white dark:from-blue-900/10 dark:to-gray-800 rounded-lg">
                       <div className="space-y-4">
                         <div className="flex items-start justify-between">
@@ -575,7 +510,7 @@ export default function RegulatoryUpdatesFinal() {
             </Card>
           </TabsContent>
 
-          {/* Finanzanalyse Tab */}
+          {/* Tab 4: Finanzanalyse */}
           <TabsContent value="finance" className="mt-6">
             <Card className="border-2 border-orange-200 shadow-lg bg-white dark:bg-gray-900">
               <CardHeader className="bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 border-b border-orange-200">
@@ -645,7 +580,7 @@ export default function RegulatoryUpdatesFinal() {
             </Card>
           </TabsContent>
 
-          {/* KI-Analyse Tab */}
+          {/* Tab 5: KI-Analyse */}
           <TabsContent value="ai-analysis" className="mt-6">
             <Card className="border-2 border-purple-200 shadow-lg bg-white dark:bg-gray-900">
               <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-b border-purple-200">
@@ -728,7 +663,7 @@ export default function RegulatoryUpdatesFinal() {
             </Card>
           </TabsContent>
 
-          {/* Metadaten Tab */}
+          {/* Tab 6: Metadaten */}
           <TabsContent value="metadata" className="mt-6">
             <Card className="border-2 border-gray-200 shadow-lg bg-white dark:bg-gray-900">
               <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20 border-b border-gray-200">
