@@ -43,6 +43,7 @@ const IntelligentSearch = lazy(() => import("@/pages/intelligent-search"));
 const DocumentViewer = lazy(() => import("@/pages/document-viewer"));
 const SyncManager = lazy(() => import("@/pages/sync-manager"));
 const Phase1Integration = lazy(() => import("@/pages/phase1-integration"));
+const AIContentAnalysis = lazy(() => import("@/pages/ai-content-analysis"));
 const Phase2Integration = lazy(() => import("@/pages/phase2-integration"));
 const Phase3Advanced = lazy(() => import("@/pages/phase3-advanced"));
 const RealTimeIntegration = lazy(() => import("@/pages/real-time-integration"));
@@ -91,6 +92,7 @@ function Router() {
         <Route path="/phase1-integration" component={Phase1Integration} />
         <Route path="/phase2-integration" component={Phase2Integration} />
         <Route path="/phase3-advanced" component={Phase3Advanced} />
+        <Route path="/ai-content-analysis" component={AIContentAnalysis} />
         <Route path="/real-time-integration" component={RealTimeIntegration} />
         <Route path="/administration/data-sources" component={DataSourcesAdmin} />
         <Route path="/administration" component={Administration} />
