@@ -59,6 +59,7 @@ interface FDARecall {
 
 export class FDAOpenAPIService {
   private baseUrl = 'https://api.fda.gov';
+  private apiKey = process.env.FDA_API_KEY || '';
   private rateLimitDelay = 250; // 250ms between requests (240 requests/minute limit)
   private maxRetries = 3;
   private retryDelay = 2000; // 2 second retry delay
@@ -74,9 +75,14 @@ export class FDAOpenAPIService {
 
   private async makeRequest(endpoint: string, retryAttempt: number = 0): Promise<any> {
     try {
-      console.log(`🔄 [FDA API] Requesting: ${endpoint} (attempt ${retryAttempt + 1})`);
+      // Add API key as URL parameter if available
+      const urlWithKey = this.apiKey ? 
+        `${endpoint}${endpoint.includes('?') ? '&' : '?'}api_key=${this.apiKey}` : 
+        endpoint;
       
-      const response = await fetch(endpoint, {
+      console.log(`🔄 [FDA API] Requesting: ${urlWithKey.replace(this.apiKey, 'API_KEY_HIDDEN')} (attempt ${retryAttempt + 1})`);
+      
+      const response = await fetch(urlWithKey, {
         headers: {
           'User-Agent': 'Helix-Regulatory-Intelligence/1.0',
           'Accept': 'application/json'
@@ -102,7 +108,7 @@ export class FDAOpenAPIService {
       // Rate limiting
       await this.delay(this.rateLimitDelay);
       
-      console.log(`✅ [FDA API] Request successful`);
+      console.log(`✅ [FDA API] Request successful - received ${data.results?.length || 0} items`);
       return data;
     } catch (error) {
       if (retryAttempt < this.maxRetries && !(error as Error).message.includes('Rate limited')) {
