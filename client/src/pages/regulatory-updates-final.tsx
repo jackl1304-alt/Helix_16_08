@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Eye, FileText, Calendar, Clock, Brain, Download, ExternalLink } from 'lucide-react';
+import { Eye, FileText, Calendar, Clock, Brain, Download, ExternalLink, Search, Filter, Globe, BarChart3, TrendingUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
@@ -40,6 +40,9 @@ export default function RegulatoryUpdatesFinal() {
   const [selectedUpdate, setSelectedUpdate] = useState<RegulatoryUpdate | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedSource, setSelectedSource] = useState('all');
+  const [selectedPriority, setSelectedPriority] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -57,8 +60,8 @@ export default function RegulatoryUpdatesFinal() {
     refetchOnWindowFocus: false
   });
 
-  // Filter und Suche
-  const filteredUpdates = updates.filter((update: RegulatoryUpdate) => {
+  // Filter und Suche - sicherstellen dass updates existiert
+  const filteredUpdates = (updates || []).filter((update: RegulatoryUpdate) => {
     const matchesSearch = !searchTerm || 
       update.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       update.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -66,7 +69,17 @@ export default function RegulatoryUpdatesFinal() {
     
     const matchesRegion = selectedRegion === 'all' || update.region === selectedRegion;
     
-    return matchesSearch && matchesRegion;
+    const matchesCategory = selectedCategory === 'all' || 
+      update.update_type?.toLowerCase() === selectedCategory.toLowerCase();
+    
+    const matchesSource = selectedSource === 'all' || 
+      update.source_id?.toLowerCase().includes(selectedSource.toLowerCase()) ||
+      update.source?.toLowerCase().includes(selectedSource.toLowerCase());
+    
+    const matchesPriority = selectedPriority === 'all' || 
+      update.priority?.toLowerCase() === selectedPriority.toLowerCase();
+    
+    return matchesSearch && matchesRegion && matchesCategory && matchesSource && matchesPriority;
   });
 
   // Paginierung
@@ -110,35 +123,147 @@ export default function RegulatoryUpdatesFinal() {
             Regulatorische Updates
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            {filteredUpdates.length} von {updates.length} Updates verfügbar
+            {filteredUpdates.length} von {updates?.length || 0} Updates verfügbar
           </p>
         </div>
 
-        {/* Filter */}
-        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Input
-            placeholder="Updates durchsuchen..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full"
-          />
-          
-          <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-            <SelectTrigger>
-              <SelectValue placeholder="Region auswählen" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Alle Regionen</SelectItem>
-              <SelectItem value="Global">Global</SelectItem>
-              <SelectItem value="Europe">Europa</SelectItem>
-              <SelectItem value="North America">Nordamerika</SelectItem>
-              <SelectItem value="Asia">Asien</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <div className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
-            Seite {currentPage} von {totalPages}
+        {/* Erweiterte Filteroptionen */}
+        <div className="mb-6 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-6 rounded-xl border border-green-200 dark:border-green-700">
+          <div className="flex items-center gap-2 mb-4">
+            <Search className="h-5 w-5 text-green-600" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Erweiterte Filteroptionen</h3>
           </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kategorie</label>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Alle Kategorien" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle Kategorien</SelectItem>
+                  <SelectItem value="approval">Zulassungen</SelectItem>
+                  <SelectItem value="guidance">Leitfäden</SelectItem>
+                  <SelectItem value="regulation">Verordnungen</SelectItem>
+                  <SelectItem value="alert">Warnungen</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Region</label>
+              <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Alle Regionen" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle Regionen</SelectItem>
+                  <SelectItem value="Global">Global</SelectItem>
+                  <SelectItem value="Europe">Europa</SelectItem>
+                  <SelectItem value="North America">Nordamerika</SelectItem>
+                  <SelectItem value="Asia">Asien</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quelle</label>
+              <Select value={selectedSource} onValueChange={setSelectedSource}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Alle Quellen" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle Quellen</SelectItem>
+                  <SelectItem value="EMA">EMA</SelectItem>
+                  <SelectItem value="FDA">FDA</SelectItem>
+                  <SelectItem value="BfArM">BfArM</SelectItem>
+                  <SelectItem value="Swissmedic">Swissmedic</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Priorität</label>
+              <Select value={selectedPriority} onValueChange={setSelectedPriority}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Alle Prioritäten" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle Prioritäten</SelectItem>
+                  <SelectItem value="critical">Kritisch</SelectItem>
+                  <SelectItem value="high">Hoch</SelectItem>
+                  <SelectItem value="medium">Mittel</SelectItem>
+                  <SelectItem value="low">Niedrig</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Suche</label>
+              <Input
+                placeholder="Artikel, Quelle oder Inhalt suchen..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Statistik-Karten */}
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-700">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Gesamte Artikel</p>
+                  <p className="text-3xl font-bold text-blue-900 dark:text-blue-100">{updates?.length || 0}</p>
+                </div>
+                <FileText className="h-12 w-12 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200 dark:border-green-700">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-green-600 dark:text-green-400 font-medium">Gefiltert</p>
+                  <p className="text-3xl font-bold text-green-900 dark:text-green-100">{filteredUpdates.length}</p>
+                </div>
+                <Filter className="h-12 w-12 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-purple-200 dark:border-purple-700">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">Quellen</p>
+                  <p className="text-3xl font-bold text-purple-900 dark:text-purple-100">
+                    {new Set((updates || []).map(u => u.source_id || u.source || 'Unbekannt')).size}
+                  </p>
+                </div>
+                <Globe className="h-12 w-12 text-purple-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 border-orange-200 dark:border-orange-700">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-orange-600 dark:text-orange-400 font-medium">Kategorien</p>
+                  <p className="text-3xl font-bold text-orange-900 dark:text-orange-100">
+                    {new Set((updates || []).map(u => u.update_type || 'Sonstiges')).size}
+                  </p>
+                </div>
+                <BarChart3 className="h-12 w-12 text-orange-500" />
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Updates Liste */}
