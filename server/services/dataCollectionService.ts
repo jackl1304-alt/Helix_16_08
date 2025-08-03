@@ -104,26 +104,27 @@ export class DataCollectionService {
     console.log(`[DataCollectionService] Syncing FDA source: ${sourceId}`);
     
     try {
-      // Verwende FDA Open API Service für echte Daten
-      const fdaData = await fdaOpenApiService.getRecentDeviceData();
+      // Verwende verfügbare FDA Open API Service Methoden
+      let fdaData: any[] = [];
       
-      return fdaData.slice(0, 3).map(item => ({
-        id: `fda_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        title: item.title,
-        content: item.description || item.summary || 'FDA regulatory update',
-        source_id: sourceId,
-        source_name: this.getSourceName(sourceId),
-        published_date: new Date().toISOString(),
-        url: item.url || `https://www.fda.gov/medical-devices`,
-        region: 'North America',
-        category: 'regulatory',
-        priority: 'medium' as const,
-        device_classes: ['Class II'],
-        created_at: new Date(),
-        updated_at: new Date()
-      }));
+      if (sourceId === 'fda_510k' || sourceId === 'fda_historical') {
+        // Sammle 510(k) Devices direkt - diese werden automatisch in DB gespeichert
+        console.log(`[DataCollectionService] Collecting FDA 510(k) data for ${sourceId}...`);
+        fdaData = await fdaOpenApiService.collect510kDevices(5); // Nur 5 für schnellere Sync
+      } else if (sourceId === 'fda_recalls') {
+        // Sammle Recalls direkt - diese werden automatisch in DB gespeichert  
+        console.log(`[DataCollectionService] Collecting FDA recalls for ${sourceId}...`);
+        fdaData = await fdaOpenApiService.collectRecalls(3); // Nur 3 für schnellere Sync
+      }
+      
+      console.log(`[DataCollectionService] FDA sync completed for ${sourceId}: ${fdaData.length} items processed`);
+      
+      // Return empty da die FDA Services bereits direkt in DB speichern
+      // Das verhindert Duplikate und ist authentischer
+      return [];
+      
     } catch (error) {
-      console.error(`[DataCollectionService] FDA sync failed - using no updates to maintain authentic data policy:`, error);
+      console.error(`[DataCollectionService] FDA sync failed - maintaining authentic data policy:`, error);
       return [];
     }
   }
