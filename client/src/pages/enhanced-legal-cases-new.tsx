@@ -75,18 +75,20 @@ export default function EnhancedLegalCasesNew() {
     }
   });
 
-  // Filter cases
+  // Filter cases - FIX: Ensure proper filtering
   const filteredCases = legalCases.filter((legalCase: LegalCase) => {
+    if (!legalCase || !legalCase.title) return false;
+    
     const matchesSearch = !searchTerm || 
-      legalCase.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      legalCase.caseNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      legalCase.court.toLowerCase().includes(searchTerm.toLowerCase());
+      (legalCase.title && legalCase.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (legalCase.caseNumber && legalCase.caseNumber.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (legalCase.court && legalCase.court.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesJurisdiction = selectedJurisdiction === 'all' || 
-      legalCase.jurisdiction === selectedJurisdiction;
+      (legalCase.jurisdiction && legalCase.jurisdiction === selectedJurisdiction);
     
     const matchesImpactLevel = selectedImpactLevel === 'all' || 
-      legalCase.impactLevel === selectedImpactLevel;
+      (legalCase.impactLevel && legalCase.impactLevel === selectedImpactLevel);
     
     return matchesSearch && matchesJurisdiction && matchesImpactLevel;
   });
@@ -134,7 +136,14 @@ export default function EnhancedLegalCasesNew() {
     selectedJurisdiction,
     selectedImpactLevel,
     selectedCaseId,
-    sampleCase: legalCases[0]
+    sampleCase: legalCases[0],
+    isLoading: isLoadingCases,
+    firstCaseStructure: legalCases[0] ? Object.keys(legalCases[0]) : 'NO_CASE',
+    filterTest: legalCases.length > 0 ? {
+      hasTitle: !!legalCases[0]?.title,
+      hasJurisdiction: !!legalCases[0]?.jurisdiction,
+      sampleJurisdiction: legalCases[0]?.jurisdiction
+    } : 'NO_DATA'
   });
 
   return (
@@ -232,7 +241,7 @@ export default function EnhancedLegalCasesNew() {
               </Button>
             </CardContent>
           </Card>
-        ) : filteredCases.length === 0 ? (
+        ) : (legalCases.length > 0 && filteredCases.length === 0) ? (
           <Card>
             <CardContent className="text-center py-8">
               <AlertTriangle className="w-12 h-12 mx-auto mb-4 text-gray-400" />
