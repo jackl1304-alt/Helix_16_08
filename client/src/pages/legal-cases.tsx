@@ -560,26 +560,56 @@ export default function LegalCases() {
           </div>
         )}
 
-        {/* Enhanced Main Content Tabs */}
+        {/* Main Content Tabs - Einheitliches Design */}
         <Tabs defaultValue="cases" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-gradient-to-r from-gray-100 to-blue-100 dark:from-gray-800 dark:to-blue-900/30">
-            <TabsTrigger value="cases" className="data-[state=active]:bg-white data-[state=active]:shadow-lg">Rechtsfälle</TabsTrigger>
-            <TabsTrigger value="analysis" className="data-[state=active]:bg-white data-[state=active]:shadow-lg">Rechtssprechungsanalyse</TabsTrigger>
-            <TabsTrigger value="changes" className="data-[state=active]:bg-white data-[state=active]:shadow-lg">Änderungen</TabsTrigger>
-            <TabsTrigger value="analytics" className="data-[state=active]:bg-white data-[state=active]:shadow-lg">Analyse</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5 h-14 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1">
+            <TabsTrigger 
+              value="cases" 
+              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
+            >
+              <Gavel className="h-4 w-4" />
+              Übersicht
+            </TabsTrigger>
+            <TabsTrigger 
+              value="analysis" 
+              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
+            >
+              <Brain className="h-4 w-4" />
+              Zusammenfassung
+            </TabsTrigger>
+            <TabsTrigger 
+              value="content" 
+              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
+            >
+              <FileText className="h-4 w-4" />
+              Vollständiger Inhalt
+            </TabsTrigger>
+            <TabsTrigger 
+              value="analysis-ai" 
+              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-orange-50 data-[state=active]:text-orange-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-orange-900/20 dark:data-[state=active]:text-orange-300"
+            >
+              <Brain className="h-4 w-4" />
+              🔥 KI-Analyse
+            </TabsTrigger>
+            <TabsTrigger 
+              value="metadata" 
+              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
+            >
+              <Globe className="h-4 w-4" />
+              Metadaten
+            </TabsTrigger>
           </TabsList>
 
-              <TabsContent value="cases">
-                <Card className="shadow-lg">
-                  <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-800 dark:to-blue-900/20">
-                    <CardTitle className="flex items-center">
-                      <Gavel className="w-5 h-5 mr-2 text-blue-600" />
-                      Juristische Entscheidungen
-                    </CardTitle>
-                    <CardDescription>
-                      {filteredData.length} von {legalData.length} authentische Rechtsfälle
-                    </CardDescription>
-                  </CardHeader>
+          <TabsContent value="cases" className="mt-6">
+            <Card className="border-0 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 border-b">
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Rechtsfälle Übersicht
+                </CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-400">
+                  {filteredData.length} von {legalData.length} authentische Rechtsfälle verfügbar
+                </CardDescription>
+              </CardHeader>
                   <CardContent className="p-6">
                     {isLoadingData ? (
                       <div className="flex items-center justify-center py-12">
@@ -667,17 +697,19 @@ export default function LegalCases() {
                       </div>
                     )}
                   </CardContent>
-                </Card>
-              </TabsContent>
+            </Card>
+          </TabsContent>
 
-        <TabsContent value="analysis">
-          <Card>
-            <CardHeader>
-              <CardTitle>Rechtssprechungsanalyse</CardTitle>
-              <CardDescription>
-                Tiefgehende Analyse der Rechtsentwicklungen
-              </CardDescription>
-            </CardHeader>
+          <TabsContent value="analysis" className="mt-6">
+            <Card className="border-0 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/10 dark:to-blue-900/10 border-b">
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Rechtssprechungsanalyse
+                </CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-400">
+                  Tiefgehende Analyse der Rechtsentwicklungen und Präzedenzfälle
+                </CardDescription>
+              </CardHeader>
             <CardContent>
               {legalDataError ? (
                 <div className="flex flex-col items-center justify-center py-8 text-red-600 space-y-3">
@@ -1138,47 +1170,7 @@ Unternehmen sollten eine proaktive Strategie entwickeln, um den neuen rechtliche
               )}
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="analytics">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {report && (
-              <>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Falltypen</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {report && report.caseTypes && Object.entries(report.caseTypes).map(([type, count]) => (
-                        <div key={type} className="flex items-center justify-between">
-                          <span className="text-sm">{type}</span>
-                          <Badge variant="secondary">{count}</Badge>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Sprachverteilung</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {report && report.languageDistribution && Object.entries(report.languageDistribution).map(([lang, count]) => (
-                        <div key={lang} className="flex items-center justify-between">
-                          <span className="text-sm">{lang.toUpperCase()}</span>
-                          <Badge variant="outline">{count}</Badge>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </>
-            )}
-          </div>
-        </TabsContent>
+          </TabsContent>
             </Tabs>
       </div>
     </div>
