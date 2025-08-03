@@ -251,7 +251,7 @@ export default function EnhancedLegalCases() {
               </CardHeader>
               
               <CardContent>
-                <Tabs defaultValue="overview" className="w-full">
+                <Tabs key={legalCase.id} defaultValue="overview" className="w-full">
                   <TabsList className="grid w-full grid-cols-6">
                     <TabsTrigger value="overview">Übersicht</TabsTrigger>
                     <TabsTrigger value="summary">Zusammenfassung</TabsTrigger>
@@ -302,10 +302,7 @@ export default function EnhancedLegalCases() {
                         Vollständige Zusammenfassung aus Originaldatenbank
                       </h4>
                       <div className="bg-white p-4 rounded border max-h-[500px] overflow-y-auto">
-                        <div className="bg-red-50 p-2 mb-3 rounded text-xs">
-                          <strong>DEBUG INFO:</strong> Fall-ID: {legalCase.id} | 
-                          Erste 100 Zeichen: "{legalCase.summary?.substring(0, 100)}..."
-                        </div>
+
                         <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
                           {legalCase.summary || "Keine Zusammenfassung verfügbar"}
                         </div>
@@ -324,10 +321,7 @@ export default function EnhancedLegalCases() {
                         Vollständiger Originalinhalt aus Datenbank
                       </h4>
                       <div className="bg-white p-4 rounded border max-h-[600px] overflow-y-auto">
-                        <div className="bg-yellow-100 p-2 mb-3 rounded text-xs">
-                          <strong>DEBUG INFO:</strong> Fall-ID: {legalCase.id} | 
-                          Erste 100 Zeichen: "{legalCase.content?.substring(0, 100)}..."
-                        </div>
+
                         <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
                           {legalCase.content || "Vollständiger Inhalt wird geladen..."}
                         </div>
