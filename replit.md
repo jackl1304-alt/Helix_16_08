@@ -10,6 +10,14 @@ Preferred communication style: German language - Simple, everyday language.
 - Detaillierte Aufgabenaufstellungen für alle Seiten gewünscht
 - Klare Priorisierung nach Implementierungsstand
 
+## Recent Changes (August 3, 2025)
+### Regulatory Updates Modal System Fixed
+- **Problem Resolved**: Modal dialogs showed identical template content across different updates
+- **Root Cause**: Backend generated template fullText instead of using authentic database content
+- **Solution**: Modified server/routes.ts to use real description data for fullText field
+- **Result**: All 6 modal tabs (Übersicht, Zusammenfassung, Vollständiger Inhalt, Finanzanalyse, KI-Analyse, Metadaten) now display unique, authentic content for each regulatory update
+- **User Feedback**: "nun geht es" - confirmed working correctly
+
 ## System Architecture
 
 ### Frontend Architecture
