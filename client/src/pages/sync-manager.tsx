@@ -210,11 +210,20 @@ export default function SyncManager() {
       }));
       
       try {
-        // Echter Bulk-Sync API-Aufruf (Backend macht alle 46 Quellen parallel)
+        // Optimierter Bulk-Sync API-Aufruf mit Performance-Tracking
         const result = await apiRequest('/api/data-sources/sync-all', { 
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            optimized: true,
+            backgroundProcessing: true
+          })
         });
+        
+        console.log('[SYNC-MANAGER] Bulk sync completed:', result);
         return result;
       } finally {
         // Reset nach Abschluss
@@ -225,10 +234,13 @@ export default function SyncManager() {
       }
     },
     onSuccess: (data) => {
-      const totalExistingData = data.results.reduce((sum: number, result: any) => 
-        sum + (result.existingCount || 0), 0);
-      const totalNewUpdates = data.results.reduce((sum: number, result: any) => 
-        sum + (result.newUpdatesCount || 0), 0);
+      console.log('[SYNC-MANAGER] Bulk sync success response:', data);
+      
+      const totalNewUpdates = data.totalNewUpdates || 0;
+      const totalExisting = data.totalExisting || 0;
+      const successful = data.successful || 0;
+      const failed = data.failed || 0;
+      const totalDuration = data.totalDuration || 0;
       
       if (totalNewUpdates > 0) {
         setLiveStats(prev => ({
@@ -238,18 +250,28 @@ export default function SyncManager() {
         }));
         
         toast({
-          title: "✅ Bulk-Sync erfolgreich",
-          description: `${data.total} Quellen synchronisiert: ${totalNewUpdates} neue Updates gesammelt`,
+          title: "✅ Optimierte Bulk-Synchronisation erfolgreich",
+          description: `${successful}/${data.total} Quellen synchronisiert: ${totalNewUpdates} neue Updates | ${Math.round(totalDuration/1000)}s`,
         });
       } else {
         toast({
-          title: "ℹ️ Bulk-Sync abgeschlossen",
-          description: `${data.total} Quellen überprüft: Keine neuen Updates verfügbar`,
+          title: "ℹ️ Optimierte Bulk-Synchronisation abgeschlossen",
+          description: `${successful}/${data.total} Quellen überprüft: Keine neuen Updates | ${Math.round(totalDuration/1000)}s`,
         });
       }
       
+      // Performance-Logging für Bulk-Sync
+      console.log('[SYNC-MANAGER] Bulk sync performance:', {
+        totalSources: data.total,
+        successful,
+        failed,
+        duration: `${Math.round(totalDuration/1000)}s`,
+        newUpdates: totalNewUpdates,
+        throughput: `${Math.round(data.total / (totalDuration/1000))} sources/sec`
+      });
+      
       queryClient.invalidateQueries({ queryKey: ['/api/data-sources'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/sync/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
     },
     onError: (error: any) => {
       // Setze laufende Syncs auf 0 bei Fehlern
@@ -259,8 +281,8 @@ export default function SyncManager() {
       }));
       
       toast({
-        title: "Komplett-Dokumentation fehlgeschlagen",
-        description: `Fehler bei der Dokumentation: ${error.message}`,
+        title: "❌ Bulk-Synchronisation fehlgeschlagen",
+        description: `Fehler bei der Bulk-Synchronisation: ${error.message}`,
         variant: "destructive",
       });
     }

@@ -283,6 +283,111 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Bulk-Synchronisation für alle aktiven Datenquellen
+  app.post("/api/data-sources/sync-all", async (req, res) => {
+    try {
+      console.log('[API] Starting bulk synchronization for all active data sources...');
+      
+      const startTime = Date.now();
+      
+      // Hole alle aktiven Datenquellen
+      const dataSources = await storage.getAllDataSources();
+      const activeSources = dataSources.filter(source => source.isActive);
+      
+      console.log(`[API] Found ${activeSources.length} active data sources for bulk sync`);
+      
+      // Import des optimierten Sync-Services
+      const { optimizedSyncService } = await import('./services/optimizedSyncService');
+      
+      // Parallele Synchronisation mit begrenzter Konkurrenz (max 5 gleichzeitig)
+      const batchSize = 5;
+      const results = [];
+      const errors = [];
+      
+      for (let i = 0; i < activeSources.length; i += batchSize) {
+        const batch = activeSources.slice(i, i + batchSize);
+        
+        console.log(`[API] Processing batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(activeSources.length/batchSize)} with ${batch.length} sources`);
+        
+        const batchPromises = batch.map(async (source) => {
+          try {
+            const syncResult = await optimizedSyncService.syncDataSourceWithMetrics(source.id, {
+              realTime: false,
+              optimized: true,
+              backgroundProcessing: true,
+              timeout: 45000 // 45s timeout für bulk ops
+            });
+            
+            return {
+              sourceId: source.id,
+              sourceName: source.name,
+              success: syncResult.success,
+              newUpdatesCount: syncResult.newUpdatesCount,
+              existingCount: syncResult.existingDataCount,
+              duration: syncResult.metrics.duration,
+              throughput: syncResult.metrics.throughput,
+              errors: syncResult.errors
+            };
+          } catch (error: any) {
+            console.error(`[API] Bulk sync failed for ${source.id}:`, error);
+            errors.push(`${source.id}: ${error.message}`);
+            
+            return {
+              sourceId: source.id,
+              sourceName: source.name,
+              success: false,
+              newUpdatesCount: 0,
+              existingCount: 0,
+              duration: 0,
+              throughput: 0,
+              errors: [error.message]
+            };
+          }
+        });
+        
+        const batchResults = await Promise.all(batchPromises);
+        results.push(...batchResults);
+        
+        // Kurze Pause zwischen Batches um Server nicht zu überlasten
+        if (i + batchSize < activeSources.length) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+      
+      const totalDuration = Date.now() - startTime;
+      const successfulSyncs = results.filter(r => r.success).length;
+      const totalNewUpdates = results.reduce((sum, r) => sum + r.newUpdatesCount, 0);
+      const totalExisting = results.reduce((sum, r) => sum + r.existingCount, 0);
+      
+      console.log(`[API] Bulk sync completed in ${totalDuration}ms: ${successfulSyncs}/${activeSources.length} successful, ${totalNewUpdates} new updates`);
+      
+      res.json({
+        success: errors.length === 0,
+        total: activeSources.length,
+        successful: successfulSyncs,
+        failed: activeSources.length - successfulSyncs,
+        totalDuration,
+        totalNewUpdates,
+        totalExisting,
+        results,
+        errors,
+        message: `Bulk sync completed: ${successfulSyncs}/${activeSources.length} sources synchronized successfully`,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('[API] Bulk sync failed completely:', error);
+      res.status(500).json({
+        success: false,
+        error: {
+          message: error.message,
+          code: 'BULK_SYNC_ERROR',
+          timestamp: new Date().toISOString()
+        }
+      });
+    }
+  });
+
   // Update data source status
   app.patch("/api/data-sources/:id", async (req, res) => {
     try {
