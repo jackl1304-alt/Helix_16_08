@@ -217,11 +217,12 @@ export default function RegulatoryUpdatesFinal() {
                       <DialogHeader>
                         <DialogTitle className="text-xl font-bold flex items-center gap-2">
                           <FileText className="h-5 w-5 text-blue-600" />
-                          {update.title}
+                          {selectedUpdate?.title}
                         </DialogTitle>
                       </DialogHeader>
 
-                      <Tabs defaultValue="overview" className="w-full mt-6">
+                      {selectedUpdate && (
+                        <Tabs defaultValue="overview" className="w-full mt-6">
                         <TabsList className="grid w-full grid-cols-6">
                           <TabsTrigger value="overview">Übersicht</TabsTrigger>
                           <TabsTrigger value="summary">Zusammenfassung</TabsTrigger>
@@ -235,15 +236,15 @@ export default function RegulatoryUpdatesFinal() {
                           <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
                             <h4 className="font-semibold mb-4">Übersicht</h4>
                             <div className="grid grid-cols-2 gap-4 text-sm">
-                              <div><strong>Region:</strong> {update.region}</div>
-                              <div><strong>Priorität:</strong> {update.priority}</div>
-                              <div><strong>Veröffentlicht:</strong> {new Date(update.published_at).toLocaleDateString('de-DE')}</div>
-                              <div><strong>Update-ID:</strong> {update.id}</div>
+                              <div><strong>Region:</strong> {selectedUpdate.region}</div>
+                              <div><strong>Priorität:</strong> {selectedUpdate.priority}</div>
+                              <div><strong>Veröffentlicht:</strong> {new Date(selectedUpdate.published_at).toLocaleDateString('de-DE')}</div>
+                              <div><strong>Update-ID:</strong> {selectedUpdate.id}</div>
                             </div>
                             <div className="mt-4">
                               <strong>Beschreibung:</strong>
                               <div className="whitespace-pre-wrap text-gray-800 dark:text-gray-200 leading-relaxed mt-2">
-                                {update.description || 'Keine Beschreibung verfügbar'}
+                                {selectedUpdate.description || 'Keine Beschreibung verfügbar'}
                               </div>
                             </div>
                           </div>
@@ -255,7 +256,7 @@ export default function RegulatoryUpdatesFinal() {
                               Zusammenfassung
                             </h4>
                             <div className="whitespace-pre-wrap text-gray-800 dark:text-gray-200 leading-relaxed">
-                              {update.summary || update.description || (update.fullText ? update.fullText.substring(0, 500) + '...' : 'Keine Zusammenfassung verfügbar')}
+                              {selectedUpdate.summary || selectedUpdate.description || (selectedUpdate.fullText ? selectedUpdate.fullText.substring(0, 500) + '...' : 'Keine Zusammenfassung verfügbar')}
                             </div>
                           </div>
                         </TabsContent>
@@ -270,7 +271,7 @@ export default function RegulatoryUpdatesFinal() {
                             {/* DIREKTER VOLLTEXT */}
                             <div className="prose max-w-none">
                               <div className="whitespace-pre-wrap text-gray-800 dark:text-gray-200 leading-relaxed text-sm">
-                                {update.fullText || update.content || update.description || 'Kein vollständiger Inhalt verfügbar'}
+                                {selectedUpdate.fullText || selectedUpdate.content || selectedUpdate.description || 'Kein vollständiger Inhalt verfügbar'}
                               </div>
                             </div>
 
@@ -279,12 +280,12 @@ export default function RegulatoryUpdatesFinal() {
                               <Button 
                                 onClick={() => {
                                   try {
-                                    const content = `${update.title}\n\n${update.summary || update.description || ''}\n\n${update.fullText || update.content || update.description || 'Kein Inhalt verfügbar'}`;
+                                    const content = `${selectedUpdate.title}\n\n${selectedUpdate.summary || selectedUpdate.description || ''}\n\n${selectedUpdate.fullText || selectedUpdate.content || selectedUpdate.description || 'Kein Inhalt verfügbar'}`;
                                     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
                                     const url = URL.createObjectURL(blob);
                                     const a = document.createElement('a');
                                     a.href = url;
-                                    a.download = `Regulatorisches_Update_${update.title?.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_') || 'update'}.txt`;
+                                    a.download = `Regulatorisches_Update_${selectedUpdate.title?.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_') || 'update'}.txt`;
                                     document.body.appendChild(a);
                                     a.click();
                                     document.body.removeChild(a);
@@ -307,10 +308,10 @@ export default function RegulatoryUpdatesFinal() {
                                 <Download className="h-4 w-4" />
                                 Update herunterladen
                               </Button>
-                              {(update.source_url || update.sourceUrl || update.document_url) && (
+                              {(selectedUpdate.source_url || selectedUpdate.sourceUrl || selectedUpdate.document_url) && (
                                 <Button 
                                   variant="outline"
-                                  onClick={() => window.open(update.source_url || update.sourceUrl || update.document_url, '_blank')}
+                                  onClick={() => window.open(selectedUpdate.source_url || selectedUpdate.sourceUrl || selectedUpdate.document_url, '_blank')}
                                   className="flex items-center gap-2"
                                 >
                                   <ExternalLink className="h-4 w-4" />
@@ -348,14 +349,15 @@ export default function RegulatoryUpdatesFinal() {
                           <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
                             <h4 className="font-semibold mb-4">Metadaten</h4>
                             <div className="grid grid-cols-2 gap-4 text-sm">
-                              <div><strong>Update-ID:</strong> {update.id}</div>
-                              <div><strong>Quelle:</strong> {update.source || 'Unbekannt'}</div>
-                              <div><strong>Sprache:</strong> {update.language || 'DE'}</div>
-                              <div><strong>Typ:</strong> {update.update_type || 'Unbekannt'}</div>
+                              <div><strong>Update-ID:</strong> {selectedUpdate.id}</div>
+                              <div><strong>Quelle:</strong> {selectedUpdate.source || 'Unbekannt'}</div>
+                              <div><strong>Sprache:</strong> {selectedUpdate.language || 'DE'}</div>
+                              <div><strong>Typ:</strong> {selectedUpdate.update_type || 'Unbekannt'}</div>
                             </div>
                           </div>
                         </TabsContent>
                       </Tabs>
+                      )}
                     </DialogContent>
                   </Dialog>
                 </div>
