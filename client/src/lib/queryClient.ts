@@ -10,19 +10,23 @@ async function throwIfResNotOk(res: Response) {
 
 export async function apiRequest(
   url: string,
-  options: RequestInit = {}
+  method: string = 'GET',
+  data?: any
 ): Promise<any> {
   // Ensure we have default options
   const requestOptions: RequestInit = {
-    method: options.method || 'GET',
+    method,
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      ...options.headers,
     },
     credentials: "include",
-    ...options,
   };
+  
+  // Add body for POST requests
+  if (method === 'POST' && data) {
+    requestOptions.body = JSON.stringify(data);
+  }
   
   const res = await fetch(url, requestOptions);
 
