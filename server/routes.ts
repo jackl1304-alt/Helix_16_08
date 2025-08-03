@@ -607,7 +607,7 @@ Weitere Details finden Sie in der offiziellen Dokumentation der RegulierungsbehÃ
   // Sync All Data Sources  
   app.post("/api/sync/all", async (req, res) => {
     try {
-      console.log("Starting bulk synchronization for all active sources");
+      console.log("Documenting available updates from active sources (no live sync)");
       
       // Get all active data sources
       const dataSources = await storage.getAllDataSources();
@@ -615,31 +615,40 @@ Weitere Details finden Sie in der offiziellen Dokumentation der RegulierungsbehÃ
       
       console.log(`Found ${activeSources.length} active sources to sync`);
       
-      // Import and use the data collection service
-      const dataCollectionModule = await import("./services/dataCollectionService");
-      const dataService = new dataCollectionModule.DataCollectionService();
-      
+      // Document existing data without live sync
       const results = [];
       for (const source of activeSources) {
         try {
-          console.log(`Syncing: ${source.id} - ${source.name}`);
-          await dataService.syncDataSource(source.id);
-          await storage.updateDataSourceLastSync(source.id, new Date());
-          results.push({ id: source.id, status: 'success', name: source.name });
+          console.log(`Documenting: ${source.id} - ${source.name} (no live sync)`);
+          // Skip actual data collection service call
+          // await dataService.syncDataSource(source.id);
+          // await storage.updateDataSourceLastSync(source.id, new Date());
+          results.push({ 
+            id: source.id, 
+            status: 'documented', 
+            name: source.name,
+            message: 'Existing data documented, no new sync performed'
+          });
         } catch (error: any) {
-          console.error(`Sync failed for ${source.id}:`, error);
-          results.push({ id: source.id, status: 'error', error: error.message, name: source.name });
+          console.error(`Documentation failed for ${source.id}:`, error);
+          results.push({ 
+            id: source.id, 
+            status: 'error', 
+            error: error.message, 
+            name: source.name 
+          });
         }
       }
       
-      const successCount = results.filter(r => r.status === 'success').length;
+      const documentedCount = results.filter(r => r.status === 'documented').length;
       
       res.json({ 
         success: true, 
-        message: `${successCount} von ${activeSources.length} Quellen erfolgreich synchronisiert`,
+        message: `${documentedCount} von ${activeSources.length} Quellen dokumentiert (kein Live-Sync)`,
         results: results,
         totalSources: activeSources.length,
-        successCount: successCount
+        documentedCount: documentedCount,
+        note: "Live-Synchronisation deaktiviert - nur bestehende Daten dokumentiert"
       });
     } catch (error: any) {
       console.error("Bulk sync error:", error);
@@ -1802,6 +1811,42 @@ Status: Archiviertes historisches Dokument
     } catch (error) {
       console.error("Error fetching all data:", error);
       res.status(500).json({ error: "Failed to fetch complete data" });
+    }
+  });
+
+  // Individual data source documentation (no live sync)
+  app.post("/api/data-sources/:id/document", async (req, res) => {
+    try {
+      const sourceId = req.params.id;
+      console.log(`[API] Documenting data source: ${sourceId} (no live sync)`);
+      
+      // Get the data source details
+      const dataSources = await storage.getAllDataSources();
+      const source = dataSources.find(ds => ds.id === sourceId);
+      
+      if (!source) {
+        return res.status(404).json({ message: "Data source not found" });
+      }
+      
+      // No actual sync - just document existing data
+      console.log(`[API] Documentation complete for ${source.name} - no live sync performed`);
+      
+      res.json({ 
+        success: true, 
+        message: `Data source ${source.name} documented - no live sync performed`,
+        sourceId: sourceId,
+        sourceName: source.name,
+        lastSync: source.last_sync_at || 'Never',
+        existingData: "Documented without modification",
+        note: "Live synchronization disabled - only existing data documented"
+      });
+    } catch (error: any) {
+      console.error(`[API] Documentation failed for ${req.params.id}:`, error);
+      res.status(500).json({ 
+        message: "Documentation failed", 
+        error: error.message,
+        sourceId: req.params.id
+      });
     }
   });
 
