@@ -383,6 +383,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // NEU: Modal Summary API - Einfache, klare Antwort
+  app.get("/api/updates/modal-summary", async (req, res) => {
+    try {
+      const { logger } = await import('./services/logger.service');
+      logger.info("MODAL API: Loading recent updates for modal");
+      
+      const allUpdates = await storage.getAllRegulatoryUpdates();
+      
+      if (!Array.isArray(allUpdates) || allUpdates.length === 0) {
+        return res.json({
+          success: true,
+          updates: [],
+          message: "Keine Updates verfügbar"
+        });
+      }
+      
+      // Sortiere und nimm die neuesten 5
+      const recentUpdates = allUpdates
+        .sort((a, b) => new Date(b.published_at || b.created_at).getTime() - new Date(a.published_at || a.created_at).getTime())
+        .slice(0, 5)
+        .map(update => ({
+          id: update.id,
+          title: update.title,
+          description: update.description || update.content,
+          source: update.source_id || 'FDA',
+          publishedAt: update.published_at || update.created_at,
+          region: update.region,
+          url: update.source_url
+        }));
+      
+      logger.info(`MODAL API: Returning ${recentUpdates.length} updates`);
+      
+      res.json({
+        success: true,
+        updates: recentUpdates,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error) {
+      console.error('Error in modal summary API:', error);
+      res.status(500).json({
+        success: false,
+        updates: [],
+        error: "Fehler beim Laden der Updates"
+      });
+    }
+  });
+
   app.get("/api/regulatory-updates/recent", async (req, res) => {
     try {
       const { logger } = await import('./services/logger.service');
