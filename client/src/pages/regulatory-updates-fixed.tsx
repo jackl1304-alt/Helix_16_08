@@ -56,7 +56,7 @@ export default function RegulatoryUpdatesPage() {
 
   const { data: updates, isLoading } = useQuery({
     queryKey: ['/api/regulatory-updates'],
-    select: (data: any) => data?.data || []
+    select: (data: any) => Array.isArray(data) ? data : (data?.data || [])
   });
 
   // Filter-Logik
