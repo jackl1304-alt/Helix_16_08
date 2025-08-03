@@ -79,11 +79,11 @@ export default function SyncManager() {
     activeSources: 46
   });
 
-  // Update live stats basierend auf echten Daten
+  // Update live stats basierend auf echten Daten - KEINE laufenden Syncs
   useEffect(() => {
     setLiveStats({
       lastSync: "vor 2 Minuten",
-      runningSyncs: 0,
+      runningSyncs: 0, // Immer 0 - kein Live-Sync
       newUpdates: "5000+",
       activeSources: dataSources.filter(s => s.isActive).length || 46
     });
@@ -91,20 +91,21 @@ export default function SyncManager() {
 
   const syncMutation = useMutation({
     mutationFn: async (sourceId: string) => {
-      return apiRequest(`/api/data-sources/${sourceId}/sync`, 'POST');
+      // Dokumentation statt Live-Sync
+      return apiRequest(`/api/data-sources/${sourceId}/document`, 'POST');
     },
     onSuccess: (data, sourceId) => {
       toast({
-        title: "Synchronisation erfolgreich",
-        description: `Datenquelle ${sourceId} wurde synchronisiert`,
+        title: "Datenquelle dokumentiert",
+        description: `Bestehende Daten für ${sourceId} wurden dokumentiert - kein Live-Sync durchgeführt`,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/data-sources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
     },
     onError: (error: any, sourceId) => {
       toast({
-        title: "Synchronisation fehlgeschlagen",
-        description: `Fehler bei Datenquelle ${sourceId}: ${error.message}`,
+        title: "Dokumentation fehlgeschlagen", 
+        description: `Fehler bei der Dokumentation von ${sourceId}: ${error.message}`,
         variant: "destructive",
       });
     }
@@ -112,17 +113,17 @@ export default function SyncManager() {
 
   const syncAllMutation = useMutation({
     mutationFn: async () => {
-      // Synchronisiere alle aktiven Datenquellen nacheinander
+      // Dokumentiere alle aktiven Datenquellen ohne Live-Sync
       const activeSources = dataSources.filter(source => source.isActive);
       const results = [];
       
       for (const source of activeSources) {
-        console.log(`Starting bulk sync for: ${source.id}`);
+        console.log(`Starting bulk documentation for: ${source.id}`);
         try {
-          const result = await apiRequest(`/api/data-sources/${source.id}/sync`, 'POST');
-          results.push({ id: source.id, status: 'success', result });
+          const result = await apiRequest(`/api/data-sources/${source.id}/document`, 'POST');
+          results.push({ id: source.id, status: 'documented', result });
         } catch (error) {
-          console.error(`Bulk sync failed for ${source.id}:`, error);
+          console.error(`Bulk documentation failed for ${source.id}:`, error);
           results.push({ id: source.id, status: 'error', error });
         }
       }
@@ -130,10 +131,10 @@ export default function SyncManager() {
       return { results, total: activeSources.length };
     },
     onSuccess: (data) => {
-      const successCount = data.results.filter(r => r.status === 'success').length;
+      const documentedCount = data.results.filter(r => r.status === 'documented').length;
       toast({
-        title: "Komplett-Synchronisation abgeschlossen",
-        description: `${successCount} von ${data.total} Datenquellen erfolgreich synchronisiert`,
+        title: "Vollständige Dokumentation abgeschlossen",
+        description: `${documentedCount} von ${data.total} Datenquellen dokumentiert - kein Live-Sync durchgeführt`,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/data-sources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/sync/stats'] });
