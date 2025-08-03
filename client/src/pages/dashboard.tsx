@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { 
   FileText, 
@@ -12,11 +12,17 @@ import {
   AlertTriangle, 
   CheckCircle, 
   TrendingUp,
-  Mail
+  Mail,
+  FolderSync,
+  Loader2
 } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   
   const { data: stats = {}, isLoading, error: statsError } = useQuery({
     queryKey: ['/api/dashboard/stats'],
@@ -38,11 +44,39 @@ export default function Dashboard() {
     gcTime: 60000,
   });
 
+  // Newsletter Sync Mutation
+  const newsletterSyncMutation = useMutation({
+    mutationFn: async () => {
+      console.log("Dashboard: Starting newsletter sync");
+      const result = await apiRequest('/api/knowledge/extract-newsletters', 'POST');
+      console.log("Dashboard: Newsletter sync completed", result);
+      return result;
+    },
+    onSuccess: (data) => {
+      console.log("Dashboard: Newsletter sync successful", data);
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      
+      toast({
+        title: "✅ Newsletter Sync Erfolgreich",
+        description: `${data.stats?.articlesExtracted || 0} Artikel aus ${data.stats?.processedSources || 0} Newsletter-Quellen extrahiert`,
+      });
+    },
+    onError: (error: any) => {
+      console.error("Dashboard: Newsletter sync error:", error);
+      toast({
+        title: "Newsletter Sync Fehlgeschlagen",
+        description: `Fehler: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
   // Quick Action Handlers
-  const handleDataSourcesSync = () => setLocation('/sync-manager');
+  const handleDataSourcesSync = () => setLocation('/data-collection');
   const handleKnowledgeBase = () => setLocation('/knowledge-base');
-  const handleNewsletter = () => setLocation('/newsletter-manager');
+  const handleNewsletter = () => setLocation('/newsletter-admin');
   const handleAnalytics = () => setLocation('/analytics');
+  const handleNewsletterSync = () => newsletterSyncMutation.mutate();
 
   // Debug logging für Frontend-Fehler
   if (statsError) {
@@ -290,7 +324,7 @@ export default function Dashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <Button 
               variant="outline" 
               className="flex items-center gap-2 h-20 hover:bg-orange-50 hover:border-orange-200 transition-colors"
@@ -300,6 +334,23 @@ export default function Dashboard() {
               <div className="text-left">
                 <div className="font-medium">Datenquellen sync</div>
                 <div className="text-xs text-gray-500">FDA, EMA, BfArM Updates</div>
+              </div>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2 h-20 hover:bg-blue-50 hover:border-blue-200 transition-colors"
+              onClick={handleNewsletterSync}
+              disabled={newsletterSyncMutation.isPending}
+            >
+              {newsletterSyncMutation.isPending ? (
+                <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
+              ) : (
+                <FolderSync className="h-5 w-5 text-blue-600" />
+              )}
+              <div className="text-left">
+                <div className="font-medium">Newsletter Sync</div>
+                <div className="text-xs text-gray-500">MedTech Newsletter</div>
               </div>
             </Button>
             
