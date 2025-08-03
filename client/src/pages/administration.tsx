@@ -635,11 +635,23 @@ export default function Administration() {
   async function handleDuplicateSearch() {
     setDuplicateSearchLoading(true);
     try {
-      const response = await apiRequest('/api/quality/detect-duplicates', 'POST', { threshold: 0.85 });
-      setDuplicateResults(response.report);
+      const response = await apiRequest('/api/admin/search-duplicates', 'POST');
+      const data = response.data;
+      
+      // Transform the data to match the expected format
+      const transformedResults = {
+        totalRecords: data.totalRegulatory + data.totalLegal,
+        duplicatesFound: data.duplicateRegulatory + data.duplicateLegal,
+        duplicateGroups: [],
+        qualityScore: data.qualityScore,
+        overallDuplicatePercentage: data.overallDuplicatePercentage,
+        timestamp: data.timestamp
+      };
+      
+      setDuplicateResults(transformedResults);
       toast({
         title: "Duplikate-Suche abgeschlossen",
-        description: `${response.report?.duplicatesFound || 0} Duplikate in ${response.report?.totalRecords || 0} Einträgen gefunden.`,
+        description: response.message || `${transformedResults.duplicatesFound} Duplikate gefunden`,
       });
     } catch (error: any) {
       console.error('Duplikate-Suche fehlgeschlagen:', error);
@@ -657,11 +669,11 @@ export default function Administration() {
   async function handleAutoRemoveDuplicates() {
     setDeleteLoading(true);
     try {
-      const response = await apiRequest('/api/quality/auto-remove-duplicates', 'POST');
+      const response = await apiRequest('/api/admin/cleanup-duplicates', 'POST');
       
       toast({
         title: "Automatische Bereinigung abgeschlossen",
-        description: `${response.removedCount || 0} Duplikate wurden automatisch entfernt.`,
+        description: response.message || `${response.data?.duplicatesRemoved || 0} Duplikate entfernt`,
       });
       
       // Clear results and refresh

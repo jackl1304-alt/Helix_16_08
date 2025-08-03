@@ -73,6 +73,7 @@ import { DataQualityEnhancementService } from "./services/dataQualityEnhancement
 import { EnhancedRSSService } from "./services/enhancedRSSService";
 import { SystemMonitoringService } from "./services/systemMonitoringService";
 import { KnowledgeArticleService } from "./services/knowledgeArticleService";
+import { DuplicateCleanupService } from "./services/duplicateCleanupService";
 import { JAMANetworkScrapingService } from "./services/jamaNetworkScrapingService";
 import { UniversalKnowledgeExtractor } from "./services/universalKnowledgeExtractor";
 
@@ -3733,6 +3734,71 @@ Für vollständige Details und weitere Analysen besuchen Sie die ursprüngliche 
 
   // Mount Admin Data Sources routes
   app.use('/api/admin', adminDataSourcesRoutes);
+
+  // ========== DUPLICATE CLEANUP API ENDPOINTS ==========
+  const duplicateCleanupService = new DuplicateCleanupService();
+
+  // Duplikate suchen
+  app.post('/api/admin/search-duplicates', async (req, res) => {
+    try {
+      console.log('[API] Searching for duplicates...');
+      const stats = await duplicateCleanupService.getDuplicateStats();
+      
+      const duplicateData = {
+        totalRegulatory: stats.totalRegulatory,
+        uniqueRegulatory: stats.uniqueRegulatory,
+        duplicateRegulatory: stats.totalRegulatory - stats.uniqueRegulatory,
+        totalLegal: stats.totalLegal,
+        uniqueLegal: stats.uniqueLegal,
+        duplicateLegal: stats.totalLegal - stats.uniqueLegal,
+        overallDuplicatePercentage: Math.round((1 - stats.uniquenessRatio) * 100),
+        qualityScore: Math.round(stats.uniquenessRatio * 100),
+        timestamp: new Date().toISOString()
+      };
+
+      console.log('[API] Duplicate search completed:', duplicateData);
+      res.json({
+        success: true,
+        data: duplicateData,
+        message: `Gefunden: ${duplicateData.duplicateRegulatory + duplicateData.duplicateLegal} Duplikate (${duplicateData.overallDuplicatePercentage}% der Daten)`
+      });
+    } catch (error: any) {
+      console.error('[API] Duplicate search failed:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        message: 'Duplikatsuche fehlgeschlagen'
+      });
+    }
+  });
+
+  // Duplikate automatisch bereinigen
+  app.post('/api/admin/cleanup-duplicates', async (req, res) => {
+    try {
+      console.log('[API] Starting automatic duplicate cleanup...');
+      const cleanupStats = await duplicateCleanupService.performEmergencyDuplicateCleanup();
+      
+      res.json({
+        success: true,
+        data: {
+          totalRecords: cleanupStats.totalRecords,
+          uniqueRecords: cleanupStats.uniqueRecords,
+          duplicatesRemoved: cleanupStats.duplicatesRemoved,
+          cleanupTime: `${(cleanupStats.cleanupTime / 1000).toFixed(1)}s`,
+          qualityImprovement: `${cleanupStats.qualityImprovement.toFixed(1)}%`,
+          timestamp: new Date().toISOString()
+        },
+        message: `Bereinigung erfolgreich: ${cleanupStats.duplicatesRemoved} Duplikate entfernt`
+      });
+    } catch (error: any) {
+      console.error('[API] Duplicate cleanup failed:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        message: 'Automatische Bereinigung fehlgeschlagen'
+      });
+    }
+  });
 
   // ========== LEGAL CASE DETAIL ENDPOINT ==========
   app.get('/api/legal-cases/:id', getLegalCaseById);

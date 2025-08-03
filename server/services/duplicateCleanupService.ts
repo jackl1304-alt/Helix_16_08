@@ -138,7 +138,7 @@ export class DuplicateCleanupService {
   /**
    * Analysiert aktuelle Duplikate-Situation
    */
-  private async getDuplicateStats(): Promise<{
+  async getDuplicateStats(): Promise<{
     totalRegulatory: number;
     uniqueRegulatory: number;
     totalLegal: number;
