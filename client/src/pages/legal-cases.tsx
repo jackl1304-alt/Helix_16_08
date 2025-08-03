@@ -265,7 +265,7 @@ export default function LegalCases() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 'active': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
       case 'superseded': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
       case 'archived': return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
       default: return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
@@ -544,10 +544,10 @@ export default function LegalCases() {
             </DialogContent>
           </Dialog>
           
-            <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200">
+            <Card className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200">
               <CardContent className="p-6">
                 <div className="flex items-center">
-                  <Globe className="h-8 w-8 text-green-600" />
+                  <Globe className="h-8 w-8 text-blue-600" />
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Sprachen</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -1043,7 +1043,7 @@ Hersteller sollten ihre aktuellen Compliance-Prozesse überprüfen und gegebenen
                             </div>
 
                             {/* AI Impact Analysis */}
-                            <div className="bg-green-50 p-4 rounded-lg">
+                            <div className="bg-blue-50 p-4 rounded-lg">
                               <h4 className="font-semibold mb-2 flex items-center gap-2">
                                 <Brain className="h-4 w-4" />
                                 KI-Auswirkungsanalyse

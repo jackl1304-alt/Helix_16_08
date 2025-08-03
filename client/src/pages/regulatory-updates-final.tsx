@@ -128,9 +128,9 @@ export default function RegulatoryUpdatesFinal() {
         </div>
 
         {/* Erweiterte Filteroptionen */}
-        <div className="mb-6 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-6 rounded-xl border border-green-200 dark:border-green-700">
+        <div className="mb-6 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-6 rounded-xl border border-blue-200 dark:border-blue-700">
           <div className="flex items-center gap-2 mb-4">
-            <Search className="h-5 w-5 text-green-600" />
+            <Search className="h-5 w-5 text-blue-600" />
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Erweiterte Filteroptionen</h3>
           </div>
           
@@ -225,14 +225,14 @@ export default function RegulatoryUpdatesFinal() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200 dark:border-green-700">
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-700">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-green-600 dark:text-green-400 font-medium">Gefiltert</p>
-                  <p className="text-3xl font-bold text-green-900 dark:text-green-100">{filteredUpdates.length}</p>
+                  <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Gefiltert</p>
+                  <p className="text-3xl font-bold text-blue-900 dark:text-blue-100">{filteredUpdates.length}</p>
                 </div>
-                <Filter className="h-12 w-12 text-green-500" />
+                <Filter className="h-12 w-12 text-blue-500" />
               </div>
             </CardContent>
           </Card>
@@ -281,7 +281,7 @@ export default function RegulatoryUpdatesFinal() {
                     <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
                       {update.region}
                     </Badge>
-                    <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                    <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
                       {update.update_type}
                     </Badge>
                     <Badge variant="outline" className={cn(
