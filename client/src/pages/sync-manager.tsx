@@ -43,11 +43,17 @@ export default function SyncManager() {
     queryKey: ['/api/data-sources'],
   });
 
-  // Query für neueste Updates
-  const { data: recentUpdates = [] } = useQuery({
+  // Query für neueste Updates - lädt immer, aber zeigt nur bei Bedarf
+  const { data: recentUpdates = [], isLoading: updatesLoading } = useQuery({
     queryKey: ['/api/regulatory-updates/recent'],
-    enabled: showUpdatesSummary,
-    select: (data: any[]) => data.slice(0, 5) // Nur die neuesten 5 Updates
+    select: (data: any[]) => {
+      // Nimm die neuesten 5 Updates und sortiere nach Datum
+      const sorted = data.sort((a: any, b: any) => 
+        new Date(b.publishedAt || b.createdAt).getTime() - 
+        new Date(a.publishedAt || a.createdAt).getTime()
+      );
+      return sorted.slice(0, 5);
+    }
   });
 
   // Live Sync Statistics - Direct Implementation
@@ -413,7 +419,12 @@ export default function SyncManager() {
           </DialogHeader>
           
           <div className="space-y-4">
-            {recentUpdates.length > 0 ? (
+            {updatesLoading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                <p className="mt-2 text-gray-500">Lade Updates...</p>
+              </div>
+            ) : recentUpdates.length > 0 ? (
               recentUpdates.map((update: any, index: number) => (
                 <Card key={update.id || index} className="border-l-4 border-l-purple-500">
                   <CardContent className="p-4">
