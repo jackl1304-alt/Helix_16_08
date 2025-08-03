@@ -25,63 +25,21 @@ export class UniversalKnowledgeExtractor {
   private logger = new Logger('UniversalKnowledgeExtractor');
   private jamaService = new JAMANetworkScrapingService();
 
-  // **PRODUCTION MODE**: Only authenticated sources
-  private knowledgeSources: KnowledgeSource[] = [
-    {
-      id: 'jama_medical_devices',
-      name: 'JAMA Network - Medical Devices Collection',
-      url: 'https://jamanetwork.com/collections/5738/medical-devices-and-equipment',
-      category: 'medical_research',
-      authority: 'JAMA Network',
-      region: 'Global',
-      priority: 'high',
-      extractorType: 'medical_journal'
-    }
-  ];
+  // **PRODUCTION MODE**: NO DEMO DATA - Only real newsletter sources
+  private knowledgeSources: KnowledgeSource[] = [];
 
   async extractFromAllSources(): Promise<ExtractionStats> {
-    this.logger.info('PRODUCTION MODE: Only authentic sources processed - NO DEMO DATA');
+    this.logger.info('WISSENSDATENBANK DEAKTIVIERT - Keine Demo-Daten mehr, nur echte Newsletter-Quellen');
     
     const stats: ExtractionStats = {
-      totalSources: this.knowledgeSources.length,
+      totalSources: 0,
       processedSources: 0,
       articlesExtracted: 0,
       errors: 0,
       duplicatesSkipped: 0
     };
 
-    for (const source of this.knowledgeSources) {
-      try {
-        this.logger.info('Processing AUTHENTIC knowledge source', { 
-          sourceId: source.id,
-          sourceName: source.name,
-          authority: source.authority 
-        });
-
-        const sourceStats = await this.extractFromSource(source);
-        
-        stats.processedSources++;
-        stats.articlesExtracted += sourceStats.articlesExtracted;
-        stats.duplicatesSkipped += sourceStats.duplicatesSkipped;
-
-        this.logger.info('Source processing completed', {
-          sourceId: source.id,
-          articlesExtracted: sourceStats.articlesExtracted,
-          duplicatesSkipped: sourceStats.duplicatesSkipped
-        });
-
-        await this.delay(3000);
-
-      } catch (error) {
-        stats.errors++;
-        this.logger.error('Error processing source', { 
-          sourceId: source.id, 
-          error 
-        });
-      }
-    }
-
-    this.logger.info('AUTHENTIC knowledge extraction completed', stats);
+    this.logger.info('Knowledge Base extraction DISABLED - waiting for authentic newsletter APIs');
     return stats;
   }
 

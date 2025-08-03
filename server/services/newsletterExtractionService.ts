@@ -157,73 +157,32 @@ export class NewsletterExtractionService {
   ];
 
   /**
-   * Extrahiert Newsletter-Artikel von allen konfigurierten Quellen
+   * NEWSLETTER EXTRACTION KOMPLETT DEAKTIVIERT
+   * Keine Demo-Daten mehr - nur echte Newsletter-APIs
    */
   async extractFromAllNewsletterSources(): Promise<{
     processedSources: number;
     articlesExtracted: number;
     errors: string[];
   }> {
-    this.logger.info('Starting newsletter extraction from all sources', {
-      totalSources: this.newsletterSources.length
-    });
-
-    let processedSources = 0;
-    let articlesExtracted = 0;
-    const errors: string[] = [];
-
-    for (const source of this.newsletterSources) {
-      try {
-        this.logger.info(`Processing newsletter source: ${source.name}`, {
-          sourceId: source.id,
-          authority: source.authority,
-          region: source.region
-        });
-
-        const articles = await this.extractNewsletterArticles(source);
-        
-        // Speichere Newsletter-Artikel in Knowledge Base
-        for (const article of articles) {
-          await this.saveNewsletterToKnowledgeBase(article, source);
-          articlesExtracted++;
-        }
-
-        processedSources++;
-        this.logger.info(`Successfully processed ${source.name}`, {
-          articlesFound: articles.length
-        });
-
-        // Delay zwischen Anfragen um Server nicht zu überlasten
-        await this.delay(2000);
-
-      } catch (error: any) {
-        const errorMsg = `Error processing ${source.name}: ${error.message}`;
-        errors.push(errorMsg);
-        this.logger.error(errorMsg, error);
-      }
-    }
-
-    this.logger.info('Newsletter extraction completed', {
-      processedSources,
-      articlesExtracted,
-      errors: errors.length
-    });
+    this.logger.info('NEWSLETTER EXTRACTION DEAKTIVIERT - Keine Demo-Artikel mehr');
 
     return {
-      processedSources,
-      articlesExtracted,
-      errors
+      processedSources: 0,
+      articlesExtracted: 0,
+      errors: ['Newsletter extraction disabled - waiting for authentic RSS/API access']
     };
   }
 
   /**
    * Extrahiert Newsletter-Artikel von einer spezifischen Quelle
+   * **PRODUCTION MODE**: Keine Demo-Daten mehr, nur echte RSS/API-Anbindung
    */
   private async extractNewsletterArticles(source: NewsletterSource): Promise<NewsletterArticle[]> {
-    this.logger.info(`Extracting from newsletter source: ${source.name}`);
+    this.logger.warn(`DEAKTIVIERT: ${source.name} - Keine Demo-Newsletter, nur echte RSS-Feeds`);
 
-    // Generiere Demo-Newsletter-Artikel für jede Quelle
-    const demoArticles: NewsletterArticle[] = [];
+    // **PRODUCTION MODE**: NO DEMO ARTICLES
+    return [];
     
     // Deutsche Quellen
     if (source.language === 'de') {
