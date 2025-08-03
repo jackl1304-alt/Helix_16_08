@@ -382,54 +382,7 @@ export default function RegulatoryUpdatesPage() {
           </Card>
         </div>
 
-        {/* Main Content Tabs - Einheitliches Design */}
-        <Tabs defaultValue="updates" className="w-full">
-          <TabsList className="grid w-full grid-cols-6 h-14 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1">
-            <TabsTrigger 
-              value="updates" 
-              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
-            >
-              <FileText className="h-4 w-4" />
-              Übersicht
-            </TabsTrigger>
-            <TabsTrigger 
-              value="summary" 
-              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
-            >
-              <Eye className="h-4 w-4" />
-              Zusammenfassung
-            </TabsTrigger>
-            <TabsTrigger 
-              value="content" 
-              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
-            >
-              <FileText className="h-4 w-4" />
-              Vollständiger Inhalt
-            </TabsTrigger>
-            <TabsTrigger 
-              value="analysis-ai" 
-              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-orange-50 data-[state=active]:text-orange-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-orange-900/20 dark:data-[state=active]:text-orange-300"
-            >
-              <Brain className="h-4 w-4" />
-              🔥 Finanzanalyse
-            </TabsTrigger>
-            <TabsTrigger 
-              value="ai-analysis" 
-              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-purple-900/20 dark:data-[state=active]:text-purple-300"
-            >
-              <Brain className="h-4 w-4" />
-              🧠 KI-Analyse
-            </TabsTrigger>
-            <TabsTrigger 
-              value="metadata" 
-              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
-            >
-              <Globe className="h-4 w-4" />
-              Metadaten
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="updates" className="mt-6">
+        {/* Hauptinhalt - Direkte Anzeige ohne Tabs */}
             <Card className="border-0 shadow-lg">
               <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 border-b">
                 <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -545,93 +498,182 @@ export default function RegulatoryUpdatesPage() {
                                     </DialogTitle>
                                   </DialogHeader>
                                   
-                                  <div className="space-y-6 mt-6">
-                                    {/* Update Metadata */}
-                                    <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                                      <h4 className="font-semibold mb-3">Update-Informationen</h4>
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                                        <div><strong>Behörde:</strong> {update.authority || update.source_id || 'Unbekannt'}</div>
-                                        <div><strong>Region:</strong> {update.region}</div>
-                                        <div><strong>Typ:</strong> {update.type || update.update_type || 'Unbekannt'}</div>
-                                        <div><strong>Status:</strong> {update.status || 'Unbekannt'}</div>
-                                        <div><strong>Priorität:</strong> {update.priority}</div>
-                                        <div><strong>Sprache:</strong> {update.language || 'DE'}</div>
-                                        <div><strong>Veröffentlicht:</strong> {new Date(update.published_at).toLocaleDateString('de-DE')}</div>
-                                        {update.effective_date && (
-                                          <div><strong>Wirksam ab:</strong> {new Date(update.effective_date).toLocaleDateString('de-DE')}</div>
+                                  {/* Tab Navigation für einzelnes Update */}
+                                  <Tabs defaultValue="overview" className="w-full mt-6">
+                                    <TabsList className="grid w-full grid-cols-6 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+                                      <TabsTrigger 
+                                        value="overview" 
+                                        className="flex items-center gap-1 text-xs font-medium rounded data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-blue-900/20"
+                                      >
+                                        <FileText className="h-3 w-3" />
+                                        Übersicht
+                                      </TabsTrigger>
+                                      <TabsTrigger 
+                                        value="summary" 
+                                        className="flex items-center gap-1 text-xs font-medium rounded data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-blue-900/20"
+                                      >
+                                        <Eye className="h-3 w-3" />
+                                        Zusammenfassung
+                                      </TabsTrigger>
+                                      <TabsTrigger 
+                                        value="content" 
+                                        className="flex items-center gap-1 text-xs font-medium rounded data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-blue-900/20"
+                                      >
+                                        <FileText className="h-3 w-3" />
+                                        Vollständiger Inhalt
+                                      </TabsTrigger>
+                                      <TabsTrigger 
+                                        value="finance" 
+                                        className="flex items-center gap-1 text-xs font-medium rounded data-[state=active]:bg-orange-50 data-[state=active]:text-orange-700 dark:data-[state=active]:bg-orange-900/20"
+                                      >
+                                        <span className="text-xs">🔥</span>
+                                        Finanzanalyse
+                                      </TabsTrigger>
+                                      <TabsTrigger 
+                                        value="ai" 
+                                        className="flex items-center gap-1 text-xs font-medium rounded data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700 dark:data-[state=active]:bg-purple-900/20"
+                                      >
+                                        <Brain className="h-3 w-3" />
+                                        KI-Analyse
+                                      </TabsTrigger>
+                                      <TabsTrigger 
+                                        value="metadata" 
+                                        className="flex items-center gap-1 text-xs font-medium rounded data-[state=active]:bg-gray-50 data-[state=active]:text-gray-700 dark:data-[state=active]:bg-gray-900/20"
+                                      >
+                                        <Globe className="h-3 w-3" />
+                                        Metadaten
+                                      </TabsTrigger>
+                                    </TabsList>
+
+                                    <TabsContent value="overview" className="mt-4">
+                                      <div className="space-y-6">
+                                        {/* Update Metadata */}
+                                        <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                                          <h4 className="font-semibold mb-3">Update-Informationen</h4>
+                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                            <div><strong>Behörde:</strong> {update.authority || update.source_id || 'Unbekannt'}</div>
+                                            <div><strong>Region:</strong> {update.region}</div>
+                                            <div><strong>Typ:</strong> {update.type || update.update_type || 'Unbekannt'}</div>
+                                            <div><strong>Status:</strong> {update.status || 'Unbekannt'}</div>
+                                            <div><strong>Priorität:</strong> {update.priority}</div>
+                                            <div><strong>Sprache:</strong> {update.language || 'DE'}</div>
+                                            <div><strong>Veröffentlicht:</strong> {new Date(update.published_at).toLocaleDateString('de-DE')}</div>
+                                            {update.effective_date && (
+                                              <div><strong>Wirksam ab:</strong> {new Date(update.effective_date).toLocaleDateString('de-DE')}</div>
+                                            )}
+                                          </div>
+                                        </div>
+
+                                        {/* Tags */}
+                                        {update.tags && update.tags.length > 0 && (
+                                          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                                            <h4 className="font-semibold mb-2">Schlagwörter</h4>
+                                            <div className="flex flex-wrap gap-2">
+                                              {update.tags.map((tag, index) => (
+                                                <Badge key={index} variant="outline">
+                                                  {tag}
+                                                </Badge>
+                                              ))}
+                                            </div>
+                                          </div>
                                         )}
-                                      </div>
-                                    </div>
 
-                                    {/* Summary */}
-                                    {(update.summary || update.description) && (
-                                      <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border-l-4 border-blue-400">
-                                        <h4 className="font-semibold mb-2 text-blue-800 dark:text-blue-300">Zusammenfassung</h4>
-                                        <FormattedText text={update.summary || update.description || ''} className="text-sm leading-relaxed" />
-                                      </div>
-                                    )}
-
-                                    {/* Full Content */}
-                                    <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 p-6 rounded-lg">
-                                      <h4 className="font-semibold mb-4 flex items-center gap-2">
-                                        <FileText className="h-5 w-5 text-gray-600" />
-                                        Vollständiges Update
-                                      </h4>
-                                      <div className="prose max-w-none text-sm leading-relaxed">
-                                        <FormattedText text={update.content || update.description || 'Kein Inhalt verfügbar'} />
-                                      </div>
-                                    </div>
-
-                                    {/* Tags */}
-                                    {update.tags && update.tags.length > 0 && (
-                                      <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                                        <h4 className="font-semibold mb-2">Schlagwörter</h4>
-                                        <div className="flex flex-wrap gap-2">
-                                          {update.tags.map((tag, index) => (
-                                            <Badge key={index} variant="outline">
-                                              {tag}
-                                            </Badge>
-                                          ))}
+                                        {/* Action Buttons */}
+                                        <div className="flex gap-4 pt-4 border-t">
+                                          <Button 
+                                            onClick={() => {
+                                              try {
+                                                const content = `${update.title}\n\n${update.summary || update.description || ''}\n\n${update.content || update.description || 'Kein Inhalt verfügbar'}`;
+                                                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                                                const url = URL.createObjectURL(blob);
+                                                const a = document.createElement('a');
+                                                a.href = url;
+                                                a.download = `Regulatorisches_Update_${update.title?.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_') || 'update'}.txt`;
+                                                document.body.appendChild(a);
+                                                a.click();
+                                                document.body.removeChild(a);
+                                                URL.revokeObjectURL(url);
+                                              } catch (error) {
+                                                console.error('Download error:', error);
+                                              }
+                                            }}
+                                            className="flex items-center gap-2"
+                                          >
+                                            <Download className="h-4 w-4" />
+                                            Update herunterladen
+                                          </Button>
+                                          {(update.source_url || update.document_url) && (
+                                            <Button 
+                                              variant="outline"
+                                              onClick={() => window.open(update.source_url || update.document_url, '_blank')}
+                                              className="flex items-center gap-2"
+                                            >
+                                              <ExternalLink className="h-4 w-4" />
+                                              Original-Quelle öffnen
+                                            </Button>
+                                          )}
                                         </div>
                                       </div>
-                                    )}
+                                    </TabsContent>
 
-                                    {/* Action Buttons */}
-                                    <div className="flex gap-4 pt-4 border-t">
-                                      <Button 
-                                        onClick={() => {
-                                          try {
-                                            const content = `${update.title}\n\n${update.summary || update.description || ''}\n\n${update.content || update.description || 'Kein Inhalt verfügbar'}`;
-                                            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-                                            const url = URL.createObjectURL(blob);
-                                            const a = document.createElement('a');
-                                            a.href = url;
-                                            a.download = `Regulatorisches_Update_${update.title?.replace(/[^a-z0-9äöüß\s]/gi, '_').replace(/\s+/g, '_') || 'update'}.txt`;
-                                            document.body.appendChild(a);
-                                            a.click();
-                                            document.body.removeChild(a);
-                                            URL.revokeObjectURL(url);
-                                          } catch (error) {
-                                            console.error('Download error:', error);
-                                          }
-                                        }}
-                                        className="flex items-center gap-2"
-                                      >
-                                        <Download className="h-4 w-4" />
-                                        Update herunterladen
-                                      </Button>
-                                      {(update.source_url || update.document_url) && (
-                                        <Button 
-                                          variant="outline"
-                                          onClick={() => window.open(update.source_url || update.document_url, '_blank')}
-                                          className="flex items-center gap-2"
-                                        >
-                                          <ExternalLink className="h-4 w-4" />
-                                          Original-Quelle öffnen
-                                        </Button>
-                                      )}
-                                    </div>
-                                  </div>
+                                    <TabsContent value="summary" className="mt-4">
+                                      <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border-l-4 border-blue-400">
+                                        <h4 className="font-semibold mb-4 text-blue-800 dark:text-blue-300 text-lg">Zusammenfassung</h4>
+                                        <FormattedText text={update.summary || update.description || 'Keine Zusammenfassung verfügbar'} className="text-sm leading-relaxed" />
+                                      </div>
+                                    </TabsContent>
+
+                                    <TabsContent value="content" className="mt-4">
+                                      <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 p-6 rounded-lg">
+                                        <h4 className="font-semibold mb-4 flex items-center gap-2 text-lg">
+                                          <FileText className="h-5 w-5 text-gray-600" />
+                                          Vollständiges Update
+                                        </h4>
+                                        <div className="prose max-w-none text-sm leading-relaxed">
+                                          <FormattedText text={update.content || update.description || 'Kein Inhalt verfügbar'} />
+                                        </div>
+                                      </div>
+                                    </TabsContent>
+
+                                    <TabsContent value="finance" className="mt-4">
+                                      <div className="bg-orange-50 dark:bg-orange-900/20 p-6 rounded-lg border-l-4 border-orange-400">
+                                        <h4 className="font-semibold mb-4 text-orange-800 dark:text-orange-300 text-lg flex items-center gap-2">
+                                          <span>🔥</span>
+                                          KI-gestützte Finanzanalyse
+                                        </h4>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                          Detaillierte Finanzanalyse für dieses regulatorische Update wird hier angezeigt.
+                                        </p>
+                                      </div>
+                                    </TabsContent>
+
+                                    <TabsContent value="ai" className="mt-4">
+                                      <div className="bg-purple-50 dark:bg-purple-900/20 p-6 rounded-lg border-l-4 border-purple-400">
+                                        <h4 className="font-semibold mb-4 text-purple-800 dark:text-purple-300 text-lg flex items-center gap-2">
+                                          <Brain className="h-5 w-5" />
+                                          KI-gestützte Compliance-Analyse
+                                        </h4>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                          Intelligente KI-Analyse zur Bewertung und Kategorisierung wird hier angezeigt.
+                                        </p>
+                                      </div>
+                                    </TabsContent>
+
+                                    <TabsContent value="metadata" className="mt-4">
+                                      <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+                                        <h4 className="font-semibold mb-4 text-lg flex items-center gap-2">
+                                          <Globe className="h-5 w-5 text-gray-600" />
+                                          Technische Metadaten
+                                        </h4>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                          <div><strong>Update-ID:</strong> {update.id}</div>
+                                          <div><strong>Erstellt am:</strong> {new Date(update.created_at).toLocaleDateString('de-DE')}</div>
+                                          <div><strong>Datenformat:</strong> JSON</div>
+                                          <div><strong>Quelle:</strong> {update.source_url ? 'Externe URL' : 'Interne Datenbank'}</div>
+                                        </div>
+                                      </div>
+                                    </TabsContent>
+                                  </Tabs>
                                 </DialogContent>
                               </Dialog>
 
@@ -684,144 +726,6 @@ export default function RegulatoryUpdatesPage() {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
-
-          <TabsContent value="summary" className="mt-6">
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/10 dark:to-blue-900/10 border-b">
-                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Update Zusammenfassungen
-                </CardTitle>
-                <CardDescription className="text-gray-600 dark:text-gray-400">
-                  Kompakte Übersicht aller regulatorischen Updates mit Zusammenfassungen
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="text-center py-12 text-gray-500">
-                  <Eye className="w-16 h-16 mx-auto mb-4 text-purple-400" />
-                  <h3 className="text-lg font-semibold mb-2">Update Zusammenfassungen</h3>
-                  <p>Wählen Sie ein Update aus der Übersicht für eine detaillierte Zusammenfassung.</p>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="content" className="mt-6">
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/10 dark:to-emerald-900/10 border-b">
-                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Vollständiger Update-Inhalt
-                </CardTitle>
-                <CardDescription className="text-gray-600 dark:text-gray-400">
-                  Detaillierte regulatorische Updates und Compliance-Informationen
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="text-center py-12 text-gray-500">
-                  <FileText className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                  <h3 className="text-lg font-semibold mb-2">Vollständiger Inhalt</h3>
-                  <p>Wählen Sie ein Update aus der Übersicht, um den vollständigen Inhalt anzuzeigen.</p>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="analysis-ai" className="mt-6">
-            <Card className="border-0 shadow-lg border-l-4 border-l-orange-500">
-              <CardHeader className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/10 dark:to-red-900/10 border-b">
-                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
-                  <Brain className="w-5 h-5 mr-2 text-orange-600" />
-                  🔥 KI-gestützte Finanzanalyse
-                </CardTitle>
-                <CardDescription className="text-gray-600 dark:text-gray-400">
-                  Fortschrittliche KI-Analyse zur finanziellen Auswirkung regulatorischer Updates
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="text-center py-12 text-gray-500">
-                  <Brain className="w-16 h-16 mx-auto mb-4 text-orange-400" />
-                  <h3 className="text-lg font-semibold mb-2">KI-Finanzanalyse</h3>
-                  <p>Wählen Sie ein Update aus der Übersicht für eine detaillierte KI-gestützte Finanzanalyse.</p>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="ai-analysis" className="mt-6">
-            <Card className="border-0 shadow-lg border-l-4 border-l-purple-500">
-              <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/10 dark:to-indigo-900/10 border-b">
-                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
-                  <Brain className="w-5 h-5 mr-2 text-purple-600" />
-                  🧠 KI-gestützte Compliance-Analyse
-                </CardTitle>
-                <CardDescription className="text-gray-600 dark:text-gray-400">
-                  Intelligente Analyse zur Bewertung und Kategorisierung regulatorischer Updates
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="text-center py-12 text-gray-500">
-                  <Brain className="w-16 h-16 mx-auto mb-4 text-purple-400" />
-                  <h3 className="text-lg font-semibold mb-2">KI-Compliance-Analyse</h3>
-                  <p>Wählen Sie ein Update aus der Übersicht für eine detaillierte KI-gestützte Compliance-Analyse.</p>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="metadata" className="mt-6">
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-900/10 dark:to-blue-900/10 border-b">
-                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Regulatorische Updates Metadaten
-                </CardTitle>
-                <CardDescription className="text-gray-600 dark:text-gray-400">
-                  Technische Details, Quellen und Datenherkunft der regulatorischen Updates
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="font-semibold mb-3">Datenquellen</h4>
-                    <div className="space-y-2 text-sm">
-                      {authorities.slice(0, 5).map((authority) => (
-                        <div key={authority} className="flex justify-between">
-                          <span>{authority}</span>
-                          <Badge variant="secondary">Aktiv</Badge>
-                        </div>
-                      ))}
-                      {authorities.length > 5 && (
-                        <div className="text-gray-500">
-                          +{authorities.length - 5} weitere Behörden
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-3">Datenqualität</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>Vollständigkeit</span>
-                        <Badge className="bg-green-100 text-green-800">100%</Badge>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Authentizität</span>
-                        <Badge className="bg-green-100 text-green-800">Verifiziert</Badge>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Letzte Aktualisierung</span>
-                        <span className="text-gray-600">Heute</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Updates verfügbar</span>
-                        <span className="text-gray-600">{updates.length}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
       </div>
     </div>
   );
