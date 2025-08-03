@@ -44,6 +44,7 @@ const RealTimeIntegration = lazy(() => import("@/pages/real-time-integration"));
 const DataSourcesAdmin = lazy(() => import("@/pages/DataSourcesAdmin"));
 const Administration = lazy(() => import("@/pages/administration"));
 const GripData = lazy(() => import("@/pages/grip-data"));
+const NewsletterAdmin = lazy(() => import("@/pages/newsletter-admin"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -84,6 +85,7 @@ function Router() {
         <Route path="/administration/data-sources" component={DataSourcesAdmin} />
         <Route path="/administration" component={Administration} />
         <Route path="/grip-data" component={GripData} />
+        <Route path="/newsletter-admin" component={NewsletterAdmin} />
         <Route path="/documents/:sourceType/:documentId" component={DocumentViewer} />
         
         {/* Fallback to 404 */}
