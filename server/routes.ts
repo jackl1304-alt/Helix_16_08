@@ -936,22 +936,24 @@ Weitere Details finden Sie in der offiziellen Dokumentation der Regulierungsbeh�
     }
   });
 
-  // Expanded Newsletter sources with 23 authentic MedTech sources
+  // Real Newsletter sources with web scraping capabilities
   app.get('/api/newsletter-sources', async (req, res) => {
     console.log('[CRITICAL] API ROUTE DETECTED: /api/newsletter-sources - FORCING JSON ONLY');
     res.setHeader('Content-Type', 'application/json');
     try {
-      const { expandedNewsletterService } = await import('./services/expandedNewsletterService');
-      const result = expandedNewsletterService.getNewsletterSources();
+      const { realNewsletterScraper } = await import('./services/realNewsletterScraper');
+      const sources = realNewsletterScraper.getSources();
+      const stats = realNewsletterScraper.getStats();
       
       res.json({
         success: true,
-        sources: result.sources,
-        stats: result.stats,
+        sources: sources,
+        stats: stats,
+        scrapingCapability: 'Enabled',
         timestamp: new Date().toISOString()
       });
     } catch (error: any) {
-      console.error('Failed to get expanded newsletter sources:', error);
+      console.error('Failed to get real newsletter sources:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to get newsletter sources',
@@ -3112,69 +3114,82 @@ Status: Archiviertes historisches Dokument
     }
   });
 
-  // Newsletter Extraction - Erweiterte MedTech Quellen (23 authentische Newsletter)
+  // Newsletter Extraction - ECHTE Web-Scraping von MedTech-Quellen
   app.post('/api/knowledge/extract-newsletters', async (req, res) => {
     try {
-      console.log('API: Starting EXPANDED newsletter extraction from 23 authentic MedTech sources');
+      console.log('API: Starting REAL newsletter web scraping from authentic MedTech sources');
       
-      const { expandedNewsletterService } = await import('./services/expandedNewsletterService');
-      const newsletterData = expandedNewsletterService.getNewsletterSources();
+      const { realNewsletterScraper } = await import('./services/realNewsletterScraper');
       
-      // Extrahiere nur von aktiven Quellen (12 von 23)
-      const activeSources = newsletterData.sources.filter(source => source.status === 'active');
-      console.log(`Processing ${activeSources.length} active newsletter sources from total ${newsletterData.sources.length} sources`);
+      // Echtes Web-Scraping von öffentlich zugänglichen Quellen
+      const scrapedArticles = await realNewsletterScraper.scrapePublicSources();
+      console.log(`Scraped ${scrapedArticles.length} articles from public sources`);
       
       let totalArticles = 0;
-      const processedSources = [];
-      const errors = [];
+      const processedSources: any[] = [];
+      const errors: string[] = [];
       
-      // Simuliere echte Newsletter-Extraktion für jede aktive Quelle
-      for (const source of activeSources) {
+      // Speichere gescrapte Artikel in der Datenbank
+      for (const article of scrapedArticles) {
         try {
-          console.log(`Processing newsletter: ${source.name} (${source.category})`);
-          
-          // Generiere authentische MedTech-Artikel basierend auf der Quellen-Kategorie
-          const articlesCount = Math.floor(Math.random() * 5) + 2; // 2-6 Artikel pro Quelle
-          
-          for (let i = 0; i < articlesCount; i++) {
-            const article = generateMedTechArticle(source);
-            await storage.addKnowledgeArticle(article);
-            totalArticles++;
-          }
-          
-          processedSources.push({
-            name: source.name,
-            articlesExtracted: articlesCount,
-            category: source.category,
-            requiresAuth: source.requiresAuth
+          await storage.addKnowledgeArticle({
+            title: article.article_title,
+            content: article.content_text,
+            source: article.source_name,
+            url: article.article_url,
+            publishedAt: new Date(article.publication_date),
+            tags: article.keywords || [],
+            summary: article.content_text.substring(0, 200) + '...',
+            credibility: article.is_gated ? 'premium' : 'public',
+            category: 'newsletter'
           });
-        } catch (sourceError: any) {
-          console.error(`Error processing ${source.name}:`, sourceError);
-          errors.push(`${source.name}: ${sourceError.message}`);
+          totalArticles++;
+        } catch (dbError: any) {
+          console.error(`Error saving article: ${article.article_title}`, dbError);
+          errors.push(`Database error for ${article.article_title}: ${dbError.message}`);
         }
       }
       
-      console.log(`Newsletter extraction completed: ${totalArticles} articles from ${processedSources.length} active sources`);
+      // Gruppiere nach Quellen für Statistiken
+      const sourceGroups = scrapedArticles.reduce((acc, article) => {
+        if (!acc[article.source_name]) {
+          acc[article.source_name] = {
+            name: article.source_name,
+            articlesExtracted: 0,
+            requiresAuth: article.is_gated
+          };
+        }
+        acc[article.source_name].articlesExtracted++;
+        return acc;
+      }, {} as Record<string, any>);
+      
+      processedSources.push(...Object.values(sourceGroups));
+      
+      const stats = realNewsletterScraper.getStats();
+      
+      console.log(`Real newsletter scraping completed: ${totalArticles} articles from ${processedSources.length} sources`);
       
       res.json({ 
         success: true, 
-        message: `Enhanced newsletter extraction completed: ${totalArticles} articles from ${processedSources.length} authentic MedTech sources`,
+        message: `Real newsletter scraping completed: ${totalArticles} articles from ${processedSources.length} authentic MedTech sources`,
         stats: {
           articlesExtracted: totalArticles,
           processedSources: processedSources.length,
-          totalSources: newsletterData.sources.length,
-          activeSources: activeSources.length,
-          configuredSources: newsletterData.sources.filter(s => s.status === 'configured').length,
+          totalSources: stats.totalSources,
+          activeSources: stats.activeSources,
+          configuredSources: stats.configuredSources,
           sources: processedSources,
-          errors: errors
+          errors: errors,
+          scrapingMethod: 'Real web scraping with Cheerio and Axios',
+          publicSourcesProcessed: scrapedArticles.length > 0 ? 'Success' : 'No articles found'
         },
         timestamp: new Date().toISOString()
       });
     } catch (error: any) {
-      console.error('API: Enhanced newsletter extraction failed:', error);
+      console.error('API: Real newsletter scraping failed:', error);
       res.status(500).json({ 
         success: false, 
-        message: error.message || 'Failed to extract newsletter content from authentic sources'
+        message: error.message || 'Failed to scrape newsletter content from authentic sources'
       });
     }
   });
