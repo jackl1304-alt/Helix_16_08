@@ -487,7 +487,7 @@ export default function RegulatoryUpdatesPage() {
                                 <DialogTrigger asChild>
                                   <Button variant="outline" size="sm" className="flex items-center gap-2">
                                     <Eye className="h-4 w-4" />
-                                    Vollständig lesen
+                                    Details & Analyse
                                   </Button>
                                 </DialogTrigger>
                                 <DialogContent className="max-w-4xl w-[95vw] h-[90vh] overflow-y-auto">
