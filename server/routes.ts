@@ -46,6 +46,7 @@ import { storage } from "./storage";
 import adminRoutes from "./routes/admin.routes";
 import errorRoutes from "./routes/errors";
 import gripRoutes from "./routes/grip.routes";
+import { getLegalCaseById } from "./routes/legal-case-detail";
 import { aiApprovalService } from "./services/ai-approval-service";
 import { 
   insertUserSchema, 
@@ -3749,6 +3750,9 @@ Für vollständige Details und weitere Analysen besuchen Sie die ursprüngliche 
 
   // Mount Admin Data Sources routes
   app.use('/api/admin', adminDataSourcesRoutes);
+
+  // ========== LEGAL CASE DETAIL ENDPOINT ==========
+  app.get('/api/legal-cases/:id', getLegalCaseById);
 
   // Health Check and Metrics endpoints
   const { healthCheckHandler, metricsHandler } = await import('./middleware/healthCheck');
