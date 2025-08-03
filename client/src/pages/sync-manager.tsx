@@ -205,7 +205,7 @@ export default function SyncManager() {
               <Clock className="h-5 w-5 text-orange-600" />
               <div>
                 <p className="text-sm text-gray-600">Laufende Syncs</p>
-                <p className="font-semibold">{syncAllMutation.isPending ? dataSources.filter(s => s.isActive).length : 0}</p>
+                <p className="font-semibold">{(syncStats as any)?.runningSyncs || 0}</p>
               </div>
             </div>
           </CardContent>
