@@ -249,17 +249,17 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {recentUpdates && recentUpdates.length > 0 ? (
-              recentUpdates.slice(0, 5).map((update: any, index: number) => (
+            {recentUpdates && recentUpdates.data && recentUpdates.data.length > 0 ? (
+              recentUpdates.data.slice(0, 5).map((update: any, index: number) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div>
                     <p className="font-medium text-sm">{update.title}</p>
                     <p className="text-xs text-gray-500">
-                      {update.jurisdiction} • {update.type}
+                      {update.source_id || update.source || 'FDA'} • {update.category || update.type || 'Regulatory Update'}
                     </p>
                   </div>
                   <Badge variant="outline">
-                    {new Date(update.publishedDate).toLocaleDateString('de-DE')}
+                    {new Date(update.published_at || update.publishedDate).toLocaleDateString('de-DE')}
                   </Badge>
                 </div>
               ))
