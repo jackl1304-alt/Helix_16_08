@@ -290,11 +290,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const startTime = Date.now();
       
-      // Hole alle aktiven Datenquellen
+      // Hole alle aktiven Datenquellen mit detailliertem Debugging
       const dataSources = await storage.getAllDataSources();
-      const activeSources = dataSources.filter(source => source.isActive);
+      console.log(`[API] Total data sources found: ${dataSources.length}`);
+      console.log(`[API] First source sample:`, dataSources[0]);
       
-      console.log(`[API] Found ${activeSources.length} active data sources for bulk sync`);
+      const activeSources = dataSources.filter(source => source.is_active === true);
+      console.log(`[API] Active sources after filtering: ${activeSources.length}`);
+      
+      if (activeSources.length === 0) {
+        console.log('[API] WARNING: No active sources found! Checking alternative field names...');
+        const altActiveSources = dataSources.filter(source => source.isActive === true || source.active === true);
+        console.log(`[API] Alternative active filtering result: ${altActiveSources.length}`);
+        
+        if (altActiveSources.length > 0) {
+          console.log('[API] Using alternative active sources');
+          activeSources.push(...altActiveSources);
+        }
+      }
+      
+      console.log(`[API] Final active sources count for bulk sync: ${activeSources.length}`);
       
       // Import des optimierten Sync-Services
       const { optimizedSyncService } = await import('./services/optimizedSyncService');
