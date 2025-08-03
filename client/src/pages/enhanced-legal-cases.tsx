@@ -38,7 +38,7 @@ export default function EnhancedLegalCases() {
       
       console.log("Legal Cases - Raw data:", data.length, "cases loaded");
       console.log("Sample case structure:", data[0] ? Object.keys(data[0]) : "No data");
-      console.log("First 3 cases content preview:", data.slice(0, 3).map(c => ({
+      console.log("First 3 cases content preview:", data.slice(0, 3).map((c: any) => ({
         id: c.id,
         title: c.title,
         summaryPreview: c.summary?.substring(0, 100) + "...",
@@ -302,6 +302,10 @@ export default function EnhancedLegalCases() {
                         Vollständige Zusammenfassung aus Originaldatenbank
                       </h4>
                       <div className="bg-white p-4 rounded border max-h-[500px] overflow-y-auto">
+                        <div className="bg-red-50 p-2 mb-3 rounded text-xs">
+                          <strong>DEBUG INFO:</strong> Fall-ID: {legalCase.id} | 
+                          Erste 100 Zeichen: "{legalCase.summary?.substring(0, 100)}..."
+                        </div>
                         <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
                           {legalCase.summary || "Keine Zusammenfassung verfügbar"}
                         </div>
@@ -320,6 +324,10 @@ export default function EnhancedLegalCases() {
                         Vollständiger Originalinhalt aus Datenbank
                       </h4>
                       <div className="bg-white p-4 rounded border max-h-[600px] overflow-y-auto">
+                        <div className="bg-yellow-100 p-2 mb-3 rounded text-xs">
+                          <strong>DEBUG INFO:</strong> Fall-ID: {legalCase.id} | 
+                          Erste 100 Zeichen: "{legalCase.content?.substring(0, 100)}..."
+                        </div>
                         <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
                           {legalCase.content || "Vollständiger Inhalt wird geladen..."}
                         </div>
