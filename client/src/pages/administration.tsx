@@ -54,6 +54,109 @@ export default function Administration() {
   const [duplicateResults, setDuplicateResults] = useState<any>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
+  // Duplicate search function
+  const handleDuplicateSearch = async () => {
+    setDuplicateSearchLoading(true);
+    try {
+      const response = await apiRequest('/api/admin/search-duplicates', 'POST');
+      const data = response.data;
+      
+      // Transform the data to match the expected format
+      const transformedResults = {
+        totalRecords: data.totalRegulatory + data.totalLegal,
+        duplicatesFound: data.duplicateRegulatory + data.duplicateLegal,
+        duplicateGroups: [],
+        qualityScore: data.qualityScore,
+        overallDuplicatePercentage: data.overallDuplicatePercentage,
+        timestamp: data.timestamp
+      };
+      
+      setDuplicateResults(transformedResults);
+      toast({
+        title: "Duplikate-Suche abgeschlossen",
+        description: response.message || `${transformedResults.duplicatesFound} Duplikate gefunden`,
+      });
+    } catch (error: any) {
+      console.error('Duplikate-Suche fehlgeschlagen:', error);
+      toast({
+        title: "Fehler bei der Duplikate-Suche",
+        description: error.message || "Ein unbekannter Fehler ist aufgetreten.",
+        variant: "destructive",
+      });
+    } finally {
+      setDuplicateSearchLoading(false);
+    }
+  };
+
+  // Automatic duplicate removal function
+  const handleAutoRemoveDuplicates = async () => {
+    setDeleteLoading(true);
+    try {
+      const response = await apiRequest('/api/admin/cleanup-duplicates', 'POST');
+      
+      toast({
+        title: "Automatische Bereinigung abgeschlossen",
+        description: response.message || `${response.data?.duplicatesRemoved || 0} Duplikate entfernt`,
+      });
+      
+      // Clear results and refresh
+      setDuplicateResults(null);
+      await handleDuplicateSearch();
+    } catch (error: any) {
+      console.error('Automatische Duplikat-Entfernung fehlgeschlagen:', error);
+      toast({
+        title: "Fehler bei automatischer Bereinigung",
+        description: error.message || "Ein unbekannter Fehler ist aufgetreten.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  // Delete duplicates function
+  const handleDeleteDuplicates = async () => {
+    if (!duplicateResults?.removalCandidates?.length) {
+      toast({
+        title: "Keine Duplikate zum Löschen",
+        description: "Führe zuerst eine Duplikate-Suche durch.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setDeleteLoading(true);
+    try {
+      // Process duplicates in smaller batches to avoid payload limits
+      const batchSize = 100;
+      const candidates = duplicateResults.removalCandidates;
+      let totalRemoved = 0;
+      
+      for (let i = 0; i < candidates.length; i += batchSize) {
+        const batch = candidates.slice(i, i + batchSize);
+        const response = await apiRequest('/api/quality/remove-duplicates', 'POST', { candidateIds: batch });
+        totalRemoved += response.removedCount || 0;
+      }
+      
+      toast({
+        title: "Duplikate erfolgreich gelöscht",
+        description: `${totalRemoved} Duplikate wurden entfernt.`,
+      });
+      
+      // Refresh search results
+      await handleDuplicateSearch();
+    } catch (error: any) {
+      console.error('Duplikate-Löschung fehlgeschlagen:', error);
+      toast({
+        title: "Fehler beim Löschen der Duplikate",
+        description: error.message || "Ein unbekannter Fehler ist aufgetreten.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   // Fetch development phases
   const { data: phases, isLoading } = useQuery({
     queryKey: ['/api/admin/development-phases'],
@@ -630,107 +733,4 @@ export default function Administration() {
       </Tabs>
     </div>
   );
-
-  // Duplicate search function
-  async function handleDuplicateSearch() {
-    setDuplicateSearchLoading(true);
-    try {
-      const response = await apiRequest('/api/admin/search-duplicates', 'POST');
-      const data = response.data;
-      
-      // Transform the data to match the expected format
-      const transformedResults = {
-        totalRecords: data.totalRegulatory + data.totalLegal,
-        duplicatesFound: data.duplicateRegulatory + data.duplicateLegal,
-        duplicateGroups: [],
-        qualityScore: data.qualityScore,
-        overallDuplicatePercentage: data.overallDuplicatePercentage,
-        timestamp: data.timestamp
-      };
-      
-      setDuplicateResults(transformedResults);
-      toast({
-        title: "Duplikate-Suche abgeschlossen",
-        description: response.message || `${transformedResults.duplicatesFound} Duplikate gefunden`,
-      });
-    } catch (error: any) {
-      console.error('Duplikate-Suche fehlgeschlagen:', error);
-      toast({
-        title: "Fehler bei der Duplikate-Suche",
-        description: error.message || "Ein unbekannter Fehler ist aufgetreten.",
-        variant: "destructive",
-      });
-    } finally {
-      setDuplicateSearchLoading(false);
-    }
-  }
-
-  // Automatic duplicate removal function
-  async function handleAutoRemoveDuplicates() {
-    setDeleteLoading(true);
-    try {
-      const response = await apiRequest('/api/admin/cleanup-duplicates', 'POST');
-      
-      toast({
-        title: "Automatische Bereinigung abgeschlossen",
-        description: response.message || `${response.data?.duplicatesRemoved || 0} Duplikate entfernt`,
-      });
-      
-      // Clear results and refresh
-      setDuplicateResults(null);
-      await handleDuplicateSearch();
-    } catch (error: any) {
-      console.error('Automatische Duplikat-Entfernung fehlgeschlagen:', error);
-      toast({
-        title: "Fehler bei automatischer Bereinigung",
-        description: error.message || "Ein unbekannter Fehler ist aufgetreten.",
-        variant: "destructive",
-      });
-    } finally {
-      setDeleteLoading(false);
-    }
-  }
-
-  // Delete duplicates function
-  async function handleDeleteDuplicates() {
-    if (!duplicateResults?.removalCandidates?.length) {
-      toast({
-        title: "Keine Duplikate zum Löschen",
-        description: "Führe zuerst eine Duplikate-Suche durch.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setDeleteLoading(true);
-    try {
-      // Process duplicates in smaller batches to avoid payload limits
-      const batchSize = 100;
-      const candidates = duplicateResults.removalCandidates;
-      let totalRemoved = 0;
-      
-      for (let i = 0; i < candidates.length; i += batchSize) {
-        const batch = candidates.slice(i, i + batchSize);
-        const response = await apiRequest('/api/quality/remove-duplicates', 'POST', { candidateIds: batch });
-        totalRemoved += response.removedCount || 0;
-      }
-      
-      toast({
-        title: "Duplikate erfolgreich gelöscht",
-        description: `${totalRemoved} Duplikate wurden entfernt.`,
-      });
-      
-      // Refresh search results
-      await handleDuplicateSearch();
-    } catch (error: any) {
-      console.error('Duplikate-Löschung fehlgeschlagen:', error);
-      toast({
-        title: "Fehler beim Löschen der Duplikate",
-        description: error.message || "Ein unbekannter Fehler ist aufgetreten.",
-        variant: "destructive",
-      });
-    } finally {
-      setDeleteLoading(false);
-    }
-  }
 }
