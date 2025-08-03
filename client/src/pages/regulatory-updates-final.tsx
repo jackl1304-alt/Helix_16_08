@@ -266,76 +266,75 @@ export default function RegulatoryUpdatesFinal() {
           </Card>
         </div>
 
-        {/* Updates Liste */}
-        <div className="space-y-4 mb-8">
+        {/* Kompakte Updates Liste */}
+        <div className="space-y-3 mb-8">
           {paginatedUpdates.map((update: RegulatoryUpdate) => (
-            <Card key={update.id} className="bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                      {update.title}
-                    </h3>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      <Badge variant="outline" className="text-blue-600">
-                        {update.region}
-                      </Badge>
-                      <Badge 
-                        variant={update.priority === 'high' ? 'destructive' : 'default'}
-                        className={cn(
-                          update.priority === 'high' && 'bg-red-500 text-white',
-                          update.priority === 'medium' && 'bg-yellow-500 text-white',
-                          update.priority === 'low' && 'bg-green-500 text-white'
-                        )}
-                      >
-                        {update.priority}
-                      </Badge>
-                      {update.update_type && (
-                        <Badge variant="outline" className="text-purple-600">
-                          {update.update_type}
-                        </Badge>
+            <Card key={update.id} className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    {update.title}
+                  </h3>
+                  
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                      {update.region}
+                    </Badge>
+                    <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                      {update.update_type}
+                    </Badge>
+                    <Badge variant="outline" className={cn(
+                      "text-xs border",
+                      update.priority === 'high' ? "bg-red-50 text-red-700 border-red-200" :
+                      update.priority === 'medium' ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
+                      "bg-gray-50 text-gray-700 border-gray-200"
+                    )}>
+                      {update.priority}
+                    </Badge>
+                  </div>
+
+                  {/* Kompakte Beschreibung */}
+                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    {update.description?.split('\n')[0] || update.content?.substring(0, 100) + '...' || 'Keine Beschreibung verfügbar'}
+                  </div>
+
+                  {/* Wichtige Punkte anzeigen */}
+                  {update.description?.includes('WICHTIGE ÄNDERUNGEN:') && (
+                    <div className="text-sm space-y-1 mb-2">
+                      {update.description.split('\n').slice(2, 6).map((line, idx) => 
+                        line.trim().startsWith('•') && (
+                          <div key={idx} className="text-gray-700 dark:text-gray-300">{line}</div>
+                        )
                       )}
                     </div>
-                  </div>
-                </div>
-              </CardHeader>
-
-              <CardContent>
-                {/* Direkte Anzeige des fullText */}
-                <div className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-                  {update.fullText ? (
-                    <div className="whitespace-pre-wrap">
-                      {update.fullText.substring(0, 400)}
-                      {update.fullText.length > 400 && '...'}
-                    </div>
-                  ) : update.description ? (
-                    <div>{update.description}</div>
-                  ) : (
-                    <div className="text-gray-500 italic">Kein Inhalt verfügbar</div>
                   )}
-                </div>
-
-                <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
+                  
+                  <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
                       {new Date(update.published_at).toLocaleDateString('de-DE')}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {new Date(update.created_at).toLocaleDateString('de-DE')}
-                    </span>
+                    </div>
+                    {update.source_id && (
+                      <div className="flex items-center gap-1">
+                        <FileText className="h-3 w-3" />
+                        {update.source_id}
+                      </div>
+                    )}
                   </div>
-
+                </div>
+                
+                <div className="ml-4">
                   <Dialog onOpenChange={(open) => {
                     if (open) setSelectedUpdate(update);
                     else setSelectedUpdate(null);
                   }}>
                     <DialogTrigger asChild>
-                      <Button 
+                      <Button
                         variant="outline"
+                        size="sm"
+                        className="flex items-center gap-2 text-xs"
                       >
-                        <Eye className="h-4 w-4 mr-2" />
+                        <Eye className="h-3 w-3" />
                         Details & Analyse
                       </Button>
                     </DialogTrigger>
