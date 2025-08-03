@@ -310,6 +310,74 @@ export default function DataCollection() {
         <TabsContent value="sources">
           <div className="grid gap-4">
             
+            {/* Regulatory Sources Section */}
+            <Card className="border-red-200 bg-red-50/50">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-red-800">🏛️ Regulatorische Datenquellen</h3>
+                    <p className="text-sm text-red-600 mt-1">
+                      Offizielle regulatorische Datenbanken (FDA, WHO, EU) für Compliance-Daten
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-sm text-red-700 text-right">
+                      <div className="font-medium">5 aktiv</div>
+                      <div className="text-xs">8 gesamt</div>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => fetch('/api/knowledge/extract-regulatory', { method: 'POST' })}
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      <Database className="h-4 w-4 mr-2" />
+                      Regulatorische Daten
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96 overflow-y-auto">
+                  {[
+                    { name: 'FDA Medical Device Databases', region: 'US', category: 'regulatory_database', active: true },
+                    { name: 'WHO Global Atlas of Medical Devices', region: 'Global', category: 'standards', active: true },
+                    { name: 'MedTech Europe Regulatory Convergence', region: 'EU', category: 'compliance', active: true },
+                    { name: 'NCBI Global Regulation Framework', region: 'Global', category: 'standards', active: true },
+                    { name: 'IQVIA MedTech Compliance Blog', region: 'Global', category: 'market_analysis', active: true },
+                    { name: 'MedBoard Regulatory Intelligence', region: 'Global', category: 'regulatory_database', active: false },
+                    { name: 'Clarivate Medtech Intelligence', region: 'Global', category: 'regulatory_database', active: false },
+                    { name: 'IQVIA Regulatory Intelligence Platform', region: 'Global', category: 'regulatory_database', active: false }
+                  ].map((source, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-medium text-sm truncate">
+                            {source.name}
+                          </p>
+                          <Badge 
+                            variant={source.active ? 'default' : 'secondary'}
+                            className="text-xs"
+                          >
+                            {source.active ? 'Aktiv' : 'Premium'}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-1 mt-1">
+                          <Badge variant="outline" className="text-xs px-1">
+                            {source.region}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs px-1">
+                            {source.category === 'regulatory_database' ? 'Datenbank' : 
+                             source.category === 'standards' ? 'Standards' : 
+                             source.category === 'compliance' ? 'Compliance' : 'Analyse'}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Newsletter Sources Section */}
             <Card className="border-blue-200 bg-blue-50/50">
               <CardHeader>

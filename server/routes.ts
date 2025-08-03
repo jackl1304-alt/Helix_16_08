@@ -3114,6 +3114,87 @@ Status: Archiviertes historisches Dokument
     }
   });
 
+  // Regulatory Data Extraction - AUTHENTISCHE REGULATORISCHE DATENQUELLEN
+  app.post('/api/knowledge/extract-regulatory', async (req, res) => {
+    try {
+      console.log('API: Starting regulatory data extraction from authentic sources');
+      
+      const { regulatoryDataScraper } = await import('./services/regulatoryDataScraper');
+      
+      // Echtes Web-Scraping von regulatorischen Datenquellen
+      const scrapedData = await regulatoryDataScraper.scrapeAllSources();
+      console.log(`Scraped ${scrapedData.length} regulatory data entries from authentic sources`);
+      
+      let totalEntries = 0;
+      const processedSources: any[] = [];
+      const errors: string[] = [];
+      
+      // Speichere gescrapte regulatorische Daten in der Datenbank
+      for (const entry of scrapedData) {
+        try {
+          await storage.addKnowledgeArticle({
+            title: entry.title,
+            content: entry.content,
+            source: entry.source_name,
+            url: entry.url,
+            publishedAt: new Date(entry.publication_date),
+            tags: entry.keywords || [],
+            summary: entry.content.substring(0, 200) + '...',
+            credibility: entry.source_name.includes('FDA') || entry.source_name.includes('WHO') ? 'official' : 'verified',
+            category: 'regulatory'
+          });
+          totalEntries++;
+        } catch (dbError: any) {
+          console.error(`Error saving regulatory entry: ${entry.title}`, dbError);
+          errors.push(`Database error for ${entry.title}: ${dbError.message}`);
+        }
+      }
+      
+      // Gruppiere nach Quellen für Statistiken
+      const sourceGroups = scrapedData.reduce((acc, entry) => {
+        if (!acc[entry.source_name]) {
+          acc[entry.source_name] = {
+            name: entry.source_name,
+            entriesExtracted: 0,
+            category: entry.category,
+            region: entry.region
+          };
+        }
+        acc[entry.source_name].entriesExtracted++;
+        return acc;
+      }, {} as Record<string, any>);
+      
+      processedSources.push(...Object.values(sourceGroups));
+      
+      const stats = regulatoryDataScraper.getStats();
+      
+      console.log(`Regulatory data extraction completed: ${totalEntries} entries from ${processedSources.length} sources`);
+      
+      res.json({ 
+        success: true, 
+        message: `Regulatory data extraction completed: ${totalEntries} entries from ${processedSources.length} authentic regulatory sources`,
+        stats: {
+          entriesExtracted: totalEntries,
+          processedSources: processedSources.length,
+          totalSources: stats.totalSources,
+          activeSources: stats.activeSources,
+          errors: errors.length,
+          sourceBreakdown: processedSources,
+          categories: stats.categories,
+          regions: stats.regions,
+          scrapingMethod: 'Real web scraping with Cheerio and Axios from official regulatory sources'
+        },
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error('API: Regulatory data extraction failed:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: error.message || 'Failed to extract regulatory data'
+      });
+    }
+  });
+
   // Newsletter Extraction - ECHTE Web-Scraping von MedTech-Quellen
   app.post('/api/knowledge/extract-newsletters', async (req, res) => {
     try {
