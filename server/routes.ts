@@ -2914,7 +2914,7 @@ Status: Archiviertes historisches Dokument
       const status = await universalExtractor.getSourcesStatus();
       res.json(status);
     } catch (error: any) {
-      logger.error('API: Failed to get sources status', error);
+      console.error('API: Failed to get sources status:', error);
       res.status(500).json({ 
         success: false, 
         message: error.message || 'Failed to get sources status'

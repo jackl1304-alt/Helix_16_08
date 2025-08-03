@@ -108,7 +108,10 @@ export default function SyncManager() {
       
       try {
         // Echter Live-Sync mit realistischer Dauer (5-15 Sekunden)
-        const result = await apiRequest(`/api/data-sources/${sourceId}/document`, 'POST');
+        const result = await apiRequest(`/api/data-sources/${sourceId}/document`, { 
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
         return result;
       } finally {
         // Reduziere laufende Syncs nach Abschluss
@@ -180,7 +183,10 @@ export default function SyncManager() {
       
       try {
         // Echter Bulk-Sync API-Aufruf (Backend macht alle 46 Quellen parallel)
-        const result = await apiRequest('/api/data-sources/sync-all', 'POST');
+        const result = await apiRequest('/api/data-sources/sync-all', { 
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
         return result;
       } finally {
         // Reset nach Abschluss
