@@ -37,15 +37,26 @@ const useDeviceDetection = () => {
   return device;
 };
 
-// Formatted text component for proper line breaks
+// Formatted text component for proper line breaks and HTML cleanup
 const FormattedText = ({ text, className = "" }: { text: string; className?: string }) => {
+  if (!text) return <p className={`text-gray-500 italic ${className}`}>Kein Inhalt verfügbar</p>;
+  
+  // HTML-Tags entfernen und Text bereinigen
+  const cleanText = text
+    .replace(/<[^>]*>/g, '') // HTML Tags entfernen
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .trim();
+  
   return (
     <div className={className}>
-      {text.split('\n').map((line, index) => (
-        <span key={index}>
-          {line}
-          {index < text.split('\n').length - 1 && <br />}
-        </span>
+      {cleanText.split('\n').map((line, index) => (
+        <p key={index} className="mb-2 last:mb-0 text-gray-800 dark:text-gray-200">
+          {line.trim() || '\u00A0'}
+        </p>
       ))}
     </div>
   );
