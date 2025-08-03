@@ -5,6 +5,104 @@ export class SimpleNewsletterService {
   private logger = new Logger('SimpleNewsletterService');
 
   /**
+   * Gibt alle konfigurierten Newsletter-Quellen zurück
+   */
+  getActiveNewsletterSources() {
+    return [
+      {
+        id: 'medtech_dive',
+        name: 'MedTech Dive',
+        url: 'https://www.medtechdive.com/',
+        category: 'industry_newsletter',
+        requiresAuth: true,
+        status: 'active',
+        description: 'Tägliche Branchennachrichten und Analysen'
+      },
+      {
+        id: 'medtech_europe_monthly',
+        name: 'MedTech Europe Monthly',
+        url: 'https://www.medtecheurope.org/medtech-views/newsletters/',
+        category: 'regulatory_newsletter',
+        requiresAuth: true,
+        status: 'active',
+        description: 'Europäische Regulatory Updates'
+      },
+      {
+        id: 'citeline_medtech_insight',
+        name: 'Citeline Medtech Insight',
+        url: 'https://insights.citeline.com/medtech-insight/',
+        category: 'industry_newsletter',
+        requiresAuth: true,
+        status: 'active',
+        description: 'Globale Premium-Inhalte und Marktanalysen'
+      },
+      {
+        id: 'medtech_world_news',
+        name: 'MedTech World News',
+        url: 'https://med-tech.world/news/',
+        category: 'industry_newsletter',
+        requiresAuth: false,
+        status: 'active',
+        description: 'Öffentliche RSS-Feeds und Technologie-Updates'
+      },
+      {
+        id: 'ey_medtech_pulse',
+        name: 'EY MedTech Pulse Reports',
+        url: 'https://www.ey.com/en_gl/life-sciences/medtech',
+        category: 'market_analysis',
+        requiresAuth: true,
+        status: 'configured',
+        description: 'Jährliche Branchenberichte und strategische Analysen'
+      },
+      {
+        id: 'deloitte_medtech_insights',
+        name: 'Deloitte MedTech Insights',
+        url: 'https://www2.deloitte.com/global/en/pages/life-sciences-and-healthcare/topics/medtech.html',
+        category: 'market_analysis',
+        requiresAuth: true,
+        status: 'configured',
+        description: 'Strategische Analysen und Marktprognosen'
+      },
+      {
+        id: 'who_medical_device_updates',
+        name: 'WHO Medical Device Updates',
+        url: 'https://www.who.int/medical_devices/en/',
+        category: 'regulatory_newsletter',
+        requiresAuth: false,
+        status: 'configured',
+        description: 'Regulatorische Richtlinien und globale Standards'
+      },
+      {
+        id: 'medical_design_outsourcing',
+        name: 'Medical Design & Outsourcing',
+        url: 'https://www.medicaldesignandoutsourcing.com/',
+        category: 'industry_newsletter',
+        requiresAuth: true,
+        status: 'configured',
+        description: 'Produktdesign News und Engineering-Trends'
+      },
+      {
+        id: 'meddevice_online',
+        name: 'MedDevice Online',
+        url: 'https://www.meddeviceonline.com/',
+        category: 'industry_newsletter',
+        requiresAuth: true,
+        status: 'configured',
+        description: 'Technologie Updates und Produktneuheiten'
+      },
+      {
+        id: 'raps_regulatory_affairs',
+        name: 'RAPS Regulatory Affairs',
+        url: 'https://www.raps.org/',
+        category: 'regulatory_newsletter',
+        requiresAuth: true,
+        status: 'configured',
+        description: 'Best Practices und Compliance-Richtlinien'
+      }
+    ];
+  }
+
+  /**
    * Extrahiert Newsletter-Inhalte aus authentischen MedTech-Quellen
    */
   async extractNewsletterContent(): Promise<{
