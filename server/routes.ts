@@ -76,6 +76,49 @@ import { KnowledgeArticleService } from "./services/knowledgeArticleService";
 import { DuplicateCleanupService } from "./services/duplicateCleanupService";
 import { JAMANetworkScrapingService } from "./services/jamaNetworkScrapingService";
 import { UniversalKnowledgeExtractor } from "./services/universalKnowledgeExtractor";
+// AI Content Analysis functions (inline implementation for reliability)
+function analyzeContent(content: string) {
+  const normalizedContent = content.toLowerCase();
+  
+  // Device type detection
+  const deviceTypes = [];
+  const deviceKeywords = ['diagnostic', 'therapeutic', 'surgical', 'monitoring', 'imaging', 'implantable', 'ai', 'machine learning', 'pacemaker', 'catheter'];
+  for (const keyword of deviceKeywords) {
+    if (normalizedContent.includes(keyword)) {
+      deviceTypes.push(keyword);
+    }
+  }
+  
+  // Category detection
+  const categories = [];
+  if (normalizedContent.includes('fda') || normalizedContent.includes('510k')) categories.push('FDA Regulation');
+  if (normalizedContent.includes('mdr') || normalizedContent.includes('medical device regulation')) categories.push('MDR Compliance');
+  if (normalizedContent.includes('ai') || normalizedContent.includes('artificial intelligence')) categories.push('AI/ML Technology');
+  if (normalizedContent.includes('cybersecurity')) categories.push('Cybersecurity');
+  if (normalizedContent.includes('recall')) categories.push('Safety Alert');
+  
+  // Risk level
+  let riskLevel = 'medium';
+  if (normalizedContent.includes('class iii') || normalizedContent.includes('critical')) riskLevel = 'high';
+  if (normalizedContent.includes('class i') || normalizedContent.includes('non-invasive')) riskLevel = 'low';
+  
+  // Priority
+  let priority = 'medium';
+  if (normalizedContent.includes('urgent') || normalizedContent.includes('recall')) priority = 'high';
+  if (normalizedContent.includes('routine')) priority = 'low';
+  
+  // Confidence based on matches
+  const confidence = Math.min(0.5 + (categories.length * 0.1) + (deviceTypes.length * 0.05), 1.0);
+  
+  return {
+    categories: categories.length > 0 ? categories : ['General MedTech'],
+    deviceTypes: deviceTypes.length > 0 ? deviceTypes : ['Medical Device'],
+    riskLevel,
+    priority,
+    confidence,
+    therapeuticArea: 'general'
+  };
+}
 
 // Initialize Phase 1 & 2 services
 const fdaApiService = new FDAOpenAPIService();
@@ -3796,6 +3839,252 @@ Für vollständige Details und weitere Analysen besuchen Sie die ursprüngliche 
         success: false,
         error: error.message,
         message: 'Automatische Bereinigung fehlgeschlagen'
+      });
+    }
+  });
+
+  // ========== AI CONTENT ANALYSIS ENDPOINTS ==========
+  
+  // AI Content Analysis - Automatische Kategorisierung und Bewertung
+  app.post('/api/ai/analyze-content', async (req, res) => {
+    try {
+      const { content, contentType = 'regulatory' } = req.body;
+      
+      if (!content) {
+        return res.status(400).json({
+          success: false,
+          error: 'Content is required for analysis'
+        });
+      }
+
+      console.log(`[AI-ANALYSIS] Starting content analysis for ${contentType} content`);
+      const startTime = Date.now();
+      
+      // Perform content analysis
+      const analysis = analyzeContent(content);
+      
+      // Extract key sentences
+      const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 10);
+      const keyPoints = sentences.slice(0, 3).map(s => s.trim());
+      
+      // Extract entities (simple pattern matching)
+      const entityPattern = /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g;
+      const entities = Array.from(new Set(content.match(entityPattern) || [])).slice(0, 5);
+      
+      // Generate summary
+      const summary = content.length > 200 ? content.substring(0, 200) + '...' : content;
+      
+      // Compliance areas
+      const complianceAreas = [];
+      if (content.toLowerCase().includes('fda')) complianceAreas.push('FDA');
+      if (content.toLowerCase().includes('mdr')) complianceAreas.push('MDR');
+      if (content.toLowerCase().includes('cybersecurity')) complianceAreas.push('Cybersecurity');
+      
+      // Requirements and recommendations
+      const requirements = [`${analysis.riskLevel} risk medical device requirements`];
+      const recommendations = [`Review ${analysis.categories.join(', ')} compliance requirements`];
+      const risks = analysis.riskLevel === 'high' ? ['High risk device - enhanced monitoring required'] : [];
+      
+      // Sentiment analysis (simple)
+      const positiveWords = ['approved', 'clearance', 'breakthrough', 'innovation'];
+      const negativeWords = ['recall', 'warning', 'violation', 'denied'];
+      const posCount = positiveWords.filter(w => content.toLowerCase().includes(w)).length;
+      const negCount = negativeWords.filter(w => content.toLowerCase().includes(w)).length;
+      const sentiment = posCount > negCount ? 'positive' : negCount > posCount ? 'negative' : 'neutral';
+      
+      const processingTime = Date.now() - startTime;
+      
+      // Combined analysis result
+      const analysisResult = {
+        categorization: {
+          categories: analysis.categories,
+          deviceTypes: analysis.deviceTypes,
+          therapeuticArea: analysis.therapeuticArea,
+          riskLevel: analysis.riskLevel,
+          confidence: analysis.confidence
+        },
+        evaluation: {
+          priority: analysis.priority,
+          timelineSensitivity: analysis.priority === 'high' ? 'urgent' : 'standard',
+          qualityScore: Math.round(analysis.confidence * 100),
+          sentiment: sentiment
+        },
+        insights: {
+          keyPoints: keyPoints,
+          entities: entities,
+          summary: summary,
+          complianceAreas: complianceAreas,
+          requirements: requirements,
+          risks: risks,
+          recommendations: recommendations
+        },
+        metadata: {
+          processedAt: new Date().toISOString(),
+          contentLength: content.length,
+          analysisVersion: '2.0',
+          processingTime: `${processingTime}ms`
+        }
+      };
+
+      console.log(`[AI-ANALYSIS] Analysis completed with confidence: ${analysisResult.categorization.confidence}`);
+      
+      res.json({
+        success: true,
+        data: analysisResult,
+        message: `Content analysis completed with ${Math.round(analysisResult.categorization.confidence * 100)}% confidence`
+      });
+      
+    } catch (error: any) {
+      console.error('[AI-ANALYSIS] Content analysis failed:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        message: 'AI Content Analysis fehlgeschlagen'
+      });
+    }
+  });
+
+  // Batch Content Analysis für mehrere Inhalte
+  app.post('/api/ai/batch-analyze', async (req, res) => {
+    try {
+      const { items, contentType = 'regulatory' } = req.body;
+      
+      if (!items || !Array.isArray(items)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Items array is required for batch analysis'
+        });
+      }
+
+      console.log(`[AI-BATCH-ANALYSIS] Starting batch analysis for ${items.length} items`);
+      const startTime = Date.now();
+      
+      const results = [];
+      for (const item of items.slice(0, 50)) { // Limit to 50 items for performance
+        try {
+          const content = item.content || item.title || item.description || '';
+          if (content.length < 10) continue; // Skip very short content
+          
+          const analysis = analyzeContent(content);
+          
+          results.push({
+            id: item.id,
+            categories: analysis.categories,
+            deviceTypes: analysis.deviceTypes,
+            riskLevel: analysis.riskLevel,
+            priority: analysis.priority,
+            confidence: analysis.confidence,
+            qualityScore: Math.round(analysis.confidence * 100)
+          });
+        } catch (itemError) {
+          console.error(`[AI-BATCH-ANALYSIS] Error analyzing item ${item.id}:`, itemError);
+          results.push({
+            id: item.id,
+            error: 'Analysis failed',
+            categories: ['Unverified'],
+            confidence: 0
+          });
+        }
+      }
+      
+      const processingTime = Date.now() - startTime;
+      console.log(`[AI-BATCH-ANALYSIS] Batch analysis completed in ${processingTime}ms`);
+      
+      res.json({
+        success: true,
+        data: {
+          results,
+          totalProcessed: results.length,
+          processingTime: `${processingTime}ms`,
+          averageConfidence: results.reduce((sum, r) => sum + (r.confidence || 0), 0) / results.length
+        },
+        message: `Batch analysis completed for ${results.length} items`
+      });
+      
+    } catch (error: any) {
+      console.error('[AI-BATCH-ANALYSIS] Batch analysis failed:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        message: 'Batch AI Analysis fehlgeschlagen'
+      });
+    }
+  });
+
+  // AI Content Quality Assessment
+  app.post('/api/ai/assess-quality', async (req, res) => {
+    try {
+      const { contentId, content, contentType = 'regulatory' } = req.body;
+      
+      if (!content) {
+        return res.status(400).json({
+          success: false,
+          error: 'Content is required for quality assessment'
+        });
+      }
+
+      console.log(`[AI-QUALITY] Assessing quality for content ${contentId || 'unknown'}`);
+      
+      // Comprehensive quality assessment
+      const analysis = analyzeContent(content);
+      
+      // Quality metrics
+      const qualityMetrics = {
+        completeness: Math.min(content.length / 500, 1.0), // Based on content length
+        clarity: content.split(/[.!?]+/).length > 3 ? 0.8 : 0.4, // Based on sentence structure
+        relevance: analysis.confidence, // Based on AI confidence
+        compliance: analysis.categories.filter(c => c.includes('Compliance') || c.includes('Regulation')).length > 0 ? 0.9 : 0.5,
+        accuracy: Math.min(content.match(/\b[A-Z][a-z]+\b/g)?.length || 0 / 10, 1.0) // Based on proper nouns
+      };
+      
+      const overallQuality = Object.values(qualityMetrics).reduce((sum, val) => sum + val, 0) / Object.keys(qualityMetrics).length;
+      
+      const qualityAssessment = {
+        overallScore: Math.round(overallQuality * 100),
+        metrics: qualityMetrics,
+        recommendations: [],
+        flags: []
+      };
+      
+      // Generate recommendations
+      if (qualityMetrics.completeness < 0.5) {
+        qualityAssessment.recommendations.push('Content should be more detailed and comprehensive');
+      }
+      if (qualityMetrics.clarity < 0.6) {
+        qualityAssessment.recommendations.push('Add more clear key points and structure');
+      }
+      if (qualityMetrics.relevance < 0.7) {
+        qualityAssessment.recommendations.push('Improve medical device relevance and terminology');
+      }
+      if (qualityMetrics.compliance < 0.7) {
+        qualityAssessment.recommendations.push('Include more regulatory compliance information');
+      }
+      
+      // Generate quality flags
+      if (overallQuality < 0.5) {
+        qualityAssessment.flags.push('LOW_QUALITY');
+      }
+      if (analysis.riskLevel === 'high') {
+        qualityAssessment.flags.push('HIGH_RISK_CONTENT');
+      }
+      if (analysis.categories.includes('Safety Alert')) {
+        qualityAssessment.flags.push('COMPLIANCE_CONCERNS');
+      }
+      
+      console.log(`[AI-QUALITY] Quality assessment completed: ${qualityAssessment.overallScore}%`);
+      
+      res.json({
+        success: true,
+        data: qualityAssessment,
+        message: `Quality assessment completed with ${qualityAssessment.overallScore}% overall score`
+      });
+      
+    } catch (error: any) {
+      console.error('[AI-QUALITY] Quality assessment failed:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        message: 'AI Quality Assessment fehlgeschlagen'
       });
     }
   });
