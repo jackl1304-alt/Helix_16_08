@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -266,21 +266,61 @@ export default function RegulatoryUpdatesFinal() {
           </Card>
         </div>
 
-        {/* Updates Liste mit Rahmen */}
-        <Card className="shadow-lg border border-blue-200 dark:border-blue-700">
-          <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-b border-blue-200 dark:border-blue-700">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Regulatorische Updates</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  {filteredUpdates.length} von {updates?.length || 0} Updates verfügbar
-                </p>
-              </div>
-              <FileText className="h-6 w-6 text-blue-600" />
-            </div>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-3">
+        {/* Main Content Tabs - Einheitliches Design wie bei Rechtsfällen */}
+        <Tabs defaultValue="updates" className="w-full">
+          <TabsList className="grid w-full grid-cols-5 h-14 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1">
+            <TabsTrigger 
+              value="updates" 
+              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
+            >
+              <FileText className="h-4 w-4" />
+              Übersicht
+            </TabsTrigger>
+            <TabsTrigger 
+              value="summary" 
+              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
+            >
+              <Brain className="h-4 w-4" />
+              Zusammenfassung
+            </TabsTrigger>
+            <TabsTrigger 
+              value="content" 
+              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
+            >
+              <FileText className="h-4 w-4" />
+              Vollständiger Inhalt
+            </TabsTrigger>
+            <TabsTrigger 
+              value="ai-analysis" 
+              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-orange-50 data-[state=active]:text-orange-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-orange-900/20 dark:data-[state=active]:text-orange-300"
+            >
+              <Brain className="h-4 w-4" />
+              🔥 KI-Analyse
+            </TabsTrigger>
+            <TabsTrigger 
+              value="metadata" 
+              className="flex items-center gap-2 text-sm font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
+            >
+              <Globe className="h-4 w-4" />
+              Metadaten
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="updates" className="mt-6">
+            <Card className="border-2 border-blue-200 shadow-lg bg-white dark:bg-gray-900">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-b border-blue-200">
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <FileText className="h-6 w-6 text-blue-600" />
+                  Regulatorische Updates Übersicht
+                </CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-400">
+                  {filteredUpdates.length} von {updates?.length || 0} authentische Updates verfügbar
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+                  <div className="space-y-4">
+                    <div className="space-y-3">
           {paginatedUpdates.map((update: RegulatoryUpdate) => (
             <Card key={update.id} className="p-4 hover:shadow-lg transition-all duration-200 border border-blue-200 dark:border-blue-700 bg-gradient-to-r from-blue-50/30 to-white dark:from-blue-900/10 dark:to-gray-800 rounded-lg shadow-sm">
               <CardContent className="p-0">
@@ -507,9 +547,85 @@ export default function RegulatoryUpdatesFinal() {
               </CardContent>
             </Card>
           ))}
-            </div>
-          </CardContent>
-        </Card>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Weitere Tab-Inhalte analog zu Rechtsfällen */}
+          <TabsContent value="summary" className="mt-6">
+            <Card className="border-0 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/10 dark:to-blue-900/10 border-b">
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Zusammenfassung der regulatorischen Updates
+                </CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-400">
+                  Übersichtliche Zusammenfassung der wichtigsten Änderungen
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="text-center py-8">
+                  <Brain className="h-12 w-12 mx-auto text-blue-500 mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Zusammenfassung wird generiert</h3>
+                  <p className="text-gray-600">KI-gestützte Zusammenfassung aller regulatorischen Änderungen</p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="content" className="mt-6">
+            <Card className="border-0 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/10 dark:to-blue-800/10 border-b">
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Vollständiger Inhalt aller Updates
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="text-center py-8">
+                  <FileText className="h-12 w-12 mx-auto text-blue-500 mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Vollständiger Inhalt</h3>
+                  <p className="text-gray-600">Detaillierte Ansicht aller regulatorischen Updates</p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="ai-analysis" className="mt-6">
+            <Card className="border-0 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-900/10 dark:to-orange-800/10 border-b">
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                  🔥 KI-Analyse der regulatorischen Updates
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="text-center py-8">
+                  <Brain className="h-12 w-12 mx-auto text-orange-500 mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">KI-gestützte Analyse</h3>
+                  <p className="text-gray-600">Intelligente Bewertung und Kategorisierung der regulatorischen Änderungen</p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="metadata" className="mt-6">
+            <Card className="border-0 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/10 dark:to-gray-800/10 border-b">
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Metadaten der regulatorischen Updates
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="text-center py-8">
+                  <Globe className="h-12 w-12 mx-auto text-gray-500 mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Metadata-Übersicht</h3>
+                  <p className="text-gray-600">Detaillierte Metadaten und Quelleninformationen</p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
         {/* Paginierung */}
         {totalPages > 1 && (
