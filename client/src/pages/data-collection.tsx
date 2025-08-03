@@ -31,6 +31,12 @@ export default function DataCollection() {
     queryKey: ["/api/data-sources"],
   });
 
+  const { data: newsletterSources } = useQuery({
+    queryKey: ['/api/newsletter-sources'],
+    staleTime: 300000, // 5 minutes
+    gcTime: 600000, // 10 minutes
+  });
+
 
 
 
@@ -303,6 +309,83 @@ export default function DataCollection() {
 
         <TabsContent value="sources">
           <div className="grid gap-4">
+            
+            {/* Newsletter Sources Section */}
+            <Card className="border-blue-200 bg-blue-50/50">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-blue-800">📧 Newsletter-Quellen</h3>
+                    <p className="text-sm text-blue-600 mt-1">
+                      Authentische MedTech-Newsletter für automatische Inhaltsextraktion
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {newsletterSources?.stats && (
+                      <div className="text-sm text-blue-700 text-right">
+                        <div className="font-medium">{newsletterSources.stats.activeSources} aktiv</div>
+                        <div className="text-xs">{newsletterSources.stats.totalSources} konfiguriert</div>
+                      </div>
+                    )}
+                    <Button
+                      size="sm"
+                      onClick={() => newsletterSyncMutation.mutate()}
+                      disabled={newsletterSyncMutation.isPending}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      {newsletterSyncMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <FolderSync className="h-4 w-4 mr-2" />
+                      )}
+                      Newsletter Sync
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {newsletterSources?.sources ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {newsletterSources.sources.slice(0, 8).map((source: any, index: number) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-medium text-sm truncate">
+                              {source.name}
+                            </p>
+                            <Badge 
+                              variant={source.status === 'active' ? 'default' : 'secondary'}
+                              className="text-xs"
+                            >
+                              {source.status === 'active' ? 'Aktiv' : 'Konfiguriert'}
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-gray-500 truncate">
+                            {source.description}
+                          </p>
+                          <div className="flex items-center gap-1 mt-1">
+                            <Badge variant="outline" className="text-xs px-1">
+                              {source.category === 'industry_newsletter' ? 'Branche' : 
+                               source.category === 'regulatory_newsletter' ? 'Regulatorisch' : 'Marktanalyse'}
+                            </Badge>
+                            {source.requiresAuth && (
+                              <Badge variant="outline" className="text-xs px-1">
+                                Auth
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-6">
+                    <div className="text-blue-500 mb-2">📧</div>
+                    <p className="text-sm text-blue-600">Newsletter-Quellen werden geladen...</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
             {sources && Array.isArray(sources) && sources.length > 0 ? (
               sources.map((source) => (
