@@ -38,9 +38,14 @@ export default function SyncManager() {
     queryKey: ['/api/data-sources'],
   });
 
-  const { data: syncStats = {} } = useQuery({
+  const { data: syncStats = {}, isLoading: syncStatsLoading } = useQuery({
     queryKey: ['/api/sync/stats'],
     refetchInterval: 5000, // Aktualisiere alle 5 Sekunden
+    refetchOnWindowFocus: true,
+    staleTime: 0, // Immer frische Daten anfordern
+    onSuccess: (data) => {
+      console.log('🔄 Live Sync Stats empfangen:', data);
+    }
   });
 
   const syncMutation = useMutation({
@@ -172,7 +177,9 @@ export default function SyncManager() {
               <CheckCircle className="h-5 w-5 text-green-600" />
               <div>
                 <p className="text-sm text-gray-600">Letzte Synchronisation</p>
-                <p className="font-semibold">{(syncStats as any)?.lastSync || 'Nie'}</p>
+                <p className="font-semibold">
+                  {syncStatsLoading ? '⏳ Lade...' : (syncStats as any)?.lastSync || 'Nie'}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -194,7 +201,9 @@ export default function SyncManager() {
               <Download className="h-5 w-5 text-purple-600" />
               <div>
                 <p className="text-sm text-gray-600">Neue Updates</p>
-                <p className="font-semibold">{(syncStats as any)?.newUpdates || 0}</p>
+                <p className="font-semibold text-purple-600">
+                  {syncStatsLoading ? '⏳' : (syncStats as any)?.newUpdates || 0}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -205,7 +214,9 @@ export default function SyncManager() {
               <Clock className="h-5 w-5 text-orange-600" />
               <div>
                 <p className="text-sm text-gray-600">Laufende Syncs</p>
-                <p className="font-semibold">{(syncStats as any)?.runningSyncs || 0}</p>
+                <p className="font-semibold text-orange-600">
+                  {syncStatsLoading ? '⏳' : (syncStats as any)?.runningSyncs || 0}
+                </p>
               </div>
             </div>
           </CardContent>
