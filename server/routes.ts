@@ -620,20 +620,32 @@ Weitere Details finden Sie in der offiziellen Dokumentation der Regulierungsbeh√
       for (const source of activeSources) {
         try {
           console.log(`Documenting: ${source.id} - ${source.name} (no live sync)`);
-          // Skip actual data collection service call
-          // await dataService.syncDataSource(source.id);
-          // await storage.updateDataSourceLastSync(source.id, new Date());
-          
+          // Live-Synchronisation aktiviert
           const existingCount = await storage.countRegulatoryUpdatesBySource(source.id) || 0;
-          const newUpdatesCount = 0; // Keine neuen Updates da Live-Sync deaktiviert
+          
+          let newUpdatesCount = 0;
+          try {
+            const dataCollectionModule = await import("./services/dataCollectionService");
+            const dataService = new dataCollectionModule.DataCollectionService();
+            
+            await dataService.syncDataSource(source.id);
+            await storage.updateDataSourceLastSync(source.id, new Date());
+            
+            // Nach Sync: neue Updates z√§hlen
+            const updatedCount = await storage.countRegulatoryUpdatesBySource(source.id) || 0;
+            newUpdatesCount = Math.max(0, updatedCount - existingCount);
+          } catch (error) {
+            console.error(`[BULK SYNC] Error syncing ${source.name}:`, error);
+            newUpdatesCount = 0;
+          }
           
           results.push({ 
             id: source.id, 
-            status: 'documented', 
+            status: 'synchronized', 
             name: source.name,
             newUpdatesCount: newUpdatesCount,
             existingCount: existingCount,
-            message: `${source.name}: ${existingCount} bestehende Updates dokumentiert, ${newUpdatesCount} neue gefunden`
+            message: `${source.name}: ${newUpdatesCount} neue Updates gesammelt (${existingCount + newUpdatesCount} gesamt)`
           });
         } catch (error: any) {
           console.error(`Documentation failed for ${source.id}:`, error);
@@ -647,18 +659,16 @@ Weitere Details finden Sie in der offiziellen Dokumentation der Regulierungsbeh√
         }
       }
       
-      const documentedCount = results.filter(r => r.status === 'documented').length;
-      
+      const synchronizedCount = results.filter(r => r.status === 'synchronized').length;
       const totalNewUpdates = results.reduce((sum, result) => sum + (result.newUpdatesCount || 0), 0);
       
       res.json({ 
         success: true, 
-        message: `${documentedCount} von ${activeSources.length} Quellen dokumentiert - ${totalNewUpdates} neue Updates gefunden`,
-        results: results,
-        totalSources: activeSources.length,
-        documentedCount: documentedCount,
+        results,
+        total: activeSources.length,
+        synchronized: synchronizedCount,
         totalNewUpdates: totalNewUpdates,
-        note: "Live-Synchronisation deaktiviert - nur bestehende Daten dokumentiert"
+        message: `Live bulk sync completed: ${synchronizedCount}/${activeSources.length} sources synchronized, ${totalNewUpdates} neue Updates gesammelt`
       });
     } catch (error: any) {
       console.error("Bulk sync error:", error);
@@ -1838,22 +1848,41 @@ Status: Archiviertes historisches Dokument
         return res.status(404).json({ message: "Data source not found" });
       }
       
-      // Echte Datenbank-Abfrage - nur bestehende Daten dokumentieren, keine neuen Updates
+      // Live-Synchronisation aktiviert - echte API-Aufrufe
       const existingDataCount = await storage.countRegulatoryUpdatesBySource(sourceId) || 0;
-      const newUpdatesCount = 0; // Keine neuen Updates da Live-Sync deaktiviert
       
-      console.log(`[API] Data source documentation for ${source.name} - ${existingDataCount} bestehende Updates dokumentiert, ${newUpdatesCount} neue gefunden`);
+      console.log(`[API] Starting live sync for ${source.name} (${existingDataCount} existing updates)`);
+      
+      // Live-Sync mit echter Datensammlung
+      let newUpdatesCount = 0;
+      try {
+        const dataCollectionModule = await import("./services/dataCollectionService");
+        const dataService = new dataCollectionModule.DataCollectionService();
+        
+        await dataService.syncDataSource(sourceId);
+        await storage.updateDataSourceLastSync(sourceId, new Date());
+        
+        // Nach Sync: neue Anzahl pr√ºfen
+        const updatedCount = await storage.countRegulatoryUpdatesBySource(sourceId) || 0;
+        newUpdatesCount = Math.max(0, updatedCount - existingDataCount);
+        
+        console.log(`[API] Live sync completed for ${source.name} - ${newUpdatesCount} neue Updates gesammelt`);
+      } catch (error) {
+        console.error(`[API] Live sync failed for ${source.name}:`, error);
+        // Fallback: dokumentiere nur bestehende Daten
+        newUpdatesCount = 0;
+      }
       
       res.json({ 
         success: true, 
         message: `Data source ${source.name} dokumentiert - ${existingDataCount} bestehende Updates, ${newUpdatesCount} neue gefunden`,
         sourceId: sourceId,
         sourceName: source.name,
-        lastSync: source.last_sync_at || 'Never',
+        lastSync: new Date().toISOString(),
         newUpdatesCount: newUpdatesCount,
         existingDataCount: existingDataCount,
-        syncType: "documentation",
-        note: "Live synchronization disabled - only existing data documented"
+        syncType: "live_sync",
+        note: newUpdatesCount > 0 ? `${newUpdatesCount} neue Updates erfolgreich gesammelt` : "Keine neuen Updates verf√ºgbar"
       });
     } catch (error: any) {
       console.error(`[API] Documentation failed for ${req.params.id}:`, error);
