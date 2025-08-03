@@ -38,33 +38,38 @@ export default function SyncManager() {
   const queryClient = useQueryClient();
 
   const [showUpdatesSummary, setShowUpdatesSummary] = useState(false);
+  const [modalUpdates, setModalUpdates] = useState<any[]>([]);
+  const [loadingUpdates, setLoadingUpdates] = useState(false);
 
   const { data: dataSources = [], isLoading } = useQuery<DataSource[]>({
     queryKey: ['/api/data-sources'],
   });
 
-  // Query für neueste Updates - lädt immer, aber zeigt nur bei Bedarf
-  const { data: recentUpdates = [], isLoading: updatesLoading } = useQuery({
-    queryKey: ['/api/regulatory-updates/recent'],
-    select: (response: any) => {
-      console.log('REGULATORY UPDATES LOADED:', response?.data?.length || 0, 'Updates verfügbar', response?.success, response?.data?.length);
+  // Funktion zum Laden der Updates für das Modal
+  const loadRecentUpdatesForModal = async () => {
+    setLoadingUpdates(true);
+    try {
+      const response = await fetch('/api/updates/modal-summary');
+      const data = await response.json();
       
-      // Handle API response structure: { success: true, data: [...] }
-      const updates = response?.data || response || [];
-      if (!Array.isArray(updates)) {
-        console.warn('Updates data is not an array:', updates);
-        return [];
+      if (data.success && Array.isArray(data.updates)) {
+        setModalUpdates(data.updates);
+      } else {
+        setModalUpdates([]);
       }
-      
-      // Nimm die neuesten 5 Updates und sortiere nach Datum
-      const sorted = updates.sort((a: any, b: any) => 
-        new Date(b.published_at || b.publishedAt || b.createdAt || b.created_at).getTime() - 
-        new Date(a.published_at || a.publishedAt || a.createdAt || a.created_at).getTime()
-      );
-      console.log('First 3 sorted updates:', sorted.slice(0, 3).map(u => ({ title: u.title, date: u.published_at || u.publishedAt || u.created_at })));
-      return sorted.slice(0, 5);
+    } catch (error) {
+      console.error('Error loading modal updates:', error);
+      setModalUpdates([]);
+    } finally {
+      setLoadingUpdates(false);
     }
-  });
+  };
+
+  // Updates laden wenn Modal geöffnet wird
+  const handleOpenModal = () => {
+    setShowUpdatesSummary(true);
+    loadRecentUpdatesForModal();
+  };
 
   // Live Sync Statistics - Direct Implementation
   const [liveStats, setLiveStats] = useState({
@@ -247,7 +252,7 @@ export default function SyncManager() {
             </div>
           </CardContent>
         </Card>
-        <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setShowUpdatesSummary(true)}>
+        <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={handleOpenModal}>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
               <Download className="h-5 w-5 text-purple-600" />
@@ -409,7 +414,7 @@ export default function SyncManager() {
         </CardContent>
       </Card>
 
-      {/* Updates Summary Dialog */}
+      {/* Neues Updates Summary Dialog */}
       <Dialog open={showUpdatesSummary} onOpenChange={setShowUpdatesSummary}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
@@ -418,36 +423,29 @@ export default function SyncManager() {
                 <Download className="h-5 w-5 text-purple-600 mr-2" />
                 Neueste Regulatory Updates
               </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowUpdatesSummary(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
             </DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4">
-            {updatesLoading ? (
+            {loadingUpdates ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
                 <p className="mt-2 text-gray-500">Lade Updates...</p>
               </div>
-            ) : recentUpdates.length > 0 ? (
-              recentUpdates.map((update: any, index: number) => (
+            ) : modalUpdates.length > 0 ? (
+              modalUpdates.map((update: any, index: number) => (
                 <Card key={update.id || index} className="border-l-4 border-l-purple-500">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <h3 className="font-medium text-gray-900 mb-2">{update.title}</h3>
                         <p className="text-sm text-gray-600 mb-3 line-clamp-3">
-                          {update.summary || update.description?.substring(0, 200) + '...' || update.content?.substring(0, 200) + '...'}
+                          {update.description || update.content}
                         </p>
                         <div className="flex items-center space-x-4 text-xs text-gray-500">
-                          <span>{update.source_id || update.source || 'FDA'}</span>
+                          <span>{update.source}</span>
                           <span>•</span>
-                          <span>{new Date(update.published_at || update.publishedAt || update.created_at).toLocaleDateString('de-DE')}</span>
+                          <span>{new Date(update.publishedAt).toLocaleDateString('de-DE')}</span>
                           {update.region && (
                             <>
                               <span>•</span>
@@ -458,11 +456,11 @@ export default function SyncManager() {
                           )}
                         </div>
                       </div>
-                      {(update.url || update.source_url || update.sourceUrl) && (
+                      {update.url && (
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => window.open(update.url || update.source_url || update.sourceUrl, '_blank')}
+                          onClick={() => window.open(update.url, '_blank')}
                           className="ml-4"
                         >
                           <ExternalLink className="h-4 w-4" />
