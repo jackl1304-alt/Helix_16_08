@@ -49,10 +49,17 @@ export default function DataCollection() {
       const existingDataCount = data?.existingDataCount || 0;
       const newUpdatesFound = data?.newUpdatesCount || 0;
       
-      toast({
-        title: "Dokumentation abgeschlossen",
-        description: `${sourceId}: ${existingDataCount} bestehende Updates dokumentiert, ${newUpdatesFound} neue Updates gefunden`,
-      });
+      if (newUpdatesFound > 0) {
+        toast({
+          title: "✅ Synchronisation erfolgreich",
+          description: `${sourceId}: ${newUpdatesFound} neue Updates gesammelt (${existingDataCount + newUpdatesFound} gesamt)`,
+        });
+      } else {
+        toast({
+          title: "ℹ️ Sync abgeschlossen",
+          description: `${sourceId}: Keine neuen Updates verfügbar (${existingDataCount} bestehende)`,
+        });
+      }
     },
     onError: (error, sourceId) => {
       console.error("Frontend: Documentation error:", error);

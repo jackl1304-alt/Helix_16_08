@@ -114,11 +114,23 @@ export default function SyncManager() {
       
       const existingDataCount = data?.existingDataCount || 0;
       
-      // Nur echte Daten anzeigen - newUpdatesFound ist immer 0 da Live-Sync deaktiviert
-      toast({
-        title: "Dokumentation abgeschlossen",
-        description: `${sourceId}: ${existingDataCount} bestehende Updates dokumentiert, ${newUpdatesFound} neue Updates gefunden`,
-      });
+      if (newUpdatesFound > 0) {
+        setLiveStats(prev => ({
+          ...prev,
+          newUpdates: String(parseInt(prev.newUpdates) + newUpdatesFound),
+          lastSync: "gerade eben"
+        }));
+        
+        toast({
+          title: "✅ Synchronisation erfolgreich",
+          description: `${sourceId}: ${newUpdatesFound} neue Updates gesammelt (${existingDataCount + newUpdatesFound} gesamt)`,
+        });
+      } else {
+        toast({
+          title: "ℹ️ Sync abgeschlossen",
+          description: `${sourceId}: Keine neuen Updates verfügbar (${existingDataCount} bestehende)`,
+        });
+      }
       
       queryClient.invalidateQueries({ queryKey: ['/api/data-sources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
@@ -175,10 +187,23 @@ export default function SyncManager() {
       const totalNewUpdates = data.results.reduce((sum: number, result: any) => 
         sum + (result.newUpdatesCount || 0), 0);
       
-      toast({
-        title: "Bulk-Dokumentation abgeschlossen",
-        description: `${data.total} Quellen dokumentiert: ${totalExistingData} bestehende Updates, ${totalNewUpdates} neue Updates`,
-      });
+      if (totalNewUpdates > 0) {
+        setLiveStats(prev => ({
+          ...prev,
+          newUpdates: String(parseInt(prev.newUpdates) + totalNewUpdates),
+          lastSync: "gerade eben"
+        }));
+        
+        toast({
+          title: "✅ Bulk-Sync erfolgreich",
+          description: `${data.total} Quellen synchronisiert: ${totalNewUpdates} neue Updates gesammelt`,
+        });
+      } else {
+        toast({
+          title: "ℹ️ Bulk-Sync abgeschlossen",
+          description: `${data.total} Quellen überprüft: Keine neuen Updates verfügbar`,
+        });
+      }
       
       queryClient.invalidateQueries({ queryKey: ['/api/data-sources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/sync/stats'] });
