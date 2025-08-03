@@ -633,6 +633,13 @@ export default function RegulatoryUpdatesPage() {
                                       <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border-l-4 border-blue-400">
                                         <h4 className="font-semibold mb-4 text-blue-800 dark:text-blue-300 text-lg">Zusammenfassung</h4>
                                         <FormattedText text={update.description || update.summary || (update.fullText ? update.fullText.substring(0, 500) + '...' : 'Keine Zusammenfassung verfügbar')} className="text-sm leading-relaxed" />
+                                        {!update.description && !update.summary && !update.fullText && (
+                                          <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded border border-red-200 dark:border-red-800 mt-2">
+                                            <p className="text-red-800 dark:text-red-200 text-xs">
+                                              Keine Daten verfügbar - Prüfe Backend-Verbindung
+                                            </p>
+                                          </div>
+                                        )}
                                       </div>
                                     </TabsContent>
 
@@ -644,6 +651,17 @@ export default function RegulatoryUpdatesPage() {
                                         </h4>
                                         <div className="prose max-w-none text-sm leading-relaxed">
                                           <FormattedText text={update.fullText || update.content || update.description || 'Kein Inhalt verfügbar'} />
+                                          {!update.fullText && !update.content && (
+                                            <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded border border-yellow-200 dark:border-yellow-800 mt-4">
+                                              <p className="text-yellow-800 dark:text-yellow-200 text-sm">
+                                                <strong>Debug Info:</strong><br/>
+                                                Title: {update.title}<br/>
+                                                Description: {update.description ? 'Verfügbar' : 'Nicht verfügbar'}<br/>
+                                                FullText: {update.fullText ? 'Verfügbar' : 'Nicht verfügbar'}<br/>
+                                                Content: {update.content ? 'Verfügbar' : 'Nicht verfügbar'}
+                                              </p>
+                                            </div>
+                                          )}
                                         </div>
                                       </div>
                                     </TabsContent>
