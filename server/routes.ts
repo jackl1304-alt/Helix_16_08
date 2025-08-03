@@ -3091,24 +3091,26 @@ Status: Archiviertes historisches Dokument
   // Newsletter Extraction - MedTech Information Sources
   app.post('/api/knowledge/extract-newsletters', async (req, res) => {
     try {
-      console.log('API: Starting newsletter extraction from MedTech information sources');
+      console.log('API: Starting enhanced newsletter extraction from authenticated MedTech sources');
       
-      const { NewsletterExtractionService } = await import('./services/newsletterExtractionService');
-      const newsletterService = new NewsletterExtractionService();
-      
-      const result = await newsletterService.extractFromAllNewsletterSources();
+      const { simpleNewsletterService } = await import('./services/simpleNewsletterService');
+      const result = await simpleNewsletterService.extractNewsletterContent();
       
       res.json({ 
         success: true, 
-        message: `Newsletter extraction completed: ${result.articlesExtracted} articles from ${result.processedSources} sources`,
-        stats: result,
+        message: `Newsletter extraction completed: ${result.articlesExtracted} articles from ${result.sourcesSynced} sources`,
+        stats: {
+          articlesExtracted: result.articlesExtracted,
+          processedSources: result.sourcesSynced,
+          errors: result.errors
+        },
         timestamp: new Date().toISOString()
       });
     } catch (error: any) {
-      console.error('API: Newsletter extraction failed:', error);
+      console.error('API: Enhanced newsletter extraction failed:', error);
       res.status(500).json({ 
         success: false, 
-        message: error.message || 'Failed to extract newsletter content'
+        message: error.message || 'Failed to extract newsletter content from authenticated sources'
       });
     }
   });
