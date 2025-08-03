@@ -59,7 +59,7 @@ export default function NewsletterAdminPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Vordefinierte authentische Newsletter-Quellen aus der Liste
+  // Erweiterte authentische Newsletter-Quellen mit Login-Anforderungen
   const predefinedSources: Partial<NewsletterSource>[] = [
     {
       name: "MedTech Dive",
@@ -87,7 +87,7 @@ export default function NewsletterAdminPage() {
     {
       name: "Citeline Medtech Insight",
       url: "https://insights.citeline.com/medtech-insight/",
-      description: "Globale Medtech-Nachrichten und Einblicke",
+      description: "Globale Medtech-Nachrichten und Einblicke - Premium Content",
       category: "industry_newsletter",
       region: "Global",
       language: "en",
@@ -106,6 +106,73 @@ export default function NewsletterAdminPage() {
       requiresAuth: false,
       rssUrl: "https://med-tech.world/feed/",
       status: "active"
+    },
+    {
+      name: "EY MedTech Pulse Reports",
+      url: "https://www.ey.com/en_us/life-sciences/pulse-of-medtech-industry-outlook",
+      description: "Jährliche Branchenberichte und Trends der MedTech-Industrie",
+      category: "industry_newsletter",
+      region: "Global",
+      language: "en",
+      priority: "high",
+      requiresAuth: true,
+      status: "pending"
+    },
+    {
+      name: "Deloitte MedTech Insights",
+      url: "https://www2.deloitte.com/us/en/pages/life-sciences-and-health-care/articles/medtech-industry-trends.html",
+      description: "Strategische Einblicke und Trends der MedTech-Branche",
+      category: "industry_newsletter",
+      region: "Global",
+      language: "en",
+      priority: "high",
+      requiresAuth: true,
+      status: "pending"
+    },
+    {
+      name: "WHO Medical Device Updates",
+      url: "https://apps.who.int/iris/handle/10665/42744",
+      description: "Globale Richtlinien und Regulierung von Medizinprodukten",
+      category: "regulatory_newsletter",
+      region: "Global",
+      language: "en",
+      priority: "high",
+      requiresAuth: false,
+      rssUrl: "https://www.who.int/rss-feeds/news-releases",
+      status: "active"
+    },
+    {
+      name: "Medical Design & Outsourcing",
+      url: "https://www.medicaldesignandoutsourcing.com/",
+      description: "Medizinprodukt-Design und Fertigung News",
+      category: "industry_newsletter",
+      region: "Global",
+      language: "en",
+      priority: "medium",
+      requiresAuth: true,
+      status: "pending"
+    },
+    {
+      name: "MedDevice Online",
+      url: "https://www.meddeviceonline.com/",
+      description: "Medizinprodukt-Nachrichten und Technologie-Updates",
+      category: "industry_newsletter",
+      region: "Global",
+      language: "en",
+      priority: "medium",
+      requiresAuth: true,
+      status: "pending"
+    },
+    {
+      name: "Regulatory Affairs Professionals Society (RAPS)",
+      url: "https://www.raps.org/",
+      description: "Regulatory Affairs News und Best Practices",
+      category: "regulatory_newsletter",
+      region: "Global",
+      language: "en",
+      priority: "high",
+      requiresAuth: true,
+      status: "pending"
     }
   ];
 
