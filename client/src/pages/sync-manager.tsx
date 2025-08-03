@@ -58,9 +58,10 @@ export default function SyncManager() {
       
       // Nimm die neuesten 5 Updates und sortiere nach Datum
       const sorted = updates.sort((a: any, b: any) => 
-        new Date(b.publishedAt || b.createdAt || b.created_at).getTime() - 
-        new Date(a.publishedAt || a.createdAt || a.created_at).getTime()
+        new Date(b.published_at || b.publishedAt || b.createdAt || b.created_at).getTime() - 
+        new Date(a.published_at || a.publishedAt || a.createdAt || a.created_at).getTime()
       );
+      console.log('First 3 sorted updates:', sorted.slice(0, 3).map(u => ({ title: u.title, date: u.published_at || u.publishedAt || u.created_at })));
       return sorted.slice(0, 5);
     }
   });
@@ -441,12 +442,12 @@ export default function SyncManager() {
                       <div className="flex-1">
                         <h3 className="font-medium text-gray-900 mb-2">{update.title}</h3>
                         <p className="text-sm text-gray-600 mb-3 line-clamp-3">
-                          {update.summary || update.content?.substring(0, 200) + '...'}
+                          {update.summary || update.description?.substring(0, 200) + '...' || update.content?.substring(0, 200) + '...'}
                         </p>
                         <div className="flex items-center space-x-4 text-xs text-gray-500">
                           <span>{update.sourceId}</span>
                           <span>•</span>
-                          <span>{new Date(update.publishedAt || update.createdAt).toLocaleDateString('de-DE')}</span>
+                          <span>{new Date(update.published_at || update.publishedAt || update.created_at).toLocaleDateString('de-DE')}</span>
                           {update.region && (
                             <>
                               <span>•</span>
