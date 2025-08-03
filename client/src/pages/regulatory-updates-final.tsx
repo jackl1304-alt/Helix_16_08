@@ -266,10 +266,23 @@ export default function RegulatoryUpdatesFinal() {
           </Card>
         </div>
 
-        {/* Kompakte Updates Liste */}
-        <div className="space-y-3 mb-8">
+        {/* Updates Liste mit Rahmen */}
+        <Card className="shadow-lg border border-blue-200 dark:border-blue-700">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-b border-blue-200 dark:border-blue-700">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Regulatorische Updates</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  {filteredUpdates.length} von {updates?.length || 0} Updates verfügbar
+                </p>
+              </div>
+              <FileText className="h-6 w-6 text-blue-600" />
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="space-y-3">
           {paginatedUpdates.map((update: RegulatoryUpdate) => (
-            <Card key={update.id} className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
+            <Card key={update.id} className="p-4 hover:shadow-lg transition-all duration-200 border border-blue-200 dark:border-blue-700 bg-gradient-to-r from-blue-50/30 to-white dark:from-blue-900/10 dark:to-gray-800 rounded-lg shadow-sm">
               <CardContent className="p-0">
                 <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -494,7 +507,9 @@ export default function RegulatoryUpdatesFinal() {
               </CardContent>
             </Card>
           ))}
-        </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Paginierung */}
         {totalPages > 1 && (
