@@ -84,25 +84,28 @@ export default function KnowledgeBasePage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Load knowledge base articles directly - FIXED API
+  const { data: realArticlesData, isLoading: articlesLoading } = useQuery({
+    queryKey: ['/api/knowledge-base'],
+    staleTime: 300000, // 5 minutes
+    gcTime: 600000, // 10 minutes
+  });
+
+  // Load knowledge base stats
+  const { data: statsData } = useQuery({
+    queryKey: ['/api/knowledge-base/stats'],
+    staleTime: 300000, // 5 minutes
+  });
+
   // Fetch knowledge sources status
   const { data: sourcesData, isLoading: sourcesLoading } = useQuery({
     queryKey: ['/api/knowledge/sources-status'],
     refetchInterval: 30000
   });
-
-  // Load real knowledge articles from database - FIXED DATA STRUCTURE
-  const { data: articlesResponse, isLoading: articlesLoading } = useQuery({
-    queryKey: ['/api/knowledge/articles'],
-    refetchInterval: 30000
-  });
-
-  // Extract articles from API response structure - NEWSLETTER-DATEN
-  const realArticlesData = (articlesResponse as any)?.data || [];
-  console.log('Newsletter Knowledge Base Articles:', {
-    response: articlesResponse,
+  console.log('Knowledge Base Articles:', {
     articles: realArticlesData,
-    count: realArticlesData.length,
-    sources: (articlesResponse as any)?.sources
+    count: realArticlesData?.length || 0,
+    statsData: statsData
   });
 
   // Deep scraping mutation for comprehensive articles
@@ -119,7 +122,8 @@ export default function KnowledgeBasePage() {
         description: message,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/knowledge/sources-status'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/knowledge/articles'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/knowledge-base'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/knowledge-base/stats'] });
       queryClient.invalidateQueries({ queryKey: ['/api/regulatory-updates'] });
     },
     onError: (error: any) => {
@@ -140,7 +144,8 @@ export default function KnowledgeBasePage() {
           title: "Knowledge Collection Erfolgreich",
           description: `${data.stats.articlesExtracted} Artikel von ${data.stats.processedSources} Quellen gesammelt`,
         });
-        queryClient.invalidateQueries({ queryKey: ['/api/knowledge/articles'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/knowledge-base'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/knowledge-base/stats'] });
         queryClient.invalidateQueries({ queryKey: ['/api/knowledge/sources-status'] });
       } else {
         toast({
@@ -161,7 +166,8 @@ export default function KnowledgeBasePage() {
           title: "Newsletter Extraktion Erfolgreich",
           description: `${data.stats.articlesExtracted} Newsletter-Artikel von ${data.stats.processedSources} MedTech-Quellen extrahiert`,
         });
-        queryClient.invalidateQueries({ queryKey: ['/api/knowledge/articles'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/knowledge-base'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/knowledge-base/stats'] });
         queryClient.invalidateQueries({ queryKey: ['/api/knowledge/sources-status'] });
       } else {
         toast({
@@ -257,18 +263,18 @@ Helix Regulatory Intelligence Platform
     });
   };
 
-  // Statistics
+  // Statistics - Use real API data when available
   const stats = {
     totalSources: sources.length,
-    activeSources: sources.filter(s => s.status === 'active').length,
-    totalArticles: articles.length,
-    categories: {
+    activeSources: statsData?.activeQuellen || sources.filter(s => s.status === 'active').length,  
+    totalArticles: statsData?.totalArticles || articles.length,
+    categories: statsData?.categoryBreakdown || {
       medtech_knowledge: articles.filter(a => a.category === 'medtech_knowledge').length,
       regulatory_updates: articles.filter(a => a.category === 'regulatory_updates').length,
       legal_cases: articles.filter(a => a.category === 'legal_cases').length
     },
-    regions: Array.from(new Set(articles.map(a => a.region))).length,
-    languages: Array.from(new Set(articles.map(a => a.language))).length
+    regions: statsData?.regionen || Array.from(new Set(articles.map(a => a.region))).length,
+    languages: statsData?.sprachen || Array.from(new Set(articles.map(a => a.language))).length
   };
 
   return (
