@@ -46,11 +46,20 @@ export default function SyncManager() {
   // Query für neueste Updates - lädt immer, aber zeigt nur bei Bedarf
   const { data: recentUpdates = [], isLoading: updatesLoading } = useQuery({
     queryKey: ['/api/regulatory-updates/recent'],
-    select: (data: any[]) => {
+    select: (response: any) => {
+      console.log('REGULATORY UPDATES LOADED:', response?.data?.length || 0, 'Updates verfügbar', response?.success, response?.data?.length);
+      
+      // Handle API response structure: { success: true, data: [...] }
+      const updates = response?.data || response || [];
+      if (!Array.isArray(updates)) {
+        console.warn('Updates data is not an array:', updates);
+        return [];
+      }
+      
       // Nimm die neuesten 5 Updates und sortiere nach Datum
-      const sorted = data.sort((a: any, b: any) => 
-        new Date(b.publishedAt || b.createdAt).getTime() - 
-        new Date(a.publishedAt || a.createdAt).getTime()
+      const sorted = updates.sort((a: any, b: any) => 
+        new Date(b.publishedAt || b.createdAt || b.created_at).getTime() - 
+        new Date(a.publishedAt || a.createdAt || a.created_at).getTime()
       );
       return sorted.slice(0, 5);
     }
