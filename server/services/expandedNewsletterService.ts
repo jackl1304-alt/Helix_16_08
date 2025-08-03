@@ -379,7 +379,7 @@ export class ExpandedNewsletterService {
         this.logger.info(`Processing premium newsletter source: ${source.name}`);
         
         // Simuliere Artikel-Extraktion basierend auf realen Quellen
-        const extractedCount = Math.floor(Math.random() * 8) + 3; // 3-10 Artikel pro Quelle
+        const extractedCount = 0; // MOCK DATA ENTFERNT - Keine automatische Artikel-Generierung
         results.articlesExtracted += extractedCount;
         results.sourcesSynced++;
 

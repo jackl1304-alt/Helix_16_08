@@ -399,7 +399,7 @@ class MorningStorage implements IStorage {
       // CRITICAL FIX: Ensure ID is never null or undefined
       let sourceId = data.id;
       if (!sourceId || sourceId === null || sourceId === undefined || sourceId === '') {
-        sourceId = `source_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        sourceId = `source_${Date.now()}_${crypto.randomUUID().substr(0, 9)}`;
         console.log(`[DB] Generated new ID for data source: ${sourceId}`);
       }
       

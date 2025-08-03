@@ -519,7 +519,7 @@ export class RegulatoryDataScraper {
     };
 
     const content = fallbackContent[source.category] || fallbackContent.regulatory_database;
-    const itemCount = Math.floor(Math.random() * 3) + 2; // 2-4 items
+    const itemCount = 0; // MOCK DATA ENTFERNT - Keine automatische Item-Generierung
 
     return content.slice(0, itemCount).map((title, index) => ({
       source_name: source.name,
@@ -528,7 +528,7 @@ export class RegulatoryDataScraper {
       content: this.generateDetailedContent(title, source),
       category: source.category,
       region: source.region,
-      publication_date: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+      publication_date: new Date().toISOString(), // MOCK DATA ENTFERNT - Feste Zeit statt random
       regulation_type: this.getRegulationType(source.category),
       keywords: this.extractKeywords(title, source.category),
       scrape_timestamp: new Date().toISOString()

@@ -259,14 +259,15 @@ export class EnhancedNewsletterService {
     const articles: ExtractedArticle[] = [];
 
     // Erstelle realistische Artikel basierend auf der Quelle
-    const articleCount = Math.floor(Math.random() * 3) + 2; // 2-4 Artikel
+    // ALLE MOCK-DATEN ENTFERNT - Keine automatische Newsletter-Artikel-Generierung
+    const articleCount = 0;
 
     for (let i = 0; i < articleCount; i++) {
       articles.push({
         title: this.generateAuthenticTitle(source),
         content: this.generateAuthenticMedTechContent(source.category),
         summary: this.generateAuthenticSummary(source.category),
-        publishedDate: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+        publishedDate: new Date().toISOString(), // MOCK DATA ENTFERNT - Feste Zeit statt random
         author: this.generateAuthorName(source),
         sourceUrl: source.url,
         category: source.category,

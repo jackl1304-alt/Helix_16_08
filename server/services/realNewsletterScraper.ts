@@ -986,13 +986,13 @@ export class RealNewsletterScraper {
     };
 
     const titles = categoryArticles[source.category] || categoryArticles.industry_newsletter;
-    const articlesToGenerate = Math.floor(Math.random() * 3) + 2; // 2-4 articles
+    const articlesToGenerate = 0; // MOCK DATA ENTFERNT - Keine automatische Artikel-Generierung
 
     return titles.slice(0, articlesToGenerate).map(title => ({
       source_name: source.name,
       article_title: title,
       article_url: source.url,
-      publication_date: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(), // Random date within last week
+      publication_date: new Date().toISOString(), // MOCK DATA ENTFERNT - Feste Zeit statt random
       content_text: this.generateArticleContent(title, source),
       keywords: this.extractKeywords(title, source.category),
       is_gated: source.requiresAuth,

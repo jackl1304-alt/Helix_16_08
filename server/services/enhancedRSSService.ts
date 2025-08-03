@@ -169,29 +169,10 @@ export class EnhancedRSSService {
     }
   }
 
+  // ALLE MOCK-DATEN ENTFERNT - Keine RSS-Item-Simulation mehr
   private generateSimulatedRSSItems(feed: RSSFeed): RSSItem[] {
-    const currentDate = new Date();
-    const items: RSSItem[] = [];
-    
-    // Generate realistic RSS items based on authority
-    const itemTemplates = this.getRSSItemTemplates(feed.authority);
-    
-    for (let i = 0; i < Math.floor(Math.random() * 5) + 2; i++) {
-      const template = itemTemplates[Math.floor(Math.random() * itemTemplates.length)];
-      const itemDate = new Date(currentDate.getTime() - (i * 24 * 60 * 60 * 1000)); // Spread over recent days
-      
-      items.push({
-        title: template.title,
-        link: template.link,
-        description: template.description,
-        pubDate: itemDate.toISOString(),
-        guid: `${feed.authority.toLowerCase()}-${Date.now()}-${i}`,
-        category: template.category,
-        author: feed.authority
-      });
-    }
-    
-    return items;
+    console.log(`[Enhanced RSS] MOCK DATA DELETED - No simulated RSS items for ${feed.name}`);
+    return [];
   }
 
   private getRSSItemTemplates(authority: string): any[] {
@@ -269,7 +250,7 @@ export class EnhancedRSSService {
 
   private transformRSSToRegulatory(item: RSSItem, feed: RSSFeed): any {
     return {
-      id: `rss-${feed.authority.toLowerCase()}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `rss-${feed.authority.toLowerCase()}-${Date.now()}-${crypto.randomUUID().substr(0, 9)}`,
       title: item.title,
       content: item.description,
       authority: feed.authority,

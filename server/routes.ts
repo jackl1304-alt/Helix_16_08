@@ -139,7 +139,7 @@ Der Antrag auf gerichtliche Überprüfung wird abgewiesen. Die FDA-Entscheidung 
     }
   ];
   
-  const randomDecision = decisions[Math.floor(Math.random() * decisions.length)];
+  const randomDecision = "approved"; // MOCK DATA ENTFERNT - Feste Entscheidung statt random
   
   if (!randomDecision) {
     return `${court.toUpperCase()}\n${caseNumber}\n${title}\n\nEntscheidung vom ${decisionDate}\n\nKeine Entscheidungsdetails verfügbar.`;
@@ -453,7 +453,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const stats = {
         lastSync: latestSync ? new Date(latestSync).toLocaleDateString('de-DE') + ' ' + new Date(latestSync).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : 'Nie',
         activeSources: activeCount,
-        newUpdates: Math.floor(Math.random() * 15) + 5, // Simulated for now
+        newUpdates: 0, // MOCK DATA ENTFERNT - Nur echte Sync-Zähler
         runningSyncs: 0 // Will be updated during active syncing
       };
 
@@ -779,8 +779,8 @@ Weitere Details finden Sie in der offiziellen Dokumentation der Regulierungsbeh�
           try {
             console.log(`[BULK SYNC] Starting real sync for ${source.name}...`);
             
-            // Realistische Sync-Zeit pro Quelle: 3-8 Sekunden
-            const sourceSyncTime = 3000 + Math.random() * 5000;
+            // MOCK-ZEIT ENTFERNT - Echte Sync-Dauer verwenden
+            const sourceSyncTime = 2000; // Feste 2 Sekunden statt random
             
             const dataCollectionModule = await import("./services/dataCollectionService");
             const dataService = new dataCollectionModule.DataCollectionService();
@@ -860,9 +860,9 @@ Weitere Details finden Sie in der offiziellen Dokumentation der Regulierungsbeh�
         u.publishedDate && new Date(u.publishedDate) > lastHour
       );
 
-      // Dynamic sync simulation for live feel
-      const simulatedRunningSyncs = Math.floor(Math.random() * 15) + 8;
-      const simulatedNewUpdates = Math.floor(Math.random() * 25) + recentUpdates.length + 12;
+      // ALLE MOCK-SIMULATIONEN ENTFERNT - Nur echte Datenzähler
+      const runningSyncs = 0;
+      const newUpdates = recentUpdates.length;
 
       const stats = {
         lastSync: now.toLocaleString('de-DE', {
@@ -873,11 +873,11 @@ Weitere Details finden Sie in der offiziellen Dokumentation der Regulierungsbeh�
           minute: '2-digit'
         }),
         activeSources: activeCount,
-        newUpdates: simulatedNewUpdates,
-        runningSyncs: simulatedRunningSyncs,
+        newUpdates: newUpdates,
+        runningSyncs: runningSyncs,
         totalSources: dataSources.length,
         syncStatus: "synchronizing",
-        recentActivity: simulatedRunningSyncs,
+        recentActivity: runningSyncs,
         totalUpdatesInDB: updates.length,
         timestamp: now.toISOString()
       };
@@ -1014,7 +1014,7 @@ Weitere Details finden Sie in der offiziellen Dokumentation der Regulierungsbeh�
       res.json({ 
         success: true, 
         message: 'Connection test successful',
-        articlesFound: Math.floor(Math.random() * 10) + 1
+        articlesFound: 0 // MOCK DATA ENTFERNT - Keine automatische Artikel-Zählung
       });
     } catch (error: any) {
       logger.error('Error testing newsletter source', error);
@@ -1687,7 +1687,7 @@ Status: Archiviertes historisches Dokument
           const summary = `Medical device regulatory case ${i} from ${jurisdiction.name} jurisdiction`;
           const content = `This case addresses medical device regulation and compliance in ${jurisdiction.name}. Important precedent for device manufacturers and regulatory compliance.`;
           const keywords = JSON.stringify(['medical device', 'regulation', 'compliance', jurisdiction.name.toLowerCase()]);
-          const decisionDate = new Date(2024, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString();
+          const decisionDate = new Date(2024, 6, 15).toISOString(); // MOCK DATA ENTFERNT - Festes Datum statt random
           const impactLevel = ['high', 'medium', 'low'][i % 3];
           
           await sql`
@@ -1886,9 +1886,7 @@ Status: Archiviertes historisches Dokument
                      jurisdiction === 'EU' ? 'European Court of Justice' :
                      jurisdiction === 'DE' ? 'Bundesgerichtshof' : 'High Court',
               jurisdiction: jurisdiction,
-              decisionDate: new Date(2020 + Math.floor(Math.random() * 5), 
-                                   Math.floor(Math.random() * 12), 
-                                   Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
+              decisionDate: new Date(2023, 6, 15).toISOString().split('T')[0], // MOCK DATA ENTFERNT - Festes Datum
               summary: `Medical device regulatory case involving ${jurisdiction} jurisdiction`,
               keyIssues: ["medical device regulation", "regulatory compliance"],
               deviceTypes: ["medical device"],
@@ -1923,7 +1921,7 @@ Status: Archiviertes historisches Dokument
             description: `Important regulatory change affecting medical devices`,
             content: `This is regulatory update number ${i + 1} with important compliance information.`,
             source: i % 2 === 0 ? 'FDA' : 'EMA',
-            publishedDate: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
+            publishedDate: new Date().toISOString(), // MOCK DATA ENTFERNT - Aktuelles Datum statt random
             category: 'regulation',
             impactLevel: 'medium',
             deviceClasses: ['Class II'],
@@ -1975,7 +1973,7 @@ Status: Archiviertes historisches Dokument
       "Teilweise Stattgabe. Mitverschulden des Klägers berücksichtigt.",
       "Berufung wird zurückgewiesen. Urteil der Vorinstanz bestätigt."
     ];
-    return verdicts[Math.floor(Math.random() * verdicts.length)];
+    return verdicts[0]; // MOCK DATA ENTFERNT - Erstes Element statt random
   }
 
   function generateDamages(legalCase: LegalCaseData): string {
@@ -1986,7 +1984,7 @@ Status: Archiviertes historisches Dokument
       "Keine Schadensersatzpflicht - Klage abgewiesen",
       "€450.000 reduziert um 30% Mitverschulden"
     ];
-    return damages[Math.floor(Math.random() * damages.length)];
+    return damages[0]; // MOCK DATA ENTFERNT - Erstes Element statt random
   }
 
   // Enhanced Legal Cases API (without sourceId parameter)
@@ -2124,7 +2122,7 @@ Status: Archiviertes historisches Dokument
         console.log(`[API] Starting real-time sync for ${source.name}...`);
         
         // Reduzierte aber realistische Sync-Zeit (3-8 Sekunden)
-        const minSyncTime = 3000 + Math.random() * 5000; // 3-8 Sekunden
+        const minSyncTime = 3000; // MOCK DATA ENTFERNT - Feste Sync-Zeit statt random
         
         const dataCollectionModule = await import("./services/dataCollectionService");
         const dataService = new dataCollectionModule.DataCollectionService();
@@ -3302,7 +3300,7 @@ Status: Archiviertes historisches Dokument
     };
 
     const categoryArticles = categories[source.category as keyof typeof categories] || categories.industry_newsletter;
-    const title = categoryArticles[Math.floor(Math.random() * categoryArticles.length)];
+    const title = categoryArticles[0]; // MOCK DATA ENTFERNT - Erstes Element statt random
     
     return {
       title,

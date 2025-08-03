@@ -39,19 +39,8 @@ export class WebScrapingService {
       
       const results: ScrapingResult[] = [];
       
-      // Simulate scraping results for now (would implement actual scraping)
-      console.log('[Web Scraping] BfArM scraping - Implementation needed for production');
-      
-      // Placeholder structure showing expected data format
-      results.push({
-        title: 'BfArM Bekanntmachung - Medizinprodukte Q1 2024',
-        content: 'Wichtige regulatorische Updates für Medizinprodukte im ersten Quartal 2024...',
-        url: newsUrl,
-        publishedDate: new Date(),
-        documentType: 'announcement',
-        region: 'Germany',
-        regulatoryBody: 'BfArM'
-      });
+      // ALLE MOCK-DATEN ENTFERNT - Nur echtes Web-Scraping implementieren
+      console.log('[Web Scraping] BfArM scraping - MOCK DATA DELETED, no placeholder results');
       
       return results;
       
@@ -74,18 +63,8 @@ export class WebScrapingService {
       
       const results: ScrapingResult[] = [];
       
-      // Simulate scraping results for now
-      console.log('[Web Scraping] Swissmedic scraping - Implementation needed for production');
-      
-      results.push({
-        title: 'Swissmedic Guidance Update - Medizinprodukte Zulassung',
-        content: 'Neue Richtlinien für die Zulassung von Medizinprodukten in der Schweiz...',
-        url: guidanceUrl,
-        publishedDate: new Date(),
-        documentType: 'guidance',
-        region: 'Switzerland',
-        regulatoryBody: 'Swissmedic'
-      });
+      // ALLE MOCK-DATEN ENTFERNT - Nur echtes Web-Scraping implementieren
+      console.log('[Web Scraping] Swissmedic scraping - MOCK DATA DELETED, no placeholder results');
       
       return results;
       

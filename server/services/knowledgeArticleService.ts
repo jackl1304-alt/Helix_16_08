@@ -308,29 +308,13 @@ export class KnowledgeArticleService {
 
   private generateKnowledgeArticles(source: KnowledgeSource): KnowledgeArticle[] {
     const articles: KnowledgeArticle[] = [];
-    const count = Math.floor(Math.random() * 4) + 2; // 2-5 articles per source
+    // ALLE MOCK-DATEN ENTFERNT - Keine automatische Artikel-Generierung
+    const count = 0;
     
-    const templates = this.getArticleTemplates(source.category, source.language);
+    console.log(`[Knowledge Service] MOCK DATA DELETED - No artificial articles for ${source.name}`);
     
-    for (let i = 0; i < count; i++) {
-      const template = templates[Math.floor(Math.random() * templates.length)];
-      const publishDate = new Date(Date.now() - i * 24 * 60 * 60 * 1000); // Spread over recent days
-      
-      articles.push({
-        id: `${source.id}-${Date.now()}-${i}`,
-        title: template.title,
-        content: template.content,
-        source: source.name,
-        category: source.category,
-        author: template.author,
-        publishedAt: publishDate.toISOString(),
-        url: `${source.url}#article-${i}`,
-        tags: template.tags,
-        summary: template.summary,
-        impact: template.impact,
-        audience: template.audience
-      });
-    }
+    // ALLE MOCK-ARTIKEL-GENERIERUNG KOMPLETT ENTFERNT
+    console.log(`[Knowledge Service] No artificial articles generated for ${source.name}`);
     
     return articles;
   }

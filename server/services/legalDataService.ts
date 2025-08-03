@@ -141,21 +141,10 @@ export class LegalDataService {
     console.log('Legal jurisprudence database initialization complete.');
   }
 
+  // ALLE MOCK-DATEN ENTFERNT - Keine automatische Legal Case Generierung
   private async generateLegalCases(sourceId: string, source: any): Promise<HistoricalDataRecord[]> {
-    const cases: HistoricalDataRecord[] = [];
-    const caseCount = Math.floor(Math.random() * 200) + 50; // 50-250 cases per source
-
-    // Generate cases for different time periods
-    const currentDate = new Date();
-    for (let i = 0; i < caseCount; i++) {
-      const daysAgo = Math.floor(Math.random() * 3650); // Cases from last 10 years
-      const caseDate = new Date(currentDate.getTime() - (daysAgo * 24 * 60 * 60 * 1000));
-      
-      const legalCase = await this.generateLegalCase(sourceId, source, i + 1, caseDate);
-      cases.push(legalCase);
-    }
-
-    return cases.sort((a, b) => new Date(b.originalDate).getTime() - new Date(a.originalDate).getTime());
+    console.log(`[LegalDataService] MOCK DATA DELETED - No artificial legal cases for ${sourceId}`);
+    return [];
   }
 
   private async generateLegalCase(sourceId: string, source: any, caseNumber: number, date: Date): Promise<HistoricalDataRecord> {
