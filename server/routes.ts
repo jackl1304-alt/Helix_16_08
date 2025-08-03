@@ -624,16 +624,16 @@ Weitere Details finden Sie in der offiziellen Dokumentation der RegulierungsbehÃ
           // await dataService.syncDataSource(source.id);
           // await storage.updateDataSourceLastSync(source.id, new Date());
           
-          const simulatedNewUpdates = Math.floor(Math.random() * 3); // 0-2 neue Updates pro Quelle
           const existingCount = await storage.countRegulatoryUpdatesBySource(source.id) || 0;
+          const newUpdatesCount = 0; // Keine neuen Updates da Live-Sync deaktiviert
           
           results.push({ 
             id: source.id, 
-            status: 'synchronized', 
+            status: 'documented', 
             name: source.name,
-            newUpdatesCount: simulatedNewUpdates,
+            newUpdatesCount: newUpdatesCount,
             existingCount: existingCount,
-            message: `${source.name}: ${simulatedNewUpdates} neue Updates gefunden (${existingCount} bestehende)`
+            message: `${source.name}: ${existingCount} bestehende Updates dokumentiert, ${newUpdatesCount} neue gefunden`
           });
         } catch (error: any) {
           console.error(`Documentation failed for ${source.id}:`, error);
@@ -1838,22 +1838,22 @@ Status: Archiviertes historisches Dokument
         return res.status(404).json({ message: "Data source not found" });
       }
       
-      // Simuliere realistische Sync-Ergebnisse fÃ¼r Demo-Zwecke
-      const simulatedNewUpdates = Math.floor(Math.random() * 5); // 0-4 neue Updates
+      // Echte Datenbank-Abfrage - nur bestehende Daten dokumentieren, keine neuen Updates
       const existingDataCount = await storage.countRegulatoryUpdatesBySource(sourceId) || 0;
+      const newUpdatesCount = 0; // Keine neuen Updates da Live-Sync deaktiviert
       
-      console.log(`[API] Sync simulation for ${source.name} - ${simulatedNewUpdates} neue Updates simuliert (${existingDataCount} bestehende)`);
+      console.log(`[API] Data source documentation for ${source.name} - ${existingDataCount} bestehende Updates dokumentiert, ${newUpdatesCount} neue gefunden`);
       
       res.json({ 
         success: true, 
-        message: `Data source ${source.name} synchronisiert - ${simulatedNewUpdates} neue Updates gefunden`,
+        message: `Data source ${source.name} dokumentiert - ${existingDataCount} bestehende Updates, ${newUpdatesCount} neue gefunden`,
         sourceId: sourceId,
         sourceName: source.name,
-        lastSync: new Date().toISOString(),
-        newUpdatesCount: simulatedNewUpdates,
+        lastSync: source.last_sync_at || 'Never',
+        newUpdatesCount: newUpdatesCount,
         existingDataCount: existingDataCount,
-        syncType: "simulation",
-        note: simulatedNewUpdates > 0 ? `${simulatedNewUpdates} neue Regulatory Updates gefunden` : "Keine neuen Updates gefunden"
+        syncType: "documentation",
+        note: "Live synchronization disabled - only existing data documented"
       });
     } catch (error: any) {
       console.error(`[API] Documentation failed for ${req.params.id}:`, error);
