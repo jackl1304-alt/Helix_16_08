@@ -37,24 +37,33 @@ export default function DataCollection() {
 
   const syncMutation = useMutation({
     mutationFn: async (sourceId: string) => {
-      console.log(`Frontend: Starting sync for source ${sourceId}`);
-      const result = await apiRequest(`/api/data-sources/${sourceId}/sync`, "POST");
-      console.log(`Frontend: Sync result:`, result);
+      console.log(`Frontend: Starting documentation for source ${sourceId}`);
+      const result = await apiRequest(`/api/data-sources/${sourceId}/document`, "POST");
+      console.log(`Frontend: Documentation result:`, result);
       return result;
     },
-    onSuccess: (data) => {
-      console.log("Frontend: Sync successful", data);
+    onSuccess: (data, sourceId) => {
+      console.log("Frontend: Documentation successful", data);
       queryClient.invalidateQueries({ queryKey: ["/api/data-sources"] });
-      toast({
-        title: "Sync Started",
-        description: "Data source synchronization has been initiated.",
-      });
+      
+      const newUpdatesFound = data?.newUpdatesCount || 0;
+      if (newUpdatesFound > 0) {
+        toast({
+          title: "Neue Updates gefunden",
+          description: `${newUpdatesFound} neue Updates von ${sourceId} dokumentiert`,
+        });
+      } else {
+        toast({
+          title: "Keine neuen Updates",
+          description: `${sourceId} dokumentiert - keine neuen Daten gefunden`,
+        });
+      }
     },
-    onError: (error) => {
-      console.error("Frontend: Sync error:", error);
+    onError: (error, sourceId) => {
+      console.error("Frontend: Documentation error:", error);
       toast({
-        title: "Sync Failed", 
-        description: `Failed to start data source synchronization: ${error.message}`,
+        title: "Dokumentation fehlgeschlagen", 
+        description: `Fehler bei der Dokumentation von ${sourceId}: ${error.message}`,
         variant: "destructive",
       });
     },
@@ -277,7 +286,7 @@ export default function DataCollection() {
                           className="bg-[#d95d2c] hover:bg-[#b8441f] text-white"
                         >
                           <FolderSync className="h-4 w-4 mr-2" />
-                          Sync Now
+                          {syncMutation.isPending ? "Dokumentiert..." : "Sync Now"}
                         </Button>
                         <Button variant="outline" size="sm">
                           <Edit className="h-4 w-4" />
