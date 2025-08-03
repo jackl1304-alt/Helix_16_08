@@ -1,0 +1,182 @@
+# Helix Regulatory Intelligence - Prometheus Alert Rules
+
+groups:
+- name: helix_application
+  rules:
+  # Application Health
+  - alert: HelixAppDown
+    expr: up{job="helix-app"} == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Helix application is down"
+      description: "The Helix regulatory intelligence application has been down for more than 1 minute."
+
+  - alert: HelixHighErrorRate
+    expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High error rate in Helix application"
+      description: "Error rate is {{ $value }} errors per second."
+
+  - alert: HelixHighResponseTime
+    expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+    for: 3m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High response time in Helix application"
+      description: "95th percentile response time is {{ $value }} seconds."
+
+- name: helix_database
+  rules:
+  # Database Health
+  - alert: PostgreSQLDown
+    expr: up{job="postgres"} == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "PostgreSQL database is down"
+      description: "The PostgreSQL database has been down for more than 1 minute."
+
+  - alert: PostgreSQLHighConnections
+    expr: pg_stat_database_numbackends / pg_settings_max_connections > 0.8
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "PostgreSQL high connection usage"
+      description: "PostgreSQL connection usage is at {{ $value }}%."
+
+  - alert: PostgreSQLHighDiskUsage
+    expr: (pg_database_size_bytes / 1024 / 1024 / 1024) > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "PostgreSQL high disk usage"
+      description: "PostgreSQL database size is {{ $value }} GB."
+
+- name: helix_cache
+  rules:
+  # Redis Health
+  - alert: RedisDown
+    expr: up{job="redis"} == 0
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Redis cache is down"
+      description: "The Redis cache has been down for more than 1 minute."
+
+  - alert: RedisHighMemoryUsage
+    expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Redis high memory usage"
+      description: "Redis memory usage is at {{ $value }}%."
+
+- name: helix_system
+  rules:
+  # System Resources
+  - alert: HighCPUUsage
+    expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High CPU usage"
+      description: "CPU usage is {{ $value }}% on {{ $labels.instance }}."
+
+  - alert: HighMemoryUsage
+    expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High memory usage"
+      description: "Memory usage is {{ $value }}% on {{ $labels.instance }}."
+
+  - alert: LowDiskSpace
+    expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.1
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Low disk space"
+      description: "Disk space is {{ $value }}% full on {{ $labels.instance }}."
+
+- name: helix_data_sources
+  rules:
+  # Data Collection Health
+  - alert: DataSyncFailure
+    expr: increase(helix_data_sync_errors_total[1h]) > 5
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Multiple data sync failures"
+      description: "{{ $value }} data sync failures in the last hour."
+
+  - alert: FDAAPIDown
+    expr: up{job="fda-api"} == 0
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "FDA API is unreachable"
+      description: "The FDA API has been unreachable for 5 minutes."
+
+  - alert: EMAAPIDown
+    expr: up{job="ema-api"} == 0
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "EMA API is unreachable"
+      description: "The EMA API has been unreachable for 5 minutes."
+
+  - alert: StaleData
+    expr: time() - helix_last_successful_sync_timestamp > 86400
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Data synchronization is stale"
+      description: "No successful data sync for {{ $value }} seconds."
+
+- name: helix_business
+  rules:
+  # Business Logic Alerts
+  - alert: HighRegulatoryUpdates
+    expr: increase(helix_regulatory_updates_total[1h]) > 100
+    for: 1m
+    labels:
+      severity: info
+    annotations:
+      summary: "High volume of regulatory updates"
+      description: "{{ $value }} regulatory updates received in the last hour."
+
+  - alert: CriticalLegalCase
+    expr: helix_legal_cases_priority{priority="critical"} > 0
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Critical legal case detected"
+      description: "{{ $value }} critical legal cases require immediate attention."
+
+  - alert: AIApprovalBacklog
+    expr: helix_pending_approvals_total > 50
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "AI approval backlog is high"
+      description: "{{ $value }} items are pending AI approval for more than 10 minutes."

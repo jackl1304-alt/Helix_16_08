@@ -1,0 +1,152 @@
+version: '3.8'
+
+services:
+  # Main Application
+  helix-app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - FDA_API_KEY=${FDA_API_KEY}
+      - EMA_API_KEY=${EMA_API_KEY}
+      - MHRA_API_KEY=${MHRA_API_KEY}
+      - GRIP_USERNAME=${GRIP_USERNAME}
+      - GRIP_PASSWORD=${GRIP_PASSWORD}
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    networks:
+      - helix-network
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=helix_regulatory
+      - POSTGRES_USER=${POSTGRES_USER:-helix_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - helix-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-helix_user} -d helix_regulatory"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for Caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - helix-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - helix-app
+    restart: unless-stopped
+    networks:
+      - helix-network
+
+  # Monitoring with Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    restart: unless-stopped
+    networks:
+      - helix-network
+
+  # Grafana Dashboard
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - helix-network
+
+  # Backup Service
+  backup:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data:ro
+      - ./backups:/backups
+    environment:
+      - POSTGRES_DB=helix_regulatory
+      - POSTGRES_USER=${POSTGRES_USER:-helix_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    command: |
+      sh -c '
+        while true; do
+          echo "Creating backup at $$(date)"
+          pg_dump -h postgres -U $$POSTGRES_USER $$POSTGRES_DB > /backups/helix_$$(date +%Y%m%d_%H%M%S).sql
+          find /backups -name "helix_*.sql" -mtime +7 -delete
+          sleep 86400
+        done
+      '
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - helix-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  helix-network:
+    driver: bridge

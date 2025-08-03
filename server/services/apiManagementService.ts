@@ -153,7 +153,7 @@ export class APIManagementService {
       return { 
         success: false, 
         error: 'Rate limit exceeded',
-        nextSyncTime: this.rateLimits.get(sourceId)?.resetTime
+        nextSyncTime: this.rateLimits.get(sourceId)?.resetTime || new Date()
       };
     }
 
