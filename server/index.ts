@@ -1,8 +1,10 @@
-// DEBUG ENVIRONMENT VARIABLES AT STARTUP
-console.log(`[ENV DEBUG] NODE_ENV: ${process.env.NODE_ENV}`);
-console.log(`[ENV DEBUG] DATABASE_URL exists: ${!!process.env.DATABASE_URL}`);
-console.log(`[ENV DEBUG] DATABASE_URL first 30 chars: ${process.env.DATABASE_URL?.substring(0, 30)}`);
-console.log(`[ENV DEBUG] REPLIT_DEPLOYMENT: ${process.env.REPLIT_DEPLOYMENT}`);
+// Production-optimized logging: Only debug in development
+if (process.env.NODE_ENV === 'development') {
+  console.log(`[ENV DEBUG] NODE_ENV: ${process.env.NODE_ENV}`);
+  console.log(`[ENV DEBUG] DATABASE_URL exists: ${!!process.env.DATABASE_URL}`);
+  console.log(`[ENV DEBUG] DATABASE_URL type: ${process.env.DATABASE_URL?.includes("neondb") ? "Production Neon" : "Development"}`);
+  console.log(`[ENV DEBUG] REPLIT_DEPLOYMENT: ${process.env.REPLIT_DEPLOYMENT}`);
+}
 
 import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
@@ -11,8 +13,15 @@ import { setupVite, serveStatic, log } from "./vite";
 import { emailService } from "./services/emailService";
 import { historicalDataService } from "./services/historicalDataService";
 import { legalDataService } from "./services/legalDataService";
+import { Logger } from "./services/logger.service";
 import fs from "fs";
 import path from "path";
+
+// Initialize structured logger for production-ready logging
+const logger = new Logger('ServerMain');
+
+// Increase EventEmitter limits to prevent memory leak warnings
+process.setMaxListeners(15);
 
 const app = express();
 // Increase payload size limits for duplicate deletion operations
@@ -50,192 +59,32 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Debug environment variables
-  console.log(`[ENV] NODE_ENV: ${process.env.NODE_ENV}`);
-  console.log(`[ENV] DATABASE_URL exists: ${!!process.env.DATABASE_URL}`);
-  console.log(`[ENV] PORT: ${process.env.PORT}`);
-  console.log(`[ENV] REPLIT_DEPLOYMENT: ${process.env.REPLIT_DEPLOYMENT}`);
+  // Production-optimized environment logging
+  logger.info('Starting Helix Platform', {
+    nodeEnv: process.env.NODE_ENV,
+    hasDatabaseUrl: !!process.env.DATABASE_URL,
+    port: process.env.PORT,
+    isReplitDeployment: !!process.env.REPLIT_DEPLOYMENT
+  });
   
   // Initialize email service and verify connection
-  console.log("Initializing email service...");
+  logger.info("Initializing email service...");
   await emailService.verifyConnection();
   
-  // CRITICAL: Force initialize data sources for production deployment
-  console.log("PRODUCTION DEPLOYMENT: Initializing data sources...");
+  // Optimized: Start background initialization without blocking server startup
+  logger.info("Starting background data initialization...");
   const { storage } = await import("./storage.js");
+  const { backgroundInitService } = await import("./services/backgroundInitService.js");
   
-  try {
-    const existingSources = await storage.getAllDataSources();
-    console.log(`Found ${existingSources.length} existing data sources`);
-    
-    // ALWAYS ensure minimum 21+ data sources exist for production including GRIP
-    const requiredSources = [
-      // GRIP Platform - Global Intelligence
-      { id: 'grip_platform', name: 'GRIP Regulatory Intelligence', endpoint: 'https://grip-app.pureglobal.com', country: 'GLOBAL', region: 'Global', type: 'intelligence', category: 'regulatory', isActive: true },
-      // North America - FDA & Health Canada
-      { id: 'fda_510k', name: 'FDA 510(k) Database', endpoint: 'https://api.fda.gov/device/510k.json', country: 'US', region: 'North America', type: 'regulatory', category: 'approvals', isActive: true },
-      { id: 'fda_pma', name: 'FDA PMA Database', endpoint: 'https://api.fda.gov/device/pma.json', country: 'US', region: 'North America', type: 'regulatory', category: 'approvals', isActive: true },
-      { id: 'fda_recalls', name: 'FDA Device Recalls', endpoint: 'https://api.fda.gov/device/recall.json', country: 'US', region: 'North America', type: 'safety', category: 'recalls', isActive: true },
-      { id: 'fda_guidance', name: 'FDA Guidance Documents', endpoint: 'https://www.fda.gov/medical-devices/guidance-documents-medical-devices-and-radiation-emitting-products', country: 'US', region: 'North America', type: 'guidance', category: 'guidelines', isActive: true },
-      { id: 'health_canada', name: 'Health Canada', endpoint: 'https://www.canada.ca/en/health-canada', country: 'CA', region: 'North America', type: 'regulatory', category: 'approvals', isActive: true },
-      { id: 'health_canada_recalls', name: 'Health Canada Recalls', endpoint: 'https://recalls-rappels.canada.ca/en/search/site', country: 'CA', region: 'North America', type: 'safety', category: 'recalls', isActive: true },
-      
-      // Europe - EMA & National Authorities
-      { id: 'ema_epar', name: 'EMA EPAR', endpoint: 'https://www.ema.europa.eu/en/medicines', country: 'EU', region: 'Europe', type: 'regulatory', category: 'approvals', isActive: true },
-      { id: 'ema_guidelines', name: 'EMA Guidelines', endpoint: 'https://www.ema.europa.eu/en/human-regulatory/research-development/scientific-guidelines', country: 'EU', region: 'Europe', type: 'guidance', category: 'guidelines', isActive: true },
-      { id: 'bfarm_guidelines', name: 'BfArM Leitfäden', endpoint: 'https://www.bfarm.de', country: 'DE', region: 'Europe', type: 'guidelines', category: 'guidelines', isActive: true },
-      { id: 'bfarm_approvals', name: 'BfArM Zulassungen', endpoint: 'https://www.bfarm.de/DE/Medizinprodukte/_node.html', country: 'DE', region: 'Europe', type: 'regulatory', category: 'approvals', isActive: true },
-      { id: 'swissmedic_guidelines', name: 'Swissmedic Guidelines', endpoint: 'https://www.swissmedic.ch', country: 'CH', region: 'Europe', type: 'guidelines', category: 'guidelines', isActive: true },
-      { id: 'swissmedic_approvals', name: 'Swissmedic Approvals', endpoint: 'https://www.swissmedic.ch/swissmedic/en/home/medical-devices', country: 'CH', region: 'Europe', type: 'regulatory', category: 'approvals', isActive: true },
-      { id: 'mhra_guidance', name: 'MHRA Guidance', endpoint: 'https://www.gov.uk/mhra', country: 'UK', region: 'Europe', type: 'guidance', category: 'guidelines', isActive: true },
-      { id: 'mhra_alerts', name: 'MHRA Safety Alerts', endpoint: 'https://www.gov.uk/drug-device-alerts', country: 'UK', region: 'Europe', type: 'safety', category: 'alerts', isActive: true },
-      { id: 'ansm_france', name: 'ANSM France', endpoint: 'https://ansm.sante.fr/Produits-de-sante/Dispositifs-medicaux-et-dispositifs-medicaux-de-diagnostic-in-vitro', country: 'FR', region: 'Europe', type: 'regulatory', category: 'approvals', isActive: true },
-      
-      // Asia-Pacific
-      { id: 'tga_australia', name: 'TGA Australia', endpoint: 'https://www.tga.gov.au', country: 'AU', region: 'Asia-Pacific', type: 'regulatory', category: 'approvals', isActive: true },
-      { id: 'pmda_japan', name: 'PMDA Japan', endpoint: 'https://www.pmda.go.jp/english/review-services/outline/devices/0002.html', country: 'JP', region: 'Asia-Pacific', type: 'regulatory', category: 'approvals', isActive: true },
-      { id: 'nmpa_china', name: 'NMPA China', endpoint: 'https://www.nmpa.gov.cn/datasearch/search-info.html', country: 'CN', region: 'Asia-Pacific', type: 'regulatory', category: 'approvals', isActive: true },
-      { id: 'cdsco_india', name: 'CDSCO India', endpoint: 'https://cdsco.gov.in/opencms/opencms/en/Home/', country: 'IN', region: 'Asia-Pacific', type: 'regulatory', category: 'approvals', isActive: true },
-      { id: 'hsa_singapore', name: 'HSA Singapore', endpoint: 'https://www.hsa.gov.sg/medical-devices', country: 'SG', region: 'Asia-Pacific', type: 'regulatory', category: 'approvals', isActive: true },
-      
-      // South America
-      { id: 'anvisa_brazil', name: 'ANVISA Brazil', endpoint: 'https://www.gov.br/anvisa/pt-br', country: 'BR', region: 'South America', type: 'regulatory', category: 'approvals', isActive: true },
-      { id: 'anmat_argentina', name: 'ANMAT Argentina', endpoint: 'https://www.argentina.gob.ar/anmat', country: 'AR', region: 'South America', type: 'regulatory', category: 'approvals', isActive: true },
-      
-      // International Standards & Others
-      { id: 'iso_standards', name: 'ISO Medical Device Standards', endpoint: 'https://www.iso.org/committee/54892.html', country: 'INTL', region: 'International', type: 'standards', category: 'standards', isActive: true },
-      { id: 'iec_standards', name: 'IEC Medical Standards', endpoint: 'https://www.iec.ch/dyn/www/f?p=103:7:0::::FSP_ORG_ID:1316', country: 'INTL', region: 'International', type: 'standards', category: 'standards', isActive: true },
-      { id: 'who_prequalification', name: 'WHO Prequalification', endpoint: 'https://extranet.who.int/pqweb/medical-devices', country: 'INTL', region: 'International', type: 'qualification', category: 'approvals', isActive: true }
-    ];
-    
-    for (const source of requiredSources) {
-      try {
-        await storage.createDataSource(source);
-        console.log(`✓ Created/Updated data source: ${source.name}`);
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : String(err);
-        console.log(`ℹ Data source ${source.name} already exists or error: ${errorMessage}`);
-      }
-    }
-    
-    const finalCount = await storage.getAllDataSources();
-    console.log(`PRODUCTION READY: ${finalCount.length} data sources available`);
-    
-  } catch (error) {
-    console.error("CRITICAL: Error initializing data sources:", error);
-  }
-
-  // Initialize historical data service
-  console.log("Initializing historical data collection...");
+  // Start background init without waiting
+  backgroundInitService.startBackgroundInit();
   
-  // Initialize legal/jurisprudence data
-  console.log("Initializing legal jurisprudence database...");
+  // Initialize caching service
+  logger.info("Initializing caching service...");
+  const { cachingService } = await import("./services/cachingService.js");
   
-  // CRITICAL: Force Production database initialization based on environment
-  const isProductionDB = process.env.REPLIT_DEPLOYMENT === "1" || 
-                         process.env.NODE_ENV === "production" ||
-                         process.env.DATABASE_URL?.includes("neondb") ||
-                         !process.env.DATABASE_URL?.includes("localhost");
-                         
-  // Additional Production detection for replit.app domain
-  const isReplitApp = process.env.REPLIT_DEPLOYMENT === "1" || 
-                      process.env.DATABASE_URL?.includes("@ep-") ||
-                      process.env.DATABASE_URL?.includes(".replit.app") ||
-                      typeof process !== 'undefined' && process.env.HOSTNAME?.includes("replit");
-  
-  console.log(`ENVIRONMENT DETECTION: isProductionDB=${isProductionDB}`);
-  console.log(`REPLIT_DEPLOYMENT: ${process.env.REPLIT_DEPLOYMENT}`);
-  console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
-  console.log(`DATABASE_URL type: ${process.env.DATABASE_URL?.includes("neondb") ? "Production Neon" : "Development"}`);
-  
-  try {
-    const currentLegalCases = await storage.getAllLegalCases();
-    console.log(`Current legal cases in database: ${currentLegalCases.length}`);
-    
-    // CRITICAL: More aggressive detection for replit.app live deployment
-    const isLiveDeployment = process.env.DATABASE_URL?.includes("neondb") || 
-                           process.env.DATABASE_URL?.includes("@ep-") ||
-                           process.env.DATABASE_URL?.includes(".replit.app") ||
-                           !process.env.DATABASE_URL?.includes("localhost");
-
-    // AGGRESSIVELY FORCE INITIALIZATION - ALWAYS initialize if 0 legal cases
-    if (currentLegalCases.length === 0) {
-      console.log("🚨 ZERO LEGAL CASES DETECTED: Triggering IMMEDIATE FORCE initialization...");
-      await legalDataService.initializeLegalData();
-      
-      const updatedLegalCount = await storage.getAllLegalCases();
-      console.log(`✅ ZERO CASE FIX: After forced initialization: ${updatedLegalCount.length} legal cases`);
-    } else if ((isProductionDB || isReplitApp || isLiveDeployment) && currentLegalCases.length < 2000) {
-      console.log("🚨 LIVE DEPLOYMENT DETECTED: Insufficient legal cases, triggering IMMEDIATE initialization...");
-      await legalDataService.initializeLegalData();
-      
-      const updatedLegalCount = await storage.getAllLegalCases();
-      console.log(`✅ LIVE DEPLOYMENT: After forced initialization: ${updatedLegalCount.length} legal cases`);
-    } else if (currentLegalCases.length < 500) {
-      console.log("PRODUCTION/REPLIT DETECTED: Insufficient legal cases, triggering FORCED initialization...");
-      await legalDataService.initializeLegalData();
-      
-      const updatedLegalCount = await storage.getAllLegalCases();
-      console.log(`PRODUCTION: After forced initialization: ${updatedLegalCount.length} legal cases`);
-    } else if (currentLegalCases.length < 100) {
-      console.log("DEVELOPMENT: Database has insufficient legal cases, triggering initialization...");
-      await legalDataService.initializeLegalData();
-      
-      const updatedLegalCount = await storage.getAllLegalCases();
-      console.log(`DEVELOPMENT: After initialization: ${updatedLegalCount.length} legal cases`);
-    } else {
-      console.log(`DATABASE STATUS: Contains ${currentLegalCases.length} legal cases - skipping initialization`);
-    }
-  } catch (error) {
-    console.error("CRITICAL: Error with legal data initialization:", error);
-    // Force initialization on any error
-    console.log("FALLBACK: Forcing legal data initialization due to error...");
-    await legalDataService.initializeLegalData();
-  }
-  
-  // CRITICAL: Force initialize regulatory updates for production  
-  console.log("CHECKING REGULATORY UPDATES for Production/Development...");
-  try {
-    const { dataCollectionService } = await import("./services/dataCollectionService.js");
-    
-    // Check current regulatory updates count
-    const currentUpdates = await storage.getAllRegulatoryUpdates();
-    console.log(`Current regulatory updates in database: ${currentUpdates.length}`);
-    
-    // Force initialization if production OR if insufficient data  
-    if ((isProductionDB || isReplitApp) && currentUpdates.length === 0) {
-      console.log("🚨 LIVE DEPLOYMENT DETECTED: ZERO regulatory updates, triggering IMMEDIATE collection...");
-      await dataCollectionService.performInitialDataCollection();
-      
-      const updatedCount = await storage.getAllRegulatoryUpdates();
-      console.log(`✅ LIVE DEPLOYMENT: After forced collection: ${updatedCount.length} regulatory updates`);
-    } else if (currentUpdates.length < 1000) {
-      console.log("PRODUCTION/REPLIT DETECTED: Insufficient regulatory updates, triggering FORCED collection...");
-      await dataCollectionService.performInitialDataCollection();
-      
-      const updatedCount = await storage.getAllRegulatoryUpdates();
-      console.log(`PRODUCTION: After forced collection: ${updatedCount.length} regulatory updates`);
-    } else if (currentUpdates.length < 100) {
-      console.log("DEVELOPMENT: Database has insufficient updates, triggering data collection...");
-      await dataCollectionService.performInitialDataCollection();
-      
-      const updatedCount = await storage.getAllRegulatoryUpdates();
-      console.log(`DEVELOPMENT: After collection: ${updatedCount.length} regulatory updates`);
-    } else {
-      console.log(`DATABASE STATUS: Contains ${currentUpdates.length} regulatory updates - skipping collection`);
-    }
-    
-  } catch (error) {
-    console.error("CRITICAL: Error with regulatory updates initialization:", error);
-    // Force collection on any error
-    console.log("FALLBACK: Forcing regulatory data collection due to error...");
-    try {
-      const { dataCollectionService } = await import("./services/dataCollectionService.js");
-      await dataCollectionService.performInitialDataCollection();
-    } catch (fallbackError) {
-      console.error("FALLBACK FAILED:", fallbackError);
-    }
-  }
+  // Log successful startup
+  logger.info("Helix Platform successfully initialized with background services");
   
 
 
