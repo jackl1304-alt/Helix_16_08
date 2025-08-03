@@ -3311,25 +3311,23 @@ Für vollständige Details und weitere Analysen besuchen Sie die ursprüngliche 
       const realArticles = await storage.getAllKnowledgeArticles();
       console.log(`[API] Found ${realArticles.length} knowledge articles in database`);
       
-      // Transform database articles to standardized API format WITH DEMO MARKING
+      // Transform database articles to standardized API format - ECHTE NEWSLETTER-DATEN
       const knowledgeArticles = realArticles.map(article => ({
         id: article.id,
         title: article.title,
         content: article.content,
-        category: article.category,
+        category: article.category || 'newsletter',
         tags: Array.isArray(article.tags) ? (article.tags || []) : [],
-        published_at: article.created_at,
+        published_at: article.publishedAt?.toISOString() || article.created_at,
         created_at: article.created_at,
         status: 'active',
-        // Extract authority from tags or use default
-        authority: Array.isArray(article.tags) 
-          ? article.tags.find(tag => ['FDA', 'EMA', 'BfArM', 'MHRA', 'Swissmedic', 'ISO', 'IEC', 'Johner', 'MTD', 'PubMed', 'JAMA'].includes(tag)) || 'Knowledge Base'
-          : 'Knowledge Base',
+        authority: article.source || 'Newsletter',
         region: 'Global',
-        priority: 'high',
-        language: article.content?.includes('DiGA') || article.content?.includes('Deutschland') ? 'de' : 'en',
-        source: `DEMO: Knowledge Base: ${article.category}`,
-        summary: `🧪 DEMO: ${article.content?.substring(0, 150) + '...'}`
+        priority: article.credibility === 'premium' ? 'high' : 'medium',
+        language: article.content?.includes('Deutschland') || article.content?.includes('EU MDR') ? 'de' : 'en',
+        source: article.source,
+        url: article.url || '',
+        summary: article.summary || article.content?.substring(0, 200) + '...'
       }));
 
       res.json({

@@ -96,12 +96,13 @@ export default function KnowledgeBasePage() {
     refetchInterval: 30000
   });
 
-  // Extract articles from API response structure - FIXED TYPE SAFETY
+  // Extract articles from API response structure - NEWSLETTER-DATEN
   const realArticlesData = (articlesResponse as any)?.data || [];
-  console.log('Knowledge Base Articles Data:', {
+  console.log('Newsletter Knowledge Base Articles:', {
     response: articlesResponse,
     articles: realArticlesData,
-    count: realArticlesData.length
+    count: realArticlesData.length,
+    sources: (articlesResponse as any)?.sources
   });
 
   // Deep scraping mutation for comprehensive articles
