@@ -1,6 +1,9 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { logger } from './logger';
+import { Logger } from './logger.service.js';
+
+// Initialize logger instance
+const logger = new Logger('RegulatoryDataScraper');
 
 interface RegulatorySource {
   id: string;
