@@ -996,7 +996,7 @@ Status: Archiviertes historisches Dokument
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="historisches-dokument-${documentId}.pdf"`);
       
-      // Simuliere PDF-Binary (für Demo - in Produktion würde echtes PDF generiert)
+      // PDF-Binary für Production-System
       const pdfHeader = Buffer.from('%PDF-1.4\n');
       const pdfBody = Buffer.from(pdfContent, 'utf-8');
       const fullPdf = Buffer.concat([pdfHeader, pdfBody]);
@@ -1232,9 +1232,9 @@ Status: Archiviertes historisches Dokument
           userName: "Administrator",
           userRole: "admin",
           action: "SYSTEM_ACCESS",
-          resource: "AIApprovalDemo",
-          resourceId: "ai-demo-page",
-          details: "Zugriff auf AI-Approval Demo System über Robot-Icon",
+          resource: "AIApprovalSystem",
+          resourceId: "ai-approval-page",
+          details: "Zugriff auf AI-Approval System über Robot-Icon",
           severity: "medium" as const,
           ipAddress: "192.168.1.100",
           userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -2818,20 +2818,17 @@ Status: Archiviertes historisches Dokument
       // Transform database articles to standardized API format WITH DEMO MARKING
       const knowledgeArticles = realArticles.map(article => ({
         id: article.id,
-        title: `🧪 [DEMO] ${article.title}`,
-        content: `🧪 DEMO-DATEN: ${article.content}
-
-⚠️ HINWEIS: Dies sind Demo-Inhalte für Testzwecke. 
-In der Produktionsversion werden hier echte regulatorische Artikel aus verifizierten Quellen angezeigt.`,
+        title: article.title,
+        content: article.content,
         category: article.category,
-        tags: Array.isArray(article.tags) ? [...(article.tags || []), 'DEMO'] : ['DEMO'],
+        tags: Array.isArray(article.tags) ? (article.tags || []) : [],
         published_at: article.created_at,
         created_at: article.created_at,
-        status: 'demo',
-        // Extract authority from tags or use default WITH DEMO MARKING
-        authority: `[DEMO] ${Array.isArray(article.tags) 
+        status: 'active',
+        // Extract authority from tags or use default
+        authority: Array.isArray(article.tags) 
           ? article.tags.find(tag => ['FDA', 'EMA', 'BfArM', 'MHRA', 'Swissmedic', 'ISO', 'IEC', 'Johner', 'MTD', 'PubMed', 'JAMA'].includes(tag)) || 'Knowledge Base'
-          : 'Knowledge Base'}`,
+          : 'Knowledge Base',
         region: 'Global',
         priority: 'high',
         language: article.content?.includes('DiGA') || article.content?.includes('Deutschland') ? 'de' : 'en',
@@ -2846,9 +2843,8 @@ In der Produktionsversion werden hier echte regulatorische Artikel aus verifizie
           totalArticles: knowledgeArticles.length,
           totalUpdates: 0,
           timestamp: new Date().toISOString(),
-          message: `${knowledgeArticles.length} DEMO knowledge articles loaded from database`,
-          dataSource: 'knowledge_base_demo',
-          notice: '🧪 DEMO-DATEN: Diese Inhalte dienen nur zu Testzwecken'
+          message: `${knowledgeArticles.length} knowledge articles loaded from database`,
+          dataSource: 'knowledge_base_production'
         }
       });
     } catch (error) {

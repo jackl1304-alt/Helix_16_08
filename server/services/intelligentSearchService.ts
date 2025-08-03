@@ -36,38 +36,8 @@ interface SearchFilters {
 }
 
 class IntelligentSearchService {
-  private knowledgeBase = [
-    {
-      id: "kb_1",
-      title: "MDR Implementierung: Vollständiger Leitfaden für Klasse III Geräte",
-      content: "Detaillierte Anleitung zur vollständigen Implementierung der EU MDR für Medizinprodukte der Klasse III mit praktischen Checklisten und Zeitplänen.",
-      category: "regulatory_guidance",
-      tags: ["MDR", "Klasse III", "EU", "Implementierung", "Compliance"],
-      author: "Dr. Maria Schmidt",
-      region: "EU",
-      deviceClass: "Klasse III"
-    },
-    {
-      id: "kb_2",
-      title: "FDA 510(k) Einreichung: Schritt-für-Schritt Anleitung",
-      content: "Komplette Anleitung für erfolgreiche FDA 510(k) Einreichungen mit häufigen Fehlern und deren Vermeidung.",
-      category: "compliance_process",
-      tags: ["FDA", "510(k)", "USA", "Einreichung", "Zulassung"],
-      author: "Dr. Robert Johnson",
-      region: "USA",
-      deviceClass: "Klasse II"
-    },
-    {
-      id: "kb_3",
-      title: "Cybersecurity Framework für Connected Medical Devices",
-      content: "Umfassender Leitfaden zur Implementierung von Cybersecurity-Maßnahmen für vernetzte Medizinprodukte nach FDA und EU-Anforderungen.",
-      category: "cybersecurity",
-      tags: ["Cybersecurity", "Connected Devices", "FDA", "EU", "IoT"],
-      author: "Sarah Chen",
-      region: "Global",
-      deviceClass: "Alle Klassen"
-    }
-  ];
+  // Knowledge Base wird durch echte Artikel aus der Datenbank geladen
+  private knowledgeBase: any[] = [];
 
   // Text similarity calculation using simple keyword matching
   private calculateSimilarity(text1: string, text2: string): number {
@@ -96,36 +66,15 @@ class IntelligentSearchService {
     const results: SearchResult[] = [];
     const keywords = this.extractKeywords(query);
     
-    // Sample regulatory data
-    const regulatoryData = [
-      {
-        id: "reg_1",
-        title: "EU MDR 2017/745 - Anforderungen für Klasse III Medizinprodukte",
-        content: "Die Verordnung (EU) 2017/745 über Medizinprodukte legt spezifische Anforderungen für Klasse III Geräte fest, einschließlich klinischer Bewertung, technischer Dokumentation und Konformitätsbewertungsverfahren.",
-        source: "EU MDR",
-        region: "EU",
-        deviceClass: "Klasse III",
-        date: "2025-01-15"
-      },
-      {
-        id: "reg_2", 
-        title: "FDA Guidance: Cybersecurity in Medical Devices (2022)",
-        content: "FDA-Leitfaden zur Cybersecurity für Medizinprodukte mit Anforderungen an Risikoanalyse, Sicherheitskontrollen und Post-Market-Überwachung für vernetzte Geräte.",
-        source: "FDA",
-        region: "USA",
-        deviceClass: "Alle Klassen",
-        date: "2024-12-20"
-      },
-      {
-        id: "reg_3",
-        title: "BfArM Stellungnahme zu KI-basierten Medizinprodukten",
-        content: "Offizielle Stellungnahme des BfArM zu Anforderungen an KI-basierte Medizinprodukte, einschließlich Algorithm Lifecycle Management und Kontinuierliches Lernen.",
-        source: "BfArM",
-        region: "Deutschland",
-        deviceClass: "Alle Klassen",
-        date: "2025-01-10"
-      }
-    ];
+    // Echte regulatory data aus der Datenbank laden
+    let regulatoryData: any[] = [];
+    try {
+      const storage = await import('../storage');
+      const allUpdates = await storage.default.getAllRegulatoryUpdates();
+      regulatoryData = allUpdates.slice(0, 50); // Begrenzte Anzahl für Performance
+    } catch (error) {
+      console.error('Error loading regulatory data for search:', error);
+    }
 
     for (const item of regulatoryData) {
       const relevance = this.calculateSimilarity(query, item.title + " " + item.content);
@@ -159,20 +108,16 @@ class IntelligentSearchService {
     // Get legal cases from legal data service (using dynamic import)
     try {
       const { legalDataService } = await import('./legalDataService');
-      // Simplified legal data search without external service dependency
-      const mockLegalData = [
-        {
-          id: 'legal-001',
-          title: 'Medical Device Regulation Case',
-          summary: 'Important regulatory decision',
-          jurisdiction: 'US',
-          caseType: 'Federal',
-          date: '2025-01-15',
-          url: '#'
-        }
-      ];
+      // Echte Legal Cases aus der Datenbank laden
+      let legalData: any[] = [];
+      try {
+        const storage = await import('../storage');
+        legalData = await storage.default.getAllLegalCases();
+      } catch (error) {
+        console.error('Error loading legal data for search:', error);
+      }
 
-      for (const legalCase of mockLegalData) {
+      for (const legalCase of legalData) {
         const relevance = this.calculateSimilarity(query, legalCase.title + " " + legalCase.summary);
         if (relevance > 0.1) {
           results.push({

@@ -31,7 +31,7 @@ const AuditLogs = lazy(() => import("@/pages/audit-logs"));
 const AIInsights = lazy(() => import("@/pages/ai-insights"));
 const KnowledgeBase = lazy(() => import("@/pages/knowledge-base"));
 const EnhancedLegalCases = lazy(() => import("@/pages/enhanced-legal-cases"));
-const AIApprovalDemo = lazy(() => import("@/pages/ai-approval-demo"));
+
 const HistoricalData = lazy(() => import("@/pages/historical-data-simple"));
 const LegalCases = lazy(() => import("@/pages/legal-cases"));
 const IntelligentSearch = lazy(() => import("@/pages/intelligent-search"));
@@ -76,7 +76,7 @@ function Router() {
         <Route path="/historical-data" component={HistoricalData} />
         <Route path="/legal-cases" component={LegalCases} />
         <Route path="/intelligent-search" component={IntelligentSearch} />
-        <Route path="/ai-approval-demo" component={AIApprovalDemo} />
+
         <Route path="/phase1-integration" component={Phase1Integration} />
         <Route path="/phase2-integration" component={Phase2Integration} />
         <Route path="/phase3-advanced" component={Phase3Advanced} />
