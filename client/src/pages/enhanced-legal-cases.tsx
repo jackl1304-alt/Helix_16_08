@@ -267,11 +267,15 @@ export default function EnhancedLegalCases() {
             const caseDetails = extractCaseDetails(legalCase.content);
             
             return (
-              <Card key={legalCase.id} className="hover:shadow-lg transition-shadow">
+              <Card 
+                key={legalCase.id} 
+                className="hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => window.location.href = `/legal-case/${legalCase.id}`}
+              >
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <CardTitle className="text-xl mb-2 flex items-center gap-2">
+                      <CardTitle className="text-xl mb-2 flex items-center gap-2 hover:text-blue-600 transition-colors">
                         <span className="text-2xl">{getJurisdictionIcon(legalCase.jurisdiction)}</span>
                         {legalCase.title}
                       </CardTitle>
