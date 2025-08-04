@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ColoredHashtagBadge } from "@/components/colored-hashtag-badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -435,6 +436,16 @@ export default function AIInsights() {
                     <Badge key={region} variant="secondary" className="text-xs">
                       {region}
                     </Badge>
+                  ))}
+                </div>
+              </div>
+
+              {/* Farbkodierte Hashtags */}
+              <div>
+                <span className="text-sm font-medium">Tags:</span>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {insight.tags.map((tag, index) => (
+                    <ColoredHashtagBadge key={index} tag={tag} />
                   ))}
                 </div>
               </div>
