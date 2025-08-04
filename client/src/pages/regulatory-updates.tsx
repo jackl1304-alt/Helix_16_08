@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/performance-optimized-card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ColoredHashtagBadge } from "@/components/colored-hashtag-badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -625,6 +626,18 @@ EXPORT DETAILS:
                                         <div><strong>Prioritätsstufe:</strong> {priorityLabels[update.priority]}</div>
                                         <div><strong>Zeichenanzahl:</strong> {update.description?.length || 0}</div>
                                       </div>
+                                      
+                                      {/* Farbkodierte Hashtags */}
+                                      {update.raw_data?.hashtags && (
+                                        <div className="mt-4">
+                                          <h4 className="font-semibold mb-2">Tags:</h4>
+                                          <div className="flex flex-wrap gap-2">
+                                            {update.raw_data.hashtags.map((tag: string, index: number) => (
+                                              <ColoredHashtagBadge key={index} tag={tag} />
+                                            ))}
+                                          </div>
+                                        </div>
+                                      )}
                                       
                                       {update.raw_data && (
                                         <div className="mt-4">
