@@ -233,21 +233,23 @@ export default function AIInsights() {
   };
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="flex justify-between items-center mb-8">
+    <div className="container mx-auto py-4 px-4 sm:py-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center">
-            <Brain className="mr-3 h-8 w-8 text-primary" />
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center">
+            <Brain className="mr-2 sm:mr-3 h-6 w-6 sm:h-8 sm:w-8 text-primary" />
             KI-Insights
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             KI-gestützte Analyse und Vorhersagen für regulatorische Trends
           </p>
         </div>
         
-        <div className="flex space-x-2">
+        <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
           <Button 
             variant="outline"
+            size="sm"
+            className="w-full sm:w-auto"
             onClick={() => {
               toast({
                 title: "Aktualisierung",
@@ -257,10 +259,12 @@ export default function AIInsights() {
             }}
           >
             <RefreshCw className="mr-2 h-4 w-4" />
-            Aktualisieren
+            <span className="sm:inline">Aktualisieren</span>
           </Button>
           <Button 
             variant="outline"
+            size="sm"
+            className="w-full sm:w-auto"
             onClick={() => {
               toast({
                 title: "Export",
@@ -269,23 +273,23 @@ export default function AIInsights() {
             }}
           >
             <Download className="mr-2 h-4 w-4" />
-            Report exportieren
+            <span className="sm:inline">Export</span>
           </Button>
         </div>
       </div>
 
       {/* Quick Overview Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4 mb-6 sm:mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aktive Analysen</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-xs sm:text-sm font-medium line-clamp-2">Aktive Analysen</CardTitle>
+            <BarChart3 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+          <CardContent className="pt-2">
+            <div className="text-xl sm:text-2xl font-bold text-blue-600">
               {insights.filter(i => i.category === 'trend_analysis').length}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground line-clamp-2">
               Laufende Trend-Analysen
             </p>
           </CardContent>
@@ -293,29 +297,29 @@ export default function AIInsights() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Kritische Risiken</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-xs sm:text-sm font-medium line-clamp-2">Kritische Risiken</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
+          <CardContent className="pt-2">
+            <div className="text-xl sm:text-2xl font-bold text-red-600">
               {insights.filter(i => i.severity === 'critical').length}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Sofortige Aufmerksamkeit erforderlich
+            <p className="text-xs text-muted-foreground line-clamp-2">
+              Sofortige Aufmerksamkeit
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Markt-Intelligence</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-xs sm:text-sm font-medium line-clamp-2">Markt-Intelligence</CardTitle>
+            <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+          <CardContent className="pt-2">
+            <div className="text-xl sm:text-2xl font-bold text-green-600">
               {insights.filter(i => i.category === 'market_intelligence').length}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground line-clamp-2">
               Marktchancen identifiziert
             </p>
           </CardContent>
@@ -338,26 +342,26 @@ export default function AIInsights() {
       </div>
 
       {/* Filters and Search */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Filter className="mr-2 h-5 w-5" />
+      <Card className="mb-6 sm:mb-8">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center text-base sm:text-lg">
+            <Filter className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
             Filter & Suche
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Nach Insights suchen..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full"
-              />
-            </div>
-            
+        <CardContent className="space-y-4">
+          <div className="w-full">
+            <Input
+              placeholder="Nach Insights suchen..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full"
+            />
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-48">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Kategorie" />
               </SelectTrigger>
               <SelectContent>
@@ -371,7 +375,7 @@ export default function AIInsights() {
             </Select>
 
             <Select value={selectedSeverity} onValueChange={setSelectedSeverity}>
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Priorität" />
               </SelectTrigger>
               <SelectContent>
@@ -387,7 +391,7 @@ export default function AIInsights() {
       </Card>
 
       {/* AI Insights Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {filteredInsights.map((insight) => (
           <Card key={insight.id} className="h-full">
             <CardHeader>
@@ -464,18 +468,18 @@ export default function AIInsights() {
                 </ul>
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-3 border-t gap-3">
                 <span className="text-xs text-muted-foreground">
                   {formatDate(insight.createdAt)}
                 </span>
-                <div className="flex space-x-2">
-                  <Button size="sm" variant="outline">
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" className="flex-1 sm:flex-none">
                     <Eye className="mr-1 h-3 w-3" />
-                    Details
+                    <span className="sm:inline">Details</span>
                   </Button>
-                  <Button size="sm" variant="outline">
+                  <Button size="sm" variant="outline" className="flex-1 sm:flex-none">
                     <ExternalLink className="mr-1 h-3 w-3" />
-                    Export
+                    <span className="sm:inline">Export</span>
                   </Button>
                 </div>
               </div>
@@ -495,24 +499,46 @@ export default function AIInsights() {
       )}
 
       {/* New Analysis Input */}
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <MessageSquare className="mr-2 h-5 w-5" />
+      <Card className="mt-6 sm:mt-8">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center text-base sm:text-lg">
+            <MessageSquare className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
             Neue KI-Analyse anfordern
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-sm">
             Stellen Sie eine spezifische Frage zur regulatorischen Landschaft
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex space-x-2">
-            <Textarea
-              placeholder="z.B. 'Vergleiche FDA und EMA Anforderungen für AI/ML Medizinprodukte'"
-              value={newAnalysisQuery}
-              onChange={(e) => setNewAnalysisQuery(e.target.value)}
-              className="flex-1"
-              rows={3}
+        <CardContent className="space-y-4">
+          <Textarea
+            placeholder="z.B. 'Vergleiche FDA und EMA Anforderungen für AI/ML Medizinprodukte'"
+            value={newAnalysisQuery}
+            onChange={(e) => setNewAnalysisQuery(e.target.value)}
+            className="w-full resize-none"
+            rows={3}
+          />
+          <Button 
+            onClick={handleNewAnalysis} 
+            disabled={createAnalysisMutation.isPending || !newAnalysisQuery.trim()}
+            className="w-full sm:w-auto"
+          >
+            {createAnalysisMutation.isPending ? (
+              <>
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                Analyse läuft...
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Analyse starten
+              </>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
             />
             <Button 
               onClick={handleNewAnalysis}

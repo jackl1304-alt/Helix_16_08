@@ -161,33 +161,34 @@ EXPORT DETAILS:
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
             Regulatory Updates
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Aktuelle regulatorische Änderungen und Bestimmungen von FDA, EMA, BfArM
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1 sm:mt-2">
+            Aktuelle regulatorische Änderungen von FDA, EMA, BfArM
           </p>
         </div>
         <Button 
           onClick={() => toast({ title: "Synchronisierung", description: "Updates werden synchronisiert..." })}
-          className="min-w-[180px]"
+          className="w-full sm:w-auto sm:min-w-[180px]"
+          size="sm"
         >
           <Download className="h-4 w-4 mr-2" />
-          Updates synchronisieren
+          <span className="sm:inline">Updates synchronisieren</span>
         </Button>
       </div>
 
       {/* Controls */}
       <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Filteroptionen</CardTitle>
+        <CardHeader className="pb-4">
+          <CardTitle className="text-base sm:text-lg">Filteroptionen</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div>
-              <label className="text-sm font-medium">Region</label>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
+            <div className="space-y-1">
+              <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Region</label>
               <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9">
                   <SelectValue placeholder="Region wählen" />
                 </SelectTrigger>
                 <SelectContent>
@@ -201,10 +202,10 @@ EXPORT DETAILS:
               </Select>
             </div>
             
-            <div>
-              <label className="text-sm font-medium">Priorität</label>
+            <div className="space-y-1">
+              <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Priorität</label>
               <Select value={selectedPriority} onValueChange={setSelectedPriority}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9">
                   <SelectValue placeholder="Priorität wählen" />
                 </SelectTrigger>
                 <SelectContent>
@@ -242,15 +243,15 @@ EXPORT DETAILS:
               />
             </div>
             
-            <div>
-              <label className="text-sm font-medium">Suche</label>
+            <div className="space-y-1 col-span-full sm:col-span-1 lg:col-span-2">
+              <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Suche</label>
               <div className="relative">
-                <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
+                <Search className="h-4 w-4 absolute left-3 top-2.5 text-gray-400" />
                 <Input
                   placeholder="Titel oder Beschreibung suchen..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 h-9"
                 />
               </div>
             </div>
@@ -315,11 +316,11 @@ EXPORT DETAILS:
                   {filteredUpdates.map((update) => (
                     <div 
                       key={update.id} 
-                      className="p-6 border rounded-lg hover:shadow-md transition-all duration-200 bg-white dark:bg-slate-800/50"
+                      className="p-4 sm:p-6 border rounded-lg hover:shadow-md transition-all duration-200 bg-white dark:bg-slate-800/50"
                     >
-                      <div className="flex items-start justify-between gap-4 mb-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
                             <Badge className={`${priorityColors[update.priority]} text-xs`}>
                               {priorityLabels[update.priority]}
                             </Badge>
@@ -330,36 +331,36 @@ EXPORT DETAILS:
                               {update.update_type}
                             </Badge>
                           </div>
-                          <h3 className="text-lg font-semibold mb-2 line-clamp-2">
+                          <h3 className="text-base sm:text-lg font-semibold mb-2 line-clamp-2">
                             {update.title}
                           </h3>
                           <FormattedText 
-                            text={update.description?.substring(0, 300) + '...' || 'Keine Beschreibung verfügbar'}
-                            className="text-sm text-slate-600 dark:text-slate-400 line-clamp-3 mb-3"
+                            text={update.description?.substring(0, device.isMobile ? 150 : 300) + '...' || 'Keine Beschreibung verfügbar'}
+                            className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 sm:line-clamp-3 mb-3"
                           />
                           
                           {update.device_classes && update.device_classes.length > 0 && (
                             <div className="flex flex-wrap gap-1 mb-3">
-                              <span className="text-xs text-slate-500 mr-2">Geräteklassen:</span>
-                              {update.device_classes.slice(0, 3).map((deviceClass, idx) => (
+                              <span className="text-xs text-slate-500 mr-1 sm:mr-2 whitespace-nowrap">Geräteklassen:</span>
+                              {update.device_classes.slice(0, device.isMobile ? 2 : 3).map((deviceClass, idx) => (
                                 <Badge key={idx} variant="secondary" className="text-xs">
                                   {deviceClass}
                                 </Badge>
                               ))}
-                              {update.device_classes.length > 3 && (
+                              {update.device_classes.length > (device.isMobile ? 2 : 3) && (
                                 <Badge variant="secondary" className="text-xs">
-                                  +{update.device_classes.length - 3}
+                                  +{update.device_classes.length - (device.isMobile ? 2 : 3)}
                                 </Badge>
                               )}
                             </div>
                           )}
                         </div>
                         
-                        <div className="text-right text-sm text-slate-500">
+                        <div className="text-right text-xs sm:text-sm text-slate-500 flex-shrink-0">
                           <div className="font-medium">
                             {new Date(update.published_at).toLocaleDateString('de-DE')}
                           </div>
-                          <div>
+                          <div className="hidden sm:block">
                             {new Date(update.published_at).toLocaleTimeString('de-DE', { 
                               hour: '2-digit', 
                               minute: '2-digit' 
@@ -368,10 +369,10 @@ EXPORT DETAILS:
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-4 border-t">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-3 sm:pt-4 border-t gap-3">
                         <div className="flex items-center gap-2 text-xs text-slate-500">
-                          <FileText className="h-3 w-3" />
-                          <span>Quelle: {update.source_id}</span>
+                          <FileText className="h-3 w-3 flex-shrink-0" />
+                          <span className="truncate">Quelle: {update.source_id}</span>
                         </div>
                         
                         <div className="flex items-center gap-2">
@@ -381,35 +382,35 @@ EXPORT DETAILS:
                             title={`PDF herunterladen: ${update.title}`}
                             variant="outline" 
                             size="sm"
-                            className="text-xs"
+                            className="text-xs flex-1 sm:flex-none"
                           />
                           <Dialog>
                             <DialogTrigger asChild>
-                              <Button variant="outline" size="sm" className="text-xs">
+                              <Button variant="outline" size="sm" className="text-xs flex-1 sm:flex-none">
                                 <Eye className="h-3 w-3 mr-1" />
-                                Details anzeigen
+                                <span className="sm:inline">Details</span>
                               </Button>
                             </DialogTrigger>
-                            <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden" aria-describedby="dialog-description">
-                              <DialogHeader>
-                                <DialogTitle className="text-xl font-bold">{update.title}</DialogTitle>
+                            <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden p-4 sm:p-6" aria-describedby="dialog-description">
+                              <DialogHeader className="pb-4">
+                                <DialogTitle className="text-lg sm:text-xl font-bold line-clamp-2">{update.title}</DialogTitle>
                               </DialogHeader>
                               
                               <Tabs defaultValue="overview" className="flex flex-col h-full">
-                                <TabsList className="grid w-full grid-cols-6 h-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1">
+                                <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 h-10 sm:h-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1">
                                   <TabsTrigger 
                                     value="overview" 
                                     className="flex items-center gap-1 text-xs font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
                                   >
                                     <Eye className="h-3 w-3" />
-                                    Übersicht
+                                    <span className="hidden sm:inline">Übersicht</span>
                                   </TabsTrigger>
                                   <TabsTrigger 
                                     value="summary" 
                                     className="flex items-center gap-1 text-xs font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
                                   >
                                     <Clock className="h-3 w-3" />
-                                    Zusammenfassung
+                                    <span className="hidden sm:inline">Zusammenfassung</span>
                                   </TabsTrigger>
                                   <TabsTrigger 
                                     value="content" 
