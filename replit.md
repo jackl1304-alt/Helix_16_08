@@ -19,6 +19,8 @@ Preferred communication style: German language - Simple, everyday language.
 - **Datenqualität**: 100% authentische Daten, 12.964 Duplikate entfernt, echte FDA-API-Integration aktiv
 - **6-Tab-Navigation implementiert**: Konsistente Tab-Struktur (Übersicht, Zusammenfassung, Vollständiger Inhalt, Finanzanalyse, KI-Analyse, Metadaten) in allen Artikel-Dialogen
 - **Legal Cases entfernt**: Überflüssige legal-cases.tsx Seite gelöscht - Rechtsprechung wird über /rechtsprechung verwaltet
+- **Legal Cases aus Sidebar entfernt**: Doppelte Navigation bereinigt - nur noch Rechtsprechung unter COMPLIANCE & REGULIERUNG
+- **Zühlke MedTech Datenquelle hinzugefügt**: KI Insights erweitert um Zühlke Case Studies (AI-Diagnostik, AVA Fertility Tracker, Fibronostics SaMD) - reale Projekte mit FDA/CE-Zulassungen
 
 ## System Architecture
 
@@ -76,6 +78,7 @@ Preferred communication style: German language - Simple, everyday language.
 - **Medical Design and Outsourcing** (Industry Publication)
 - **Medtech Big 100 Companies** (Company Intelligence)
 - **JAMA Network**
+- **Zühlke MedTech Case Studies** (AI-based diagnostics, medical device compliance, SaMD development)
 
 ### Frontend Libraries
 - **React Ecosystem**
