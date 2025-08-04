@@ -364,8 +364,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`[API] Final active sources count for bulk sync: ${activeSources.length}`);
       
-      // Import des optimierten Sync-Services
-      const { optimizedSyncService } = await import('./services/optimizedSyncService');
+      // Import des Data Collection Services (funktioniert bereits)
+      const dataCollectionModule = await import('./services/dataCollectionService');
+      const dataService = new dataCollectionModule.DataCollectionService();
       
       // Parallele Synchronisation mit begrenzter Konkurrenz (max 5 gleichzeitig)
       const batchSize = 5;
@@ -379,22 +380,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         const batchPromises = batch.map(async (source) => {
           try {
-            const syncResult = await optimizedSyncService.syncDataSourceWithMetrics(source.id, {
-              realTime: false,
-              optimized: true,
-              backgroundProcessing: true,
-              timeout: 45000 // 45s timeout für bulk ops
-            });
+            const startTime = Date.now();
+            const existingCount = await storage.countRegulatoryUpdatesBySource(source.id) || 0;
+            
+            // Echte Synchronisation mit bekanntem DataCollectionService
+            await dataService.syncDataSource(source.id);
+            await storage.updateDataSourceLastSync(source.id, new Date());
+            
+            const updatedCount = await storage.countRegulatoryUpdatesBySource(source.id) || 0;
+            const newUpdatesCount = Math.max(0, updatedCount - existingCount);
+            const duration = (Date.now() - startTime);
             
             return {
               sourceId: source.id,
               sourceName: source.name,
-              success: syncResult.success,
-              newUpdatesCount: syncResult.newUpdatesCount,
-              existingCount: syncResult.existingDataCount,
-              duration: syncResult.metrics.duration,
-              throughput: syncResult.metrics.throughput,
-              errors: syncResult.errors
+              success: true,
+              newUpdatesCount: newUpdatesCount,
+              existingCount: existingCount,
+              duration: duration,
+              throughput: newUpdatesCount / (duration / 1000),
+              errors: []
             };
           } catch (error: any) {
             console.error(`[API] Bulk sync failed for ${source.id}:`, error);
