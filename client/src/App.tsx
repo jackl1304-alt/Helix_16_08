@@ -30,7 +30,7 @@ const UserManagement = lazy(() => import("@/pages/user-management"));
 const SystemSettings = lazy(() => import("@/pages/system-settings"));
 const AuditLogs = lazy(() => import("@/pages/audit-logs"));
 const AIInsights = lazy(() => import("@/pages/ai-insights"));
-const AIApprovalTest = lazy(() => import("@/pages/ai-approval-test"));
+
 const KnowledgeBaseNew = lazy(() => import("@/pages/knowledge-base-new"));
 const EnhancedLegalCases = lazy(() => import("@/pages/enhanced-legal-cases"));
 const EnhancedLegalCasesNew = lazy(() => import("@/pages/enhanced-legal-cases-new"));
@@ -51,9 +51,7 @@ const DataSourcesAdmin = lazy(() => import("@/pages/DataSourcesAdmin"));
 const Administration = lazy(() => import("@/pages/administration"));
 const GripData = lazy(() => import("@/pages/grip-data"));
 const NewsletterAdmin = lazy(() => import("@/pages/newsletter-admin"));
-const EnhancedContentDemo = lazy(() => import("@/pages/enhanced-content-demo"));
 const AdvancedAnalytics = lazy(() => import("@/pages/advanced-analytics"));
-const UserExperiencePolish = lazy(() => import("@/pages/user-experience-polish"));
 const RegulatoryUpdateDetail = lazy(() => import("@/pages/regulatory-update-detail"));
 const RechtsprechungFixed = lazy(() => import("@/pages/rechtsprechung-fixed"));
 
@@ -85,7 +83,7 @@ function Router() {
         <Route path="/system-settings" component={SystemSettings} />
         <Route path="/audit-logs" component={AuditLogs} />
         <Route path="/ai-insights" component={AIInsights} />
-        <Route path="/ai-approval-test" component={AIApprovalTest} />
+
         <Route path="/knowledge-base" component={KnowledgeBaseNew} />
         <Route path="/enhanced-legal-cases" component={EnhancedLegalCases} />
         <Route path="/enhanced-legal-cases-new" component={EnhancedLegalCasesNew} />
@@ -104,9 +102,7 @@ function Router() {
         <Route path="/administration" component={Administration} />
         <Route path="/grip-data" component={GripData} />
         <Route path="/newsletter-admin" component={NewsletterAdmin} />
-        <Route path="/enhanced-content-demo" component={EnhancedContentDemo} />
         <Route path="/advanced-analytics" component={AdvancedAnalytics} />
-        <Route path="/user-experience-polish" component={UserExperiencePolish} />
         <Route path="/documents/:sourceType/:documentId" component={DocumentViewer} />
         
         {/* Fallback to 404 */}
