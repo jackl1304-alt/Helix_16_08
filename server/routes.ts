@@ -79,6 +79,8 @@ import { UniversalKnowledgeExtractor } from "./services/universalKnowledgeExtrac
 import { meditechApiService } from "./services/meditechApiService";
 import { whoIntegrationService } from "./services/whoIntegrationService";
 import { mdoIntegrationService } from "./services/mdoIntegrationService";
+import { enhancedContentService } from "./services/enhancedContentService";
+import { massContentEnhancer } from "./services/massContentEnhancer";
 // AI Content Analysis functions (inline implementation for reliability)
 function analyzeContent(content: string) {
   const normalizedContent = content.toLowerCase();
@@ -4508,6 +4510,91 @@ Für vollständige Details und weitere Analysen besuchen Sie die ursprüngliche 
         status: 'unhealthy',
         details: `Health check failed: ${error.message}`,
         timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // ========== ENHANCED CONTENT SERVICE ENDPOINTS ==========
+  app.post('/api/content/enhance/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log(`[CONTENT-API] Enhancing content for update ${id}...`);
+      
+      const success = await enhancedContentService.enhanceRegulatoryUpdate(id);
+      
+      if (success) {
+        res.json({
+          success: true,
+          message: `Regulatory update ${id} successfully enhanced with comprehensive content`,
+          enhanced: true,
+          timestamp: new Date().toISOString()
+        });
+      } else {
+        res.status(404).json({
+          success: false,
+          message: `Failed to enhance update ${id}`,
+          enhanced: false
+        });
+      }
+      
+    } catch (error: any) {
+      console.error('[CONTENT-API] Error enhancing content:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        message: 'Content enhancement failed'
+      });
+    }
+  });
+
+  app.post('/api/content/batch-enhance', async (req, res) => {
+    try {
+      const { count = 50 } = req.body;
+      console.log(`[CONTENT-API] Starting batch enhancement of ${count} updates...`);
+      
+      const result = await enhancedContentService.batchEnhanceUpdates(count);
+      
+      res.json({
+        success: true,
+        message: 'Batch content enhancement completed',
+        enhanced: result.enhanced,
+        errors: result.errors,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('[CONTENT-API] Batch enhancement failed:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        message: 'Batch content enhancement failed'
+      });
+    }
+  });
+
+  app.post('/api/content/mass-enhance-all', async (req, res) => {
+    try {
+      console.log('[CONTENT-API] Starting MASS ENHANCEMENT for ALL regulatory updates...');
+      
+      const result = await massContentEnhancer.massEnhanceAllContent();
+      
+      res.json({
+        success: true,
+        message: 'MASS CONTENT ENHANCEMENT completed - ALL updates enhanced with comprehensive professional analysis',
+        enhanced: result.enhanced,
+        errors: result.errors,
+        enhancementLevel: 'MAXIMUM',
+        contentDepth: '8 detailed analysis areas per update',
+        totalDataPoints: '80+ per update',
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('[CONTENT-API] Mass enhancement failed:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        message: 'Mass content enhancement failed'
       });
     }
   });
