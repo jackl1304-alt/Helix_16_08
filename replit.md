@@ -36,7 +36,7 @@ Preferred communication style: German language - Simple, everyday language.
 ### System Design
 - **Core Services**: Clean Production Service, Data Collection Service, AI Approval System, Historical Data Management, AegisIntel Services Suite for AI-powered regulatory analysis.
 - **Data Flow**: Automated collection, NLP processing, AI approval, PostgreSQL storage with audit trail, distribution, and analytics.
-- **Key Features**: Automated content categorization and evaluation using ML, intelligent categorization (device types, risk levels, compliance areas), real-time sentiment analysis, quality scoring, duplicate detection and cleanup (title-based deduplication), real-time monitoring, predictive analytics, data visualization.
+- **Key Features**: Automated content categorization and evaluation using ML, intelligent categorization (device types, risk levels, compliance areas), real-time sentiment analysis, quality scoring, duplicate detection and cleanup (title-based deduplication), real-time monitoring, predictive analytics, data visualization, **Universal PDF Export** (alle Artikel als PDF exportierbar).
 - **Integration**: Secure connection to Pure Global's GRIP platform with encrypted credentials and automated data extraction.
 - **Production Infrastructure**: Docker, Kubernetes, Prometheus, Grafana for automated deployment, health checks, and rollbacks.
 
