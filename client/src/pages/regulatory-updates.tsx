@@ -376,14 +376,6 @@ EXPORT DETAILS:
                         </div>
                         
                         <div className="flex items-center gap-2">
-                          <PDFDownloadButton 
-                            type="regulatory-update" 
-                            id={update.id} 
-                            title={`PDF herunterladen: ${update.title}`}
-                            variant="outline" 
-                            size="sm"
-                            className="text-xs flex-1 sm:flex-none"
-                          />
                           <Dialog>
                             <DialogTrigger asChild>
                               <Button variant="outline" size="sm" className="text-xs flex-1 sm:flex-none">
@@ -654,15 +646,15 @@ EXPORT DETAILS:
                               </Tabs>
                             </DialogContent>
                           </Dialog>
-                          
-                          <Button
-                            variant="ghost"
+                          <PDFDownloadButton 
+                            type="regulatory-update" 
+                            id={update.id} 
+                            title={`PDF herunterladen: ${update.title}`}
+                            variant="outline" 
                             size="sm"
-                            onClick={() => handleDownload(update)}
-                            title="Herunterladen"
-                          >
-                            <Download className="h-4 w-4" />
-                          </Button>
+                            className="text-xs flex-1 sm:flex-none"
+                            showText={false}
+                          />
                           
                           <Button
                             variant="ghost"
