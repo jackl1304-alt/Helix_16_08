@@ -32,13 +32,9 @@ const AuditLogs = lazy(() => import("@/pages/audit-logs"));
 const AIInsights = lazy(() => import("@/pages/ai-insights"));
 
 const KnowledgeBaseNew = lazy(() => import("@/pages/knowledge-base-new"));
-const EnhancedLegalCases = lazy(() => import("@/pages/enhanced-legal-cases"));
-const EnhancedLegalCasesNew = lazy(() => import("@/pages/enhanced-legal-cases-new"));
-const LegalCasesSimple = lazy(() => import("@/pages/legal-cases-simple"));
-const LegalCaseDetail = lazy(() => import("@/pages/legal-case-detail"));
+const KnowledgeBase = lazy(() => import("@/pages/knowledge-base"));
 
 const HistoricalData = lazy(() => import("@/pages/historical-data-simple"));
-const LegalCases = lazy(() => import("@/pages/legal-cases"));
 const IntelligentSearch = lazy(() => import("@/pages/intelligent-search"));
 const DocumentViewer = lazy(() => import("@/pages/document-viewer"));
 const SyncManager = lazy(() => import("@/pages/sync-manager"));
@@ -84,13 +80,9 @@ function Router() {
         <Route path="/audit-logs" component={AuditLogs} />
         <Route path="/ai-insights" component={AIInsights} />
 
-        <Route path="/knowledge-base" component={KnowledgeBaseNew} />
-        <Route path="/enhanced-legal-cases" component={EnhancedLegalCases} />
-        <Route path="/enhanced-legal-cases-new" component={EnhancedLegalCasesNew} />
-        <Route path="/legal-cases-simple" component={LegalCasesSimple} />
+        <Route path="/knowledge-base" component={KnowledgeBase} />
         <Route path="/rechtsprechung" component={RechtsprechungFixed} />
         <Route path="/historical-data" component={HistoricalData} />
-        <Route path="/legal-cases" component={RechtsprechungFixed} />
         <Route path="/intelligent-search" component={IntelligentSearch} />
 
         <Route path="/phase1-integration" component={Phase1Integration} />
