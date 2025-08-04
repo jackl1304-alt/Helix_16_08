@@ -76,6 +76,7 @@ import { KnowledgeArticleService } from "./services/knowledgeArticleService";
 import { DuplicateCleanupService } from "./services/duplicateCleanupService";
 import { JAMANetworkScrapingService } from "./services/jamaNetworkScrapingService";
 import { UniversalKnowledgeExtractor } from "./services/universalKnowledgeExtractor";
+import { meditechApiService } from "./services/meditechApiService";
 // AI Content Analysis functions (inline implementation for reliability)
 function analyzeContent(content: string) {
   const normalizedContent = content.toLowerCase();
@@ -136,6 +137,9 @@ const systemMonitoringService = new SystemMonitoringService();
 const knowledgeArticleService = new KnowledgeArticleService();
 const jamaScrapingService = new JAMANetworkScrapingService();
 const universalExtractor = new UniversalKnowledgeExtractor();
+
+// MEDITECH Integration Service
+console.log('[MEDITECH] Initializing MEDITECH FHIR API integration...');
 
 // Generate full legal decision content for realistic court cases
 function generateFullLegalDecision(legalCase: LegalCaseData): string {
@@ -4192,6 +4196,128 @@ Für vollständige Details und weitere Analysen besuchen Sie die ursprüngliche 
         error: 'Legal synchronization failed',
         message: error.message,
         timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // ========== MEDITECH FHIR API INTEGRATION ENDPOINTS ==========
+  app.get('/api/meditech/devices', async (req, res) => {
+    try {
+      console.log('[MEDITECH-API] Fetching device data from MEDITECH FHIR...');
+      
+      const devices = await meditechApiService.fetchDeviceData();
+      
+      res.json({
+        success: true,
+        data: devices,
+        count: devices.length,
+        source: 'MEDITECH_FHIR',
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('[MEDITECH-API] Error fetching devices:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        message: 'Failed to fetch MEDITECH device data'
+      });
+    }
+  });
+
+  app.get('/api/meditech/sync', async (req, res) => {
+    try {
+      console.log('[MEDITECH-SYNC] Starting MEDITECH data synchronization...');
+      
+      const syncResult = await meditechApiService.syncToDatabase();
+      
+      res.json({
+        success: syncResult.success,
+        message: 'MEDITECH FHIR data synchronization completed',
+        synced: syncResult.synced,
+        errors: syncResult.errors,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('[MEDITECH-SYNC] Synchronization failed:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        message: 'MEDITECH synchronization failed'
+      });
+    }
+  });
+
+  app.get('/api/meditech/health', async (req, res) => {
+    try {
+      const healthStatus = await meditechApiService.healthCheck();
+      
+      res.json({
+        service: 'MEDITECH_FHIR_API',
+        status: healthStatus.status,
+        details: healthStatus.details,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      res.status(500).json({
+        service: 'MEDITECH_FHIR_API',
+        status: 'unhealthy',
+        details: `Health check failed: ${error.message}`,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Enhanced data sources endpoint with MEDITECH integration
+  app.get('/api/data-sources/enhanced', async (req, res) => {
+    try {
+      console.log('[DATA-SOURCES] Fetching enhanced data sources including MEDITECH...');
+      
+      const existingSources = await storage.getAllDataSources();
+      const meditechHealth = await meditechApiService.healthCheck();
+      
+      // Add MEDITECH as an enhanced data source
+      const enhancedSources = [
+        ...existingSources,
+        {
+          id: 'meditech_fhir_api',
+          name: 'MEDITECH FHIR API',
+          description: 'Real-time medical device data from MEDITECH EHR via FHIR',
+          type: 'official_api',
+          category: 'Real-time Device Data',
+          region: 'US',
+          country: 'USA',
+          endpoint: 'MEDITECH FHIR Endpoint',
+          status: meditechHealth.status,
+          syncFrequency: 'real-time',
+          lastSync: new Date().toISOString(),
+          dataTypes: ['device_data', 'clinical_observations', 'regulatory_compliance'],
+          isActive: meditechHealth.status === 'healthy',
+          metadata: {
+            authentication: 'OAuth 2.0',
+            standards: ['FHIR R4', 'HL7'],
+            capabilities: ['real-time', 'device_tracking', 'clinical_data']
+          }
+        }
+      ];
+      
+      res.json({
+        success: true,
+        data: enhancedSources,
+        count: enhancedSources.length,
+        enhanced: true,
+        meditech_status: meditechHealth.status,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('[DATA-SOURCES] Error fetching enhanced sources:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        message: 'Failed to fetch enhanced data sources'
       });
     }
   });
