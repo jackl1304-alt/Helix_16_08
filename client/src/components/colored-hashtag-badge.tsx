@@ -58,7 +58,7 @@ export function ColoredHashtagBadge({ tag, className }: ColoredHashtagBadgeProps
     <Badge 
       variant="outline" 
       className={cn(
-        'text-xs font-medium transition-colors duration-200 cursor-default',
+        'text-xs font-medium transition-colors duration-200 cursor-default px-2 py-1 whitespace-nowrap',
         colorClass,
         className
       )}
