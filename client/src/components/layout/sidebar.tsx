@@ -54,7 +54,7 @@ const navigationStructure: Record<string, NavigationSection> = {
   dataManagement: {
     title: "DATENMANAGEMENT",
     items: [
-      { name: "Datenquellen", href: "/data-collection", icon: Database },
+      { name: "Datensammlung", href: "/data-collection", icon: Database },
       { name: "Newsletter-Verwaltung", href: "/newsletter-admin", icon: Mail },
       { name: "Wissensdatenbank", href: "/knowledge-base", icon: Book },
     ],
@@ -66,7 +66,7 @@ const navigationStructure: Record<string, NavigationSection> = {
     title: "COMPLIANCE & REGULIERUNG",
     items: [
       { name: "Regulatorische Updates", href: "/regulatory-updates", icon: FileText },
-      { name: "Rechtsprechung", href: "/enhanced-legal-cases", icon: Scale },
+      { name: "Rechtsprechung", href: "/rechtsprechung", icon: Scale },
     ],
     defaultOpen: true
   },

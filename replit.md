@@ -11,11 +11,11 @@ Preferred communication style: German language - Simple, everyday language.
 - Klare Priorisierung nach Implementierungsstand
 
 ## Recent Changes (August 2025)
-- **Dashboard-Statistiken repariert**: Knowledge Articles zeigt jetzt 638 (573 Updates + 65 Legal Cases) statt 0
-- **Rechtsprechung vollständig überarbeitet**: Neue `rechtsprechung-fixed.tsx` mit 6 vollständigen Content-Tabs
-- **Finanzanalyse implementiert**: Compliance-Kosten (€50k-180k), Quartalsprognosen, Investitionsempfehlungen
-- **KI-Analyse erweitert**: Präzedenzfall-Analyse (92% Ähnlichkeit), ML-Erfolgswahrscheinlichkeit (78%), strategische Empfehlungen
-- **PDF-Export repariert**: LSP-Fehler behoben, alle Artikel PDF-exportierbar
+- **Demo-Bereinigung abgeschlossen**: Alle Demo-Funktionalität entfernt (AI Approval Demo, Enhanced Content Demo, Test-Versionen)
+- **Navigation korrigiert**: Sidebar-Links auf funktionierende Routen umgestellt, 404-Fehler behoben
+- **Bulk-Synchronisation repariert**: API-Endpunkt von /api/sync/all zu /api/data-sources/sync-all korrigiert
+- **LSP-Fehler behoben**: Data Collection Interface mit korrekten Feldnamen (isActive, apiEndpoint, metadata)
+- **Produktionsbereit**: 668 Knowledge Articles (603 Updates + 65 Legal Cases), 56 aktive Datenquellen
 - **Datenqualität**: 100% authentische Daten, 12.964 Duplikate entfernt, echte FDA-API-Integration aktiv
 
 ## System Architecture
