@@ -78,7 +78,7 @@ Preferred communication style: German language - Simple, everyday language.
 - **Medical Design and Outsourcing** (Industry Publication)
 - **Medtech Big 100 Companies** (Company Intelligence)
 - **JAMA Network**
-- **Zühlke MedTech Case Studies** (AI-based diagnostics, medical device compliance, SaMD development)
+- **Zühlke MedTech Case Studies** (50+ Jahre Expertise: CUTISS Hauttransplantate, Biorithm femom Schwangerschaftsmonitoring, Akina KI-Physiotherapie, NHS COVID-19 App, FreeSurfer Neurologie-Forschung, ObvioHealth klinische Studien, Fibronostics Leberdiagnostik, MyoSwiss Exoskelett, Singapore-ETH LvL UP Lifestyle-Coach)
 
 ### Frontend Libraries
 - **React Ecosystem**
