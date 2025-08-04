@@ -15,8 +15,10 @@ Preferred communication style: German language - Simple, everyday language.
 - **Navigation korrigiert**: Sidebar-Links auf funktionierende Routen umgestellt, 404-Fehler behoben
 - **Bulk-Synchronisation repariert**: API-Endpunkt von /api/sync/all zu /api/data-sources/sync-all korrigiert
 - **LSP-Fehler behoben**: Data Collection Interface mit korrekten Feldnamen (isActive, apiEndpoint, metadata)
-- **Produktionsbereit**: 668 Knowledge Articles (603 Updates + 65 Legal Cases), 56 aktive Datenquellen
+- **Produktionsbereit**: 618 Knowledge Articles (553 Updates + 65 Legal Cases), 56 aktive Datenquellen
 - **Datenqualität**: 100% authentische Daten, 12.964 Duplikate entfernt, echte FDA-API-Integration aktiv
+- **6-Tab-Navigation implementiert**: Konsistente Tab-Struktur (Übersicht, Zusammenfassung, Vollständiger Inhalt, Finanzanalyse, KI-Analyse, Metadaten) in allen Artikel-Dialogen
+- **Legal Cases entfernt**: Überflüssige legal-cases.tsx Seite gelöscht - Rechtsprechung wird über /rechtsprechung verwaltet
 
 ## System Architecture
 
