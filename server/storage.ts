@@ -51,7 +51,7 @@ class MorningStorage implements IStorage {
       console.log('[DB] getDashboardStats called - BEREINIGTE ECHTE DATEN');
       
       // Bereinigte Dashboard-Statistiken mit authentischen Daten
-      const [updates, sources, legalCases] = await Promise.all([
+      const [updates, sources, legalCases, newsletters, subscribers, approvals] = await Promise.all([
         sql`SELECT 
           COUNT(*) as total_count,
           COUNT(DISTINCT title) as unique_count,
@@ -62,7 +62,10 @@ class MorningStorage implements IStorage {
           COUNT(*) as total_count,
           COUNT(DISTINCT title) as unique_count,
           COUNT(*) FILTER (WHERE decision_date >= CURRENT_DATE - INTERVAL '30 days') as recent_count
-        FROM legal_cases`
+        FROM legal_cases`,
+        sql`SELECT COUNT(*) as count FROM newsletters`,
+        sql`SELECT COUNT(*) as count FROM subscribers WHERE is_active = true`,
+        sql`SELECT COUNT(*) as count FROM approvals WHERE status = 'pending'`
       ]);
 
       // Performance-Metriken nach Bereinigung
@@ -91,9 +94,9 @@ class MorningStorage implements IStorage {
         
         // Berechnete Knowledge Articles (Regulatory Updates + Legal Cases)
         totalArticles: parseInt(updates[0]?.total_count || '0') + parseInt(legalCases[0]?.total_count || '0'),
-        totalSubscribers: 156,
-        pendingApprovals: 6,
-        totalNewsletters: 42
+        totalSubscribers: parseInt(subscribers[0]?.count || '0'),
+        pendingApprovals: parseInt(approvals[0]?.count || '0'),
+        totalNewsletters: parseInt(newsletters[0]?.count || '0')
       };
       
       console.log('[DB] Bereinigte Dashboard-Statistiken:', stats);

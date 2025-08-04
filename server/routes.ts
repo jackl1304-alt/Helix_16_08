@@ -522,31 +522,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Dashboard statistics endpoint
+  // Dashboard statistics endpoint - uses real database queries
   app.get("/api/dashboard/stats", async (req, res) => {
     try {
-      const [regulatoryUpdates, legalCases, dataSources] = await Promise.all([
-        storage.getAllRegulatoryUpdates(),
-        storage.getAllLegalCases(), 
-        storage.getActiveDataSources()
-      ]);
-
-      const stats = {
-        totalUpdates: regulatoryUpdates.length,
-        totalLegalCases: legalCases.length,
-        totalDataSources: dataSources.length,
-        activeDataSources: dataSources.filter(s => s.isActive).length,
-        recentUpdates: regulatoryUpdates.filter(u => {
-          const updateDate = new Date(u.publishedAt || u.createdAt);
-          const thirtyDaysAgo = new Date();
-          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-          return updateDate > thirtyDaysAgo;
-        }).length,
-        totalArticles: 42, // Placeholder for knowledge articles
-        totalSubscribers: 156, // Placeholder for newsletter subscribers
-        pendingApprovals: 8 // Placeholder for pending approvals
-      };
-
+      // Use the optimized dashboard stats method from storage
+      const stats = await storage.getDashboardStats();
+      
+      console.log('[DB] Bereinigte Dashboard-Statistiken:', stats);
       res.json(stats);
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);
