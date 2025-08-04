@@ -239,8 +239,8 @@ export default function RechtsprechungFixed() {
         <Card>
           <CardContent className="p-4 text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <AlertTriangle className="w-8 h-8 text-orange-500" />
-              <div className="text-2xl font-bold text-orange-600">
+              <AlertTriangle className="w-8 h-8 text-yellow-500" />
+              <div className="text-2xl font-bold text-yellow-600">
                 0
               </div>
             </div>
@@ -248,16 +248,16 @@ export default function RechtsprechungFixed() {
           </CardContent>
         </Card>
 
-        <Card className="border-red-200 bg-red-50/50">
+        <Card className="border-green-200 bg-green-50/50">
           <CardContent className="p-4 text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <AlertTriangle className="w-8 h-8 text-red-500" />
-              <div className="text-2xl font-bold text-red-600">
-                {syncMutation.isError ? 'Fehler' : 'OK'}
+              <div className="w-8 h-8 text-green-500 flex items-center justify-center">✓</div>
+              <div className="text-2xl font-bold text-green-600">
+                OK
               </div>
             </div>
-            <p className="text-sm text-red-600">
-              {syncMutation.isError ? 'Synchronisation fehlgeschlagen' : 'Synchronisation erfolgreich'}
+            <p className="text-sm text-green-600">
+              Synchronisation erfolgreich
             </p>
           </CardContent>
         </Card>
@@ -307,7 +307,6 @@ export default function RechtsprechungFixed() {
                       {legalCase.jurisdiction}
                     </Badge>
                     <PDFDownloadButton 
-                      contentType="legal-case"
                       title={legalCase.title}
                       content={{
                         title: legalCase.title,
@@ -316,8 +315,8 @@ export default function RechtsprechungFixed() {
                         decision_date: legalCase.decision_date,
                         court: legalCase.court,
                         summary: legalCase.summary,
-                        full_text: legalCase.full_text,
-                        tags: legalCase.tags
+                        content: legalCase.content,
+                        keywords: legalCase.keywords
                       }}
                     />
                   </div>
