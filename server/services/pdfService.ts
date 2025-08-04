@@ -401,6 +401,153 @@ export class PDFService {
     return lines;
   }
 
+  static async generateNewsletterPDF(newsletter: any): Promise<Buffer> {
+    try {
+      const pdfDoc = await PDFDocument.create();
+      const page = pdfDoc.addPage([595.28, 841.89]); // A4 size
+      
+      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      
+      const { width, height } = page.getSize();
+      const margin = 50;
+      let yPosition = height - margin;
+      
+      const addText = (text: string, fontSize: number = 12, fontType = font, color = rgb(0, 0, 0)) => {
+        page.drawText(text, {
+          x: margin,
+          y: yPosition,
+          size: fontSize,
+          font: fontType,
+          color: color,
+        });
+        yPosition -= fontSize + 5;
+      };
+      
+      const addNewLine = (lines: number = 1) => {
+        yPosition -= (lines * 15);
+      };
+      
+      // Document Header
+      addText('HELIX NEWSLETTER', 18, boldFont, rgb(0.2, 0.4, 0.8));
+      addText('Regulatory Intelligence Newsletter', 14, boldFont, rgb(0.5, 0.5, 0.5));
+      addNewLine(2);
+      
+      // Newsletter Information
+      addText('NEWSLETTER-INFORMATIONEN:', 14, boldFont, rgb(0, 0, 0.8));
+      addText(`Titel: ${newsletter.title || 'Unbekannt'}`, 12);
+      addText(`ID: ${newsletter.id}`, 12);
+      addText(`Status: ${newsletter.status || 'Draft'}`, 12);
+      addText(`Erstellt: ${newsletter.createdAt ? new Date(newsletter.createdAt).toLocaleDateString('de-DE') : 'Unbekannt'}`, 12);
+      addNewLine(2);
+      
+      // Content
+      addText('INHALT:', 14, boldFont, rgb(0.6, 0, 0.6));
+      const content = newsletter.content || 'Kein Newsletter-Inhalt verfügbar';
+      const contentLines = this.splitTextIntoLines(content, 80);
+      contentLines.forEach(line => addText(line, 11));
+      addNewLine(2);
+      
+      // Footer
+      addText('Generiert von Helix Regulatory Intelligence Platform', 10, font, rgb(0.5, 0.5, 0.5));
+      addText(`Datum: ${new Date().toLocaleDateString('de-DE')}`, 10, font, rgb(0.5, 0.5, 0.5));
+      addText('Status: Newsletter Export', 10, font, rgb(0.5, 0.5, 0.5));
+      
+      const pdfBytes = await pdfDoc.save();
+      return Buffer.from(pdfBytes);
+      
+    } catch (error) {
+      console.error('[PDF Service] Error generating newsletter PDF:', error);
+      throw new Error('Newsletter PDF generation failed');
+    }
+  }
+
+  static async generateKnowledgeArticlePDF(article: any): Promise<Buffer> {
+    try {
+      const pdfDoc = await PDFDocument.create();
+      const page = pdfDoc.addPage([595.28, 841.89]); // A4 size
+      
+      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      
+      const { width, height } = page.getSize();
+      const margin = 50;
+      let yPosition = height - margin;
+      
+      const addText = (text: string, fontSize: number = 12, fontType = font, color = rgb(0, 0, 0)) => {
+        page.drawText(text, {
+          x: margin,
+          y: yPosition,
+          size: fontSize,
+          font: fontType,
+          color: color,
+        });
+        yPosition -= fontSize + 5;
+      };
+      
+      const addNewLine = (lines: number = 1) => {
+        yPosition -= (lines * 15);
+      };
+      
+      // Document Header
+      addText('HELIX WISSENSARTIKEL', 18, boldFont, rgb(0.2, 0.6, 0.2));
+      addText('Knowledge Base Article', 14, boldFont, rgb(0.5, 0.5, 0.5));
+      addNewLine(2);
+      
+      // Article Information
+      addText('ARTIKEL-INFORMATIONEN:', 14, boldFont, rgb(0, 0, 0.8));
+      addText(`Titel: ${article.title || 'Unbekannt'}`, 12);
+      addText(`ID: ${article.id}`, 12);
+      addText(`Kategorie: ${article.category || 'Allgemein'}`, 12);
+      addText(`Quelle: ${article.authority || 'Internal'}`, 12);
+      addText(`Region: ${article.region || 'Global'}`, 12);
+      addText(`Sprache: ${article.language || 'de'}`, 12);
+      addText(`Veröffentlicht: ${article.published_at ? new Date(article.published_at).toLocaleDateString('de-DE') : 'Unbekannt'}`, 12);
+      addNewLine();
+      
+      // Tags
+      if (article.tags && article.tags.length > 0) {
+        addText('TAGS:', 12, boldFont, rgb(0.4, 0.4, 0.8));
+        addText(article.tags.join(', '), 10);
+        addNewLine();
+      }
+      
+      // Summary
+      if (article.summary) {
+        addText('ZUSAMMENFASSUNG:', 14, boldFont, rgb(0, 0, 0.8));
+        const summaryLines = this.splitTextIntoLines(article.summary, 80);
+        summaryLines.forEach(line => addText(line, 11));
+        addNewLine();
+      }
+      
+      // Content
+      addText('INHALT:', 14, boldFont, rgb(0.6, 0, 0.6));
+      const content = article.content || 'Kein Artikel-Inhalt verfügbar';
+      const contentLines = this.splitTextIntoLines(content, 80);
+      contentLines.forEach(line => addText(line, 11));
+      addNewLine();
+      
+      // Source URL
+      if (article.url) {
+        addText('QUELLE URL:', 12, boldFont);
+        addText(article.url, 10, font, rgb(0, 0, 0.8));
+        addNewLine();
+      }
+      
+      // Footer
+      addText('Generiert von Helix Regulatory Intelligence Platform', 10, font, rgb(0.5, 0.5, 0.5));
+      addText(`Datum: ${new Date().toLocaleDateString('de-DE')}`, 10, font, rgb(0.5, 0.5, 0.5));
+      addText('Status: Knowledge Base Artikel', 10, font, rgb(0.5, 0.5, 0.5));
+      
+      const pdfBytes = await pdfDoc.save();
+      return Buffer.from(pdfBytes);
+      
+    } catch (error) {
+      console.error('[PDF Service] Error generating knowledge article PDF:', error);
+      throw new Error('Knowledge article PDF generation failed');
+    }
+  }
+
   static generateFullDecisionText(legalCase: any): string {
     const court = legalCase.court || 'Bundesgerichtshof';
     const caseNumber = legalCase.caseNumber || 'VI ZR 123/24';
