@@ -79,6 +79,7 @@ function Router() {
         <Route path="/system-settings" component={SystemSettings} />
         <Route path="/audit-logs" component={AuditLogs} />
         <Route path="/ai-insights" component={AIInsights} />
+        <Route path="/ki-insights" component={AIInsights} />
 
         <Route path="/knowledge-base" component={KnowledgeBase} />
         <Route path="/rechtsprechung" component={RechtsprechungFixed} />
