@@ -84,41 +84,32 @@ export function PDFDownloadButton({
       // Get PDF blob and force download
       const blob = await response.blob();
       
-      // Create download link with proper MIME type
+      // Create download link with proper MIME type and force download
       const url = window.URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
       const link = document.createElement('a');
       link.href = url;
-      link.download = filename;
+      link.download = filename; // This forces download instead of opening in browser
       link.style.display = 'none';
       
-      // Extract filename from Content-Disposition header or use default
-      const contentDisposition = response.headers.get('Content-Disposition');
-      let filename = `document-${id}.pdf`;
-      if (contentDisposition) {
-        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
-        if (filenameMatch) {
-          filename = filenameMatch[1];
-        }
-      }
-      
-      link.download = filename;
+      // Append to DOM, click, and cleanup
       document.body.appendChild(link);
       link.click();
       
       // Cleanup
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }, 100);
       
       toast({
-        title: "PDF erstellt",
-        description: `${filename} wurde erfolgreich heruntergeladen`,
+        title: "Download gestartet",
+        description: `PDF "${filename}" wird heruntergeladen.`,
       });
-      
-    } catch (error: any) {
-      console.error('PDF Download error:', error);
+    } catch (error) {
+      console.error('PDF Download Error:', error);
       toast({
-        title: "PDF-Download fehlgeschlagen",
-        description: error.message || "Ein unbekannter Fehler ist aufgetreten.",
+        title: "Download-Fehler",
+        description: "PDF konnte nicht heruntergeladen werden.",
         variant: "destructive",
       });
     } finally {
@@ -130,19 +121,19 @@ export function PDFDownloadButton({
     <Button
       variant={variant}
       size={size}
+      className={className}
       onClick={handlePDFDownload}
       disabled={isLoading}
-      className={`flex items-center gap-2 ${className}`}
-      title={title || `Als PDF herunterladen`}
+      title={title || "PDF herunterladen"}
     >
       {isLoading ? (
         <Loader2 className="h-4 w-4 animate-spin" />
       ) : (
-        <FileText className="h-4 w-4" />
+        <Download className="h-4 w-4" />
       )}
-      {showText && (
-        <span className="hidden sm:inline">
-          {isLoading ? "Generiere..." : "PDF"}
+      {showText && size !== "icon" && (
+        <span className="ml-2">
+          {isLoading ? "Lädt..." : "PDF"}
         </span>
       )}
     </Button>
