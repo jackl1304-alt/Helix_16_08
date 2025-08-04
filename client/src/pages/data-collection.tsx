@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { FolderSync, Plus, Trash2, Edit, AlertCircle, History, Settings, ExternalLink, Loader2, Database } from "lucide-react";
+import { FolderSync, Plus, Trash2, Edit, AlertCircle, History, Settings, ExternalLink, Loader2, Database, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { DataSource } from "@shared/schema";
@@ -162,6 +162,37 @@ export default function DataCollection() {
     },
   });
 
+  // Sync All Sources Mutation - Synchronisiert alle aktiven Datenquellen
+  const syncAllMutation = useMutation({
+    mutationFn: async () => {
+      console.log("Frontend: Starting sync for all active sources");
+      const result = await apiRequest('/api/sync/all', 'POST');
+      console.log("Frontend: Sync all result:", result);
+      return result;
+    },
+    onSuccess: (data) => {
+      console.log("Frontend: Sync all successful", data);
+      queryClient.invalidateQueries({ queryKey: ["/api/data-sources"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/regulatory-updates"] });
+      
+      const { successful = 0, total = 0, totalNewUpdates = 0 } = data;
+      
+      toast({
+        title: "✅ Sync All Abgeschlossen",
+        description: `${successful}/${total} Quellen erfolgreich synchronisiert. ${totalNewUpdates} neue Updates gesammelt.`,
+      });
+    },
+    onError: (error: any) => {
+      console.error("Frontend: Sync all error:", error);
+      toast({
+        title: "Sync All Fehlgeschlagen",
+        description: `Fehler beim Synchronisieren aller Quellen: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
   const addSourceMutation = useMutation({
     mutationFn: async (sourceData: any) => {
       return await apiRequest('/api/data-sources', 'POST', sourceData);
@@ -282,6 +313,19 @@ export default function DataCollection() {
           </TabsList>
           
           <div className="flex gap-2">
+            <Button
+              onClick={() => syncAllMutation.mutate()}
+              disabled={syncAllMutation.isPending}
+              className="bg-green-600 hover:bg-green-700 text-white font-medium"
+              size="default"
+            >
+              {syncAllMutation.isPending ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <FolderSync className="h-4 w-4 mr-2" />
+              )}
+              Sync All Sources
+            </Button>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
               <Button 
