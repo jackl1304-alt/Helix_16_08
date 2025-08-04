@@ -54,6 +54,7 @@ const NewsletterAdmin = lazy(() => import("@/pages/newsletter-admin"));
 const EnhancedContentDemo = lazy(() => import("@/pages/enhanced-content-demo"));
 const AdvancedAnalytics = lazy(() => import("@/pages/advanced-analytics"));
 const UserExperiencePolish = lazy(() => import("@/pages/user-experience-polish"));
+const RegulatoryUpdateDetail = lazy(() => import("@/pages/regulatory-update-detail"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -73,6 +74,7 @@ function Router() {
         <Route path="/data-collection" component={DataCollection} />
         <Route path="/global-sources" component={GlobalSources} />
         <Route path="/analytics" component={Analytics} />
+        <Route path="/regulatory-updates/:id" component={RegulatoryUpdateDetail} />
         <Route path="/regulatory-updates" component={RegulatoryUpdatesFinal} />
         <Route path="/regulatory-updates-old" component={RegulatoryUpdatesNew} />
         <Route path="/sync-manager" component={SyncManager} />
