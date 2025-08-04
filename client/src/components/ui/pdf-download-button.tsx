@@ -4,7 +4,7 @@ import { Download, FileText, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface PDFDownloadButtonProps {
-  type: 'regulatory-update' | 'legal-case' | 'article' | 'historical-document';
+  type: 'regulatory-update' | 'legal-case' | 'article' | 'historical-document' | 'newsletter' | 'knowledge-article';
   id: string;
   title?: string;
   variant?: "default" | "outline" | "ghost" | "link" | "destructive" | "secondary";
@@ -35,6 +35,10 @@ export function PDFDownloadButton({
         return `/api/articles/${id}/pdf`;
       case 'historical-document':
         return `/api/historical/document/${id}/pdf`;
+      case 'newsletter':
+        return `/api/newsletters/${id}/pdf`;
+      case 'knowledge-article':
+        return `/api/knowledge-articles/${id}/pdf`;
       default:
         return null;
     }
@@ -50,6 +54,10 @@ export function PDFDownloadButton({
         return `/api/articles/${id}/download`;
       case 'historical-document':
         return `/api/historical/document/${id}/download`;
+      case 'newsletter':
+        return `/api/newsletters/${id}/download`;
+      case 'knowledge-article':
+        return `/api/knowledge-articles/${id}/download`;
       default:
         return null;
     }
