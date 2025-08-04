@@ -256,8 +256,10 @@ export default function DataCollection() {
 
   const handleSaveSettings = () => {
     const settings = {
-      syncFrequency,
-      retryCount: parseInt(retryCount),
+      automaticSyncFrequency: syncFrequency,
+      retryFailedSyncs: parseInt(retryCount),
+      realTimeMonitoring: true,
+      dataValidation: true,
       lastUpdated: new Date().toISOString()
     };
     saveSettingsMutation.mutate(settings);

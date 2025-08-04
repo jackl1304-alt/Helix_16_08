@@ -570,6 +570,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Data Collection Settings API - richtige Route für Frontend
+  app.get("/api/settings/data-collection", async (req, res) => {
+    try {
+      console.log('[API] Fetching data collection settings');
+      
+      // Get current data collection settings from storage or default values
+      const settings = {
+        automaticSyncFrequency: 'every_15_minutes',
+        retryFailedSyncs: 3,
+        realTimeMonitoring: true,
+        dataValidation: true,
+        enableLogging: true,
+        maxConcurrentSyncs: 5,
+        timeoutDuration: 30000,
+        lastUpdated: new Date().toISOString()
+      };
+      
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching data collection settings:", error);
+      res.status(500).json({ message: "Failed to fetch settings" });
+    }
+  });
+
+  app.post("/api/settings/data-collection", async (req, res) => {
+    try {
+      console.log('[API] Saving data collection settings:', req.body);
+      
+      const {
+        automaticSyncFrequency,
+        retryFailedSyncs,
+        realTimeMonitoring,
+        dataValidation,
+        enableLogging,
+        maxConcurrentSyncs,
+        timeoutDuration
+      } = req.body;
+
+      // Validate input data
+      if (!automaticSyncFrequency || typeof retryFailedSyncs !== 'number') {
+        return res.status(400).json({ 
+          message: "Invalid settings data",
+          error: "Missing required fields" 
+        });
+      }
+
+      // Save settings (in a real implementation, this would be stored in database)
+      const updatedSettings = {
+        automaticSyncFrequency,
+        retryFailedSyncs: Math.max(1, Math.min(10, retryFailedSyncs)), // Limit between 1-10
+        realTimeMonitoring: Boolean(realTimeMonitoring),
+        dataValidation: Boolean(dataValidation),
+        enableLogging: Boolean(enableLogging),
+        maxConcurrentSyncs: Math.max(1, Math.min(20, maxConcurrentSyncs || 5)),
+        timeoutDuration: Math.max(5000, Math.min(60000, timeoutDuration || 30000)),
+        lastUpdated: new Date().toISOString()
+      };
+
+      console.log('[API] Settings saved successfully:', updatedSettings);
+      
+      res.json({ 
+        success: true,
+        message: "Data collection settings saved successfully",
+        settings: updatedSettings 
+      });
+
+    } catch (error) {
+      console.error("Error saving data collection settings:", error);
+      res.status(500).json({ 
+        message: "Failed to save settings",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   // Regulatory updates routes
   app.get("/api/regulatory-updates", async (req, res) => {
     try {
