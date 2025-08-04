@@ -89,7 +89,6 @@ const navigationStructure: Record<string, NavigationSection> = {
       { name: "GRIP Integration", href: "/grip-data", icon: Shield },
       { name: "Newsletter Manager", href: "/newsletter-manager", icon: Newspaper },
       { name: "Genehmigungsprozess", href: "/approval-workflow", icon: CheckCircle },
-      { name: "Legal Cases", href: "/legal-cases", icon: Scale },
       { name: "Historische Daten", href: "/historical-data", icon: Archive },
       { name: "Benutzerverwaltung", href: "/user-management", icon: Users },
       { name: "System-Verwaltung", href: "/administration", icon: Settings },
