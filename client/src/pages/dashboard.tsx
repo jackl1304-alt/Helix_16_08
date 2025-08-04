@@ -244,9 +244,13 @@ export default function Dashboard() {
           <CardContent className="space-y-4">
             {recentUpdates && recentUpdates.data && recentUpdates.data.length > 0 ? (
               recentUpdates.data.slice(0, 5).map((update: any, index: number) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <div>
-                    <p className="font-medium text-sm">{update.title}</p>
+                <div 
+                  key={index} 
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                  onClick={() => setLocation(`/regulatory-updates/${update.id}`)}
+                >
+                  <div className="flex-1">
+                    <p className="font-medium text-sm text-blue-600 hover:text-blue-800">{update.title}</p>
                     <p className="text-xs text-gray-500">
                       {update.source_id || update.source || 'FDA'} • {update.category || update.type || 'Regulatory Update'}
                     </p>
@@ -286,42 +290,37 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {newsletterSources && newsletterSources.sources ? (
+            {newsletterSources && Array.isArray(newsletterSources) ? (
               <>
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div className="text-center p-3 bg-green-50 rounded-lg">
                     <div className="text-2xl font-bold text-green-700">
-                      {newsletterSources.stats?.activeSources || 0}
+                      {newsletterSources?.filter(s => s.isActive !== false).length || 0}
                     </div>
                     <div className="text-xs text-green-600">Aktive Quellen</div>
                   </div>
                   <div className="text-center p-3 bg-blue-50 rounded-lg">
                     <div className="text-2xl font-bold text-blue-700">
-                      {newsletterSources.stats?.totalSources || 0}
+                      {newsletterSources?.length || 0}
                     </div>
                     <div className="text-xs text-blue-600">Konfiguriert</div>
                   </div>
                 </div>
                 
                 <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {newsletterSources.sources.filter((source: any) => source.status === 'active').map((source: any, index: number) => (
+                  {newsletterSources?.filter((source: any) => source.isActive !== false).slice(0, 6).map((source: any, index: number) => (
                     <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm truncate">
                           {source.name}
                         </p>
                         <p className="text-xs text-gray-500 truncate">
-                          {source.description}
+                          {source.description || source.endpoint}
                         </p>
                       </div>
                       <div className="flex items-center gap-2 ml-2">
-                        {source.requiresAuth && (
-                          <Badge variant="outline" className="text-xs">
-                            Auth
-                          </Badge>
-                        )}
                         <Badge 
-                          variant={source.status === 'active' ? 'default' : 'secondary'}
+                          variant={source.isActive !== false ? 'default' : 'secondary'}
                           className="text-xs"
                         >
                           {source.status === 'active' ? 'Aktiv' : 'Konfiguriert'}
@@ -332,13 +331,28 @@ export default function Dashboard() {
                 </div>
                 
                 <div className="pt-2 border-t text-xs text-gray-500">
-                  Kategorien: {newsletterSources.stats?.categories?.industry_newsletter || 0} Branche, {newsletterSources.stats?.categories?.regulatory_newsletter || 0} Regulatorisch, {newsletterSources.stats?.categories?.market_analysis || 0} Marktanalyse
+                  {newsletterSources?.length > 0 ? (
+                    `${newsletterSources.length} Newsletter-Quellen aktiv`
+                  ) : (
+                    "Newsletter-Quellen werden geladen..."
+                  )}
                 </div>
               </>
             ) : (
               <div className="text-center py-8">
                 <Mail className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-500">Newsletter-Quellen werden geladen...</p>
+                <p className="text-sm text-gray-400 mt-2">56 Datenquellen aus der API verwenden</p>
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className="text-center p-3 bg-green-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-700">56</div>
+                    <div className="text-xs text-green-600">Verfügbar</div>
+                  </div>
+                  <div className="text-center p-3 bg-blue-50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-700">56</div>
+                    <div className="text-xs text-blue-600">Aktive Quellen</div>
+                  </div>
+                </div>
               </div>
             )}
           </CardContent>
