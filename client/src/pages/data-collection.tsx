@@ -366,8 +366,8 @@ export default function DataCollection() {
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="text-sm text-red-700 text-right">
-                      <div className="font-medium">{sources?.filter(s => s.is_active && s.type === 'regulatory').length || 5} aktiv</div>
-                      <div className="text-xs">{sources?.filter(s => s.type === 'regulatory').length || 8} gesamt</div>
+                      <div className="font-medium">{sources?.filter(s => s.isActive !== false && s.type === 'regulatory').length || 0} aktiv</div>
+                      <div className="text-xs">{sources?.filter(s => s.type === 'regulatory').length || 0} gesamt</div>
                     </div>
                     <Button
                       size="sm"
@@ -438,12 +438,10 @@ export default function DataCollection() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    {newsletterSources?.stats && (
                       <div className="text-sm text-blue-700 text-right">
-                        <div className="font-medium">{newsletterSources.stats.activeSources} aktiv</div>
-                        <div className="text-xs">{newsletterSources.stats.totalSources} gesamt</div>
+                        <div className="font-medium">{newsletterSources?.filter(s => s.isActive !== false).length || 0} aktiv</div>
+                        <div className="text-xs">{newsletterSources?.length || 0} gesamt</div>
                       </div>
-                    )}
                     <Button
                       size="sm"
                       onClick={() => newsletterSyncMutation.mutate()}
