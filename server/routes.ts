@@ -972,24 +972,22 @@ Weitere Details werden noch verarbeitet. Bitte wenden Sie sich an die offizielle
     }
   });
 
-  // Real Newsletter sources with web scraping capabilities
+  // Newsletter sources from data sources
   app.get('/api/newsletter-sources', async (req, res) => {
     console.log('[CRITICAL] API ROUTE DETECTED: /api/newsletter-sources - FORCING JSON ONLY');
     res.setHeader('Content-Type', 'application/json');
     try {
-      const { realNewsletterScraper } = await import('./services/realNewsletterScraper');
-      const sources = realNewsletterScraper.getSources();
-      const stats = realNewsletterScraper.getStats();
+      // Get all data sources and filter for newsletter/regulatory sources
+      const dataSources = await storage.getAllDataSources();
+      console.log(`Fetched data sources: ${dataSources.length}`);
       
-      res.json({
-        success: true,
-        sources: sources,
-        stats: stats,
-        scrapingCapability: 'Enabled',
-        timestamp: new Date().toISOString()
-      });
+      // Count active sources
+      const activeSources = dataSources.filter(source => source.isActive !== false);
+      console.log(`Active sources: ${activeSources.length}`);
+      
+      res.json(dataSources);
     } catch (error: any) {
-      console.error('Failed to get real newsletter sources:', error);
+      console.error('Failed to get newsletter sources:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to get newsletter sources',
