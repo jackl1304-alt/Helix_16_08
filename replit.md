@@ -20,7 +20,8 @@ Preferred communication style: German language - Simple, everyday language.
 - **6-Tab-Navigation implementiert**: Konsistente Tab-Struktur (Übersicht, Zusammenfassung, Vollständiger Inhalt, Finanzanalyse, KI-Analyse, Metadaten) in allen Artikel-Dialogen
 - **Legal Cases entfernt**: Überflüssige legal-cases.tsx Seite gelöscht - Rechtsprechung wird über /rechtsprechung verwaltet
 - **Legal Cases aus Sidebar entfernt**: Doppelte Navigation bereinigt - nur noch Rechtsprechung unter COMPLIANCE & REGULIERUNG
-- **Zühlke MedTech Datenquelle hinzugefügt**: KI Insights erweitert um Zühlke Case Studies (AI-Diagnostik, AVA Fertility Tracker, Fibronostics SaMD) - reale Projekte mit FDA/CE-Zulassungen
+- **Zühlke MedTech Datenquelle hinzugefügt**: KI Insights erweitert um 20 Zühlke Case Studies (COVID-19 Diagnostik, WHO/UNICEF Arzneimittelsicherheit, DNA-Forensik, IoT-Konnektivität) - reale Projekte mit FDA/CE-Zulassungen
+- **KI Insights API implementiert**: /api/ai-insights Route für echte Datenbankabfragen statt Mock-Daten, Frontend zeigt alle 20 Case Studies korrekt an
 
 ## System Architecture
 
