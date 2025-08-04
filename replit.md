@@ -23,6 +23,7 @@ Preferred communication style: German language - Simple, everyday language.
 - **Zühlke MedTech Datenquelle hinzugefügt**: KI Insights erweitert um 20 Zühlke Case Studies (COVID-19 Diagnostik, WHO/UNICEF Arzneimittelsicherheit, DNA-Forensik, IoT-Konnektivität) - reale Projekte mit FDA/CE-Zulassungen
 - **KI Insights API implementiert**: /api/ai-insights Route für echte Datenbankabfragen statt Mock-Daten, Frontend zeigt alle 20 Case Studies korrekt an
 - **Legal Insights erweitert**: Umfassende Rechtsfälle-Analyse für MedTech, Medizintechnik und Pharma hinzugefügt (Produkthaftung, Kartellrecht, FDA-Compliance, KI-Haftung)
+- **Farbkodierte Hashtag-System implementiert**: Alle 21 Knowledge Articles und 3 Regulatory Updates mit semantisch farbkodierten Tags erweitert (Rot: Kritisch/Legal, Blau: Innovation/Tech, Grün: Erfolg/Performance, Lila: Compliance, Gelb: Business/Finanziell)
 
 ## System Architecture
 
