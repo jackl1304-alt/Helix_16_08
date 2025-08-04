@@ -78,6 +78,7 @@ import { JAMANetworkScrapingService } from "./services/jamaNetworkScrapingServic
 import { UniversalKnowledgeExtractor } from "./services/universalKnowledgeExtractor";
 import { meditechApiService } from "./services/meditechApiService";
 import { whoIntegrationService } from "./services/whoIntegrationService";
+import { mdoIntegrationService } from "./services/mdoIntegrationService";
 // AI Content Analysis functions (inline implementation for reliability)
 function analyzeContent(content: string) {
   const normalizedContent = content.toLowerCase();
@@ -4410,6 +4411,100 @@ Für vollständige Details und weitere Analysen besuchen Sie die ursprüngliche 
     } catch (error: any) {
       res.status(500).json({
         service: 'WHO_IMDRF_INTEGRATION',
+        status: 'unhealthy',
+        details: `Health check failed: ${error.message}`,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // ========== MEDICAL DESIGN & OUTSOURCING INTEGRATION ENDPOINTS ==========
+  app.get('/api/mdo/articles', async (req, res) => {
+    try {
+      console.log('[MDO-API] Fetching Medical Design and Outsourcing articles...');
+      
+      const articles = await mdoIntegrationService.extractMDOContent();
+      
+      res.json({
+        success: true,
+        data: articles,
+        count: articles.length,
+        source: 'MEDICAL_DESIGN_OUTSOURCING',
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('[MDO-API] Error fetching articles:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        message: 'Failed to fetch MDO articles'
+      });
+    }
+  });
+
+  app.get('/api/mdo/big100', async (req, res) => {
+    try {
+      console.log('[MDO-API] Fetching Medtech Big 100 companies...');
+      
+      const companies = await mdoIntegrationService.extractMedtechBig100();
+      
+      res.json({
+        success: true,
+        data: companies,
+        count: companies.length,
+        source: 'MEDTECH_BIG_100',
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('[MDO-API] Error fetching Big 100:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        message: 'Failed to fetch Medtech Big 100 data'
+      });
+    }
+  });
+
+  app.get('/api/mdo/sync', async (req, res) => {
+    try {
+      console.log('[MDO-SYNC] Starting Medical Design and Outsourcing synchronization...');
+      
+      const syncResult = await mdoIntegrationService.syncToDatabase();
+      
+      res.json({
+        success: syncResult.success,
+        message: 'Medical Design and Outsourcing data synchronization completed',
+        synced: syncResult.synced,
+        errors: syncResult.errors,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('[MDO-SYNC] Synchronization failed:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        message: 'MDO synchronization failed'
+      });
+    }
+  });
+
+  app.get('/api/mdo/health', async (req, res) => {
+    try {
+      const healthStatus = await mdoIntegrationService.healthCheck();
+      
+      res.json({
+        service: 'MEDICAL_DESIGN_OUTSOURCING',
+        status: healthStatus.status,
+        details: healthStatus.details,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      res.status(500).json({
+        service: 'MEDICAL_DESIGN_OUTSOURCING',
         status: 'unhealthy',
         details: `Health check failed: ${error.message}`,
         timestamp: new Date().toISOString()
