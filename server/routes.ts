@@ -77,6 +77,7 @@ import { DuplicateCleanupService } from "./services/duplicateCleanupService";
 import { JAMANetworkScrapingService } from "./services/jamaNetworkScrapingService";
 import { UniversalKnowledgeExtractor } from "./services/universalKnowledgeExtractor";
 import { meditechApiService } from "./services/meditechApiService";
+import { whoIntegrationService } from "./services/whoIntegrationService";
 // AI Content Analysis functions (inline implementation for reliability)
 function analyzeContent(content: string) {
   const normalizedContent = content.toLowerCase();
@@ -4318,6 +4319,100 @@ Für vollständige Details und weitere Analysen besuchen Sie die ursprüngliche 
         success: false,
         error: error.message,
         message: 'Failed to fetch enhanced data sources'
+      });
+    }
+  });
+
+  // ========== WHO/IMDRF INTEGRATION ENDPOINTS ==========
+  app.get('/api/who/gmrf', async (req, res) => {
+    try {
+      console.log('[WHO-API] Fetching WHO Global Model Regulatory Framework...');
+      
+      const gmrfData = await whoIntegrationService.fetchGlobalModelFramework();
+      
+      res.json({
+        success: true,
+        data: gmrfData,
+        count: gmrfData.length,
+        source: 'WHO_GMRF',
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('[WHO-API] Error fetching GMRF:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        message: 'Failed to fetch WHO GMRF data'
+      });
+    }
+  });
+
+  app.get('/api/who/imdrf', async (req, res) => {
+    try {
+      console.log('[WHO-API] Fetching IMDRF harmonization data...');
+      
+      const imdrfData = await whoIntegrationService.fetchIMDRFHarmonization();
+      
+      res.json({
+        success: true,
+        data: imdrfData,
+        count: imdrfData.length,
+        source: 'IMDRF',
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('[WHO-API] Error fetching IMDRF:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        message: 'Failed to fetch IMDRF data'
+      });
+    }
+  });
+
+  app.get('/api/who/sync', async (req, res) => {
+    try {
+      console.log('[WHO-SYNC] Starting WHO/IMDRF data synchronization...');
+      
+      const syncResult = await whoIntegrationService.syncToDatabase();
+      
+      res.json({
+        success: syncResult.success,
+        message: 'WHO/IMDRF data synchronization completed',
+        synced: syncResult.synced,
+        errors: syncResult.errors,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('[WHO-SYNC] Synchronization failed:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        message: 'WHO/IMDRF synchronization failed'
+      });
+    }
+  });
+
+  app.get('/api/who/health', async (req, res) => {
+    try {
+      const healthStatus = await whoIntegrationService.healthCheck();
+      
+      res.json({
+        service: 'WHO_IMDRF_INTEGRATION',
+        status: healthStatus.status,
+        details: healthStatus.details,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      res.status(500).json({
+        service: 'WHO_IMDRF_INTEGRATION',
+        status: 'unhealthy',
+        details: `Health check failed: ${error.message}`,
+        timestamp: new Date().toISOString()
       });
     }
   });
