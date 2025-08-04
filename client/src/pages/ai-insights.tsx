@@ -161,7 +161,7 @@ export default function AIInsights() {
   const [searchQuery, setSearchQuery] = useState("");
   const [newAnalysisQuery, setNewAnalysisQuery] = useState("");
 
-  const { data: rawInsights = [], isLoading: insightsLoading } = useQuery({
+  const { data: rawInsights = [], isLoading: insightsLoading } = useQuery<any[]>({
     queryKey: ["/api/ai-insights"],
     enabled: true // Enable real API calls
   });
@@ -534,21 +534,6 @@ export default function AIInsights() {
               </>
             )}
           </Button>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-            />
-            <Button 
-              onClick={handleNewAnalysis}
-              disabled={!newAnalysisQuery.trim() || createAnalysisMutation.isPending}
-              className="self-end"
-            >
-              <Sparkles className="mr-2 h-4 w-4" />
-              Analyse starten
-            </Button>
-          </div>
         </CardContent>
       </Card>
     </div>
