@@ -58,20 +58,38 @@ export function PDFDownloadButton({
     setIsLoading(true);
     
     try {
-      // Get PDF binary data from API
-      const response = await fetch(endpoint);
+      // Fetch PDF with correct headers for download
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/pdf',
+          'Content-Type': 'application/pdf',
+        },
+      });
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      // Get binary data directly as blob
+      // Get filename from response headers or use default
+      const contentDisposition = response.headers.get('content-disposition');
+      let filename = `helix-document-${id}.pdf`;
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+        if (filenameMatch) {
+          filename = filenameMatch[1].replace(/['"]/g, '');
+        }
+      }
+      
+      // Get PDF blob and force download
       const blob = await response.blob();
       
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
+      // Create download link with proper MIME type
+      const url = window.URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
       const link = document.createElement('a');
       link.href = url;
+      link.download = filename;
+      link.style.display = 'none';
       
       // Extract filename from Content-Disposition header or use default
       const contentDisposition = response.headers.get('Content-Disposition');
