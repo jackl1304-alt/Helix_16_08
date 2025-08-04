@@ -127,14 +127,14 @@ export function Sidebar() {
         key={item.href}
         href={item.href}
         className={cn(
-          "flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer",
+          "flex items-center justify-start px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer text-left",
           isActive
             ? "bg-[#07233e] text-white shadow-md"
             : "text-gray-700 hover:bg-[#f0f8ff] hover:text-[#07233e]"
         )}
       >
-        <IconComponent className="mr-3 h-5 w-5" />
-        {item.name}
+        <IconComponent className="mr-3 h-5 w-5 flex-shrink-0" />
+        <span className="text-left">{item.name}</span>
       </Link>
     );
   };
@@ -147,7 +147,7 @@ export function Sidebar() {
       <div key={sectionKey} className="mb-3">
         <button
           onClick={() => toggleSection(sectionKey)}
-          className="flex items-center justify-between w-full px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-[#07233e] transition-colors duration-200"
+          className="flex items-center justify-between w-full px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-[#07233e] transition-colors duration-200 text-left"
         >
           <span>{section.title}</span>
           <ChevronIcon className="h-4 w-4" />
