@@ -127,7 +127,7 @@ export default function DataCollection() {
       
       // Hole aktuelle Daten für echte Zahlen
       const currentSources = sources || [];
-      const activeSources = currentSources.filter(source => source.is_active).length;
+      const activeSources = currentSources.filter(source => source.isActive).length;
       
       // Cache-Invalidierung zum Neuladen der Daten
       queryClient.invalidateQueries({ queryKey: ["/api/regulatory-updates"] });
@@ -166,7 +166,7 @@ export default function DataCollection() {
   const syncAllMutation = useMutation({
     mutationFn: async () => {
       console.log("Frontend: Starting sync for all active sources");
-      const result = await apiRequest('/api/sync/all', 'POST');
+      const result = await apiRequest('/api/data-sources/sync-all', 'POST');
       console.log("Frontend: Sync all result:", result);
       return result;
     },
@@ -248,7 +248,7 @@ export default function DataCollection() {
       ...newSource,
       id: newSource.name.toLowerCase().replace(/\s+/g, '_'),
       isActive: true,
-      configData: {}
+      metadata: {}
     };
     
     addSourceMutation.mutate(sourceData);
@@ -585,7 +585,7 @@ export default function DataCollection() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-gray-600">
-                      {source.endpoint || 'No endpoint configured'}
+                      {source.apiEndpoint || source.url || 'No endpoint configured'}
                     </p>
                   </CardContent>
                 </Card>

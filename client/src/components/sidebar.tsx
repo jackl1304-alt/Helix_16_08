@@ -48,13 +48,7 @@ const navigation = [
     current: false,
     description: "Datenanalyse und Berichte"
   },
-  {
-    name: "🤖 AI APPROVAL DEMO",
-    href: "/ai-approval",
-    icon: Bot,
-    current: false,
-    description: "KI-basierte Genehmigungen"
-  },
+
   {
     name: "Regulierungs-Updates",
     href: "/regulatory-updates",
