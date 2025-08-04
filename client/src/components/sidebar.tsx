@@ -85,11 +85,11 @@ const navigation = [
     description: "Jurisprudenz-Datenbank"
   },
   {
-    name: "KI-Insights",
-    href: "/ai-insights",
+    name: "KI-Analyse",
+    href: "/ai-content-analysis", 
     icon: Brain,
     current: false,
-    description: "AI-gestützte Analysen"
+    description: "AI-gestützte Inhaltsanalyse"
   },
   {
     name: "Knowledge Base",
