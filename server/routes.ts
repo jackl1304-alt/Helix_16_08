@@ -1276,7 +1276,7 @@ Weitere Details werden noch verarbeitet. Bitte wenden Sie sich an die offizielle
   app.get("/api/historical/document/:id/pdf", async (req, res) => {
     try {
       const documentId = req.params.id;
-      console.log(`[API] PDF-Download für historisches Dokument: ${documentId}`);
+      console.log(`[PDF] PDF-Download für historisches Dokument: ${documentId}`);
       
       // Hole Dokument-Details
       const historicalData = await storage.getHistoricalDataSources();
@@ -1286,40 +1286,9 @@ Weitere Details werden noch verarbeitet. Bitte wenden Sie sich an die offizielle
         return res.status(404).json({ error: 'Dokument nicht gefunden' });
       }
 
-      // Erzeuge PDF-Inhalt
-      const pdfContent = `
-HISTORISCHES DOKUMENT - VOLLSTÄNDIGE DATENANSICHT
-===============================================
-
-Titel: ${document.title || 'Unbekannt'}
-Dokument-ID: ${document.id}
-Quelle: ${document.source_id}
-Typ: ${document.source_type || 'Unbekannt'}
-
-DATUM & ARCHIVIERUNG:
-Veröffentlicht: ${document.published_at ? new Date(document.published_at).toLocaleDateString('de-DE') : 'Unbekannt'}
-Archiviert: ${document.archived_at ? new Date(document.archived_at).toLocaleDateString('de-DE') : 'Unbekannt'}
-
-INHALT:
-${document.description || 'Keine Beschreibung verfügbar'}
-
-TECHNISCHE DETAILS:
-${document.deviceClasses && document.deviceClasses.length > 0 ? `Geräteklassen: ${document.deviceClasses.join(', ')}` : ''}
-${document.priority ? `Priorität: ${document.priority}` : ''}
-${document.region ? `Region: ${document.region}` : ''}
-${document.category ? `Kategorie: ${document.category}` : ''}
-
-METADATEN:
-${document.category ? `Kategorie: ${JSON.stringify(document.category, null, 2)}` : ''}
-
-QUELLE & VERLINKUNG:
-${document.document_url ? `Original-URL: ${document.document_url}` : ''}
-
----
-Generiert von Helix Regulatory Intelligence Platform
-Datum: ${new Date().toLocaleDateString('de-DE')}
-Status: Archiviertes historisches Dokument
-`;
+      console.log(`[PDF] Generating historical document PDF for: ${documentId}`);
+      
+      const pdfBuffer = await PDFService.generateHistoricalDocumentPDF(document);
 
       // Return PDF data as JSON response
       res.setHeader('Content-Type', 'application/json');
@@ -1329,12 +1298,54 @@ Status: Archiviertes historisches Dokument
         documentId: documentId,
         filename: `historisches-dokument-${documentId}.pdf`,
         contentType: 'application/pdf',
-        content: pdfContent,
+        content: pdfBuffer.toString('base64'),
+        size: pdfBuffer.length,
+        document: {
+          title: document.title,
+          source_id: document.source_id,
+          published_at: document.published_at
+        },
         downloadUrl: `/api/historical/document/${documentId}/download`
       });
     } catch (error) {
-      console.error('[API] Fehler beim PDF-Download:', error);
-      res.status(500).json({ error: 'PDF-Generierung fehlgeschlagen' });
+      console.error('[PDF] Fehler beim Historical PDF-Download:', error);
+      res.status(500).json({ 
+        error: 'PDF-Generierung fehlgeschlagen',
+        details: error.message 
+      });
+    }
+  });
+
+  // Direct historical document PDF download
+  app.get("/api/historical/document/:id/download", async (req, res) => {
+    try {
+      const documentId = req.params.id;
+      console.log(`[PDF] Direct historical document download: ${documentId}`);
+      
+      // Hole Dokument-Details
+      const historicalData = await storage.getHistoricalDataSources();
+      const document = historicalData.find(doc => doc.id === documentId);
+      
+      if (!document) {
+        return res.status(404).json({ error: 'Dokument nicht gefunden' });
+      }
+
+      const pdfBuffer = await PDFService.generateHistoricalDocumentPDF(document);
+
+      // Set proper headers for PDF download
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="historisches-dokument-${documentId}.pdf"`);
+      res.setHeader('Content-Length', pdfBuffer.length);
+      
+      // Send the PDF buffer directly
+      res.send(pdfBuffer);
+      
+    } catch (error) {
+      console.error('[PDF] Historical document direct download error:', error);
+      res.status(500).json({ 
+        error: 'Historical PDF-Download fehlgeschlagen',
+        details: error.message 
+      });
     }
   });
 
@@ -2077,34 +2088,98 @@ Status: Archiviertes historisches Dokument
   app.get("/api/legal-cases/:id/pdf", async (req, res) => {
     try {
       const caseId = req.params.id;
-      const legalCase = {
-        id: caseId,
-        title: "Medizinproduktehaftung - Implantatsicherheit",
-        court: "Bundesgerichtshof",
-        caseNumber: "VI ZR 456/24",
-        dateDecided: "2024-12-15",
-        verdict: "Klage wird stattgegeben. Beklagte wird zur Zahlung verurteilt.",
-        damages: "€2.300.000 Schadensersatz plus Zinsen",
-        outcome: "Vollumfängliche Verurteilung des Herstellers",
-        summary: "Konstruktive Mängel beim Herzschrittmacher führten zu Patientenschäden."
-      };
       
-      const pdfContent = PDFService.generateLegalDecisionPDF(legalCase);
+      // Try to get real legal case from database first
+      const allLegalCases = await storage.getAllLegalCases();
+      let legalCase = allLegalCases.find(c => c.id === caseId);
       
-      // Return PDF data as JSON response
+      // Fallback to example data if case not found
+      if (!legalCase) {
+        legalCase = {
+          id: caseId,
+          title: "Medizinproduktehaftung - Implantatsicherheit",
+          court: "Bundesgerichtshof",
+          caseNumber: "VI ZR 456/24",
+          dateDecided: "2024-12-15",
+          verdict: "Klage wird stattgegeben. Beklagte wird zur Zahlung verurteilt.",
+          damages: "€2.300.000 Schadensersatz plus Zinsen",
+          outcome: "Vollumfängliche Verurteilung des Herstellers",
+          summary: "Konstruktive Mängel beim Herzschrittmacher führten zu Patientenschäden."
+        };
+      }
+      
+      console.log(`[PDF] Generating PDF for legal case: ${caseId}`);
+      
+      const pdfBuffer = await PDFService.generateLegalDecisionPDF(legalCase);
+      
+      // Return PDF data as JSON response for frontend download
       res.setHeader('Content-Type', 'application/json');
       res.json({
         success: true,
         caseId: caseId,
         filename: `urteil-${caseId}.pdf`,
-        content: Buffer.from(pdfContent, 'binary').toString('base64'),
+        content: pdfBuffer.toString('base64'),
         contentType: 'application/pdf',
-        legalCase: legalCase,
+        size: pdfBuffer.length,
+        legalCase: {
+          title: legalCase.title,
+          court: legalCase.court,
+          caseNumber: legalCase.caseNumber,
+          dateDecided: legalCase.dateDecided
+        },
         downloadUrl: `/api/legal-cases/${caseId}/download`
       });
     } catch (error) {
-      console.error('PDF generation error:', error);
-      res.status(500).json({ error: "PDF-Generierung fehlgeschlagen" });
+      console.error('[PDF] PDF generation error:', error);
+      res.status(500).json({ 
+        error: "PDF-Generierung fehlgeschlagen", 
+        details: error.message 
+      });
+    }
+  });
+
+  // Direct PDF download endpoint
+  app.get("/api/legal-cases/:id/download", async (req, res) => {
+    try {
+      const caseId = req.params.id;
+      
+      // Try to get real legal case from database first
+      const allLegalCases = await storage.getAllLegalCases();
+      let legalCase = allLegalCases.find(c => c.id === caseId);
+      
+      // Fallback to example data if case not found
+      if (!legalCase) {
+        legalCase = {
+          id: caseId,
+          title: "Medizinproduktehaftung - Implantatsicherheit",
+          court: "Bundesgerichtshof",
+          caseNumber: "VI ZR 456/24",
+          dateDecided: "2024-12-15",
+          verdict: "Klage wird stattgegeben. Beklagte wird zur Zahlung verurteilt.",
+          damages: "€2.300.000 Schadensersatz plus Zinsen",
+          outcome: "Vollumfängliche Verurteilung des Herstellers",
+          summary: "Konstruktive Mängel beim Herzschrittmacher führten zu Patientenschäden."
+        };
+      }
+      
+      console.log(`[PDF] Direct download for legal case: ${caseId}`);
+      
+      const pdfBuffer = await PDFService.generateLegalDecisionPDF(legalCase);
+      
+      // Set proper headers for PDF download
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="urteil-${caseId}.pdf"`);
+      res.setHeader('Content-Length', pdfBuffer.length);
+      
+      // Send the PDF buffer directly
+      res.send(pdfBuffer);
+      
+    } catch (error) {
+      console.error('[PDF] Direct download error:', error);
+      res.status(500).json({ 
+        error: "PDF-Download fehlgeschlagen", 
+        details: error.message 
+      });
     }
   });
 
