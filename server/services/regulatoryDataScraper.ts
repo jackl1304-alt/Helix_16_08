@@ -155,6 +155,12 @@ export class RegulatoryDataScraper {
         return this.scrapeNCBIFramework(source);
       case 'iqvia_compliance_blog':
         return this.scrapeIQVIABlog(source);
+      case 'bfarm_web_scraping':
+        return this.scrapeBfARM(source);
+      case 'swissmedic_web_scraping':
+        return this.scrapeSwissmedic(source);
+      case 'health_canada_web_scraping':
+        return this.scrapeHealthCanada(source);
       default:
         logger.warn(`No scraping method implemented for source: ${source.id}`);
         return this.generateFallbackData(source);
@@ -231,6 +237,8 @@ export class RegulatoryDataScraper {
     }
 
     return data;
+
+    return data;
   }
 
   private async scrapeWHOAtlas(source: RegulatorySource): Promise<ScrapedRegulatoryData[]> {
@@ -294,6 +302,8 @@ export class RegulatoryDataScraper {
       logger.error(`Error scraping WHO Atlas:`, error.message);
       data.push(...this.generateFallbackData(source));
     }
+
+    return data;
 
     return data;
   }
@@ -361,6 +371,8 @@ export class RegulatoryDataScraper {
     }
 
     return data;
+
+    return data;
   }
 
   private async scrapeNCBIFramework(source: RegulatorySource): Promise<ScrapedRegulatoryData[]> {
@@ -424,6 +436,8 @@ export class RegulatoryDataScraper {
       logger.error(`Error scraping NCBI Framework:`, error.message);
       data.push(...this.generateFallbackData(source));
     }
+
+    return data;
 
     return data;
   }
@@ -493,6 +507,210 @@ export class RegulatoryDataScraper {
     return data;
   }
 
+  private async scrapeBfARM(source: RegulatorySource): Promise<ScrapedRegulatoryData[]> {
+    const data: ScrapedRegulatoryData[] = [];
+    
+    try {
+      const headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'de-DE,de;q=0.9,en;q=0.8'
+      };
+
+      const response = await axios.get(source.url, { headers, timeout: 30000 });
+      const $ = cheerio.load(response.data);
+      
+      // BfArM spezifische Selektoren für Medizinprodukte
+      const contentSelectors = [
+        '.contentWrapper .text-content p',
+        '.main-content .page-content p',
+        '.content-area p',
+        '.article-body p',
+        'main p'
+      ];
+
+      let foundContent = false;
+
+      for (const selector of contentSelectors) {
+        const contentBlocks = $(selector);
+        
+        if (contentBlocks.length > 0) {
+          foundContent = true;
+          logger.info(`Found ${contentBlocks.length} BfArM content blocks`);
+
+          contentBlocks.each((index, element) => {
+            if (index >= 10) return false;
+
+            const $block = $(element);
+            const content = $block.text().trim();
+            
+            if (content && content.length > 100 && content.includes('Medizinprodukt')) {
+              data.push({
+                source_name: source.name,
+                title: `BfArM Medizinprodukte-Regulierung - Update ${index + 1}`,
+                url: source.url,
+                content: content,
+                category: 'regulatory_update',
+                region: 'DE',
+                publication_date: new Date().toISOString(),
+                regulation_type: 'BfArM_MPG',
+                keywords: this.extractKeywords(content.substring(0, 200), 'BfArM Medizinprodukt regulierung'),
+                scrape_timestamp: new Date().toISOString()
+              });
+            }
+          });
+          break;
+        }
+      }
+
+      if (!foundContent) {
+        data.push(...this.generateFallbackData(source));
+      }
+
+    } catch (error: any) {
+      logger.error(`Error scraping BfArM:`, error.message);
+      data.push(...this.generateFallbackData(source));
+    }
+
+    return data;
+  }
+
+  private async scrapeSwissmedic(source: RegulatorySource): Promise<ScrapedRegulatoryData[]> {
+    const data: ScrapedRegulatoryData[] = [];
+    
+    try {
+      const headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'de-CH,de;q=0.9,en;q=0.8'
+      };
+
+      const response = await axios.get(source.url, { headers, timeout: 30000 });
+      const $ = cheerio.load(response.data);
+      
+      // Swissmedic spezifische Selektoren
+      const contentSelectors = [
+        '.main-content .text p',
+        '.content-wrapper p',
+        '.page-content p',
+        '.article-content p',
+        'main .content p'
+      ];
+
+      let foundContent = false;
+
+      for (const selector of contentSelectors) {
+        const contentBlocks = $(selector);
+        
+        if (contentBlocks.length > 0) {
+          foundContent = true;
+          logger.info(`Found ${contentBlocks.length} Swissmedic content blocks`);
+
+          contentBlocks.each((index, element) => {
+            if (index >= 8) return false;
+
+            const $block = $(element);
+            const content = $block.text().trim();
+            
+            if (content && content.length > 120) {
+              data.push({
+                source_name: source.name,
+                title: `Swissmedic Medizinprodukte-Zulassung - Update ${index + 1}`,
+                url: source.url,
+                content: content,
+                category: 'approval',
+                region: 'CH',
+                publication_date: new Date().toISOString(),
+                regulation_type: 'Swissmedic_MDD',
+                keywords: this.extractKeywords(content.substring(0, 200), 'Swissmedic Medizinprodukt Zulassung'),
+                scrape_timestamp: new Date().toISOString()
+              });
+            }
+          });
+          break;
+        }
+      }
+
+      if (!foundContent) {
+        data.push(...this.generateFallbackData(source));
+      }
+
+    } catch (error: any) {
+      logger.error(`Error scraping Swissmedic:`, error.message);
+      data.push(...this.generateFallbackData(source));
+    }
+
+    return data;
+  }
+
+  private async scrapeHealthCanada(source: RegulatorySource): Promise<ScrapedRegulatoryData[]> {
+    const data: ScrapedRegulatoryData[] = [];
+    
+    try {
+      const headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-CA,en;q=0.9,fr-CA;q=0.8'
+      };
+
+      const response = await axios.get(source.url, { headers, timeout: 30000 });
+      const $ = cheerio.load(response.data);
+      
+      // Health Canada spezifische Selektoren
+      const contentSelectors = [
+        '.main-content .field-item p',
+        '.page-content p',
+        '.content-wrapper p',
+        '.article-body p',
+        'main .content p'
+      ];
+
+      let foundContent = false;
+
+      for (const selector of contentSelectors) {
+        const contentBlocks = $(selector);
+        
+        if (contentBlocks.length > 0) {
+          foundContent = true;
+          logger.info(`Found ${contentBlocks.length} Health Canada content blocks`);
+
+          contentBlocks.each((index, element) => {
+            if (index >= 10) return false;
+
+            const $block = $(element);
+            const content = $block.text().trim();
+            
+            if (content && content.length > 100 && (content.includes('medical device') || content.includes('device'))) {
+              data.push({
+                source_name: source.name,
+                title: `Health Canada Medical Device Regulation - Update ${index + 1}`,
+                url: source.url,
+                content: content,
+                category: 'regulatory_update',
+                region: 'CA',
+                publication_date: new Date().toISOString(),
+                regulation_type: 'Health_Canada_MDR',
+                keywords: this.extractKeywords(content.substring(0, 200), 'Health Canada medical device regulation'),
+                scrape_timestamp: new Date().toISOString()
+              });
+            }
+          });
+          break;
+        }
+      }
+
+      if (!foundContent) {
+        data.push(...this.generateFallbackData(source));
+      }
+
+    } catch (error: any) {
+      logger.error(`Error scraping Health Canada:`, error.message);
+      data.push(...this.generateFallbackData(source));
+    }
+
+    return data;
+  }
+
   private generateFallbackData(source: RegulatorySource): ScrapedRegulatoryData[] {
     const fallbackContent = {
       regulatory_database: [
@@ -521,7 +739,7 @@ export class RegulatoryDataScraper {
       ]
     };
 
-    const content = fallbackContent[source.category] || fallbackContent.regulatory_database;
+    const content = fallbackContent[source.category as keyof typeof fallbackContent] || fallbackContent.regulatory_database;
     const itemCount = 0; // MOCK DATA ENTFERNT - Keine automatische Item-Generierung
 
     return content.slice(0, itemCount).map((title, index) => ({
@@ -548,7 +766,7 @@ export class RegulatoryDataScraper {
       standards: 'Internationale Standards wie ISO 13485, IEC 62304 und ISO 14971 bilden das Fundament für Qualitätsmanagementsysteme in der Medizintechnik. Diese Standards werden regelmäßig aktualisiert, um technologische Entwicklungen zu berücksichtigen.'
     };
 
-    return baseContent + (additionalContent[source.category] || additionalContent.regulatory_database);
+    return baseContent + (additionalContent[source.category as keyof typeof additionalContent] || additionalContent.regulatory_database);
   }
 
   private getRegulationType(category: string): string {
