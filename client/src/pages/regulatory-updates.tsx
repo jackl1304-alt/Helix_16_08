@@ -409,28 +409,28 @@ EXPORT DETAILS:
                                     className="flex items-center gap-1 text-xs font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
                                   >
                                     <FileText className="h-3 w-3" />
-                                    Vollständiger Inhalt
+                                    <span className="hidden sm:inline">Vollständiger Inhalt</span>
                                   </TabsTrigger>
                                   <TabsTrigger 
                                     value="financial" 
                                     className="flex items-center gap-1 text-xs font-medium rounded-md data-[state=active]:bg-green-50 data-[state=active]:text-green-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-green-900/20 dark:data-[state=active]:text-green-300"
                                   >
                                     <Calendar className="h-3 w-3" />
-                                    Finanzanalyse
+                                    <span className="hidden sm:inline">Finanzanalyse</span>
                                   </TabsTrigger>
                                   <TabsTrigger 
                                     value="ai" 
                                     className="flex items-center gap-1 text-xs font-medium rounded-md data-[state=active]:bg-orange-50 data-[state=active]:text-orange-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-orange-900/20 dark:data-[state=active]:text-orange-300"
                                   >
                                     <Bell className="h-3 w-3" />
-                                    🔥 KI-Analyse
+                                    <span className="hidden sm:inline">🔥 KI-Analyse</span>
                                   </TabsTrigger>
                                   <TabsTrigger 
                                     value="metadata" 
                                     className="flex items-center gap-1 text-xs font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
                                   >
                                     <Globe className="h-3 w-3" />
-                                    Metadaten
+                                    <span className="hidden sm:inline">Metadaten</span>
                                   </TabsTrigger>
                                 </TabsList>
 
