@@ -55,6 +55,7 @@ const EnhancedContentDemo = lazy(() => import("@/pages/enhanced-content-demo"));
 const AdvancedAnalytics = lazy(() => import("@/pages/advanced-analytics"));
 const UserExperiencePolish = lazy(() => import("@/pages/user-experience-polish"));
 const RegulatoryUpdateDetail = lazy(() => import("@/pages/regulatory-update-detail"));
+const RechtsprechungFixed = lazy(() => import("@/pages/rechtsprechung-fixed"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -89,9 +90,9 @@ function Router() {
         <Route path="/enhanced-legal-cases" component={EnhancedLegalCases} />
         <Route path="/enhanced-legal-cases-new" component={EnhancedLegalCasesNew} />
         <Route path="/legal-cases-simple" component={LegalCasesSimple} />
-        <Route path="/rechtsprechung" component={EnhancedLegalCasesNew} />
+        <Route path="/rechtsprechung" component={RechtsprechungFixed} />
         <Route path="/historical-data" component={HistoricalData} />
-        <Route path="/legal-cases" component={LegalCases} />
+        <Route path="/legal-cases" component={RechtsprechungFixed} />
         <Route path="/intelligent-search" component={IntelligentSearch} />
 
         <Route path="/phase1-integration" component={Phase1Integration} />
