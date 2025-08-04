@@ -44,25 +44,6 @@ export function PDFDownloadButton({
     }
   };
 
-  const getDownloadEndpoint = () => {
-    switch (type) {
-      case 'regulatory-update':
-        return `/api/regulatory-updates/${id}/download`;
-      case 'legal-case':
-        return `/api/legal-cases/${id}/download`;
-      case 'article':
-        return `/api/articles/${id}/download`;
-      case 'historical-document':
-        return `/api/historical/document/${id}/download`;
-      case 'newsletter':
-        return `/api/newsletters/${id}/download`;
-      case 'knowledge-article':
-        return `/api/knowledge-articles/${id}/download`;
-      default:
-        return null;
-    }
-  };
-
   const handlePDFDownload = async () => {
     const endpoint = getApiEndpoint();
     if (!endpoint) {
@@ -77,33 +58,32 @@ export function PDFDownloadButton({
     setIsLoading(true);
     
     try {
-      // Get PDF data from API
+      // Get PDF binary data from API
       const response = await fetch(endpoint);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      const data = await response.json();
-      
-      if (!data.success || !data.content) {
-        throw new Error('PDF-Generierung fehlgeschlagen');
-      }
-
-      // Convert base64 to blob and download
-      const binaryString = atob(data.content);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-      
-      const blob = new Blob([bytes], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
+      // Get binary data directly as blob
+      const blob = await response.blob();
       
       // Create download link
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = data.filename || `document-${id}.pdf`;
+      
+      // Extract filename from Content-Disposition header or use default
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = `document-${id}.pdf`;
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
+      }
+      
+      link.download = filename;
       document.body.appendChild(link);
       link.click();
       
@@ -113,7 +93,7 @@ export function PDFDownloadButton({
       
       toast({
         title: "PDF erstellt",
-        description: `${data.filename} wurde erfolgreich heruntergeladen`,
+        description: `${filename} wurde erfolgreich heruntergeladen`,
       });
       
     } catch (error: any) {
@@ -125,13 +105,6 @@ export function PDFDownloadButton({
       });
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleDirectDownload = () => {
-    const downloadEndpoint = getDownloadEndpoint();
-    if (downloadEndpoint) {
-      window.open(downloadEndpoint, '_blank');
     }
   };
 
