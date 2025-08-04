@@ -160,10 +160,28 @@ export default function AIInsights() {
   const [searchQuery, setSearchQuery] = useState("");
   const [newAnalysisQuery, setNewAnalysisQuery] = useState("");
 
-  const { data: insights = mockInsights, isLoading: insightsLoading } = useQuery<AIInsight[]>({
+  const { data: rawInsights = [], isLoading: insightsLoading } = useQuery({
     queryKey: ["/api/ai-insights"],
-    enabled: false // Use mock data for demonstration
+    enabled: true // Enable real API calls
   });
+
+  // Transform database insights to AIInsight format
+  const insights: AIInsight[] = rawInsights.map((article: any) => ({
+    id: article.id,
+    title: article.title,
+    description: article.content?.substring(0, 200) + '...' || 'Zühlke MedTech Case Study',
+    category: 'trend_analysis',
+    severity: 'medium',
+    confidence: 85,
+    impact: 'high',
+    timeframe: 'medium_term',
+    sources: Array.isArray(article.tags) ? article.tags : [],
+    recommendations: [],
+    createdAt: article.created_at,
+    relevantRegions: ['EU', 'US', 'APAC'],
+    affectedDeviceClasses: ['Class II', 'Class III'],
+    tags: Array.isArray(article.tags) ? article.tags : []
+  }));
 
   const createAnalysisMutation = useMutation({
     mutationFn: async (query: string) => {

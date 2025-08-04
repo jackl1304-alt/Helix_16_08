@@ -33,6 +33,7 @@ export interface IStorage {
   getLegalCasesByJurisdiction(jurisdiction: string): Promise<any[]>;
   createLegalCase(data: any): Promise<any>;
   getAllKnowledgeArticles(): Promise<any[]>;
+  getKnowledgeBaseByCategory(category: string): Promise<any[]>;
   addKnowledgeArticle(data: any): Promise<any>;
   createKnowledgeArticle(data: any): Promise<any>;
   updateDataSourceLastSync(id: string, lastSync: Date): Promise<any>;
@@ -541,6 +542,22 @@ class MorningStorage implements IStorage {
       return result;
     } catch (error) {
       console.error("All knowledge articles error:", error);
+      return [];
+    }
+  }
+
+  async getKnowledgeBaseByCategory(category: string) {
+    try {
+      console.log(`[DB] getKnowledgeBaseByCategory called for: ${category}`);
+      const result = await sql`
+        SELECT * FROM knowledge_base 
+        WHERE category = ${category} AND is_published = true
+        ORDER BY created_at DESC
+      `;
+      console.log(`[DB] Found ${result.length} articles in category ${category}`);
+      return result;
+    } catch (error) {
+      console.error(`[DB] Error getting knowledge articles by category ${category}:`, error);
       return [];
     }
   }

@@ -3955,6 +3955,25 @@ Für vollständige Details und weitere Analysen besuchen Sie die ursprüngliche 
     }
   });
 
+  // AI Insights API route - specifically for ai_insights category
+  app.get('/api/ai-insights', async (req, res) => {
+    try {
+      console.log('[API] AI Insights endpoint called');
+      
+      // Force JSON headers explicitly
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Cache-Control', 'no-cache');
+      
+      const insights = await storage.getKnowledgeBaseByCategory('ai_insights');
+      console.log(`[API] Fetched ${insights.length} AI insights from database`);
+      
+      res.json(insights);
+    } catch (error) {
+      console.error('[API] Error in ai-insights endpoint:', String(error));
+      res.status(500).json({ message: 'Failed to fetch AI insights', error: String(error) });
+    }
+  });
+
   // AegisIntel Services Integration - Comprehensive AI-powered regulatory analysis
   app.post('/api/aegis/analyze-regulatory-content', async (req, res) => {
     try {
