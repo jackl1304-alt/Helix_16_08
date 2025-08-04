@@ -17,6 +17,7 @@ import {
   Eye,
   Download
 } from "lucide-react";
+import { PDFDownloadButton } from "@/components/ui/pdf-download-button";
 
 interface LegalDataRecord {
   id: string;
@@ -203,6 +204,13 @@ export function EnhancedLegalCard({ case: legalCase }: EnhancedLegalCardProps) {
         {/* Action Buttons */}
         <div className="flex items-center justify-between pt-2">
           <div className="flex gap-2">
+            <PDFDownloadButton 
+              type="legal-case" 
+              id={legalCase.id} 
+              title={`PDF herunterladen: ${legalCase.title}`}
+              variant="outline" 
+              size="sm"
+            />
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm">

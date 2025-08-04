@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { BookOpen, Database, Globe, FileText, Filter, Search, Download, ExternalLink, RefreshCw, Play, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { PDFDownloadButton } from "@/components/ui/pdf-download-button";
 
 interface KnowledgeArticle {
   id: string;
@@ -325,6 +326,13 @@ Helix Regulatory Intelligence Platform
                       </div>
                       
                       <div className="flex gap-2">
+                        <PDFDownloadButton 
+                          type="knowledge-article" 
+                          id={article.id} 
+                          title={`PDF herunterladen: ${article.title}`}
+                          variant="outline" 
+                          size="sm"
+                        />
                         <Button 
                           variant="outline" 
                           size="sm"
