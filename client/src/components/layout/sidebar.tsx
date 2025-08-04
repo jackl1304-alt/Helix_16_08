@@ -75,8 +75,7 @@ const navigationStructure: Record<string, NavigationSection> = {
   aiAutomation: {
     title: "KI & AUTOMATISIERUNG",
     items: [
-      { name: "KI-Erkenntnisse", href: "/ai-insights", icon: Brain },
-      { name: "KI-Bewertung", href: "/ai-approval-test", icon: Bot },
+      { name: "KI-Analyse", href: "/ai-content-analysis", icon: Brain },
     ],
     defaultOpen: true
   },
