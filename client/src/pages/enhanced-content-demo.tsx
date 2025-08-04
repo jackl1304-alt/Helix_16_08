@@ -18,6 +18,7 @@ import {
   Sparkles,
   CheckCircle2
 } from "lucide-react";
+import { PDFDownloadButton } from "@/components/ui/pdf-download-button";
 
 interface RegulatoryUpdate {
   id: string;

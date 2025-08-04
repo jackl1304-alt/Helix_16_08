@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Send, Edit, Trash2, Calendar, Users, AlertCircle, Menu } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { PDFDownloadButton } from "@/components/ui/pdf-download-button";
 
 interface Newsletter {
   id: string;
@@ -245,6 +246,13 @@ export default function NewsletterManager() {
                         </div>
                       </div>
                       <div className="flex space-x-2">
+                        <PDFDownloadButton 
+                          type="newsletter" 
+                          id={newsletter.id} 
+                          title={`PDF herunterladen: ${newsletter.title}`}
+                          variant="outline" 
+                          size="sm"
+                        />
                         {newsletter.status === 'approved' && !newsletter.sentAt && (
                           <Button
                             size="sm"

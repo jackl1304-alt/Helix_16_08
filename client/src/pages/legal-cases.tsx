@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import LegalRelationshipViewer from "@/components/legal-relationship-viewer";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { EnhancedLegalCard } from "@/components/enhanced-legal-card";
+import { PDFDownloadButton } from "@/components/ui/pdf-download-button";
 
 // Define types
 interface ChangeDetection {
@@ -677,10 +678,19 @@ export default function LegalCases() {
                                 <div className="flex items-center space-x-2 text-sm text-gray-500">
                                   <span>Gerät: {record.deviceType}</span>
                                 </div>
-                                <Button variant="outline" size="sm" className="hover:bg-blue-50">
-                                  <ExternalLink className="w-4 h-4 mr-1" />
-                                  Details
-                                </Button>
+                                <div className="flex gap-2">
+                                  <PDFDownloadButton 
+                                    type="legal-case" 
+                                    id={record.id} 
+                                    title={`PDF herunterladen: ${record.title}`}
+                                    variant="outline" 
+                                    size="sm"
+                                  />
+                                  <Button variant="outline" size="sm" className="hover:bg-blue-50">
+                                    <ExternalLink className="w-4 h-4 mr-1" />
+                                    Details
+                                  </Button>
+                                </div>
                               </div>
                             </CardContent>
                           </Card>

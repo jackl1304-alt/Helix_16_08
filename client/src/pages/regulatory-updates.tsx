@@ -16,6 +16,7 @@ import { useDevice } from "@/hooks/use-device";
 import { ResponsiveGrid } from "@/components/responsive-layout";
 import { cn } from "@/lib/utils";
 import { VirtualList } from "@/components/virtual-list";
+import { PDFDownloadButton } from "@/components/ui/pdf-download-button";
 
 interface RegulatoryUpdate {
   id: string;
@@ -373,6 +374,14 @@ EXPORT DETAILS:
                         </div>
                         
                         <div className="flex items-center gap-2">
+                          <PDFDownloadButton 
+                            type="regulatory-update" 
+                            id={update.id} 
+                            title={`PDF herunterladen: ${update.title}`}
+                            variant="outline" 
+                            size="sm"
+                            className="text-xs"
+                          />
                           <Dialog>
                             <DialogTrigger asChild>
                               <Button variant="outline" size="sm" className="text-xs">

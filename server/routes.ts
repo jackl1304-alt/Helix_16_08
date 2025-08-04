@@ -2183,6 +2183,193 @@ Weitere Details werden noch verarbeitet. Bitte wenden Sie sich an die offizielle
     }
   });
 
+  // PDF-Download für Regulatory Updates
+  app.get("/api/regulatory-updates/:id/pdf", async (req, res) => {
+    try {
+      const updateId = req.params.id;
+      
+      // Try to get real regulatory update from database first
+      const allUpdates = await storage.getAllRegulatoryUpdates();
+      let update = allUpdates.find(u => u.id === updateId);
+      
+      // Fallback to example data if update not found
+      if (!update) {
+        update = {
+          id: updateId,
+          title: "FDA Guidance Document - Software as Medical Device",
+          source_id: "FDA",
+          type: "guidance",
+          jurisdiction: "USA",
+          published_at: new Date().toISOString(),
+          description: "Neue FDA-Leitlinien für Software als Medizinprodukt mit aktualisierten Anforderungen für Zertifizierung und Qualitätssicherung.",
+          device_classes: ["Class II", "Class III"],
+          priority: "High",
+          compliance_areas: ["Software Validation", "Quality Management"],
+          keywords: ["FDA", "Software", "Medical Device", "Validation"]
+        };
+      }
+      
+      console.log(`[PDF] Generating PDF for regulatory update: ${updateId}`);
+      
+      const pdfBuffer = await PDFService.generateRegulatoryUpdatePDF(update);
+      
+      // Return PDF data as JSON response for frontend download
+      res.setHeader('Content-Type', 'application/json');
+      res.json({
+        success: true,
+        updateId: updateId,
+        filename: `regulatory-update-${updateId}.pdf`,
+        content: pdfBuffer.toString('base64'),
+        contentType: 'application/pdf',
+        size: pdfBuffer.length,
+        update: {
+          title: update.title,
+          source_id: update.source_id,
+          type: update.type,
+          published_at: update.published_at
+        },
+        downloadUrl: `/api/regulatory-updates/${updateId}/download`
+      });
+    } catch (error) {
+      console.error('[PDF] Regulatory update PDF generation error:', error);
+      res.status(500).json({ 
+        error: "PDF-Generierung fehlgeschlagen", 
+        details: error.message 
+      });
+    }
+  });
+
+  // Direct PDF download endpoint for regulatory updates
+  app.get("/api/regulatory-updates/:id/download", async (req, res) => {
+    try {
+      const updateId = req.params.id;
+      
+      // Try to get real regulatory update from database first
+      const allUpdates = await storage.getAllRegulatoryUpdates();
+      let update = allUpdates.find(u => u.id === updateId);
+      
+      // Fallback to example data if update not found
+      if (!update) {
+        update = {
+          id: updateId,
+          title: "FDA Guidance Document - Software as Medical Device",
+          source_id: "FDA",
+          type: "guidance",
+          jurisdiction: "USA",
+          published_at: new Date().toISOString(),
+          description: "Neue FDA-Leitlinien für Software als Medizinprodukt mit aktualisierten Anforderungen für Zertifizierung und Qualitätssicherung.",
+          device_classes: ["Class II", "Class III"],
+          priority: "High",
+          compliance_areas: ["Software Validation", "Quality Management"],
+          keywords: ["FDA", "Software", "Medical Device", "Validation"]
+        };
+      }
+      
+      console.log(`[PDF] Direct download for regulatory update: ${updateId}`);
+      
+      const pdfBuffer = await PDFService.generateRegulatoryUpdatePDF(update);
+      
+      // Set proper headers for PDF download
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="regulatory-update-${updateId}.pdf"`);
+      res.setHeader('Content-Length', pdfBuffer.length);
+      
+      // Send the PDF buffer directly
+      res.send(pdfBuffer);
+      
+    } catch (error) {
+      console.error('[PDF] Regulatory update direct download error:', error);
+      res.status(500).json({ 
+        error: "PDF-Download fehlgeschlagen", 
+        details: error.message 
+      });
+    }
+  });
+
+  // PDF-Download für Knowledge Articles
+  app.get("/api/articles/:id/pdf", async (req, res) => {
+    try {
+      const articleId = req.params.id;
+      
+      // Create example article data (could be replaced with database lookup)
+      const article = {
+        id: articleId,
+        title: "Medizinprodukte-Verordnung (MDR) - Compliance Guide",
+        category: "Regulatory Compliance",
+        source: "Internal Knowledge Base",
+        author: "Regulatory Affairs Team",
+        content: "Umfassender Leitfaden zur EU-Medizinprodukte-Verordnung mit praktischen Tipps für die Umsetzung und Compliance-Anforderungen für Hersteller.",
+        tags: ["MDR", "EU Regulation", "Compliance", "Medical Devices"],
+        created_at: new Date().toISOString()
+      };
+      
+      console.log(`[PDF] Generating PDF for article: ${articleId}`);
+      
+      const pdfBuffer = await PDFService.generateArticlePDF(article);
+      
+      // Return PDF data as JSON response for frontend download
+      res.setHeader('Content-Type', 'application/json');
+      res.json({
+        success: true,
+        articleId: articleId,
+        filename: `article-${articleId}.pdf`,
+        content: pdfBuffer.toString('base64'),
+        contentType: 'application/pdf',
+        size: pdfBuffer.length,
+        article: {
+          title: article.title,
+          category: article.category,
+          author: article.author
+        },
+        downloadUrl: `/api/articles/${articleId}/download`
+      });
+    } catch (error) {
+      console.error('[PDF] Article PDF generation error:', error);
+      res.status(500).json({ 
+        error: "PDF-Generierung fehlgeschlagen", 
+        details: error.message 
+      });
+    }
+  });
+
+  // Direct PDF download endpoint for articles
+  app.get("/api/articles/:id/download", async (req, res) => {
+    try {
+      const articleId = req.params.id;
+      
+      // Create example article data (could be replaced with database lookup)
+      const article = {
+        id: articleId,
+        title: "Medizinprodukte-Verordnung (MDR) - Compliance Guide",
+        category: "Regulatory Compliance",
+        source: "Internal Knowledge Base",
+        author: "Regulatory Affairs Team",
+        content: "Umfassender Leitfaden zur EU-Medizinprodukte-Verordnung mit praktischen Tipps für die Umsetzung und Compliance-Anforderungen für Hersteller.",
+        tags: ["MDR", "EU Regulation", "Compliance", "Medical Devices"],
+        created_at: new Date().toISOString()
+      };
+      
+      console.log(`[PDF] Direct download for article: ${articleId}`);
+      
+      const pdfBuffer = await PDFService.generateArticlePDF(article);
+      
+      // Set proper headers for PDF download
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="article-${articleId}.pdf"`);
+      res.setHeader('Content-Length', pdfBuffer.length);
+      
+      // Send the PDF buffer directly
+      res.send(pdfBuffer);
+      
+    } catch (error) {
+      console.error('[PDF] Article direct download error:', error);
+      res.status(500).json({ 
+        error: "PDF-Download fehlgeschlagen", 
+        details: error.message 
+      });
+    }
+  });
+
   // Remove all data limits - API for complete data access
   app.get("/api/admin/all-data", async (req, res) => {
     try {

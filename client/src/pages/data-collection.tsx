@@ -12,6 +12,7 @@ import { FolderSync, Plus, Trash2, Edit, AlertCircle, History, Settings, Externa
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { DataSource } from "@shared/schema";
+import { PDFDownloadButton } from "@/components/ui/pdf-download-button";
 
 export default function DataCollection() {
   const { toast } = useToast();

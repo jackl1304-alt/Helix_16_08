@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, FileText, Database, TrendingUp, Download, ExternalLink, Eye } from "lucide-react";
+import { PDFDownloadButton } from "@/components/ui/pdf-download-button";
 
 interface HistoricalDataRecord {
   id: string;
@@ -261,14 +262,13 @@ export default function HistoricalData() {
                             </a>
                           </Button>
                         )}
-                        <Button 
+                        <PDFDownloadButton 
+                          type="historical-document" 
+                          id={item.id} 
+                          title={`PDF herunterladen: ${item.title}`}
                           variant="outline" 
-                          size="sm" 
-                          onClick={() => window.open(`/api/historical/document/${item.id}/pdf`, '_blank')}
-                        >
-                          <Download className="h-4 w-4 mr-1" />
-                          PDF
-                        </Button>
+                          size="sm"
+                        />
                         <Button 
                           variant="outline" 
                           size="sm"
