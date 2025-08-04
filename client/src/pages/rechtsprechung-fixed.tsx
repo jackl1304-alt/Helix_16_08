@@ -307,9 +307,18 @@ export default function RechtsprechungFixed() {
                       {legalCase.jurisdiction}
                     </Badge>
                     <PDFDownloadButton 
-                      contentId={legalCase.id}
                       contentType="legal-case"
                       title={legalCase.title}
+                      content={{
+                        title: legalCase.title,
+                        case_number: legalCase.case_number,
+                        jurisdiction: legalCase.jurisdiction,
+                        decision_date: legalCase.decision_date,
+                        court: legalCase.court,
+                        summary: legalCase.summary,
+                        full_text: legalCase.full_text,
+                        tags: legalCase.tags
+                      }}
                     />
                   </div>
                 </div>
