@@ -52,6 +52,8 @@ const Administration = lazy(() => import("@/pages/administration"));
 const GripData = lazy(() => import("@/pages/grip-data"));
 const NewsletterAdmin = lazy(() => import("@/pages/newsletter-admin"));
 const EnhancedContentDemo = lazy(() => import("@/pages/enhanced-content-demo"));
+const AdvancedAnalytics = lazy(() => import("@/pages/advanced-analytics"));
+const UserExperiencePolish = lazy(() => import("@/pages/user-experience-polish"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -100,6 +102,8 @@ function Router() {
         <Route path="/grip-data" component={GripData} />
         <Route path="/newsletter-admin" component={NewsletterAdmin} />
         <Route path="/enhanced-content-demo" component={EnhancedContentDemo} />
+        <Route path="/advanced-analytics" component={AdvancedAnalytics} />
+        <Route path="/user-experience-polish" component={UserExperiencePolish} />
         <Route path="/documents/:sourceType/:documentId" component={DocumentViewer} />
         
         {/* Fallback to 404 */}
