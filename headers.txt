@@ -1,0 +1,10 @@
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Content-Type: application/pdf
+Content-Disposition: attachment; filename="newsletter-test-1.pdf"
+Content-Length: 1452
+ETag: W/"5ac-KZI6K5LLDUlBKdySRXFrAY6VA9w"
+Date: Mon, 04 Aug 2025 12:38:39 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
