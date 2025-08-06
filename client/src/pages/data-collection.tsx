@@ -485,8 +485,8 @@ export default function DataCollection() {
                   </div>
                   <div className="flex items-center gap-2">
                       <div className="text-sm text-blue-700 text-right">
-                        <div className="font-medium">{newsletterSources?.filter(s => s.isActive !== false).length || 0} aktiv</div>
-                        <div className="text-xs">{newsletterSources?.length || 0} gesamt</div>
+                        <div className="font-medium">{newsletterSources?.filter((s: any) => s.type === 'newsletter' && s.is_active !== false).length || 0} aktiv</div>
+                        <div className="text-xs">{newsletterSources?.filter((s: any) => s.type === 'newsletter').length || 0} gesamt</div>
                       </div>
                     <Button
                       size="sm"
@@ -505,9 +505,9 @@ export default function DataCollection() {
                 </div>
               </CardHeader>
               <CardContent>
-                {newsletterSources?.sources ? (
+                {newsletterSources?.filter((s: any) => s.type === 'newsletter').length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96 overflow-y-auto">
-                    {newsletterSources.sources.map((source: any, index: number) => (
+                    {newsletterSources.filter((s: any) => s.type === 'newsletter').map((source: any, index: number) => (
                       <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
@@ -515,25 +515,25 @@ export default function DataCollection() {
                               {source.name}
                             </p>
                             <Badge 
-                              variant={source.status === 'active' ? 'default' : 'secondary'}
+                              variant={source.is_active ? 'default' : 'secondary'}
                               className="text-xs"
                             >
-                              {source.status === 'active' ? 'Aktiv' : 'Konfiguriert'}
+                              {source.is_active ? 'Aktiv' : 'Inaktiv'}
                             </Badge>
                           </div>
                           <p className="text-xs text-gray-500 truncate">
-                            {source.description}
+                            {source.endpoint}
                           </p>
                           <div className="flex items-center gap-1 mt-1">
                             <Badge variant="outline" className="text-xs px-1">
-                              {source.category === 'industry_newsletter' ? 'Branche' : 
-                               source.category === 'regulatory_newsletter' ? 'Regulatorisch' : 'Marktanalyse'}
+                              {source.region}
                             </Badge>
-                            {source.requiresAuth && (
-                              <Badge variant="outline" className="text-xs px-1">
-                                Auth
-                              </Badge>
-                            )}
+                            <Badge variant="outline" className="text-xs px-1">
+                              {source.category === 'news' ? 'News' : 
+                               source.category === 'regulatory' ? 'Regulatorisch' : 
+                               source.category === 'research' ? 'Forschung' :
+                               source.category === 'industry' ? 'Branche' : source.category}
+                            </Badge>
                           </div>
                         </div>
                       </div>
