@@ -45,11 +45,12 @@ export default function SyncManager() {
     queryKey: ['/api/data-sources'],
   });
 
-  // Dashboard Stats für Live-Sync-Tracking
+  // Dashboard Stats für Live-Sync-Tracking - SOFORTIGE AKTUALISIERUNG
   const { data: dashboardStats } = useQuery({
     queryKey: ['/api/dashboard/stats'],
-    refetchInterval: 30000, // Alle 30 Sekunden aktualisieren
-    staleTime: 15000, // 15 Sekunden
+    refetchInterval: 5000, // Alle 5 Sekunden aktualisieren für Echtzeit-Tracking
+    staleTime: 0, // Keine Cache-Zeit - immer frische Daten
+    refetchOnWindowFocus: true, // Bei Window-Focus neu laden
   });
 
   // Funktion zum Laden der Updates für das Modal
@@ -117,11 +118,8 @@ export default function SyncManager() {
 
   const syncMutation = useMutation({
     mutationFn: async (sourceId: string) => {
-      // Starte Sync-Anzeige
-      setLiveStats(prev => ({
-        ...prev,
-        runningSyncs: prev.runningSyncs + 1
-      }));
+      // ENTFERNT: Lokale runningSyncs-Manipulation - Dashboard-API übernimmt das
+      // setLiveStats(prev => ({ ...prev, runningSyncs: prev.runningSyncs + 1 }));
       
       console.log(`[SYNC-MANAGER] Starting optimized real-time sync for: ${sourceId}`);
       
@@ -146,11 +144,8 @@ export default function SyncManager() {
         console.error(`[SYNC-MANAGER] Sync failed for ${sourceId}:`, error);
         throw error;
       } finally {
-        // Reduziere laufende Syncs nach Abschluss
-        setLiveStats(prev => ({
-          ...prev,
-          runningSyncs: Math.max(0, prev.runningSyncs - 1)
-        }));
+        // ENTFERNT: Lokale runningSyncs-Manipulation - Dashboard-API übernimmt das
+        // setLiveStats(prev => ({ ...prev, runningSyncs: Math.max(0, prev.runningSyncs - 1) }));
       }
     },
     onSuccess: (data, sourceId) => {
@@ -196,11 +191,8 @@ export default function SyncManager() {
     onError: (error: any, sourceId) => {
       console.error(`[SYNC-MANAGER] Error for ${sourceId}:`, error);
       
-      // Reduziere laufende Syncs auch bei Fehlern
-      setLiveStats(prev => ({
-        ...prev,
-        runningSyncs: Math.max(0, prev.runningSyncs - 1)
-      }));
+      // ENTFERNT: Lokale runningSyncs-Manipulation - Dashboard-API übernimmt das
+      // setLiveStats(prev => ({ ...prev, runningSyncs: Math.max(0, prev.runningSyncs - 1) }));
       
       toast({
         title: "❌ Optimierte Synchronisation fehlgeschlagen", 
@@ -214,11 +206,8 @@ export default function SyncManager() {
     mutationFn: async () => {
       const activeSources = dataSources.filter(source => source.isActive);
       
-      // Zeige realistische Bulk-Sync-Aktivität
-      setLiveStats(prev => ({
-        ...prev,
-        runningSyncs: activeSources.length
-      }));
+      // ENTFERNT: Lokale runningSyncs-Manipulation - Dashboard-API übernimmt das  
+      // setLiveStats(prev => ({ ...prev, runningSyncs: activeSources.length }));
       
       console.log(`Starting real bulk sync for ${activeSources.length} sources...`);
       
