@@ -89,12 +89,12 @@ export default function SyncManager() {
 
   // Update live stats mit echten Dashboard-API-Daten
   useEffect(() => {
-    if (dashboardStats) {
+    if (dashboardStats && typeof dashboardStats === 'object') {
       setLiveStats(prev => ({
         ...prev,
-        runningSyncs: dashboardStats.runningSyncs || 0,
-        activeSources: dashboardStats.activeDataSources || prev.activeSources,
-        newUpdates: dashboardStats.recentUpdates?.toString() || prev.newUpdates
+        runningSyncs: (dashboardStats as any).runningSyncs || 0,
+        activeSources: (dashboardStats as any).activeDataSources || prev.activeSources,
+        newUpdates: ((dashboardStats as any).recentUpdates?.toString() || prev.newUpdates)
       }));
     }
   }, [dashboardStats]);
@@ -125,17 +125,10 @@ export default function SyncManager() {
       
       try {
         // Optimierte API-Requests mit korrekter Formatierung
-        const result = await apiRequest(`/api/data-sources/${sourceId}/sync`, { 
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            sourceId,
-            realTime: true,
-            optimized: true
-          })
+        const result = await apiRequest(`/api/data-sources/${sourceId}/sync`, 'POST', {
+          sourceId,
+          realTime: true,
+          optimized: true
         });
         
         console.log(`[SYNC-MANAGER] Sync completed for ${sourceId}:`, result);
@@ -219,16 +212,9 @@ export default function SyncManager() {
       
       try {
         // Optimierter Bulk-Sync API-Aufruf mit Performance-Tracking
-        const result = await apiRequest('/api/data-sources/sync-all', { 
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            optimized: true,
-            backgroundProcessing: true
-          })
+        const result = await apiRequest('/api/data-sources/sync-all', 'POST', {
+          optimized: true,
+          backgroundProcessing: true
         });
         
         console.log('[SYNC-MANAGER] Bulk sync completed:', result);
