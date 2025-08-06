@@ -131,12 +131,34 @@ export default function SyncManagerNew() {
       activeSourceIds.forEach((id: string) => initialProgress[id] = 'syncing');
       setSyncProgress(initialProgress);
 
-      const result = await apiCall('/api/data-sources/sync-all', 'POST', {
-        optimized: true,
-        backgroundProcessing: true
-      });
-      
-      return result;
+      try {
+        // Direct fetch API call für bessere Kontrolle
+        const response = await fetch('/api/data-sources/sync-all', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            optimized: true,
+            backgroundProcessing: true 
+          })
+        });
+
+        console.log(`[BULK SYNC] Response status:`, response.status);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        console.log(`[BULK SYNC] Response data:`, result);
+        return result;
+      } catch (error) {
+        console.error(`[BULK SYNC] Fetch error:`, error);
+        setBulkSyncActive(false);
+        throw error;
+      }
+
     },
     onSuccess: (data: SyncResult) => {
       console.log(`[BULK SYNC] Success:`, data);
