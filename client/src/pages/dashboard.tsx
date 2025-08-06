@@ -24,13 +24,14 @@ export default function Dashboard() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   
-  const { data: stats = {}, isLoading, error: statsError } = useQuery({
-    queryKey: ['/api/dashboard/stats', Date.now()], // Force cache bypass
-    staleTime: 0, // No cache
-    gcTime: 0, // No cache
+  const { data: stats, isLoading, error: statsError } = useQuery({
+    queryKey: ['/api/dashboard/stats'],
+    staleTime: 30000, // 30 seconds cache
+    gcTime: 60000, // 1 minute garbage collection
     refetchOnMount: true,
-    refetchOnWindowFocus: true,
-    refetchInterval: 10000, // Refresh every 10 seconds
+    refetchOnWindowFocus: false, // Prevent excessive refetching
+    retry: 3,
+    retryDelay: 1000,
   });
 
   const { data: recentUpdates, error: updatesError } = useQuery({
@@ -89,14 +90,20 @@ export default function Dashboard() {
     console.error('[FRONTEND] Updates error:', updatesError);
   }
 
+  // Debug logging
+  console.log('[DASHBOARD] Stats data:', stats);
+  console.log('[DASHBOARD] IsLoading:', isLoading);
+  console.log('[DASHBOARD] Newsletter sources:', newsletterSources);
+
   if (isLoading) {
     return (
       <div className="p-6 space-y-6">
         <div className="text-center mb-4">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
           <p className="text-gray-600">Lade Dashboard-Daten...</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[...Array(8)].map((_, i) => (
+          {[...Array(4)].map((_, i) => (
             <Card key={i} className="animate-pulse">
               <CardHeader className="space-y-0 pb-2">
                 <div className="h-4 bg-gray-200 rounded w-1/2"></div>
