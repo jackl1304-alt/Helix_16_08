@@ -62,17 +62,29 @@ export default function RegulatoryUpdates() {
     end: ""
   });
 
-  // Fetch regulatory updates - KORRIGIERTE API-ROUTE
-  const { data: response, isLoading } = useQuery<{success: boolean, data: RegulatoryUpdate[], timestamp: string}>({
+  // Fetch regulatory updates - VEREINFACHT UND STABIL
+  const { data: response, isLoading, error } = useQuery<{success: boolean, data: RegulatoryUpdate[], timestamp: string}>({
     queryKey: ['/api/regulatory-updates/recent'],
-    queryFn: () => fetch('/api/regulatory-updates/recent?limit=5000').then(res => res.json()),
-    staleTime: 1 * 60 * 1000, // 1 Minute Cache für frischere Daten
+    queryFn: async () => {
+      const response = await fetch('/api/regulatory-updates/recent?limit=5000');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      return response.json();
+    },
+    staleTime: 2 * 60 * 1000, // 2 Minuten Cache
+    retry: 3,
   });
 
   const updatesArray = Array.isArray(response?.data) ? response.data : [];
   
-  // Debug output für Datenverbindung
-  console.log(`REGULATORY UPDATES LOADED: ${updatesArray.length} Updates verfügbar`, response?.success, response?.data?.length);
+  // Debug output für Datenverbindung - BEREINIGT
+  console.log(`REGULATORY UPDATES: ${updatesArray.length} verfügbar, API Success: ${response?.success}`);
+  
+  // Error handling
+  if (error) {
+    console.error('Regulatory Updates Fehler:', error);
+  }
 
   // Filter logic
   const filteredUpdates = updatesArray.filter((update) => {
