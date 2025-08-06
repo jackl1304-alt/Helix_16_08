@@ -23,11 +23,13 @@ interface RegulatoryUpdateDetailProps {
 export default function RegulatoryUpdateDetail({ params }: RegulatoryUpdateDetailProps) {
   const [, setLocation] = useLocation();
   
-  const { data: update, isLoading } = useQuery({
-    queryKey: ['/api/regulatory-updates', params.id],
+  const { data: updates, isLoading } = useQuery({
+    queryKey: ['/api/regulatory-updates'],
     staleTime: 300000, // 5 minutes
     gcTime: 600000, // 10 minutes
   });
+
+  const update = updates?.find((u: any) => u.id === params.id);
 
   if (isLoading) {
     return (
@@ -48,9 +50,9 @@ export default function RegulatoryUpdateDetail({ params }: RegulatoryUpdateDetai
           <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Artikel nicht gefunden</h2>
           <p className="text-gray-600 mb-4">Das angeforderte Regulatory Update existiert nicht.</p>
-          <Button onClick={() => setLocation('/dashboard')} variant="outline">
+          <Button onClick={() => setLocation('/regulatory-updates')} variant="outline">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Zurück zum Dashboard
+            Zurück zu Regulatory Updates
           </Button>
         </div>
       </div>
@@ -62,12 +64,12 @@ export default function RegulatoryUpdateDetail({ params }: RegulatoryUpdateDetai
       {/* Header */}
       <div className="mb-6">
         <Button 
-          onClick={() => setLocation('/dashboard')} 
+          onClick={() => setLocation('/regulatory-updates')} 
           variant="ghost" 
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Zurück zum Dashboard
+          Zurück zu Regulatory Updates
         </Button>
         
         <div className="flex justify-between items-start mb-4">
