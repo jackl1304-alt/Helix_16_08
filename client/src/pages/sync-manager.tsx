@@ -45,6 +45,13 @@ export default function SyncManager() {
     queryKey: ['/api/data-sources'],
   });
 
+  // Dashboard Stats für Live-Sync-Tracking
+  const { data: dashboardStats } = useQuery({
+    queryKey: ['/api/dashboard/stats'],
+    refetchInterval: 30000, // Alle 30 Sekunden aktualisieren
+    staleTime: 15000, // 15 Sekunden
+  });
+
   // Funktion zum Laden der Updates für das Modal
   const loadRecentUpdatesForModal = async () => {
     setLoadingUpdates(true);
@@ -78,6 +85,18 @@ export default function SyncManager() {
     newUpdates: "0", // Startet mit 0 - zeigt nur neue Updates
     activeSources: 46
   });
+
+  // Update live stats mit echten Dashboard-API-Daten
+  useEffect(() => {
+    if (dashboardStats) {
+      setLiveStats(prev => ({
+        ...prev,
+        runningSyncs: dashboardStats.runningSyncs || 0,
+        activeSources: dashboardStats.activeDataSources || prev.activeSources,
+        newUpdates: dashboardStats.recentUpdates?.toString() || prev.newUpdates
+      }));
+    }
+  }, [dashboardStats]);
 
   // Update live stats - verhindere Endlosschleife
   useEffect(() => {
