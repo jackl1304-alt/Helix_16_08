@@ -2549,6 +2549,82 @@ Weitere Details werden noch verarbeitet. Bitte wenden Sie sich an die offizielle
     }
   });
 
+  // ========== NEW INDIVIDUAL DATA SOURCE SYNC ENDPOINTS ==========
+  
+  // Individual data source sync endpoint
+  app.post("/api/data-sources/:sourceId/sync", async (req, res) => {
+    try {
+      const { sourceId } = req.params;
+      const { optimized = true, realTime = true } = req.body;
+      
+      console.log(`[API] Individual sync requested for ${sourceId}`, { optimized, realTime });
+      
+      // Find the data source
+      const dataSources = await storage.getAllDataSources();
+      const dataSource = dataSources.find(s => s.id === sourceId);
+      
+      if (!dataSource) {
+        return res.status(404).json({
+          success: false,
+          message: `Data source '${sourceId}' not found`,
+          sourceId
+        });
+      }
+      
+      if (!dataSource.is_active) {
+        return res.status(400).json({
+          success: false,
+          message: `Data source '${sourceId}' is not active`,
+          sourceId
+        });
+      }
+      
+      console.log(`[API] Starting sync for ${dataSource.name} (${sourceId})`);
+      const startTime = Date.now();
+      
+      // Run optimized sync for this specific source
+      let result;
+      try {
+        result = await optimizedSyncService.syncDataSource(sourceId, { optimized });
+      } catch (error: any) {
+        console.error(`[API] Sync failed for ${sourceId}:`, error);
+        return res.status(500).json({
+          success: false,
+          message: `Sync failed: ${error.message}`,
+          sourceId,
+          error: error.message
+        });
+      }
+      
+      const duration = Date.now() - startTime;
+      console.log(`[API] Sync completed for ${sourceId} in ${duration}ms`);
+      
+      // Update last sync timestamp
+      await storage.updateDataSourceLastSync(sourceId, new Date());
+      
+      res.json({
+        success: true,
+        message: `${dataSource.name} synchronized successfully`,
+        sourceId,
+        sourceName: dataSource.name,
+        duration,
+        newUpdatesCount: result.newItems || 0,
+        existingCount: result.processedItems || 0,
+        errors: result.errors || [],
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error(`[API] Individual sync error:`, error);
+      res.status(500).json({
+        success: false,
+        message: "Individual sync failed",
+        error: error.message,
+        sourceId: req.params.sourceId
+      });
+    }
+  });
+
   // ========== PHASE 1 NEW API ENDPOINTS ==========
   
   // FDA OpenAPI Integration
