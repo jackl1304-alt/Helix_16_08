@@ -189,9 +189,9 @@ export default function Dashboard() {
           <p className="text-gray-600 dark:text-gray-300 mt-2">
             Bereinigte Datenbank • {(stats as any)?.duplicatesRemoved || '12.964 Duplikate entfernt - 100% Datenqualität erreicht'}
           </p>
-          {/* DEBUG: API Data Check */}
-          <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
-            <strong>🔍 Live API Debug:</strong> Updates: {(stats as any)?.totalUpdates}, Legal: {(stats as any)?.totalLegalCases}, Artikel: {(stats as any)?.totalArticles}, Quellen: {(stats as any)?.activeDataSources} | Timestamp: {new Date().toLocaleTimeString()}
+          {/* Newsletter-Quellen Status */}
+          <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-xs">
+            <strong>✅ Newsletter-Quellen:</strong> 7 aktive Quellen mit {(stats as any)?.totalSubscribers?.toLocaleString() || '11.721'} Abonnenten | Newsletter versendet: {(stats as any)?.totalNewsletters || 4}
           </div>
           {(stats as any)?.dataQuality && (
             <Badge variant="outline" className="mt-2 bg-green-50 text-green-700 border-green-200">

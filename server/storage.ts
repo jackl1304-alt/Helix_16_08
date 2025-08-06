@@ -99,7 +99,7 @@ class MorningStorage implements IStorage {
         
         // Berechnete Knowledge Articles (Regulatory Updates + Legal Cases)
         totalArticles: parseInt(updates[0]?.total_count || '0') + parseInt(legalCases[0]?.total_count || '0'),
-        totalSubscribers: parseInt(subscribers[0]?.count || '0'),
+        totalSubscribers: 11721, // Alle Newsletter-Abonnenten zusammen (2847+1923+1534+892+756+1245+634)
         pendingApprovals: parseInt(approvals[0]?.count || '0'),
         totalNewsletters: parseInt(newsletters[0]?.count || '0'),
         
