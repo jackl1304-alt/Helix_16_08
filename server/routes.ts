@@ -43,6 +43,14 @@ interface User {
   createdAt: string;
 }
 import { storage } from "./storage";
+import { neon } from "@neondatabase/serverless";
+
+// SQL connection for newsletter sources
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  throw new Error('DATABASE_URL environment variable is required');
+}
+const sql = neon(DATABASE_URL);
 import adminRoutes from "./routes/admin.routes";
 import errorRoutes from "./routes/errors";
 import gripRoutes from "./routes/grip.routes";
@@ -1046,6 +1054,14 @@ Weitere Details werden noch verarbeitet. Bitte wenden Sie sich an die offizielle
       console.log(`Fetched data sources: ${dataSources.length}`);
       
       // Get newsletter sources from dedicated table instead of data_sources
+      const DATABASE_URL = process.env.DATABASE_URL;
+      if (!DATABASE_URL) {
+        throw new Error('DATABASE_URL is required');
+      }
+      
+      const { neon } = await import('@neondatabase/serverless');
+      const sql = neon(DATABASE_URL);
+      
       const newsletterSources = await sql`
         SELECT 
           id,
