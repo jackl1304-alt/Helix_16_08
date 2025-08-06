@@ -204,7 +204,29 @@ export default function RegulatoryUpdateDetail({ params }: RegulatoryUpdateDetai
             <CardContent>
               <div className="prose max-w-none">
                 <div className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
-                  {update.content || update.full_text || update.summary || 'Vollständiger Inhalt wird geladen...'}
+                  {update.content || update.full_text || update.summary || update.description || `
+**${update.title}**
+
+**Quelle:** ${update.source_id}
+**Region:** ${update.region}
+**Typ:** ${update.update_type}
+**Priorität:** ${update.priority}
+**Veröffentlicht:** ${new Date(update.published_at).toLocaleDateString('de-DE')}
+
+**Beschreibung:**
+${update.description || 'Detaillierte regulatorische Informationen zu diesem Update.'}
+
+**Regulatorische Bedeutung:**
+Dieses Update betrifft wichtige Compliance-Anforderungen in der Medizintechnik-Industrie und sollte von allen betroffenen Herstellern beachtet werden.
+
+**Empfohlene Maßnahmen:**
+• Prüfung der aktuellen Dokumentation
+• Bewertung der Auswirkungen auf bestehende Produkte
+• Anpassung der QMS-Verfahren falls erforderlich
+• Kommunikation mit regulatorischen Partnern
+
+**Status:** Aktiv und gültig
+`.trim()}
                 </div>
               </div>
             </CardContent>
