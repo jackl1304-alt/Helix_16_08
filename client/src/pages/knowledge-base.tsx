@@ -42,7 +42,7 @@ function KnowledgeBasePage() {
 
   // Fetch knowledge articles - ECHTE NEWSLETTER-DATEN
   const { data: realArticlesData, isLoading: articlesLoading, error } = useQuery({
-    queryKey: ['/api/knowledge-base'],
+    queryKey: ['/api/knowledge-articles'],
     staleTime: 300000, // 5 minutes
   });
 
