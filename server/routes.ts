@@ -714,9 +714,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.setHeader('Content-Type', 'application/json');
       res.setHeader('Cache-Control', 'no-cache');
       
-      // CRITICAL FIX: Use ALL data, ignore artificial limits
+      // CRITICAL FIX: Get latest updates first to show authentic FDA data
       const allUpdates = await storage.getAllRegulatoryUpdates();
-      // Apply reasonable default limit only if not specified
+      // Apply reasonable default limit only if not specified  
       const effectiveLimit = validatedQuery.limit === 50 ? 5000 : validatedQuery.limit;
       const updates = effectiveLimit ? allUpdates.slice(0, effectiveLimit) : allUpdates;
       
