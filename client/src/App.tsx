@@ -37,7 +37,7 @@ const KnowledgeBase = lazy(() => import("@/pages/knowledge-base"));
 const HistoricalData = lazy(() => import("@/pages/historical-data-simple"));
 const IntelligentSearch = lazy(() => import("@/pages/intelligent-search"));
 const DocumentViewer = lazy(() => import("@/pages/document-viewer"));
-const SyncManager = lazy(() => import("@/pages/sync-manager"));
+const SyncManagerNew = lazy(() => import("@/pages/sync-manager-new"));
 const Phase1Integration = lazy(() => import("@/pages/phase1-integration"));
 const AIContentAnalysis = lazy(() => import("@/pages/ai-content-analysis"));
 const Phase2Integration = lazy(() => import("@/pages/phase2-integration"));
@@ -72,7 +72,7 @@ function Router() {
         <Route path="/regulatory-updates/:id" component={RegulatoryUpdateDetail} />
         <Route path="/regulatory-updates" component={RegulatoryUpdatesFinal} />
         <Route path="/regulatory-updates-old" component={RegulatoryUpdatesNew} />
-        <Route path="/sync-manager" component={SyncManager} />
+        <Route path="/sync-manager" component={SyncManagerNew} />
         <Route path="/newsletter-manager" component={NewsletterManager} />
         <Route path="/approval-workflow" component={ApprovalWorkflow} />
         <Route path="/user-management" component={UserManagement} />
