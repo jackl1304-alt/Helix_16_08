@@ -383,11 +383,12 @@ class MorningStorage implements IStorage {
   async getAllRegulatoryUpdates() {
     try {
       console.log('[DB] getAllRegulatoryUpdates called - ALLE DATEN FÜR FRONTEND');
-      // Frontend-Anzeige: Alle verfügbaren Regulatory Updates
-      // (Frontend kann selbst entscheiden, welche als "archiviert" gelten)
+      // Frontend-Anzeige: Priorität auf authentische FDA-Daten, dann andere Updates
       const result = await sql`
         SELECT * FROM regulatory_updates 
-        ORDER BY published_at DESC
+        ORDER BY 
+          CASE WHEN source_id = 'fda_510k' THEN 1 ELSE 2 END,
+          created_at DESC
         LIMIT 5000
       `;
       console.log(`[DB] Alle regulatory updates für Frontend: ${result.length} Einträge`);
