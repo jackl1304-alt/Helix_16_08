@@ -52,7 +52,19 @@ export default function DataCollection() {
   const syncMutation = useMutation({
     mutationFn: async (sourceId: string) => {
       console.log(`Frontend: Starting documentation for source ${sourceId}`);
-      const result = await apiRequest(`/api/data-sources/${sourceId}/document`, "POST");
+      const response = await fetch(`/api/data-sources/${sourceId}/document`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({})
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
       console.log(`Frontend: Documentation result:`, result);
       return result;
     },
@@ -221,7 +233,24 @@ export default function DataCollection() {
 
   const addSourceMutation = useMutation({
     mutationFn: async (sourceData: any) => {
-      return await apiRequest('/api/data-sources', 'POST', sourceData);
+      try {
+        const response = await fetch('/api/data-sources', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(sourceData)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
+      } catch (error) {
+        console.error("Add source error:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/data-sources"] });
@@ -243,7 +272,24 @@ export default function DataCollection() {
 
   const saveSettingsMutation = useMutation({
     mutationFn: async (settings: any) => {
-      return await apiRequest('/api/settings/data-collection', 'POST', settings);
+      try {
+        const response = await fetch('/api/settings/data-collection', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(settings)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
+      } catch (error) {
+        console.error("Save settings error:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
       toast({

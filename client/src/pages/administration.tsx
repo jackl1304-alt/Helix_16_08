@@ -58,8 +58,20 @@ export default function Administration() {
   const handleDuplicateSearch = async () => {
     setDuplicateSearchLoading(true);
     try {
-      const response = await apiRequest('/api/admin/search-duplicates', 'POST');
-      const data = response.data;
+      const response = await fetch('/api/admin/search-duplicates', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({})
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const responseData = await response.json();
+      const data = responseData.data;
       
       // Transform the data to match the expected format
       const transformedResults = {
@@ -92,11 +104,23 @@ export default function Administration() {
   const handleAutoRemoveDuplicates = async () => {
     setDeleteLoading(true);
     try {
-      const response = await apiRequest('/api/admin/cleanup-duplicates', 'POST');
+      const response = await fetch('/api/admin/cleanup-duplicates', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({})
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const responseData = await response.json();
       
       toast({
         title: "Automatische Bereinigung abgeschlossen",
-        description: response.message || `${response.data?.duplicatesRemoved || 0} Duplikate entfernt`,
+        description: `${responseData.data?.duplicatesRemoved || 0} Duplikate entfernt`,
       });
       
       // Clear results and refresh
@@ -318,7 +342,24 @@ export default function Administration() {
   // Execute phase action
   const executePhase = useMutation({
     mutationFn: async ({ phaseId, action }: { phaseId: string, action: 'start' | 'pause' | 'restart' }) => {
-      return await apiRequest(`/api/admin/phases/${phaseId}/${action}`, 'POST');
+      try {
+        const response = await fetch(`/api/admin/phases/${phaseId}/${action}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({})
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
+      } catch (error) {
+        console.error("Phase execution error:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/development-phases'] });

@@ -35,22 +35,52 @@ export default function Orders() {
   });
 
   const processOrderMutation = useMutation({
-    mutationFn: (orderId: string) => 
-      apiRequest('/api/ai/process-order', {
-        method: 'POST',
-        body: { orderId }
-      }),
+    mutationFn: async (orderId: string) => {
+      try {
+        const response = await fetch('/api/ai/process-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ orderId })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
+      } catch (error) {
+        console.error("Process order error:", error);
+        throw error;
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/orders'] });
     },
   });
 
   const updateOrderMutation = useMutation({
-    mutationFn: ({ orderId, status }: { orderId: string; status: string }) => 
-      apiRequest(`/api/orders/${orderId}`, {
-        method: 'PATCH',
-        body: { status }
-      }),
+    mutationFn: async ({ orderId, status }: { orderId: string; status: string }) => {
+      try {
+        const response = await fetch(`/api/orders/${orderId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ status })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
+      } catch (error) {
+        console.error("Update order error:", error);
+        throw error;
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/orders'] });
     },

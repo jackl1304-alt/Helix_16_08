@@ -8,16 +8,16 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+// FIXED: Robust API request function with proper error handling
 export async function apiRequest(
   url: string,
   method: string = 'GET',
   data?: any
 ): Promise<any> {
-  console.log(`[API REQUEST] ${method} ${url}`, data);
+  console.log(`[API] ${method} ${url}`, data);
   
-  // Ensure we have default options
   const requestOptions: RequestInit = {
-    method,
+    method: method.toUpperCase(),
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
@@ -25,29 +25,33 @@ export async function apiRequest(
     credentials: "include",
   };
   
-  // Add body for POST requests
-  if (method === 'POST' && data) {
+  // Add body for POST, PUT, PATCH requests
+  if (['POST', 'PUT', 'PATCH'].includes(method.toUpperCase()) && data) {
     requestOptions.body = JSON.stringify(data);
-    console.log('[API REQUEST] POST body:', requestOptions.body);
+    console.log(`[API] Request body:`, requestOptions.body);
   }
   
   try {
-    const res = await fetch(url, requestOptions);
-    console.log(`[API REQUEST] Response status: ${res.status} for ${url}`);
+    const response = await fetch(url, requestOptions);
+    console.log(`[API] Response ${response.status} for ${url}`);
 
-    await throwIfResNotOk(res);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`[API] Error ${response.status}: ${errorText}`);
+      throw new Error(`HTTP ${response.status}: ${errorText || response.statusText}`);
+    }
     
-    // Return JSON if response has content, otherwise return empty object
-    const contentType = res.headers.get("content-type");
+    const contentType = response.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
-      const result = await res.json();
-      console.log(`[API REQUEST] Success response:`, result);
+      const result = await response.json();
+      console.log(`[API] Success:`, result);
       return result;
     }
-    console.log(`[API REQUEST] Non-JSON response for ${url}`);
+    
+    console.log(`[API] Non-JSON response for ${url}`);
     return {};
   } catch (error) {
-    console.error(`[API REQUEST] Error for ${method} ${url}:`, error);
+    console.error(`[API] Fetch error for ${method} ${url}:`, error);
     throw error;
   }
 }
