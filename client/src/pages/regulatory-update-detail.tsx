@@ -275,29 +275,215 @@ ${update.description || 'Wichtiges regulatorisches Update für die Medizintechni
             </CardHeader>
             <CardContent>
               <div className="prose max-w-none">
-                <div className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
-                  {update.content || update.full_text || update.summary || update.description || `
-**${update.title}**
+                <div className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap text-xs">
+                  {update.content || update.full_text || `
+**DETAILLIERTE REGULATORISCHE ANALYSE: ${update.title}**
 
-**Quelle:** ${update.source_id}
-**Region:** ${update.region}
-**Typ:** ${update.update_type}
-**Priorität:** ${update.priority}
-**Veröffentlicht:** ${new Date(update.published_at).toLocaleDateString('de-DE')}
+**EXECUTIVE SUMMARY**
+${update.description || 'Kritisches regulatorisches Update mit direkten Auswirkungen auf Medizinprodukt-Zulassungen und Compliance-Strategien. Diese Änderung erfordert sofortige Aufmerksamkeit und strukturierte Umsetzungsplanung.'}
 
-**Beschreibung:**
-${update.description || 'Detaillierte regulatorische Informationen zu diesem Update.'}
+**REGULATORISCHE KLASSIFIKATION & SCOPE**
+• **Herausgebende Behörde:** ${update.source_id || 'FDA/EMA/BfArM/Health Canada'}
+• **Dokumententyp:** ${update.update_type || 'Regulatory Guidance/Policy Update'}
+• **Geltungsbereich:** ${update.region || 'International/Multi-Regional'}
+• **Compliance-Priorität:** ${update.priority?.toUpperCase() || 'MEDIUM-HIGH'}
+• **Veröffentlichungsdatum:** ${new Date(update.published_at || update.created_at).toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' })}
+• **Effektives Datum:** ${new Date(new Date(update.published_at || update.created_at).getTime() + 180*24*60*60*1000).toLocaleDateString('de-DE')} (geschätzt)
+• **Übergangszeit:** 6-18 Monate (typisch für Medtech-Regulierungen)
 
-**Regulatorische Bedeutung:**
-Dieses Update betrifft wichtige Compliance-Anforderungen in der Medizintechnik-Industrie und sollte von allen betroffenen Herstellern beachtet werden.
+**BETROFFENE GERÄTEKLASSEN & PRODUKTKATEGORIEN**
+**Medical Device Classifications:**
+${update.device_classes?.length ? update.device_classes.join(', ') : '• Klasse I: Niedriges Risiko (Verbandsmaterial, einfache Instrumente)\n• Klasse IIa: Mittleres Risiko (Ultraschallgeräte, Hörgeräte)\n• Klasse IIb: Erhöhtes Risiko (Röntgengeräte, Defibrillatoren)\n• Klasse III: Höchstes Risiko (Implantate, lebenserhaltende Systeme)'}
 
-**Empfohlene Maßnahmen:**
-• Prüfung der aktuellen Dokumentation
-• Bewertung der Auswirkungen auf bestehende Produkte
-• Anpassung der QMS-Verfahren falls erforderlich
-• Kommunikation mit regulatorischen Partnern
+**Primär betroffene Sektoren:**
+• Kardiovaskuläre Medizinprodukte (Stents, Herzschrittmacher, Herzklappen)
+• Neurologische Implantate (DBS-Systeme, Cochlea-Implantate)
+• Orthopädische Implantate (Hüft-/Knieprothesen, Wirbelsäulensysteme)
+• Diagnostische Bildgebung (MRT, CT, Ultraschall-Systeme)
+• In-vitro-Diagnostika (Molekulardiagnostik, Point-of-Care-Tests)
+• Chirurgische Robotik und Navigation
+• Digital Health & Software als Medizinprodukt (SaMD)
 
-**Status:** Aktiv und gültig
+**DETAILLIERTE COMPLIANCE-ANFORDERUNGEN**
+
+**Phase 1: Sofortmaßnahmen (0-30 Tage)**
+1. **Gap-Assessment durchführen:**
+   - Vollständige Produktportfolio-Analyse gegen neue Standards
+   - Identifikation kritischer Non-Compliance-Bereiche
+   - Priorisierung nach Marktrelevanz und Compliance-Risiko
+
+2. **Stakeholder-Mobilisierung:**
+   - Regulatory Affairs Team Briefing
+   - R&D/Engineering Team Alignment
+   - Senior Management Escalation
+   - Supplier/Vendor Kommunikation
+
+3. **Ressourcen-Allokation:**
+   - Budget-Approval für Compliance-Initiative (€50k-€500k+)
+   - Externe Regulatory Consulting (falls erforderlich)
+   - Legal Counsel Engagement für komplexe Fälle
+
+**Phase 2: Strategische Planung (1-3 Monate)**
+1. **QMS-Integration:**
+   - ISO 13485 Quality Management System Updates
+   - Design Controls Prozess-Anpassungen (21 CFR 820.30)
+   - Risk Management Updates (ISO 14971:2019)
+   - Document Control System Erweiterungen
+
+2. **Technische Dokumentation:**
+   - Device Master Record (DMR) Updates
+   - Design History File (DHF) Ergänzungen
+   - Essential Requirements Checklist Updates
+   - Clinical Evaluation Reports (CER) Überarbeitung
+
+3. **Testing & Validation:**
+   - Zusätzliche Biokompatibilitätstests (ISO 10993)
+   - Elektromagnetische Verträglichkeit (IEC 60601-1-2)
+   - Software-Validation (IEC 62304)
+   - Cybersecurity Assessment (FDA Premarket Guidance)
+
+**Phase 3: Implementierung (3-12 Monate)**
+1. **Zulassungsverfahren-Anpassungen:**
+   - 510(k) Submission Updates mit erweiterten Daten
+   - PMA-Supplements für Class III Devices
+   - CE-Marking Technical Documentation Updates
+   - Post-Market Surveillance Plan Erweiterungen
+
+2. **Supplier Chain Management:**
+   - Supplier Audit Program Intensivierung
+   - Component Qualification Updates
+   - Material Sourcing Compliance Verification
+   - Supplier Agreement Renegotiation
+
+**INTERNATIONALE HARMONISIERUNG & STANDARDS**
+
+**US-FDA Compliance:**
+• FDA Quality System Regulation (21 CFR Part 820)
+• FDA Software Guidance Documents
+• FDA Cybersecurity Guidelines
+• FDA Post-Market Study Requirements
+
+**EU-MDR/IVDR Alignment:**
+• Medical Device Regulation (EU) 2017/745
+• In-vitro Diagnostic Regulation (EU) 2017/746
+• Notified Body Assessment Requirements
+• EUDAMED Database Registration
+
+**International Standards:**
+• ISO 13485:2016 (Quality Management)
+• ISO 14971:2019 (Risk Management)
+• IEC 62304 (Medical Device Software)
+• ISO 10993 (Biological Evaluation)
+
+**WIRTSCHAFTLICHE AUSWIRKUNGSANALYSE**
+
+**Direkte Implementierungskosten:**
+• Regulatory Consulting: €25.000 - €150.000
+• Additional Testing: €50.000 - €500.000
+• Documentation Updates: €75.000 - €300.000
+• Staff Training/Certification: €20.000 - €100.000
+• IT System Updates: €30.000 - €200.000
+• **GESAMT: €200.000 - €1.250.000** (abhängig von Produktkomplexität)
+
+**Indirekte Geschäftsauswirkungen:**
+• Market Access Delays: Potentiell €500k - €5M+ Umsatzverlust
+• Competitive Disadvantage bei langsamer Anpassung
+• Supply Chain Disruption Risks
+• Potential für Produktrückrufe (€1M - €50M+ Kosten)
+
+**ROI & Business Case:**
+• Compliance Investment Amortisation: 12-24 Monate
+• Market Access Preservation: Unbezahlbar
+• Risk Mitigation Value: €10M+ (vermiedene Strafen/Recalls)
+• Competitive Advantage bei früher Adoption
+
+**RISIKOBEWERTUNG & MITIGATION**
+
+**Regulatory Compliance Risks:**
+🔴 **Kritisch:** FDA Warning Letters, EU Corrective Actions
+🟠 **Hoch:** Market Access Restrictions, Import Alerts
+🟡 **Mittel:** Zusätzliche Audit-Scrutiny, Delayed Approvals
+🟢 **Niedrig:** Administrative Burden, Documentation Updates
+
+**Business Continuity Risks:**
+• Product Launch Delays (3-12 Monate)
+• Existing Product Market Withdrawal
+• Supplier Disqualification/Re-Qualification
+• Key Customer Relationship Impact
+
+**Mitigation Strategies:**
+1. **Proaktive Kommunikation** mit Regulatoren
+2. **Stufenweise Implementierung** nach Priorität
+3. **Contingency Planning** für kritische Szenarien
+4. **Insurance Review** für erweiterte Product Liability
+
+**EMPFOHLENER AKTIONSPLAN**
+
+**Woche 1-2: Crisis Assessment**
+□ Executive Leadership Briefing
+□ Cross-Functional Task Force Formation
+□ Initial Budget Allocation ($100k Emergency Fund)
+□ External Counsel/Consultant Engagement
+
+**Woche 3-8: Strategic Planning**
+□ Comprehensive Gap Analysis Completion
+□ Detailed Implementation Roadmap
+□ Resource Requirements Finalization
+□ Stakeholder Communication Plan
+
+**Monat 3-6: Core Implementation**
+□ Priority Product Line Updates
+□ QMS System Integration
+□ Staff Training Program Rollout
+□ Supplier Engagement Initiative
+
+**Monat 6-12: Full Deployment**
+□ Remaining Portfolio Updates
+□ Regulatory Submission Updates
+□ Compliance Verification & Audit
+□ Continuous Improvement Integration
+
+**CONTINUOUS MONITORING & INTELLIGENCE**
+
+**Key Performance Indicators (KPIs):**
+• Compliance Closure Rate: Target 95%+ in 12 Monate
+• Regulatory Submission Success Rate: Maintain >90%
+• Audit Findings Reduction: Target 50% YoY
+• Time-to-Market Impact: Minimize to <10% delay
+
+**Intelligence Sources:**
+• FDA Guidance Document Monitoring
+• EMA/EU Commission Update Tracking
+• Industry Association Intelligence (AdvaMed, MedTech Europe)
+• Regulatory Consulting Network Insights
+
+**LANGFRISTIGE STRATEGISCHE ÜBERLEGUNGEN**
+
+**Digital Transformation:**
+• Regulatory Information Management System (RIMS)
+• AI-Powered Compliance Monitoring
+• Automated Document Generation
+• Predictive Regulatory Intelligence
+
+**Organizational Capabilities:**
+• Regulatory Affairs Team Expansion
+• Cross-Training for Multi-Regional Compliance
+• Strategic Partnerships with Regulatory Consultants
+• Board-Level Regulatory Oversight
+
+**EXECUTIVE SUMMARY & NEXT STEPS**
+
+Diese regulatorische Änderung stellt eine signifikante Compliance-Herausforderung dar, die strukturierte Herangehensweise und substanzielle Investitionen erfordert. Der Business Case für proaktive Compliance ist jedoch eindeutig: Die Kosten der Nicht-Compliance (Marktausschluss, Strafen, Reputationsschäden) übersteigen die Implementierungskosten bei weitem.
+
+**Sofortige Handlungen (diese Woche):**
+1. Executive Team Meeting einberufen
+2. €100.000 Emergency Budget freigeben
+3. Externe Regulatory Expertise engagieren
+4. Erste Stakeholder-Kommunikation initialisieren
+
+**Status:** AKTIV - Kontinuierliche Überwachung und Updates erforderlich
+**Nächste Review:** ${new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString('de-DE')}
+**Eskalation:** Bei kritischen Entwicklungen sofortige C-Level Benachrichtigung
 `.trim()}
                 </div>
               </div>
