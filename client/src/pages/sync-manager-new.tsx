@@ -226,6 +226,10 @@ export default function SyncManagerNew() {
         <Button 
           onClick={() => {
             console.log('[UI] Bulk sync button clicked');
+            console.log('[UI] Current mutation state:', { 
+              isActive: bulkSyncActive, 
+              isPending: bulkSyncMutation.isPending 
+            });
             bulkSyncMutation.mutate();
           }}
           disabled={bulkSyncActive || bulkSyncMutation.isPending}
