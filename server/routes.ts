@@ -1045,11 +1045,40 @@ Weitere Details werden noch verarbeitet. Bitte wenden Sie sich an die offizielle
       const dataSources = await storage.getAllDataSources();
       console.log(`Fetched data sources: ${dataSources.length}`);
       
-      // Count active sources
-      const activeSources = dataSources.filter(source => source.isActive !== false);
-      console.log(`Active sources: ${activeSources.length}`);
+      // Get newsletter sources from dedicated table instead of data_sources
+      const newsletterSources = await sql`
+        SELECT 
+          id,
+          name,
+          source_url,
+          description,
+          frequency,
+          is_active,
+          categories,
+          last_issue_date,
+          subscriber_count,
+          created_at
+        FROM newsletter_sources 
+        WHERE is_active = true
+        ORDER BY subscriber_count DESC, name ASC
+      `;
       
-      res.json(dataSources);
+      console.log(`Fetched newsletter sources: ${newsletterSources.length}`);
+      
+      const formattedSources = newsletterSources.map(source => ({
+        id: source.id,
+        name: source.name,
+        sourceUrl: source.source_url,
+        description: source.description,
+        frequency: source.frequency,
+        isActive: source.is_active,
+        categories: source.categories || [],
+        lastIssueDate: source.last_issue_date,
+        subscriberCount: source.subscriber_count,
+        createdAt: source.created_at
+      }));
+      
+      res.json(formattedSources);
     } catch (error: any) {
       console.error('Failed to get newsletter sources:', error);
       res.status(500).json({
