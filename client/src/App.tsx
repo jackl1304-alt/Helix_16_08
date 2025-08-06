@@ -50,6 +50,7 @@ const NewsletterAdmin = lazy(() => import("@/pages/newsletter-admin"));
 const AdvancedAnalytics = lazy(() => import("@/pages/advanced-analytics"));
 const RegulatoryUpdateDetail = lazy(() => import("@/pages/regulatory-update-detail"));
 const RechtsprechungFixed = lazy(() => import("@/pages/rechtsprechung-fixed"));
+const TerminologyGlossary = lazy(() => import("@/pages/terminology-glossary"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -83,6 +84,7 @@ function Router() {
 
         <Route path="/knowledge-base" component={KnowledgeBase} />
         <Route path="/rechtsprechung" component={RechtsprechungFixed} />
+        <Route path="/terminology" component={TerminologyGlossary} />
         <Route path="/historical-data" component={HistoricalData} />
         <Route path="/intelligent-search" component={IntelligentSearch} />
 
