@@ -364,9 +364,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`[API] Final active sources count for bulk sync: ${activeSources.length}`);
       
-      // Import des Data Collection Services (funktioniert bereits)
-      const dataCollectionModule = await import('./services/dataCollectionService');
-      const dataService = new dataCollectionModule.DataCollectionService();
+      // Import des optimierten Sync-Service für Bulk-Operationen
+      const { optimizedSyncService } = await import('./services/optimizedSyncService');
       
       // Parallele Synchronisation mit begrenzter Konkurrenz (max 5 gleichzeitig)
       const batchSize = 5;
@@ -383,13 +382,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const startTime = Date.now();
             const existingCount = await storage.countRegulatoryUpdatesBySource(source.id) || 0;
             
-            // Echte Synchronisation mit bekanntem DataCollectionService
-            await dataService.syncDataSource(source.id);
-            await storage.updateDataSourceLastSync(source.id, new Date());
+            // Verwende optimierten Sync-Service für Bulk-Sync
+            const syncResult = await optimizedSyncService.syncDataSourceWithMetrics(source.id, { optimized: true });
             
-            const updatedCount = await storage.countRegulatoryUpdatesBySource(source.id) || 0;
-            const newUpdatesCount = Math.max(0, updatedCount - existingCount);
-            const duration = (Date.now() - startTime);
+            // Update last sync time only on success
+            if (syncResult.success) {
+              await storage.updateDataSourceLastSync(source.id, new Date());
+            }
+            
+            const newUpdatesCount = syncResult.newUpdatesCount;
+            const duration = syncResult.metrics.duration;
             
             return {
               sourceId: source.id,
