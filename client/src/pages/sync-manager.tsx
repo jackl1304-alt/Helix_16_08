@@ -294,6 +294,7 @@ export default function SyncManager() {
   };
 
   const handleSyncAll = () => {
+    console.log('[SYNC-MANAGER] handleSyncAll clicked - starting mutation');
     syncAllMutation.mutate();
   };
 
@@ -339,7 +340,10 @@ export default function SyncManager() {
           </p>
         </div>
         <Button 
-          onClick={handleSyncAll}
+          onClick={() => {
+            console.log('[SYNC-MANAGER] Button clicked - starting sync');
+            handleSyncAll();
+          }}
           disabled={syncAllMutation.isPending}
           className="bg-[#d95d2c] hover:bg-[#b8441f] text-white"
         >
