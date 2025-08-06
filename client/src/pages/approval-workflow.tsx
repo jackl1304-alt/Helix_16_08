@@ -37,11 +37,28 @@ export default function ApprovalWorkflow() {
 
   const updateApprovalMutation = useMutation({
     mutationFn: async ({ id, status, comments }: { id: string; status: string; comments?: string }) => {
-      return await apiRequest(`/api/approvals/${id}`, "PATCH", { 
-        status, 
-        comments, 
-        reviewerId: "current-user"
-      });
+      try {
+        const response = await fetch(`/api/approvals/${id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            status, 
+            comments, 
+            reviewerId: "current-user"
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
+      } catch (error) {
+        console.error("Update approval error:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/approvals"] });

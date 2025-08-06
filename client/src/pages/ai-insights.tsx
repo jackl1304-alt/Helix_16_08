@@ -186,7 +186,24 @@ export default function AIInsights() {
 
   const createAnalysisMutation = useMutation({
     mutationFn: async (query: string) => {
-      return await apiRequest("/api/ai-analyses", "POST", { query });
+      try {
+        const response = await fetch("/api/ai-analyses", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ query })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
+      } catch (error) {
+        console.error("AI analysis error:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/ai-analyses"] });
