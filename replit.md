@@ -28,6 +28,9 @@ Preferred communication style: German language - Simple, everyday language.
 - **Startup-Fehler behoben**: AI-Insights Syntax-Fehler korrigiert, Server startet ohne Probleme, LSP-Fehler eliminiert
 - **GRIP-Integration repariert**: Vollständige API-Reparatur mit direkter fetch API, GRIP-Authentifizierung funktioniert, alternative FDA/EMA-Datenquellen für authentische regulatorische Updates implementiert
 - **Frontend-Backend Verbindungen stabilisiert**: Systematischer Austausch aller apiRequest Calls durch native fetch API, "Invalid request method (object Object)" Fehler behoben, Live-Dashboard-Updates funktionieren (91→97 Updates, 156→162 Artikel)
+- **Regulatory Updates Detail-Navigation repariert**: Dialog-basierte Details durch separate Seiten-Navigation ersetzt, korrekte wouter Integration für `/regulatory-updates/{id}` Route
+- **Umfassende Terminologie-Kompilation erstellt**: Vollständiges Glossar-System mit 7 Kategorien, KI-Analysen, authentischen Quellen (FDA CFR, EU MDR, HL7), Executive-Level Inhalte mit McKinsey/Deloitte-Stil Kostenanalysen
+- **Admin Glossar implementiert**: Automatische Begriffsgenerierung aus Code-Analyse, Schema-Parsing und API-Integration, 5-Tab-Admin-Interface für Begriffsverwaltung, Validation-Status-System
 
 ## System Architecture
 
