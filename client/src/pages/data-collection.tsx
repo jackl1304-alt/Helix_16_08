@@ -173,9 +173,28 @@ export default function DataCollection() {
   const syncAllMutation = useMutation({
     mutationFn: async () => {
       console.log("Frontend: Starting sync for all active sources");
-      const result = await apiRequest('/api/data-sources/sync-all', 'POST');
-      console.log("Frontend: Sync all result:", result);
-      return result;
+      try {
+        const response = await fetch('/api/data-sources/sync-all', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            optimized: true 
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        console.log("Frontend: Sync all result:", result);
+        return result;
+      } catch (error) {
+        console.error("Frontend: Sync all fetch error:", error);
+        throw error;
+      }
     },
     onSuccess: (data) => {
       console.log("Frontend: Sync all successful", data);
