@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/performance-optimized-card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -53,6 +54,7 @@ const priorityLabels = {
 export default function RegulatoryUpdates() {
   const { toast } = useToast();
   const device = useDevice();
+  const [, setLocation] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRegion, setSelectedRegion] = useState<string>("all");
   const [selectedPriority, setSelectedPriority] = useState<string>("all");
@@ -396,13 +398,15 @@ EXPORT DETAILS:
                         </div>
                         
                         <div className="flex items-center gap-2">
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="outline" size="sm" className="text-xs flex-1 sm:flex-none">
-                                <Eye className="h-3 w-3 mr-1" />
-                                <span className="sm:inline">Details</span>
-                              </Button>
-                            </DialogTrigger>
+                          <Button 
+                            onClick={() => setLocation(`/regulatory-updates/${update.id}`)}
+                            variant="outline" 
+                            size="sm" 
+                            className="text-xs flex-1 sm:flex-none"
+                          >
+                            <Eye className="h-3 w-3 mr-1" />
+                            <span className="sm:inline">Details</span>
+                          </Button>
                             <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden p-4 sm:p-6" aria-describedby="dialog-description">
                               <DialogHeader className="pb-4">
                                 <DialogTitle className="text-lg sm:text-xl font-bold line-clamp-2">{update.title}</DialogTitle>
@@ -1138,13 +1142,15 @@ EXPORT DETAILS:
                         </div>
                         
                         <div className="flex items-center gap-2">
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="outline" size="sm" className="text-xs border-red-300 text-red-700 hover:bg-red-50">
-                                <Eye className="h-3 w-3 mr-1" />
-                                Details anzeigen
-                              </Button>
-                            </DialogTrigger>
+                          <Button 
+                            onClick={() => setLocation(`/regulatory-updates/${update.id}`)}
+                            variant="outline" 
+                            size="sm" 
+                            className="text-xs border-red-300 text-red-700 hover:bg-red-50"
+                          >
+                            <Eye className="h-3 w-3 mr-1" />
+                            Details anzeigen
+                          </Button>
                             <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="dialog-description">
                               <DialogHeader>
                                 <DialogTitle className="text-xl font-bold flex items-center gap-2">
