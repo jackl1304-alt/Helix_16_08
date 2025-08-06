@@ -78,8 +78,15 @@ export default function RegulatoryUpdates() {
 
   const updatesArray = Array.isArray(response?.data) ? response.data : [];
   
-  // Debug output für Datenverbindung - BEREINIGT
+  // Debug output für Datenverbindung - DETAILLIERT
   console.log(`REGULATORY UPDATES: ${updatesArray.length} verfügbar, API Success: ${response?.success}`);
+  console.log('Erste 3 Updates:', updatesArray.slice(0, 3).map(u => ({
+    title: u.title?.slice(0, 50),
+    hasDescription: !!u.description,
+    descriptionLength: u.description?.length,
+    source: u.source_id,
+    region: u.region
+  })));
   
   // Error handling
   if (error) {
@@ -426,17 +433,17 @@ EXPORT DETAILS:
                                   </TabsTrigger>
                                   <TabsTrigger 
                                     value="financial" 
-                                    className="flex items-center gap-1 text-xs font-medium rounded-md data-[state=active]:bg-green-50 data-[state=active]:text-green-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-green-900/20 dark:data-[state=active]:text-green-300"
+                                    className="flex items-center gap-1 text-xs font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
                                   >
-                                    <Calendar className="h-3 w-3" />
+                                    <Shield className="h-3 w-3" />
                                     <span className="hidden sm:inline">Finanzanalyse</span>
                                   </TabsTrigger>
                                   <TabsTrigger 
                                     value="ai" 
-                                    className="flex items-center gap-1 text-xs font-medium rounded-md data-[state=active]:bg-orange-50 data-[state=active]:text-orange-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-orange-900/20 dark:data-[state=active]:text-orange-300"
+                                    className="flex items-center gap-1 text-xs font-medium rounded-md data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-sm dark:data-[state=active]:bg-blue-900/20 dark:data-[state=active]:text-blue-300"
                                   >
-                                    <Bell className="h-3 w-3" />
-                                    <span className="hidden sm:inline">🔥 KI-Analyse</span>
+                                    <AlertTriangle className="h-3 w-3" />
+                                    <span className="hidden sm:inline">KI-Analyse</span>
                                   </TabsTrigger>
                                   <TabsTrigger 
                                     value="metadata" 
@@ -545,6 +552,114 @@ EXPORT DETAILS:
                                       </h3>
                                       <div className="prose prose-sm max-w-none bg-white dark:bg-gray-800 p-4 rounded-lg border">
                                         <FormattedText 
+                                          text={update.description || update.content || 'Keine vollständigen Daten verfügbar.'}
+                                          className="text-sm leading-relaxed whitespace-pre-line"
+                                        />
+                                      </div>
+                                      
+                                      {/* RAW DATA ANZEIGE FÜR DEBUGGING */}
+                                      {update.raw_data && (
+                                        <div className="mt-4">
+                                          <h4 className="text-md font-semibold mb-2 flex items-center gap-2">
+                                            <Calendar className="h-4 w-4" />
+                                            Rohdaten (Technische Details)
+                                          </h4>
+                                          <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-xs font-mono overflow-auto">
+                                            <pre>{JSON.stringify(update.raw_data, null, 2)}</pre>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </TabsContent>
+                                  
+                                  <TabsContent value="financial" className="space-y-4 h-full overflow-auto">
+                                    <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                                      <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                                        <Shield className="h-5 w-5 text-green-600" />
+                                        Finanzielle Auswirkungen
+                                      </h3>
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                          <h4 className="font-medium mb-2">Compliance-Kosten</h4>
+                                          <p className="text-sm text-gray-600 dark:text-gray-300">
+                                            Geschätzte Implementierungskosten für Medizinprodukthersteller
+                                          </p>
+                                        </div>
+                                        <div>
+                                          <h4 className="font-medium mb-2">Marktauswirkungen</h4>
+                                          <p className="text-sm text-gray-600 dark:text-gray-300">
+                                            Potenzielle Auswirkungen auf Marktzulassung und Vertrieb
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </TabsContent>
+                                  
+                                  <TabsContent value="ai" className="space-y-4 h-full overflow-auto">
+                                    <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
+                                      <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                                        <AlertTriangle className="h-5 w-5 text-orange-600" />
+                                        KI-basierte Analyse
+                                      </h3>
+                                      <div className="space-y-3">
+                                        <div>
+                                          <h4 className="font-medium mb-1">Risikobewertung</h4>
+                                          <div className="text-sm text-gray-600 dark:text-gray-300">
+                                            Automatisierte Bewertung regulatorischer Risiken
+                                          </div>
+                                        </div>
+                                        <div>
+                                          <h4 className="font-medium mb-1">Präzedenzfall-Analyse</h4>
+                                          <div className="text-sm text-gray-600 dark:text-gray-300">
+                                            ML-basierte Analyse ähnlicher regulatorischer Entscheidungen
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </TabsContent>
+                                  
+                                  <TabsContent value="metadata" className="space-y-4 h-full overflow-auto">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                      <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg">
+                                        <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                                          <Globe className="h-5 w-5" />
+                                          Quellenangaben
+                                        </h3>
+                                        <div className="space-y-2 text-sm">
+                                          <div><strong>Quelle:</strong> {update.source_id}</div>
+                                          <div><strong>URL:</strong> <a href={update.source_url} target="_blank" className="text-blue-600 hover:underline break-all">{update.source_url}</a></div>
+                                          <div><strong>Dokument-ID:</strong> {update.id}</div>
+                                          <div><strong>Erstellt:</strong> {new Date(update.created_at).toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg">
+                                        <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                                          <Calendar className="h-5 w-5" />
+                                          Kategorisierung  
+                                        </h3>
+                                        <div className="space-y-2 text-sm">
+                                          <div><strong>Kategorien:</strong> 
+                                            <div className="flex flex-wrap gap-1 mt-1">
+                                              {Array.isArray(update.categories) ? 
+                                                update.categories.map((cat, idx) => (
+                                                  <Badge key={idx} variant="secondary" className="text-xs">{cat}</Badge>
+                                                )) 
+                                                : <Badge variant="secondary" className="text-xs">{update.categories}</Badge>
+                                              }
+                                            </div>
+                                          </div>
+                                          <div><strong>Geräteklassen:</strong>
+                                            <div className="flex flex-wrap gap-1 mt-1">
+                                              {update.device_classes?.map((cls, idx) => (
+                                                <Badge key={idx} variant="outline" className="text-xs">{cls}</Badge>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </TabsContent> 
                                           text={update.description || update.content || 'Keine detaillierte Beschreibung verfügbar.'}
                                           className="text-sm leading-relaxed"
                                         />
