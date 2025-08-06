@@ -13,6 +13,8 @@ export async function apiRequest(
   method: string = 'GET',
   data?: any
 ): Promise<any> {
+  console.log(`[API REQUEST] ${method} ${url}`, data);
+  
   // Ensure we have default options
   const requestOptions: RequestInit = {
     method,
@@ -26,18 +28,28 @@ export async function apiRequest(
   // Add body for POST requests
   if (method === 'POST' && data) {
     requestOptions.body = JSON.stringify(data);
+    console.log('[API REQUEST] POST body:', requestOptions.body);
   }
   
-  const res = await fetch(url, requestOptions);
+  try {
+    const res = await fetch(url, requestOptions);
+    console.log(`[API REQUEST] Response status: ${res.status} for ${url}`);
 
-  await throwIfResNotOk(res);
-  
-  // Return JSON if response has content, otherwise return empty object
-  const contentType = res.headers.get("content-type");
-  if (contentType && contentType.includes("application/json")) {
-    return await res.json();
+    await throwIfResNotOk(res);
+    
+    // Return JSON if response has content, otherwise return empty object
+    const contentType = res.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      const result = await res.json();
+      console.log(`[API REQUEST] Success response:`, result);
+      return result;
+    }
+    console.log(`[API REQUEST] Non-JSON response for ${url}`);
+    return {};
+  } catch (error) {
+    console.error(`[API REQUEST] Error for ${method} ${url}:`, error);
+    throw error;
   }
-  return {};
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
