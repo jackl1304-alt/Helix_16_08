@@ -26,6 +26,8 @@ Preferred communication style: German language - Simple, everyday language.
 - **Farbkodierte Hashtag-System implementiert**: Alle 21 Knowledge Articles und 3 Regulatory Updates mit semantisch farbkodierten Tags erweitert (Rot: Kritisch/Legal, Blau: Innovation/Tech, Grün: Erfolg/Performance, Lila: Compliance, Gelb: Business/Finanziell)
 - **Dashboard-Statistiken korrigiert**: Alle Zahlen jetzt aus echten Datenbankabfragen - keine Platzhalter mehr (553 Updates, 65 Legal Cases, 57 Datenquellen, 6 Pending Approvals authentisch)
 - **Startup-Fehler behoben**: AI-Insights Syntax-Fehler korrigiert, Server startet ohne Probleme, LSP-Fehler eliminiert
+- **GRIP-Integration repariert**: Vollständige API-Reparatur mit direkter fetch API, GRIP-Authentifizierung funktioniert, alternative FDA/EMA-Datenquellen für authentische regulatorische Updates implementiert
+- **Frontend-Backend Verbindungen stabilisiert**: Systematischer Austausch aller apiRequest Calls durch native fetch API, "Invalid request method (object Object)" Fehler behoben, Live-Dashboard-Updates funktionieren (91→97 Updates, 156→162 Artikel)
 
 ## System Architecture
 
