@@ -62,10 +62,11 @@ export default function RegulatoryUpdates() {
     end: ""
   });
 
-  // Fetch regulatory updates
+  // Fetch regulatory updates - KORRIGIERTE API-ROUTE
   const { data: response, isLoading } = useQuery<{success: boolean, data: RegulatoryUpdate[], timestamp: string}>({
-    queryKey: ['/api/regulatory-updates/recent?limit=5000'],
-    staleTime: 5 * 60 * 1000,
+    queryKey: ['/api/regulatory-updates/recent'],
+    queryFn: () => fetch('/api/regulatory-updates/recent?limit=5000').then(res => res.json()),
+    staleTime: 1 * 60 * 1000, // 1 Minute Cache für frischere Daten
   });
 
   const updatesArray = Array.isArray(response?.data) ? response.data : [];
