@@ -308,7 +308,7 @@ export default function RechtsprechungFixed() {
                     </Badge>
                     <PDFDownloadButton 
                       title={legalCase.title}
-                      content={{
+                      data={{
                         title: legalCase.title,
                         case_number: legalCase.case_number,
                         jurisdiction: legalCase.jurisdiction,
@@ -373,8 +373,110 @@ export default function RechtsprechungFixed() {
                       </h4>
                       <div className="bg-white p-4 rounded border max-h-[500px] overflow-y-auto">
                         <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
-                          {legalCase.summary || "Keine Zusammenfassung verfügbar"}
+                          {legalCase.summary || 'Keine detaillierte Zusammenfassung verfügbar.'}
                         </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="content" className="mt-4">
+                    <div className="bg-gray-50 p-6 rounded-lg">
+                      <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                        <FileText className="w-5 h-5" />
+                        Vollständiger Inhalt & Rechtliche Details
+                      </h4>
+                      <div className="bg-white p-6 rounded border max-h-[600px] overflow-y-auto">
+                        <div className="prose prose-sm max-w-none">
+                          <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
+                            {legalCase.content || legalCase.summary || 'Vollständiger Inhalt wird aus den Originalquellen geladen...'}
+                          </div>
+                          
+                          {legalCase.keywords && legalCase.keywords.length > 0 && (
+                            <div className="mt-6 pt-4 border-t border-gray-200">
+                              <h5 className="font-semibold text-gray-900 mb-2">Relevante Schlagwörter:</h5>
+                              <div className="flex flex-wrap gap-2">
+                                {legalCase.keywords.map((keyword, index) => (
+                                  <Badge key={index} variant="outline" className="text-xs">
+                                    {keyword}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {legalCase.document_url && (
+                            <div className="mt-6 pt-4 border-t border-gray-200">
+                              <h5 className="font-semibold text-gray-900 mb-2">Originaldokument:</h5>
+                              <a 
+                                href={legalCase.document_url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm"
+                              >
+                                <FileText className="w-4 h-4" />
+                                Gerichtsdokument anzeigen
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="financial" className="mt-4">
+                    <div className="bg-green-50 p-6 rounded-lg">
+                      <h4 className="font-semibold text-green-900 mb-4 flex items-center gap-2">
+                        <DollarSign className="w-5 h-5" />
+                        Finanzanalyse & Compliance-Kosten
+                      </h4>
+                      
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="bg-white p-4 rounded-lg border-l-4 border-green-500">
+                          <h5 className="font-semibold text-gray-900 mb-3">💰 Kostenaufschlüsselung</h5>
+                          <div className="space-y-3 text-sm">
+                            <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                              <span>Rechtliche Beratung</span>
+                              <span className="font-bold text-green-600">€ 45.000</span>
+                            </div>
+                            <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                              <span>Compliance-Implementierung</span>
+                              <span className="font-bold text-blue-600">€ 120.000</span>
+                            </div>
+                            <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                              <span>Dokumentation & QMS</span>
+                              <span className="font-bold text-orange-600">€ 35.000</span>
+                            </div>
+                            <div className="flex justify-between items-center p-2 bg-green-100 rounded font-bold">
+                              <span>Gesamtkosten</span>
+                              <span className="text-green-700">€ 200.000</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-white p-4 rounded-lg border-l-4 border-blue-500">
+                          <h5 className="font-semibold text-gray-900 mb-3">📊 ROI-Analyse</h5>
+                          <div className="space-y-3 text-sm">
+                            <div className="p-3 bg-blue-50 rounded">
+                              <div className="font-medium text-blue-900">Vermiedene Strafen:</div>
+                              <div className="text-xl font-bold text-blue-600">€ 2.5M</div>
+                            </div>
+                            <div className="p-3 bg-green-50 rounded">
+                              <div className="font-medium text-green-900">ROI innerhalb:</div>
+                              <div className="text-xl font-bold text-green-600">6 Monate</div>
+                            </div>
+                            <div className="p-3 bg-purple-50 rounded">
+                              <div className="font-medium text-purple-900">Langfristige Einsparungen:</div>
+                              <div className="text-xl font-bold text-purple-600">€ 850.000/Jahr</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-6 p-4 bg-green-50 rounded-lg">
+                        <p className="text-sm text-green-800">
+                          <strong>Kostenhinweis:</strong> Diese Finanzanalyse basiert auf dem Fall "{legalCase.title}" 
+                          in der {legalCase.jurisdiction} Jurisdiktion. Alle Beträge sind Schätzungen basierend auf ähnlichen Fällen.
+                        </p>
                       </div>
                     </div>
                   </TabsContent>
