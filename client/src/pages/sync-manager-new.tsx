@@ -47,8 +47,14 @@ interface DataSource {
   id: string;
   name: string;
   is_active: boolean;
+  isActive?: boolean; // Fallback für inkonsistente API-Daten
   type: string;
+  region?: string;
   last_sync?: string;
+  lastSync?: string;
+  last_sync_at?: string;
+  endpoint?: string;
+  url?: string;
 }
 
 interface SyncResult {
@@ -125,8 +131,8 @@ export default function SyncManagerNew() {
       console.log(`[BULK SYNC] Starting bulk sync for all sources`);
       setBulkSyncActive(true);
       
-      // Setze alle aktiven Quellen auf syncing
-      const activeSourceIds = dataSources.filter((s: DataSource) => s.is_active).map((s: DataSource) => s.id);
+      // Setze alle aktiven Quellen auf syncing (unterstützt beide API-Formate)
+      const activeSourceIds = dataSources.filter((s: DataSource) => s.is_active || s.isActive).map((s: DataSource) => s.id);
       const initialProgress: Record<string, 'syncing'> = {};
       activeSourceIds.forEach((id: string) => initialProgress[id] = 'syncing');
       setSyncProgress(initialProgress);
@@ -231,7 +237,8 @@ export default function SyncManagerNew() {
     );
   }
 
-  const activeSources = dataSources.filter((s: DataSource) => s.is_active);
+  // Robuste Filterung für aktive Quellen (unterstützt beide API-Formate)
+  const activeSources = dataSources.filter((s: DataSource) => s.is_active || s.isActive);
 
   return (
     <div className="p-6 space-y-6">
@@ -345,8 +352,8 @@ export default function SyncManagerNew() {
                   </div>
                 </div>
                 <div className="flex space-x-2">
-                  <Badge variant={source.is_active ? "default" : "secondary"}>
-                    {source.is_active ? "Aktiv" : "Inaktiv"}
+                  <Badge variant={(source.is_active || source.isActive) ? "default" : "secondary"}>
+                    {(source.is_active || source.isActive) ? "Aktiv" : "Inaktiv"}
                   </Badge>
                   {source.type && (
                     <Badge variant="outline">{source.type}</Badge>
@@ -354,9 +361,9 @@ export default function SyncManagerNew() {
                 </div>
               </div>
               
-              {source.last_sync && (
+              {(source.last_sync || source.lastSync || source.last_sync_at) && (
                 <p className="text-xs text-gray-500 mb-3">
-                  Letzte Sync: {new Date(source.last_sync).toLocaleString('de-DE')}
+                  Letzte Sync: {new Date(source.last_sync || source.lastSync || source.last_sync_at || '').toLocaleString('de-DE')}
                 </p>
               )}
 
@@ -370,7 +377,7 @@ export default function SyncManagerNew() {
                     console.log(`[UI] Single sync clicked for ${source.id}`);
                     singleSyncMutation.mutate(source.id);
                   }}
-                  disabled={!source.is_active || syncProgress[source.id] === 'syncing'}
+                  disabled={!(source.is_active || source.isActive) || syncProgress[source.id] === 'syncing'}
                   variant="outline"
                 >
                   {syncProgress[source.id] === 'syncing' ? (
