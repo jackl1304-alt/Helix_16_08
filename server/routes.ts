@@ -250,6 +250,15 @@ Status: Rechtskräftig
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
+  // Force JSON responses for all API routes - NO HTML EVER
+  app.use('/api', (req, res, next) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    next();
+  });
+  
   // Admin routes
   app.use('/api/admin', adminRoutes);
   app.use('/api/admin', administrationRoutes);
@@ -1044,10 +1053,9 @@ Weitere Details werden noch verarbeitet. Bitte wenden Sie sich an die offizielle
     }
   });
 
-  // Newsletter sources from data sources
+  // Newsletter sources from data sources - PURE JSON ONLY
   app.get('/api/newsletter-sources', async (req, res) => {
-    console.log('[CRITICAL] API ROUTE DETECTED: /api/newsletter-sources - FORCING JSON ONLY');
-    res.setHeader('Content-Type', 'application/json');
+    console.log('[API] Newsletter sources request - JSON only');
     try {
       // Get all data sources and filter for newsletter/regulatory sources
       const dataSources = await storage.getAllDataSources();
@@ -1411,7 +1419,13 @@ Weitere Details werden noch verarbeitet. Bitte wenden Sie sich an die offizielle
       res.setHeader('Content-Disposition', `attachment; filename="historical-document-${documentId}.pdf"`);
       res.setHeader('Content-Length', pdfBuffer.length.toString());
       
-      res.send(pdfBuffer);
+      res.json({
+        success: true,
+        message: 'Historical document PDF generated successfully',
+        size: pdfBuffer.length,
+        contentType: 'application/pdf',
+        data: pdfBuffer.toString('base64')
+      });
       console.log(`[PDF] Historical document PDF generated successfully: ${pdfBuffer.length} bytes`);
     } catch (error) {
       console.error('[PDF] Fehler beim Historical PDF-Download:', error);
@@ -1433,7 +1447,13 @@ Weitere Details werden noch verarbeitet. Bitte wenden Sie sich an die offizielle
         res.setHeader('Content-Disposition', `attachment; filename="historical-document-${documentId}.pdf"`);
         res.setHeader('Content-Length', pdfBuffer.length.toString());
         
-        res.send(pdfBuffer);
+        res.json({
+          success: true,
+          message: 'Historical document PDF generated with fallback',
+          size: pdfBuffer.length,
+          contentType: 'application/pdf',
+          data: pdfBuffer.toString('base64')
+        });
         console.log(`[PDF] Historical document PDF generated with fallback: ${pdfBuffer.length} bytes`);
       } catch (fallbackError) {
         console.error('[PDF] Fallback PDF generation also failed:', fallbackError);
