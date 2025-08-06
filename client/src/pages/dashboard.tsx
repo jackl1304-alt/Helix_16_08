@@ -26,12 +26,29 @@ export default function Dashboard() {
   
   const { data: stats, isLoading, error: statsError } = useQuery({
     queryKey: ['/api/dashboard/stats'],
-    staleTime: 30000, // 30 seconds cache
-    gcTime: 60000, // 1 minute garbage collection
+    queryFn: async () => {
+      console.log('[QUERY] Fetching dashboard stats...');
+      const response = await fetch('/api/dashboard/stats', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        console.error('[QUERY] Response not ok:', response.status, response.statusText);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('[QUERY] Stats received:', data);
+      return data;
+    },
+    staleTime: 10000, // 10 seconds
+    gcTime: 30000, // 30 seconds garbage collection
     refetchOnMount: true,
-    refetchOnWindowFocus: false, // Prevent excessive refetching
-    retry: 3,
-    retryDelay: 1000,
+    retry: 2,
   });
 
   const { data: recentUpdates, error: updatesError } = useQuery({
@@ -44,8 +61,27 @@ export default function Dashboard() {
 
   const { data: newsletterSources } = useQuery({
     queryKey: ['/api/newsletter-sources'],
-    staleTime: 300000, // 5 minutes
-    gcTime: 600000, // 10 minutes
+    queryFn: async () => {
+      console.log('[QUERY] Fetching newsletter sources...');
+      const response = await fetch('/api/newsletter-sources', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        console.error('[QUERY] Newsletter sources response not ok:', response.status);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('[QUERY] Newsletter sources received:', data);
+      return data;
+    },
+    staleTime: 60000, // 1 minute
+    gcTime: 120000, // 2 minutes
   });
 
   // Newsletter Sync Mutation
