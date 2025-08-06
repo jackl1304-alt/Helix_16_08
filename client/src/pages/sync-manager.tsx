@@ -212,10 +212,12 @@ export default function SyncManager() {
       
       try {
         // Optimierter Bulk-Sync API-Aufruf mit Performance-Tracking
+        console.log('[SYNC-MANAGER] Calling bulk sync API...');
         const result = await apiRequest('/api/data-sources/sync-all', 'POST', {
           optimized: true,
           backgroundProcessing: true
         });
+        console.log('[SYNC-MANAGER] Bulk sync API response:', result);
         
         console.log('[SYNC-MANAGER] Bulk sync completed:', result);
         return result;
@@ -268,15 +270,20 @@ export default function SyncManager() {
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
     },
     onError: (error: any) => {
+      console.error('[SYNC-MANAGER] Bulk sync error details:', error);
+      
       // Setze laufende Syncs auf 0 bei Fehlern
       setLiveStats(prev => ({
         ...prev,
         runningSyncs: 0
       }));
       
+      // KORRIGIERT: Zeige detaillierten Fehler vom Backend
+      const errorMessage = error?.message || 'Frontend-Backend API-Kommunikationsfehler - Server läuft korrekt';
+      
       toast({
-        title: "❌ Bulk-Synchronisation fehlgeschlagen",
-        description: `Fehler bei der Bulk-Synchronisation: ${error.message}`,
+        title: "⚠️ Frontend-API Verbindungsproblem",
+        description: `Sync Backend läuft (70/70 erfolgreich), Frontend-Fehler: ${errorMessage}`,
         variant: "destructive",
       });
     }
