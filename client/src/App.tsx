@@ -52,6 +52,7 @@ const RegulatoryUpdateDetail = lazy(() => import("@/pages/regulatory-update-deta
 const RechtsprechungFixed = lazy(() => import("@/pages/rechtsprechung-fixed"));
 const TerminologyGlossary = lazy(() => import("@/pages/terminology-glossary"));
 const AdminGlossary = lazy(() => import("@/pages/admin-glossary"));
+const GRIPIntegration = lazy(() => import("@/pages/grip-integration"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -87,6 +88,7 @@ function Router() {
         <Route path="/rechtsprechung" component={RechtsprechungFixed} />
         <Route path="/terminology" component={TerminologyGlossary} />
         <Route path="/admin/glossary" component={AdminGlossary} />
+        <Route path="/grip-integration" component={GRIPIntegration} />
         <Route path="/historical-data" component={HistoricalData} />
         <Route path="/intelligent-search" component={IntelligentSearch} />
 

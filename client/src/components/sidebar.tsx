@@ -42,6 +42,13 @@ const navigation = [
     description: "Weltweite Regulierungsquellen"
   },
   {
+    name: "GRIP Integration",
+    href: "/grip-integration",
+    icon: Activity,
+    current: false,
+    description: "Zugangsdaten unter Verwaltung"
+  },
+  {
     name: "Analytics",
     href: "/analytics",
     icon: BarChart3,
