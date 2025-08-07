@@ -84,6 +84,7 @@ const getEnhancedAnalysisData = (update: RegulatoryUpdate) => {
     
     return {
       totalCost,
+      baseCost: costs.min,
       roi: `Jahr 1: €${Math.round(costs.min * 1.2).toLocaleString('de-DE')} Revenue (IRR: ${Math.round(baseROI)}%)`,
       roi3: `Jahr 3: €${Math.round(costs.min * 3.8).toLocaleString('de-DE')} Revenue (IRR: ${Math.round(baseROI * 1.6)}%)`,
       payback: `${12 + Math.round(Math.random() * 18)} Monate`,
@@ -101,16 +102,16 @@ const getEnhancedAnalysisData = (update: RegulatoryUpdate) => {
         implementation: {
           totalCost: analysis.totalCost,
           breakdown: update.update_type === 'approval' ? {
-            'R&D': `€${Math.round(parseInt(analysis.totalCost.replace(/[€.\s-]/g, '').slice(0, 6)) * 0.35).toLocaleString('de-DE')}`,
-            'Clinical Trials': `€${Math.round(parseInt(analysis.totalCost.replace(/[€.\s-]/g, '').slice(0, 6)) * 0.28).toLocaleString('de-DE')}`,
-            'Regulatory': `€${Math.round(parseInt(analysis.totalCost.replace(/[€.\s-]/g, '').slice(0, 6)) * 0.15).toLocaleString('de-DE')}`,
-            'Manufacturing': `€${Math.round(parseInt(analysis.totalCost.replace(/[€.\s-]/g, '').slice(0, 6)) * 0.12).toLocaleString('de-DE')}`,
-            'Marketing': `€${Math.round(parseInt(analysis.totalCost.replace(/[€.\s-]/g, '').slice(0, 6)) * 0.10).toLocaleString('de-DE')}`
+            'R&D': `€${Math.round(analysis.baseCost * 0.35).toLocaleString('de-DE')}`,
+            'Clinical Trials': `€${Math.round(analysis.baseCost * 0.28).toLocaleString('de-DE')}`,
+            'Regulatory': `€${Math.round(analysis.baseCost * 0.15).toLocaleString('de-DE')}`,
+            'Manufacturing': `€${Math.round(analysis.baseCost * 0.12).toLocaleString('de-DE')}`,
+            'Marketing': `€${Math.round(analysis.baseCost * 0.10).toLocaleString('de-DE')}`
           } : {
-            'Compliance': `€${Math.round(parseInt(analysis.totalCost.replace(/[€.\s-]/g, '').slice(0, 6)) * 0.45).toLocaleString('de-DE')}`,
-            'Legal': `€${Math.round(parseInt(analysis.totalCost.replace(/[€.\s-]/g, '').slice(0, 6)) * 0.25).toLocaleString('de-DE')}`,
-            'Implementation': `€${Math.round(parseInt(analysis.totalCost.replace(/[€.\s-]/g, '').slice(0, 6)) * 0.20).toLocaleString('de-DE')}`,
-            'Training': `€${Math.round(parseInt(analysis.totalCost.replace(/[€.\s-]/g, '').slice(0, 6)) * 0.10).toLocaleString('de-DE')}`
+            'Compliance': `€${Math.round(analysis.baseCost * 0.45).toLocaleString('de-DE')}`,
+            'Legal': `€${Math.round(analysis.baseCost * 0.25).toLocaleString('de-DE')}`,
+            'Implementation': `€${Math.round(analysis.baseCost * 0.20).toLocaleString('de-DE')}`,
+            'Training': `€${Math.round(analysis.baseCost * 0.10).toLocaleString('de-DE')}`
           },
           timeline: update.update_type === 'approval' ? '14-18 Monate bis Markteinführung' : 
                    update.update_type === 'recall' ? '3-6 Monate für vollständige Compliance' :
