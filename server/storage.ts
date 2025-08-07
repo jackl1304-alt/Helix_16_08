@@ -228,6 +228,20 @@ class MorningStorage implements IStorage {
         endpoint: "https://www.swissmedic.ch/swissmedic/en/home/medical-devices.html",
         auth_required: false,
         sync_frequency: "daily"
+      },
+      {
+        id: "grip_intelligence",
+        name: "GRIP Global Intelligence Platform",
+        type: "current",
+        category: "intelligence",
+        region: "Global",
+        last_sync: "2025-08-07T09:00:00.000Z",
+        is_active: true,
+        endpoint: "https://grip.pureglobal.com/api/v1",
+        auth_required: true,
+        sync_frequency: "hourly",
+        credentials_status: "under_management",
+        access_level: "premium"
       }
     ];
   }
