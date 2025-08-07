@@ -48,7 +48,7 @@ const Administration = lazy(() => import("@/pages/administration"));
 const GripData = lazy(() => import("@/pages/grip-data"));
 const NewsletterAdmin = lazy(() => import("@/pages/newsletter-admin"));
 const AdvancedAnalytics = lazy(() => import("@/pages/advanced-analytics"));
-const RegulatoryUpdateDetail = lazy(() => import("@/pages/regulatory-update-detail"));
+const RegulatoryUpdateDetail = lazy(() => import("@/pages/regulatory-update-detail-new"));
 const RechtsprechungFixed = lazy(() => import("@/pages/rechtsprechung-fixed"));
 const TerminologyGlossary = lazy(() => import("@/pages/terminology-glossary"));
 const AdminGlossary = lazy(() => import("@/pages/admin-glossary"));
