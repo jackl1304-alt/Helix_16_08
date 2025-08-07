@@ -241,8 +241,8 @@ export class APIManagementService {
   }
 
   private async scrapeWebsite(url: string, source: DataSource, options?: any): Promise<any> {
-    // Web Scraping Implementation würde hier erfolgen
-    // Für jetzt Placeholder mit Logging
+    // 🔴 MOCK DATA - Web Scraping Implementation würde hier erfolgen
+    // 🔴 MOCK DATA - Für jetzt Placeholder mit Logging - AUTHENTIC SCRAPER REQUIRED
     console.log(`[API Management] Web scraping ${url} - Implementation needed`);
     
     // Return structured data format

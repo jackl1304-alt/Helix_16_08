@@ -38,7 +38,7 @@ interface TrendItem {
 }
 
 export class AISummarizationService {
-  private apiUrl = 'https://api.anthropic.com/v1/messages'; // Placeholder for AI service
+  private apiUrl = 'https://api.anthropic.com/v1/messages'; // 🔴 MOCK DATA - Placeholder for AI service - AUTHENTIC API KEY REQUIRED
   private maxTokens = 1000;
   private temperature = 0.3; // Lower for more consistent summaries
   

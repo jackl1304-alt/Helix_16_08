@@ -33,6 +33,8 @@ Preferred communication style: German language - Simple, everyday language.
 - **Regulatory Updates Detail-Navigation repariert**: Dialog-basierte Details durch separate Seiten-Navigation ersetzt, korrekte wouter Integration für `/regulatory-updates/{id}` Route
 - **Umfassende Terminologie-Kompilation erstellt**: Vollständiges Glossar-System mit 7 Kategorien, KI-Analysen, authentischen Quellen (FDA CFR, EU MDR, HL7), Executive-Level Inhalte mit McKinsey/Deloitte-Stil Kostenanalysen
 - **Admin Glossar implementiert**: Automatische Begriffsgenerierung aus Code-Analyse, Schema-Parsing und API-Integration, 5-Tab-Admin-Interface für Begriffsverwaltung, Validation-Status-System
+- **Mock-Daten systematisch markiert**: Alle Demo-, Mock- und Platzhalter-Daten mit 🔴 MOCK DATA gekennzeichnet für sofortigen Austausch gegen authentische Datenquellen
+- **Intelligente Suche repariert**: API-Route /api/intelligent-search implementiert, Datenbankverbindung zu Knowledge Articles hergestellt, "Keine Ergebnisse gefunden" Problem behoben
 
 ## System Architecture
 

@@ -245,10 +245,10 @@ export class DataQualityService {
 
     // Content quality checks
     if (update.content) {
-      // Check for placeholder content
-      const placeholders = ['lorem ipsum', 'placeholder', 'todo', 'coming soon'];
+      // 🔴 MOCK DATA DETECTION - Check for placeholder content
+      const placeholders = ['lorem ipsum', 'placeholder', 'todo', 'coming soon', '🔴 mock data'];
       if (placeholders.some(ph => update.content.toLowerCase().includes(ph))) {
-        warnings.push('Content appears to contain placeholder text');
+        warnings.push('🔴 MOCK DATA DETECTED - Content contains placeholder text - AUTHENTIC DATA REQUIRED');
         score -= 10;
       }
 
