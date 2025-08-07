@@ -39,7 +39,7 @@ const IntelligentSearch = lazy(() => import("@/pages/intelligent-search"));
 const DocumentViewer = lazy(() => import("@/pages/document-viewer"));
 const SyncManagerNew = lazy(() => import("@/pages/sync-manager-new"));
 const Phase1Integration = lazy(() => import("@/pages/phase1-integration"));
-const AIContentAnalysis = lazy(() => import("@/pages/ai-content-analysis"));
+const AIContentAnalysis = lazy(() => import("@/pages/ai-analysis-combined"));
 const Phase2Integration = lazy(() => import("@/pages/phase2-integration"));
 const Phase3Advanced = lazy(() => import("@/pages/phase3-advanced"));
 const RealTimeIntegration = lazy(() => import("@/pages/real-time-integration"));

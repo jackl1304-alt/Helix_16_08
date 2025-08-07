@@ -77,7 +77,6 @@ const navigationStructure: Record<string, NavigationSection> = {
     title: "ERWEITERT",
     items: [
       { name: "KI-Analyse", href: "/ai-content-analysis", icon: Brain },
-      { name: "KI Insights", href: "/ki-insights", icon: Bot },
       { name: "Sync-Verwaltung", href: "/sync-manager", icon: RefreshCw },
       { name: "Globale Quellen", href: "/global-sources", icon: Globe },
       { name: "GRIP Integration", href: "/grip-integration", icon: Sparkles },
