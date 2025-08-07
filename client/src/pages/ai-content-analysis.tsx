@@ -4,8 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
+import { useQuery } from '@tanstack/react-query';
 import { 
   Brain, 
   Search, 
@@ -16,7 +18,11 @@ import {
   Clock,
   Target,
   Lightbulb,
-  Shield
+  Shield,
+  Bot,
+  TrendingUp,
+  Users,
+  Calendar
 } from 'lucide-react';
 
 interface AnalysisResult {
@@ -55,6 +61,13 @@ export default function AIContentAnalysis() {
   const [content, setContent] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [activeTab, setActiveTab] = useState('analysis');
+
+  // KI Insights data
+  const { data: insights, isLoading: insightsLoading } = useQuery({
+    queryKey: ['/api/ai-insights'],
+    queryFn: () => fetch('/api/ai-insights').then(res => res.json())
+  });
 
   const handleAnalyzeContent = async () => {
     if (!content.trim()) {
