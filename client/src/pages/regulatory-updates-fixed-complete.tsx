@@ -97,40 +97,39 @@ const getEnhancedAnalysisData = (update: RegulatoryUpdate) => {
   const analysis = generateSpecificAnalysis(update);
   
   return {
-    'default': {
-      financialAnalysis: {
-        implementation: {
-          totalCost: analysis.totalCost,
-          breakdown: update.update_type === 'approval' ? {
-            'R&D': `€${Math.round(analysis.baseCost * 0.35).toLocaleString('de-DE')}`,
-            'Clinical Trials': `€${Math.round(analysis.baseCost * 0.28).toLocaleString('de-DE')}`,
-            'Regulatory': `€${Math.round(analysis.baseCost * 0.15).toLocaleString('de-DE')}`,
-            'Manufacturing': `€${Math.round(analysis.baseCost * 0.12).toLocaleString('de-DE')}`,
-            'Marketing': `€${Math.round(analysis.baseCost * 0.10).toLocaleString('de-DE')}`
-          } : {
-            'Compliance': `€${Math.round(analysis.baseCost * 0.45).toLocaleString('de-DE')}`,
-            'Legal': `€${Math.round(analysis.baseCost * 0.25).toLocaleString('de-DE')}`,
-            'Implementation': `€${Math.round(analysis.baseCost * 0.20).toLocaleString('de-DE')}`,
-            'Training': `€${Math.round(analysis.baseCost * 0.10).toLocaleString('de-DE')}`
-          },
-          timeline: update.update_type === 'approval' ? '14-18 Monate bis Markteinführung' : 
-                   update.update_type === 'recall' ? '3-6 Monate für vollständige Compliance' :
-                   '6-12 Monate für Implementation',
-          roi: {
-            year1: analysis.roi,
-            year3: analysis.roi3,
-            payback: analysis.payback
-          }
+    financialAnalysis: {
+      implementation: {
+        totalCost: analysis.totalCost,
+        breakdown: update.update_type === 'approval' ? {
+          'R&D': `€${Math.round(analysis.baseCost * 0.35).toLocaleString('de-DE')}`,
+          'Clinical Trials': `€${Math.round(analysis.baseCost * 0.28).toLocaleString('de-DE')}`,
+          'Regulatory': `€${Math.round(analysis.baseCost * 0.15).toLocaleString('de-DE')}`,
+          'Manufacturing': `€${Math.round(analysis.baseCost * 0.12).toLocaleString('de-DE')}`,
+          'Marketing': `€${Math.round(analysis.baseCost * 0.10).toLocaleString('de-DE')}`
+        } : {
+          'Compliance': `€${Math.round(analysis.baseCost * 0.45).toLocaleString('de-DE')}`,
+          'Legal': `€${Math.round(analysis.baseCost * 0.25).toLocaleString('de-DE')}`,
+          'Implementation': `€${Math.round(analysis.baseCost * 0.20).toLocaleString('de-DE')}`,
+          'Training': `€${Math.round(analysis.baseCost * 0.10).toLocaleString('de-DE')}`
         },
-        marketProjection: {
+        timeline: update.update_type === 'approval' ? '14-18 Monate bis Markteinführung' : 
+                 update.update_type === 'recall' ? '3-6 Monate für vollständige Compliance' :
+                 '6-12 Monate für Implementation',
+        roi: {
+          year1: analysis.roi,
+          year3: analysis.roi3,
+          payback: analysis.payback
+        }
+      },
+      marketProjection: {
           tam: update.region === 'US' ? `€${8 + Math.round(Math.random() * 15)}.${Math.round(Math.random() * 9)}B ${update.update_type === 'approval' ? 'US Medical Device Market' : 'US Compliance Market'}` :
                update.region === 'EU' ? `€${12 + Math.round(Math.random() * 20)}.${Math.round(Math.random() * 9)}B EU Medical Device Market` :
                `€${3 + Math.round(Math.random() * 8)}.${Math.round(Math.random() * 9)}B ${update.region} Regional Market`,
           sam: `€${2 + Math.round(Math.random() * 6)}.${Math.round(Math.random() * 9)}B Serviceable Addressable Market`,
           marketShare: `${1.2 + Math.random() * 2.8}% binnen 3 Jahren`,
           revenue: `Jahr 1: €${Math.round(20 + Math.random() * 80)}M, Jahr 2: €${Math.round(60 + Math.random() * 120)}M, Jahr 3: €${Math.round(120 + Math.random() * 200)}M`
-        },
-        competitiveLandscape: {
+      },
+      competitiveLandscape: {
           detailed: {
             medtronic: {
               product: 'CoreValve Evolut R/PRO/FX',
@@ -160,16 +159,16 @@ const getEnhancedAnalysisData = (update: RegulatoryUpdate) => {
               strategicResponse: 'Leverage FDA approval advantage and clinical superiority messaging'
             }
           }
-        },
-        reimbursement: {
+      },
+      reimbursement: {
           privatePay: 'Premium-Segment €45K-€65K per Procedure',
           insurance: 'Medicare/Medicaid Coverage: DRG 266-267 Percutaneous Cardiovascular Procedures - Average Reimbursement €38.500',
           cptCodes: 'CPT 33361 (€42.800), CPT 33362 (€38.200), CPT 33363 (€35.900), CPT 33364 (€41.500)',
           internationalCoverage: 'EU: €35K-€48K (Germany), €32K-€45K (France), €38K-€52K (Switzerland), €29K-€41K (Italy)',
           volumeProjections: '2.400 Procedures Year 1 → €96M Revenue, 4.100 Procedures Year 2 → €164M Revenue',
           marketAccess: '127 TAVR-Zentren in Deutschland, 89 in Frankreich, 67 in Italien - Total Addressable: €2.8B'
-        },
-        healthEconomics: {
+      },
+      healthEconomics: {
           costEffectiveness: {
             qalys: '14.2 Quality-Adjusted Life Years gained vs. 11.8 medical therapy',
             icer: '€24.500 per QALY (below €35K threshold)',
@@ -405,10 +404,49 @@ const getEnhancedAnalysisData = (update: RegulatoryUpdate) => {
           }
         }
       }
-    }
-  };
+    };
 
-  return baseAnalyses['default'];
+    const aiAnalysis = {
+      riskScore: analysis.riskScore,
+      successProbability: analysis.successProbability,
+      complexity: analysis.complexity,
+      recommendations: update.update_type === 'approval' ? [
+        `Priorität auf ${update.region}-spezifische Marktzulassungsstrategien legen für beschleunigte Time-to-Market`,
+        `Entwicklung gezielter Schulungsprogramme für Fachkräfte in ${update.device_classes?.join(', ') || 'relevanten Geräteklassen'}`,
+        `Aufbau strategischer Partnerschaften mit führenden medizinischen Einrichtungen in der ${update.region}-Region`,
+        `Implementation eines robusten Post-Market Surveillance Systems gemäß ${update.region === 'EU' ? 'EU MDR' : 'FDA CFR'} Anforderungen`,
+        `Fokus auf Kosten-Nutzen-Narrative für Verhandlungen mit regionalen Kostenträgern und HTA-Agenturen`
+      ] : update.update_type === 'recall' ? [
+        `Sofortige Risikobewertung und Kommunikationsstrategie für betroffene ${update.device_classes?.join(', ') || 'Geräteklassen'}`,
+        `Entwicklung umfassender Corrective Action Plans (CAPA) zur Ursachenbehebung`,
+        `Verstärkung der Qualitätsmanagementsysteme zur Verhinderung ähnlicher Vorfälle`,
+        `Proaktive Kommunikation mit Regulierungsbehörden und Stakeholdern zur Vertrauenswahrung`,
+        `Post-Recall Market Recovery Strategie mit verbesserter Produktsicherheit als Differentiator`
+      ] : [
+        `Detaillierte Analyse der ${update.title.substring(0, 50)} Guidance-Auswirkungen auf bestehende Produktportfolios`,
+        `Entwicklung Implementation-Roadmap für neue regulatorische Anforderungen`,
+        `Training der relevanten Teams zu aktualisierten Compliance-Standards`,
+        `Gap-Analyse bestehender Prozesse gegen neue Guidance-Vorgaben`,
+        `Aufbau interner Expertise für kontinuierliche Regulatory Intelligence Monitoring`
+      ],
+      keyActions: [
+        {
+          action: `${update.update_type === 'approval' ? 'FDA Pre-Submission Meeting vorbereiten' : update.update_type === 'recall' ? 'Sofortige Risikobewertung durchführen' : 'Gap-Analyse starten'}`,
+          timeline: `${update.priority === 'high' ? '48 Stunden' : '1-2 Wochen'}`,
+          priority: update.priority === 'high' ? 'Kritisch' : 'Hoch'
+        },
+        {
+          action: `${update.update_type === 'approval' ? 'Klinische Studien Design finalisieren' : update.update_type === 'recall' ? 'CAPA-Plan entwickeln' : 'Compliance-Training implementieren'}`,
+          timeline: `${update.update_type === 'approval' ? '6-8 Wochen' : update.update_type === 'recall' ? '2-4 Wochen' : '3-6 Wochen'}`,
+          priority: 'Hoch'
+        }
+      ]
+    };
+
+  return {
+    financialAnalysis,
+    aiAnalysis
+  };
 };
 
 export default function RegulatoryUpdates() {
