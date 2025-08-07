@@ -116,14 +116,15 @@ export class DataCollectionService {
     }
 
     // Erweitere kurze Beschreibungen mit detaillierten Inhalten basierend auf Update-Typ
-    switch (update.update_type) {
+    const updateType = update.type || 'approval';
+    switch (updateType) {
       case 'approval':
         return `${baseContent}
 
 **VOLLSTÄNDIGE ZULASSUNGSINFORMATIONEN:**
 
 **Produktspezifikationen und Klassifizierung:**
-• **Medizinprodukte-Klassifizierung**: ${update.device_classes?.join(', ') || 'Klasse II/III Medizinprodukt nach EU MDR'}
+• **Medizinprodukte-Klassifizierung**: ${Array.isArray(update.categories) ? update.categories.join(', ') : 'Klasse II/III Medizinprodukt nach EU MDR'}
 • **Anwendungsbereiche**: Klinische Diagnostik, Therapeutische Intervention, Patientenmonitoring
 • **Zielgruppen**: Fachpersonal im Gesundheitswesen, spezialisierte Kliniken, ambulante Versorgung
 • **Technische Standards**: ISO 13485, ISO 14971, IEC 60601, IEC 62304 vollständige Compliance
@@ -261,6 +262,35 @@ export class DataCollectionService {
 • **Cost Implications**: Detaillierte Kostenanalyse der neuen Anforderungen nach Unternehmensgröße
 • **Best Practices**: Sammlung bewährter Implementierungsstrategien aus der Industrie
 • **Transition Support**: Umfassende Übergangshilfen und Beratungsangebote für Unternehmen`;
+    }
+  }
+
+  /**
+   * Erweitert alle bestehenden Regulatory Updates mit vollständigen Inhalten
+   */
+  async enhanceExistingUpdates(): Promise<void> {
+    console.log('[DataCollectionService] Enhancing existing regulatory updates...');
+    
+    try {
+      const allUpdates = await storage.getAllRegulatoryUpdates();
+      let enhancedCount = 0;
+      
+      for (const update of allUpdates) {
+        // Prüfe ob Update bereits ausführlich ist (>1000 Zeichen)
+        if (update.description && update.description.length < 1000) {
+          const enhancedDescription = this.enhanceUpdateContent(update);
+          
+          // Update in der Datenbank mit SQL
+          await storage.sql`UPDATE regulatory_updates SET description = ${enhancedDescription} WHERE id = ${update.id}`;
+          
+          enhancedCount++;
+          console.log(`[DataCollectionService] Enhanced update: ${update.title}`);
+        }
+      }
+      
+      console.log(`[DataCollectionService] Enhanced ${enhancedCount} regulatory updates with detailed content`);
+    } catch (error) {
+      console.error('[DataCollectionService] Error enhancing existing updates:', error);
     }
   }
 
