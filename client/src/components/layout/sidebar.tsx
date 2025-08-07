@@ -83,7 +83,6 @@ const navigationStructure: Record<string, NavigationSection> = {
       { name: "Historische Daten", href: "/historical-data", icon: Archive },
       { name: "Benutzerverwaltung", href: "/user-management", icon: Users },
       { name: "System-Verwaltung", href: "/administration", icon: Settings },
-      { name: "Datenquellen-Admin", href: "/administration/data-sources", icon: Database },
       { name: "Audit-Protokolle", href: "/audit-logs", icon: FileSearch },
     ],
     defaultOpen: false,
