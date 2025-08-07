@@ -80,7 +80,6 @@ const navigationStructure: Record<string, NavigationSection> = {
       { name: "Sync-Verwaltung", href: "/sync-manager", icon: RefreshCw },
       { name: "Globale Quellen", href: "/global-sources", icon: Globe },
       { name: "Newsletter Manager", href: "/newsletter-manager", icon: Newspaper },
-      { name: "Genehmigungsprozess", href: "/approval-workflow", icon: CheckCircle },
       { name: "Historische Daten", href: "/historical-data", icon: Archive },
       { name: "Benutzerverwaltung", href: "/user-management", icon: Users },
       { name: "System-Verwaltung", href: "/administration", icon: Settings },

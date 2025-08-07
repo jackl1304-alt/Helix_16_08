@@ -64,13 +64,7 @@ const navigation = [
     current: false,
     description: "Newsletter-Verwaltung"
   },
-  {
-    name: "Genehmigungsworkflow",
-    href: "/approval-workflow",
-    icon: CheckCircle,
-    current: false,
-    description: "Freigabeprozesse"
-  },
+
   {
     name: "Historische Daten",
     href: "/historical-data",

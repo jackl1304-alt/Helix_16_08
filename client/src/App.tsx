@@ -25,7 +25,7 @@ const Analytics = lazy(() => import("@/pages/analytics"));
 const RegulatoryUpdatesNew = lazy(() => import("@/pages/regulatory-updates-clean"));
 const RegulatoryUpdatesFinal = lazy(() => import("@/pages/regulatory-updates-individual"));
 const NewsletterManager = lazy(() => import("@/pages/newsletter-manager"));
-const ApprovalWorkflow = lazy(() => import("@/pages/approval-workflow"));
+
 const UserManagement = lazy(() => import("@/pages/user-management"));
 const SystemSettings = lazy(() => import("@/pages/system-settings"));
 const AuditLogs = lazy(() => import("@/pages/audit-logs"));
@@ -77,7 +77,7 @@ function Router() {
         <Route path="/regulatory-updates-old" component={RegulatoryUpdatesNew} />
         <Route path="/sync-manager" component={SyncManagerNew} />
         <Route path="/newsletter-manager" component={NewsletterManager} />
-        <Route path="/approval-workflow" component={ApprovalWorkflow} />
+
         <Route path="/user-management" component={UserManagement} />
         <Route path="/system-settings" component={SystemSettings} />
         <Route path="/audit-logs" component={AuditLogs} />
