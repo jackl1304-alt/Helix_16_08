@@ -38,6 +38,7 @@ interface NavigationSection {
   title: string;
   items: NavigationItem[];
   defaultOpen?: boolean;
+  hiddenItems?: NavigationItem[];
 }
 
 const navigationStructure: Record<string, NavigationSection> = {
@@ -76,11 +77,8 @@ const navigationStructure: Record<string, NavigationSection> = {
   advanced: {
     title: "ERWEITERT",
     items: [
-      { name: "🧠", href: "/ai-content-analysis", icon: Brain },
-      { name: "🤖", href: "/ki-insights", icon: Bot },
       { name: "Sync-Verwaltung", href: "/sync-manager", icon: RefreshCw },
       { name: "Globale Quellen", href: "/global-sources", icon: Globe },
-      { name: "✨", href: "/grip-integration", icon: Sparkles },
       { name: "Newsletter Manager", href: "/newsletter-manager", icon: Newspaper },
       { name: "Genehmigungsprozess", href: "/approval-workflow", icon: CheckCircle },
       { name: "Historische Daten", href: "/historical-data", icon: Archive },
@@ -89,7 +87,12 @@ const navigationStructure: Record<string, NavigationSection> = {
       { name: "Datenquellen-Admin", href: "/administration/data-sources", icon: Database },
       { name: "Audit-Protokolle", href: "/audit-logs", icon: FileSearch },
     ],
-    defaultOpen: false
+    defaultOpen: false,
+    hiddenItems: [
+      { name: "🧠", href: "/ai-content-analysis", icon: Brain },
+      { name: "🤖", href: "/ki-insights", icon: Bot },
+      { name: "✨", href: "/grip-integration", icon: Sparkles },
+    ]
   }
 };
 
@@ -132,6 +135,33 @@ export function Sidebar() {
     );
   };
 
+  const renderHiddenItems = (hiddenItems: NavigationItem[]) => {
+    return (
+      <div className="flex justify-center space-x-4 py-3 border-t border-gray-200 dark:border-gray-700 mt-2">
+        {hiddenItems.map((item) => {
+          const isActive = location === item.href;
+          const IconComponent = item.icon;
+          
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-300 cursor-pointer",
+                isActive
+                  ? "bg-[#07233e] text-white shadow-md"
+                  : "text-gray-700 hover:bg-[#f0f8ff] hover:text-[#07233e]"
+              )}
+              title={item.name}
+            >
+              <IconComponent className="h-5 w-5" />
+            </Link>
+          );
+        })}
+      </div>
+    );
+  };
+
   const renderNavigationSection = (sectionKey: string, section: NavigationSection) => {
     const isExpanded = expandedSections[sectionKey];
     const ChevronIcon = isExpanded ? ChevronDown : ChevronRight;
@@ -149,6 +179,7 @@ export function Sidebar() {
         {isExpanded && (
           <div className="mt-1 space-y-1">
             {section.items.map(renderNavigationItem)}
+            {section.hiddenItems && renderHiddenItems(section.hiddenItems)}
           </div>
         )}
       </div>
