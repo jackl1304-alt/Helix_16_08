@@ -264,13 +264,8 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {(() => {
-                    const updates = Array.isArray(recentUpdates) 
-                      ? recentUpdates 
-                      : Array.isArray((recentUpdates as any)?.data) 
-                        ? (recentUpdates as any).data 
-                        : [];
-                    return updates.slice(0, 3).map((update: any, index: number) => (
+                  {recentUpdates && Array.isArray(recentUpdates) && recentUpdates.length > 0 ? (
+                    recentUpdates.slice(0, 3).map((update: any, index: number) => (
                       <div key={index} className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                         <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
                         <div className="flex-1">
@@ -290,9 +285,30 @@ export default function Dashboard() {
                           </div>
                         </div>
                       </div>
-                    ));
-                  })()}
-                  {(!Array.isArray(recentUpdates) && !Array.isArray((recentUpdates as any)?.data)) && (
+                    ))
+                  ) : recentUpdates && (recentUpdates as any)?.data && Array.isArray((recentUpdates as any).data) ? (
+                    (recentUpdates as any).data.slice(0, 3).map((update: any, index: number) => (
+                      <div key={index} className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                        <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-900 line-clamp-2">
+                            {update.title}
+                          </h4>
+                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                            {update.summary || update.content?.substring(0, 100) + '...'}
+                          </p>
+                          <div className="flex items-center gap-4 mt-2">
+                            <Badge variant="secondary" className="text-xs">
+                              {update.authority || 'FDA'}
+                            </Badge>
+                            <span className="text-xs text-gray-500">
+                              {new Date(update.published_at).toLocaleDateString('de-DE')}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
                     <div className="text-center py-8 text-gray-500">
                       <Clock className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                       <p>Lade neueste Updates...</p>
