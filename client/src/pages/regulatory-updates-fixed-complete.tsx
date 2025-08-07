@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { PDFDownloadButton } from '@/components/ui/pdf-download-button';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { useDevice } from '@/hooks/use-device';
@@ -535,15 +536,25 @@ export default function RegulatoryUpdates() {
                 </Badge>
               </div>
             </div>
-            <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-              <div className="flex items-center space-x-1">
-                <Calendar className="w-4 h-4" />
-                <span>{new Date(update.published_at).toLocaleDateString('de-DE')}</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex items-center space-x-1">
+                  <Calendar className="w-4 h-4" />
+                  <span>{new Date(update.published_at).toLocaleDateString('de-DE')}</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <Building2 className="w-4 h-4" />
+                  <span className="truncate">{update.source_id}</span>
+                </div>
               </div>
-              <div className="flex items-center space-x-1">
-                <Building2 className="w-4 h-4" />
-                <span className="truncate">{update.source_id}</span>
-              </div>
+              <PDFDownloadButton 
+                id={update.id}
+                type="regulatory-update"
+                title={`${update.title} - PDF Export`}
+                variant="outline"
+                size="sm"
+                showText={true}
+              />
             </div>
           </div>
           {update.description && (
