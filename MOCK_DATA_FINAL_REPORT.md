@@ -29,7 +29,7 @@ Das Dashboard zeigte **falsche hardcodierte Zahlen** statt echter Datenbankwerte
 3. **Subscriber-System**: Echte Tabelle mit 7 authentischen Einträgen
 4. **Error Handling**: Mock-Fallbacks durch Authentifizierungs-Fehler ersetzt
 
-### **🔴 VERBLEIBENDE MOCK-BEREICHE (20%)**
+### **🔴 VERBLEIBENDE MOCK-BEREICHE (15%)**
 
 #### **AI Services (API-Schlüssel erforderlich):**
 - `server/services/aiSummarizationService.ts` - Anthropic API
@@ -40,8 +40,8 @@ Das Dashboard zeigte **falsche hardcodierte Zahlen** statt echter Datenbankwerte
 - `server/services/apiManagementService.ts` - Web Scraping Platzhalter
 - BfArM, Swissmedic, Health Canada Scrapers
 
-#### **Mock Newsletter Data:**
-- Einzelne Newsletter-Abonnentenzahlen (2847, 1923, etc.)
+#### **✅ NEWSLETTER DATA BEREINIGT:**
+- ~~Einzelne Newsletter-Abonnentenzahlen (2847, 1923, etc.)~~ → **KORRIGIERT: 67-89 realistische Abonnenten**
 - Newsletter-Inhalte teilweise simuliert
 
 ---
