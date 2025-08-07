@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { FormattedText } from "@/components/formatted-text";
 import { Bell, FileText, Download, Search, Globe, AlertTriangle, Clock, Eye, TrendingUp, Brain, BarChart3, Target, DollarSign, Activity, Lightbulb, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -1115,14 +1116,36 @@ export default function RegulatoryUpdates() {
                     </div>
                     
                     <div className="flex items-center gap-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="text-xs flex-1 sm:flex-none"
+                          >
+                            <Eye className="h-3 w-3 mr-1" />
+                            <span className="sm:inline">6-Tab Details</span>
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden p-4 sm:p-6">
+                          <DialogHeader className="pb-4">
+                            <DialogTitle className="text-lg sm:text-xl font-bold line-clamp-2">{update.title}</DialogTitle>
+                          </DialogHeader>
+                          
+                          <div className="overflow-y-auto max-h-[calc(90vh-120px)]">
+                            {renderEnhancedAnalysis(update)}
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                      
                       <Button 
                         onClick={() => setLocation(`/regulatory-updates/${update.id}`)}
-                        variant="outline" 
+                        variant="ghost" 
                         size="sm" 
-                        className="text-xs flex-1 sm:flex-none"
+                        className="text-xs"
                       >
-                        <Eye className="h-3 w-3 mr-1" />
-                        <span className="sm:inline">Details</span>
+                        <FileText className="h-3 w-3 mr-1" />
+                        <span className="hidden sm:inline">Separate Seite</span>
                       </Button>
                       
                       <PDFDownloadButton 
