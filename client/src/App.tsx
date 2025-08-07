@@ -22,7 +22,7 @@ const Landing = lazy(() => import("@/pages/landing"));
 const DataCollection = lazy(() => import("@/pages/data-collection"));
 const GlobalSources = lazy(() => import("@/pages/global-sources"));
 const Analytics = lazy(() => import("@/pages/analytics"));
-const RegulatoryUpdatesNew = lazy(() => import("@/pages/regulatory-updates-clean"));
+const RegulatoryUpdatesNew = lazy(() => import("@/pages/regulatory-updates-fixed-complete"));
 const RegulatoryUpdatesFinal = lazy(() => import("@/pages/regulatory-updates-individual"));
 const NewsletterManager = lazy(() => import("@/pages/newsletter-manager"));
 
@@ -73,7 +73,7 @@ function Router() {
         <Route path="/global-sources" component={GlobalSources} />
         <Route path="/analytics" component={Analytics} />
         <Route path="/regulatory-updates/:id" component={RegulatoryUpdateDetail} />
-        <Route path="/regulatory-updates" component={RegulatoryUpdatesFinal} />
+        <Route path="/regulatory-updates" component={RegulatoryUpdatesNew} />
         <Route path="/regulatory-updates-old" component={RegulatoryUpdatesNew} />
         <Route path="/sync-manager" component={SyncManagerNew} />
         <Route path="/newsletter-manager" component={NewsletterManager} />
