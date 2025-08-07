@@ -1052,92 +1052,70 @@ export default function RegulatoryUpdates() {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {filteredUpdates.map((update) => (
-                <div 
-                  key={update.id} 
-                  className="p-4 sm:p-6 border rounded-lg hover:shadow-md transition-all duration-200 bg-white dark:bg-slate-800/50"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
-                        <Badge className={`${priorityColors[update.priority]} text-xs`}>
-                          {priorityLabels[update.priority]}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          {update.region}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs capitalize">
-                          {update.update_type}
-                        </Badge>
-                      </div>
-                      <h3 className="text-base sm:text-lg font-semibold mb-2 line-clamp-2">
-                        {update.title}
-                      </h3>
-                      <FormattedText 
-                        text={update.description?.substring(0, device.isMobile ? 150 : 300) + '...' || 'Keine Beschreibung verfügbar'}
-                        className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 sm:line-clamp-3 mb-3"
-                      />
-                      
-                      {update.device_classes && update.device_classes.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mb-3">
-                          <span className="text-xs text-slate-500 mr-1 sm:mr-2 whitespace-nowrap">Geräteklassen:</span>
-                          {update.device_classes.slice(0, device.isMobile ? 2 : 3).map((deviceClass, idx) => (
-                            <Badge key={idx} variant="secondary" className="text-xs">
-                              {deviceClass}
-                            </Badge>
-                          ))}
-                          {update.device_classes.length > (device.isMobile ? 2 : 3) && (
-                            <Badge variant="secondary" className="text-xs">
-                              +{update.device_classes.length - (device.isMobile ? 2 : 3)}
-                            </Badge>
-                          )}
+                <Card key={update.id} className="hover:shadow-lg transition-all duration-200">
+                  <CardHeader className="pb-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-3">
+                          <Badge className={`${priorityColors[update.priority]} text-xs`}>
+                            {priorityLabels[update.priority]}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {update.region}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs capitalize">
+                            {update.update_type}
+                          </Badge>
                         </div>
-                      )}
-                    </div>
-                    
-                    <div className="text-right text-xs sm:text-sm text-slate-500 flex-shrink-0">
-                      <div className="font-medium">
-                        {new Date(update.published_at).toLocaleDateString('de-DE')}
-                      </div>
-                      <div className="hidden sm:block">
-                        {new Date(update.published_at).toLocaleTimeString('de-DE', { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        })}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-3 sm:pt-4 border-t gap-3">
-                    <div className="flex items-center gap-2 text-xs text-slate-500">
-                      <FileText className="h-3 w-3 flex-shrink-0" />
-                      <span className="truncate">Quelle: {update.source_id}</span>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="text-xs flex-1 sm:flex-none"
-                          >
-                            <Eye className="h-3 w-3 mr-1" />
-                            <span className="sm:inline">6-Tab Details</span>
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden p-4 sm:p-6">
-                          <DialogHeader className="pb-4">
-                            <DialogTitle className="text-lg sm:text-xl font-bold line-clamp-2">{update.title}</DialogTitle>
-                          </DialogHeader>
-                          
-                          <div className="overflow-y-auto max-h-[calc(90vh-120px)]">
-                            {renderEnhancedAnalysis(update)}
+                        <CardTitle className="text-base sm:text-lg line-clamp-2 mb-2">
+                          {update.title}
+                        </CardTitle>
+                        <CardDescription className="line-clamp-2 sm:line-clamp-3">
+                          {update.description?.substring(0, device.isMobile ? 150 : 300) + '...' || 'Keine Beschreibung verfügbar'}
+                        </CardDescription>
+                        
+                        {update.device_classes && update.device_classes.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-3">
+                            <span className="text-xs text-slate-500 mr-1 sm:mr-2 whitespace-nowrap">Geräteklassen:</span>
+                            {update.device_classes.slice(0, device.isMobile ? 2 : 3).map((deviceClass, idx) => (
+                              <Badge key={idx} variant="secondary" className="text-xs">
+                                {deviceClass}
+                              </Badge>
+                            ))}
+                            {update.device_classes.length > (device.isMobile ? 2 : 3) && (
+                              <Badge variant="secondary" className="text-xs">
+                                +{update.device_classes.length - (device.isMobile ? 2 : 3)}
+                              </Badge>
+                            )}
                           </div>
-                        </DialogContent>
-                      </Dialog>
+                        )}
+                      </div>
                       
+                      <div className="text-right text-xs sm:text-sm text-slate-500 flex-shrink-0">
+                        <div className="font-medium">
+                          {new Date(update.published_at).toLocaleDateString('de-DE')}
+                        </div>
+                        <div className="hidden sm:block">
+                          {new Date(update.published_at).toLocaleTimeString('de-DE', { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })}
+                        </div>
+                        <div className="flex items-center gap-1 mt-2 justify-end">
+                          <FileText className="h-3 w-3" />
+                          <span className="text-xs">Quelle: {update.source_id}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="pt-0">
+                    {/* 6-Tab Navigation direkt sichtbar wie bei Rechtsfällen */}
+                    {renderEnhancedAnalysis(update)}
+                    
+                    <div className="flex items-center gap-2 mt-6 pt-4 border-t">
                       <Button 
                         onClick={() => setLocation(`/regulatory-updates/${update.id}`)}
                         variant="ghost" 
@@ -1155,8 +1133,8 @@ export default function RegulatoryUpdates() {
                         className="text-xs"
                       />
                     </div>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           )}
