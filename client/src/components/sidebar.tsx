@@ -41,13 +41,7 @@ const navigation = [
     current: false,
     description: "Weltweite Regulierungsquellen"
   },
-  {
-    name: "GRIP Integration",
-    href: "/grip-integration",
-    icon: Activity,
-    current: false,
-    description: "Zugangsdaten unter Verwaltung"
-  },
+
   {
     name: "Analytics",
     href: "/analytics",
@@ -91,13 +85,7 @@ const navigation = [
     current: false,
     description: "Jurisprudenz-Datenbank"
   },
-  {
-    name: "KI-Analyse",
-    href: "/ai-content-analysis", 
-    icon: Brain,
-    current: false,
-    description: "AI-gestützte Inhaltsanalyse"
-  },
+
   {
     name: "Knowledge Base",
     href: "/knowledge-base",

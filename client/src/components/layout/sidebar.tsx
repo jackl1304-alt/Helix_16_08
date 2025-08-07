@@ -21,7 +21,8 @@ import {
   ChevronDown,
   ChevronRight,
   Mail,
-  Bot
+  Bot,
+  Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoPath from "@assets/ICON Helix_1753735921077.jpg";
@@ -71,23 +72,15 @@ const navigationStructure: Record<string, NavigationSection> = {
     defaultOpen: true
   },
 
-  // 4. KI & AUTOMATISIERUNG
-  aiAutomation: {
-    title: "KI & AUTOMATISIERUNG",
-    items: [
-      { name: "KI-Analyse", href: "/ai-content-analysis", icon: Brain },
-      { name: "KI Insights", href: "/ki-insights", icon: Bot },
-    ],
-    defaultOpen: true
-  },
-
-  // 5. ERWEITERT (kollabierbar)
+  // 4. ERWEITERT (kollabierbar)
   advanced: {
     title: "ERWEITERT",
     items: [
+      { name: "KI-Analyse", href: "/ai-content-analysis", icon: Brain },
+      { name: "KI Insights", href: "/ki-insights", icon: Bot },
       { name: "Sync-Verwaltung", href: "/sync-manager", icon: RefreshCw },
       { name: "Globale Quellen", href: "/global-sources", icon: Globe },
-      { name: "GRIP Integration", href: "/grip-data", icon: Shield },
+      { name: "GRIP Integration", href: "/grip-integration", icon: Sparkles },
       { name: "Newsletter Manager", href: "/newsletter-manager", icon: Newspaper },
       { name: "Genehmigungsprozess", href: "/approval-workflow", icon: CheckCircle },
       { name: "Historische Daten", href: "/historical-data", icon: Archive },
