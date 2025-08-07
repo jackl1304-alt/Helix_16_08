@@ -514,368 +514,386 @@ export default function RegulatoryUpdates() {
     }
   };
 
-  const RegionalUpdateDialog = ({ update }: { update: RegulatoryUpdate }) => {
+  const RegulatoryUpdateCard = ({ update }: { update: RegulatoryUpdate }) => {
     const analysisData = getEnhancedAnalysisData(update);
 
     return (
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="ghost" className="h-auto p-0 justify-start text-left hover:bg-transparent">
-            <Card className="w-full hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-blue-500">
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center space-x-2 mb-2">
-                      {getTypeIcon(update.update_type)}
-                      <Badge variant="outline" className={getPriorityColor(update.priority)}>
-                        {priorityTranslations[update.priority as keyof typeof priorityTranslations]}
-                      </Badge>
-                      <Badge variant="secondary">
-                        {update.region}
-                      </Badge>
-                    </div>
-                    <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-gray-100 line-clamp-2">
-                      {update.title}
-                    </h3>
-                    {update.description && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-3">
-                        {update.description}
-                      </p>
-                    )}
-                    <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="w-4 h-4" />
-                        <span>{new Date(update.published_at).toLocaleDateString('de-DE')}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Building2 className="w-4 h-4" />
-                        <span className="truncate">{update.source_id}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
-          <DialogHeader>
-            <DialogTitle className="flex items-center space-x-2">
-              {getTypeIcon(update.update_type)}
-              <span className="text-lg">{update.title}</span>
-            </DialogTitle>
-          </DialogHeader>
-          
-          <Tabs defaultValue="overview" className="flex-1 overflow-hidden">
+      <Card key={update.id} className="hover:shadow-lg transition-shadow border-l-4 border-l-blue-500">
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div className="flex-1">
+              <CardTitle className="text-xl mb-2 flex items-center gap-2">
+                {getTypeIcon(update.update_type)}
+                {update.title}
+              </CardTitle>
+              <div className="flex items-center space-x-2 mb-2">
+                <Badge variant="outline" className={getPriorityColor(update.priority)}>
+                  {priorityTranslations[update.priority as keyof typeof priorityTranslations]}
+                </Badge>
+                <Badge variant="secondary">
+                  {update.region}
+                </Badge>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+              <div className="flex items-center space-x-1">
+                <Calendar className="w-4 h-4" />
+                <span>{new Date(update.published_at).toLocaleDateString('de-DE')}</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <Building2 className="w-4 h-4" />
+                <span className="truncate">{update.source_id}</span>
+              </div>
+            </div>
+          </div>
+          {update.description && (
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+              {update.description}
+            </p>
+          )}
+        </CardHeader>
+        
+        <CardContent>
+          <Tabs defaultValue="overview" className="w-full">
             <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="overview">Übersicht</TabsTrigger>
               <TabsTrigger value="summary">Zusammenfassung</TabsTrigger>
               <TabsTrigger value="content">Vollständiger Inhalt</TabsTrigger>
-              <TabsTrigger value="financial">Finanzanalyse</TabsTrigger>
-              <TabsTrigger value="ai">KI-Analyse</TabsTrigger>
+              <TabsTrigger value="financial">💰 Finanzanalyse</TabsTrigger>
+              <TabsTrigger value="ai">🤖 KI-Analyse</TabsTrigger>
               <TabsTrigger value="metadata">Metadaten</TabsTrigger>
             </TabsList>
-
-            <div className="mt-4 overflow-y-auto max-h-[calc(90vh-200px)]">
-              <TabsContent value="overview" className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-base flex items-center space-x-2">
-                        <Info className="w-4 h-4" />
-                        <span>Grundinformationen</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div>
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Typ:</span>
-                        <p className="capitalize">{update.update_type}</p>
-                      </div>
-                      <div>
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Region:</span>
-                        <p>{update.region}</p>
-                      </div>
-                      <div>
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Priorität:</span>
-                        <Badge className={getPriorityColor(update.priority)}>
-                          {priorityTranslations[update.priority as keyof typeof priorityTranslations]}
-                        </Badge>
-                      </div>
-                      <div>
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Veröffentlicht:</span>
-                        <p>{new Date(update.published_at).toLocaleDateString('de-DE')}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-base flex items-center space-x-2">
-                        <Target className="w-4 h-4 text-blue-600" />
-                        <span>Risiko-Score</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-blue-600 mb-2">
-                          {analysisData.aiAnalysis.riskScore}/100
+            
+            <TabsContent value="overview" className="mt-4">
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg">
+                <h4 className="font-semibold text-blue-900 dark:text-blue-200 mb-4 flex items-center gap-2">
+                  <Info className="w-5 h-5" />
+                  Überblick & Kerndaten
+                </h4>
+                
+                <div className="bg-white dark:bg-gray-800 p-6 rounded border max-h-[600px] overflow-y-auto">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-base flex items-center space-x-2">
+                          <Target className="w-4 h-4 text-blue-600" />
+                          <span>Risiko-Score</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-blue-600 mb-2">
+                            {analysisData.aiAnalysis.riskScore}/100
+                          </div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">
+                            Komplexität: {analysisData.aiAnalysis.complexity}
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                          Komplexität: {analysisData.aiAnalysis.complexity}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-base flex items-center space-x-2">
-                        <TrendingUp className="w-4 h-4 text-green-600" />
-                        <span>Erfolgswahrscheinlichkeit</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-green-600 mb-2">
-                          {analysisData.aiAnalysis.successProbability}%
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-base flex items-center space-x-2">
+                          <TrendingUp className="w-4 h-4 text-green-600" />
+                          <span>Erfolgswahrscheinlichkeit</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-green-600 mb-2">
+                            {analysisData.aiAnalysis.successProbability}%
+                          </div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">
+                            Implementierungswahrscheinlichkeit
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                          Implementierungswahrscheinlichkeit
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-base flex items-center space-x-2">
+                          <DollarSign className="w-4 h-4 text-green-600" />
+                          <span>Kosten</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-green-600 mb-2">
+                            {analysisData.financialAnalysis.implementation.totalCost}
+                          </div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">
+                            Timeline: {analysisData.financialAnalysis.implementation.timeline}
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                      </CardContent>
+                    </Card>
+                  </div>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <FileText className="w-5 h-5" />
-                      <span>Kurzbeschreibung</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-700 dark:text-gray-300">
-                      {update.description || 'Keine Beschreibung verfügbar'}
-                    </p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="summary" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Zusammenfassung</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="font-semibold mb-2">Wichtigste Punkte:</h4>
-                        <ul className="space-y-2">
-                          {analysisData.aiAnalysis.recommendations.slice(0, 3).map((rec, idx) => (
-                            <li key={idx} className="flex items-start space-x-2">
-                              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
-                              <span className="text-sm">{rec}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      
-                      <div className="border-t pt-4">
-                        <h4 className="font-semibold mb-2">Auswirkungen:</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Dieses Update erfordert eine angemessene Reaktion basierend auf der {analysisData.aiAnalysis.complexity.toLowerCase()}en Komplexität 
-                          und einer Erfolgswahrscheinlichkeit von {analysisData.aiAnalysis.successProbability}%.
-                        </p>
-                      </div>
+                  <div className="space-y-4">
+                    <div>
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Typ:</span>
+                      <p className="capitalize">{update.update_type}</p>
                     </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="content" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Vollständiger Inhalt</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="prose prose-sm max-w-none dark:prose-invert">
-                      <div className="whitespace-pre-wrap">
-                        {update.content || update.description || 'Kein vollständiger Inhalt verfügbar.'}
-                      </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Region:</span>
+                      <p>{update.region}</p>
                     </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="financial" className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Implementation Costs */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center space-x-2 text-green-600">
-                        <DollarSign className="w-5 h-5" />
-                        <span>Implementierungskosten</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div className="text-lg font-semibold">
-                          {analysisData.financialAnalysis.implementation.totalCost}
-                        </div>
-                        <div className="space-y-2">
-                          {Object.entries(analysisData.financialAnalysis.implementation.breakdown).map(([key, value]) => (
-                            <div key={key} className="flex justify-between items-center text-sm">
-                              <span className="text-gray-600 dark:text-gray-400">{key}:</span>
-                              <span className="font-semibold">{value}</span>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="pt-3 border-t">
-                          <div className="text-sm text-gray-600 dark:text-gray-400">Timeline:</div>
-                          <div className="font-semibold">{analysisData.financialAnalysis.implementation.timeline}</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* ROI Projection */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center space-x-2 text-blue-600">
-                        <TrendingUp className="w-5 h-5" />
-                        <span>ROI-Projektion</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div className="space-y-3">
-                          <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                            <span className="text-sm font-medium text-blue-800 dark:text-blue-200">Jahr 1:</span>
-                            <p className="font-semibold text-blue-700 dark:text-blue-300">{analysisData.financialAnalysis.implementation.roi.year1}</p>
-                          </div>
-                          <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                            <span className="text-sm font-medium text-blue-800 dark:text-blue-200">Jahr 3:</span>
-                            <p className="font-semibold text-blue-700 dark:text-blue-300">{analysisData.financialAnalysis.implementation.roi.year3}</p>
-                          </div>
-                          <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
-                            <span className="text-sm font-medium text-green-800 dark:text-green-200">Payback:</span>
-                            <p className="font-semibold text-green-700 dark:text-green-300">{analysisData.financialAnalysis.implementation.roi.payback}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                    <div>
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Priorität:</span>
+                      <Badge className={getPriorityColor(update.priority)}>
+                        {priorityTranslations[update.priority as keyof typeof priorityTranslations]}
+                      </Badge>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Veröffentlicht:</span>
+                      <p>{new Date(update.published_at).toLocaleDateString('de-DE')}</p>
+                    </div>
+                  </div>
                 </div>
-              </TabsContent>
+              </div>
+            </TabsContent>
 
-              <TabsContent value="ai" className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center space-x-2 text-purple-600">
-                        <Zap className="w-5 h-5" />
-                        <span>KI-Empfehlungen</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        {analysisData.aiAnalysis.recommendations.map((rec, idx) => (
-                          <div key={idx} className="flex items-start space-x-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                            <div className="w-6 h-6 bg-purple-600 text-white text-xs rounded-full flex items-center justify-center flex-shrink-0">
-                              {idx + 1}
-                            </div>
-                            <p className="text-sm">{rec}</p>
-                          </div>
+            <TabsContent value="summary" className="mt-4">
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg">
+                <h4 className="font-semibold text-blue-900 dark:text-blue-200 mb-4 flex items-center gap-2">
+                  <FileText className="w-5 h-5" />
+                  Vollständige Zusammenfassung
+                </h4>
+                <div className="bg-white dark:bg-gray-800 p-6 rounded border max-h-[600px] overflow-y-auto">
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold mb-2">Wichtigste Punkte:</h4>
+                      <ul className="space-y-2">
+                        {analysisData.aiAnalysis.recommendations.slice(0, 3).map((rec, idx) => (
+                          <li key={idx} className="flex items-start space-x-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
+                            <span className="text-sm">{rec}</span>
+                          </li>
                         ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center space-x-2 text-orange-600">
-                        <Activity className="w-5 h-5" />
-                        <span>Kritische Aktionen</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {analysisData.aiAnalysis.keyActions.map((action, idx) => (
-                          <div key={idx} className="border-l-4 border-l-orange-500 pl-4 py-3 bg-orange-50 dark:bg-orange-900/20 rounded-r-lg">
-                            <div className="flex items-center justify-between mb-2">
-                              <Badge className={
-                                action.priority === 'Kritisch' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' :
-                                action.priority === 'Hoch' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300' :
-                                'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300'
-                              }>
-                                {action.priority}
-                              </Badge>
-                            </div>
-                            <h4 className="font-semibold text-sm mb-2">{action.action}</h4>
-                            <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                              <Clock className="w-4 h-4" />
-                              <span>{action.timeline}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </ul>
+                    </div>
+                    
+                    <div className="border-t pt-4">
+                      <h4 className="font-semibold mb-2">Auswirkungen:</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Dieses Update erfordert eine angemessene Reaktion basierend auf der {analysisData.aiAnalysis.complexity.toLowerCase()}en Komplexität 
+                        und einer Erfolgswahrscheinlichkeit von {analysisData.aiAnalysis.successProbability}%.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </TabsContent>
+              </div>
+            </TabsContent>
 
-              <TabsContent value="metadata" className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Technische Details</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div>
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Update-ID:</span>
-                        <p className="font-mono text-sm">{update.id}</p>
-                      </div>
-                      <div>
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Quelle:</span>
-                        <p className="text-sm">{update.source_id}</p>
-                      </div>
-                      <div>
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Typ:</span>
-                        <p className="text-sm capitalize">{update.update_type}</p>
-                      </div>
-                      {update.device_classes && (
-                        <div>
-                          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Geräteklassen:</span>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {update.device_classes.map((deviceClass, idx) => (
-                              <Badge key={idx} variant="outline" className="text-xs">
-                                {deviceClass}
-                              </Badge>
+            <TabsContent value="content" className="mt-4">
+              <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+                  <FileText className="w-5 h-5" />
+                  Vollständiger Inhalt & Details
+                </h4>
+                <div className="bg-white dark:bg-gray-800 p-6 rounded border max-h-[600px] overflow-y-auto">
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <div className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">
+                      {update.content || update.description || 'Kein vollständiger Inhalt verfügbar.'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="financial" className="mt-4">
+              <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg">
+                <h4 className="font-semibold text-green-900 dark:text-green-200 mb-4 flex items-center gap-2">
+                  <DollarSign className="w-5 h-5" />
+                  Finanzielle Auswirkungen & ROI-Analyse
+                </h4>
+                <div className="bg-white dark:bg-gray-800 p-6 rounded border max-h-[600px] overflow-y-auto">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Implementation Costs */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center space-x-2 text-green-600">
+                          <DollarSign className="w-5 h-5" />
+                          <span>Implementierungskosten</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="text-lg font-semibold">
+                            {analysisData.financialAnalysis.implementation.totalCost}
+                          </div>
+                          <div className="space-y-2">
+                            {Object.entries(analysisData.financialAnalysis.implementation.breakdown).map(([key, value]) => (
+                              <div key={key} className="flex justify-between items-center text-sm">
+                                <span className="text-gray-600 dark:text-gray-400">{key}:</span>
+                                <span className="font-semibold">{value}</span>
+                              </div>
                             ))}
                           </div>
+                          <div className="pt-3 border-t">
+                            <div className="text-sm text-gray-600 dark:text-gray-400">Timeline:</div>
+                            <div className="font-semibold">{analysisData.financialAnalysis.implementation.timeline}</div>
+                          </div>
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Zeitstempel</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div>
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Veröffentlicht:</span>
-                        <p className="text-sm">{new Date(update.published_at).toLocaleString('de-DE')}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                    {/* ROI Projection */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center space-x-2 text-blue-600">
+                          <TrendingUp className="w-5 h-5" />
+                          <span>ROI-Projektion</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="space-y-3">
+                            <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                              <span className="text-sm font-medium text-blue-800 dark:text-blue-200">Jahr 1:</span>
+                              <p className="font-semibold text-blue-700 dark:text-blue-300">{analysisData.financialAnalysis.implementation.roi.year1}</p>
+                            </div>
+                            <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                              <span className="text-sm font-medium text-blue-800 dark:text-blue-200">Jahr 3:</span>
+                              <p className="font-semibold text-blue-700 dark:text-blue-300">{analysisData.financialAnalysis.implementation.roi.year3}</p>
+                            </div>
+                            <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+                              <span className="text-sm font-medium text-green-800 dark:text-green-200">Payback:</span>
+                              <p className="font-semibold text-green-700 dark:text-green-300">{analysisData.financialAnalysis.implementation.roi.payback}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
-              </TabsContent>
-            </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="ai" className="mt-4">
+              <div className="bg-purple-50 dark:bg-purple-900/20 p-6 rounded-lg">
+                <h4 className="font-semibold text-purple-900 dark:text-purple-200 mb-4 flex items-center gap-2">
+                  <Zap className="w-5 h-5" />
+                  KI-basierte Empfehlungen & Aktionen
+                </h4>
+                <div className="bg-white dark:bg-gray-800 p-6 rounded border max-h-[600px] overflow-y-auto">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center space-x-2 text-purple-600">
+                          <Zap className="w-5 h-5" />
+                          <span>KI-Empfehlungen</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          {analysisData.aiAnalysis.recommendations.map((rec, idx) => (
+                            <div key={idx} className="flex items-start space-x-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                              <div className="w-6 h-6 bg-purple-600 text-white text-xs rounded-full flex items-center justify-center flex-shrink-0">
+                                {idx + 1}
+                              </div>
+                              <p className="text-sm">{rec}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center space-x-2 text-orange-600">
+                          <Activity className="w-5 h-5" />
+                          <span>Kritische Aktionen</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          {analysisData.aiAnalysis.keyActions.map((action, idx) => (
+                            <div key={idx} className="border-l-4 border-l-orange-500 pl-4 py-3 bg-orange-50 dark:bg-orange-900/20 rounded-r-lg">
+                              <div className="flex items-center justify-between mb-2">
+                                <Badge className={
+                                  action.priority === 'Kritisch' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' :
+                                  action.priority === 'Hoch' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300' :
+                                  'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300'
+                                }>
+                                  {action.priority}
+                                </Badge>
+                              </div>
+                              <h4 className="font-semibold text-sm mb-2">{action.action}</h4>
+                              <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                                <Clock className="w-4 h-4" />
+                                <span>{action.timeline}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="metadata" className="mt-4">
+              <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+                  <FileText className="w-5 h-5" />
+                  Technische Metadaten
+                </h4>
+                <div className="bg-white dark:bg-gray-800 p-6 rounded border max-h-[600px] overflow-y-auto">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Technische Details</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div>
+                          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Update-ID:</span>
+                          <p className="font-mono text-sm">{update.id}</p>
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Quelle:</span>
+                          <p className="text-sm">{update.source_id}</p>
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Typ:</span>
+                          <p className="text-sm capitalize">{update.update_type}</p>
+                        </div>
+                        {update.device_classes && (
+                          <div>
+                            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Geräteklassen:</span>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {update.device_classes.map((deviceClass, idx) => (
+                                <Badge key={idx} variant="outline" className="text-xs">
+                                  {deviceClass}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Zeitstempel</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div>
+                          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Veröffentlicht:</span>
+                          <p className="text-sm">{new Date(update.published_at).toLocaleString('de-DE')}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
           </Tabs>
-        </DialogContent>
-      </Dialog>
+        </CardContent>
+      </Card>
     );
   };
 
@@ -1011,9 +1029,9 @@ export default function RegulatoryUpdates() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4">
+        <div className="space-y-6">
           {filteredUpdates.map((update) => (
-            <RegionalUpdateDialog key={update.id} update={update} />
+            <RegulatoryUpdateCard key={update.id} update={update} />
           ))}
         </div>
       )}
