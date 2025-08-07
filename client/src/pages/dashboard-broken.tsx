@@ -458,10 +458,8 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
+  );
 }
-                  <p className="text-xs text-green-600 mt-1">{card.quality}</p>
-                )}
-              </CardContent>
             </Card>
           );
         })}
