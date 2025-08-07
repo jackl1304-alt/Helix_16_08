@@ -1438,6 +1438,37 @@ Informationen über mögliche Rechtsmittel und deren Status sind verfügbar.
     }
   });
 
+  // Knowledge articles with newsletter filter - Newsletter-Artikel anzeigen
+  app.get('/api/knowledge-articles', async (req, res) => {
+    try {
+      const sourceFilter = req.query.source;
+      console.log(`[API] Knowledge articles request with source filter: ${sourceFilter}`);
+      
+      // Get all knowledge articles from storage
+      const allArticles = await storage.getAllKnowledgeArticles();
+      
+      // Filter for newsletter articles if requested
+      let articles = allArticles;
+      if (sourceFilter === 'newsletter') {
+        articles = allArticles.filter(article => 
+          (article.source && article.source.toLowerCase().includes('newsletter')) ||
+          (article.authority && ['FDA News & Updates', 'EMA Newsletter', 'MedTech Dive'].includes(article.authority)) ||
+          (article.tags && article.tags.some((tag: string) => tag.toLowerCase().includes('newsletter')))
+        );
+        console.log(`[API] Filtered for newsletter articles: ${articles.length} found`);
+      }
+      
+      res.json(articles);
+    } catch (error: any) {
+      console.error('Failed to get knowledge articles:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get knowledge articles',
+        error: error.message
+      });
+    }
+  });
+
   app.post('/api/newsletter/sources', async (req, res) => {
     try {
       const sourceData = req.body;

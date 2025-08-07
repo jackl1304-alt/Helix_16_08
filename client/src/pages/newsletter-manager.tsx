@@ -58,6 +58,16 @@ export default function NewsletterManager() {
     queryKey: ["/api/subscribers"],
   });
 
+  // Newsletter-Artikel aus Knowledge Base abrufen
+  const { data: newsletterArticles, isLoading: articlesLoading } = useQuery({
+    queryKey: ["/api/knowledge-articles?source=newsletter"],
+  });
+
+  // Newsletter-Quellen für Extraktion
+  const { data: newsletterSources } = useQuery({
+    queryKey: ["/api/newsletter-sources"],
+  });
+
   const createNewsletterMutation = useMutation({
     mutationFn: async (data: any) => {
       await apiRequest("POST", "/api/newsletters", data);
@@ -162,6 +172,8 @@ export default function NewsletterManager() {
         <div className="flex items-center justify-between">
           <TabsList>
             <TabsTrigger value="newsletters">Newsletters</TabsTrigger>
+            <TabsTrigger value="extracted">Extrahierte Artikel</TabsTrigger>
+            <TabsTrigger value="sources">Quellen</TabsTrigger>
             <TabsTrigger value="subscribers">Subscribers</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
@@ -325,6 +337,143 @@ export default function NewsletterManager() {
                   <div className="text-center py-4 text-gray-500">
                     <Users className="mx-auto h-8 w-8 mb-2" />
                     <p>No subscribers yet</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="extracted">
+          <div className="grid gap-4">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold">Extrahierte Newsletter-Artikel</h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Artikel aus automatischer Newsletter-Extraktion - gespeichert in Knowledge Base
+                    </p>
+                  </div>
+                  <Badge className="bg-blue-100 text-blue-800">
+                    {newsletterArticles?.length || 0} Artikel
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {articlesLoading ? (
+                  <div className="animate-pulse space-y-3">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="h-20 bg-gray-200 rounded"></div>
+                    ))}
+                  </div>
+                ) : newsletterArticles && newsletterArticles.length > 0 ? (
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {newsletterArticles.slice(0, 20).map((article: any) => (
+                      <div key={article.id} className="flex items-start justify-between p-3 border rounded-lg bg-white hover:bg-gray-50">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-sm text-gray-900 truncate">
+                            {article.title}
+                          </h4>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant="outline" className="text-xs">
+                              {article.source || article.authority}
+                            </Badge>
+                            <span className="text-xs text-gray-500">
+                              {new Date(article.published_at || article.created_at).toLocaleDateString('de-DE')}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                            {article.summary || article.content?.slice(0, 100) + '...'}
+                          </p>
+                        </div>
+                        <div className="flex gap-1 ml-2">
+                          <PDFDownloadButton 
+                            type="knowledge-article" 
+                            id={article.id} 
+                            title={`PDF: ${article.title}`}
+                            variant="outline" 
+                            size="sm"
+                          />
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => window.open(`/knowledge-base?highlight=${article.id}`, '_blank')}
+                          >
+                            Details
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <FileText className="mx-auto h-8 w-8 mb-2" />
+                    <p>Keine Newsletter-Artikel extrahiert</p>
+                    <p className="text-xs mt-1">Newsletter-Quellen werden automatisch verarbeitet</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="sources">
+          <div className="grid gap-4">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold">Newsletter-Quellen</h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Konfigurierte Newsletter für automatische Inhaltsextraktion
+                    </p>
+                  </div>
+                  <Badge className="bg-green-100 text-green-800">
+                    {newsletterSources?.filter((s: any) => s.isActive).length || 0} aktiv
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {newsletterSources && newsletterSources.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {newsletterSources.map((source: any) => (
+                      <div key={source.id} className="border rounded-lg p-4 bg-white hover:bg-gray-50">
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="font-medium text-sm text-gray-900">
+                            {source.name}
+                          </h4>
+                          <Badge 
+                            variant={source.isActive ? 'default' : 'secondary'}
+                            className="text-xs"
+                          >
+                            {source.isActive ? 'Aktiv' : 'Inaktiv'}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-gray-600 mb-2 line-clamp-2">
+                          {source.description}
+                        </p>
+                        <div className="flex items-center justify-between text-xs text-gray-500">
+                          <span>{source.frequency || 'Täglich'}</span>
+                          <span>{source.subscriberCount || 0} Abonnenten</span>
+                        </div>
+                        <div className="mt-2">
+                          <a 
+                            href={source.sourceUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-xs text-blue-600 hover:underline"
+                          >
+                            Quelle besuchen →
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <Mail className="mx-auto h-8 w-8 mb-2" />
+                    <p>Keine Newsletter-Quellen konfiguriert</p>
                   </div>
                 )}
               </CardContent>
