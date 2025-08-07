@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 interface DashboardStats {
   activeSources: number;
   todayUpdates: number;
-  pendingApprovals: number;
+
   subscribers: number;
   lastSync: string;
   sourceGrowth: number;
@@ -87,23 +87,7 @@ export function StatusCards() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Pending Approvals</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.pendingApprovals}</p>
-            </div>
-            <div className="p-3 bg-yellow-100 rounded-full">
-              <Clock className="h-5 w-5 text-yellow-600" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-center text-sm">
-            <span className="text-yellow-600 font-medium">{stats.urgentApprovals}</span>
-            <span className="text-gray-600 ml-1">urgent items</span>
-          </div>
-        </CardContent>
-      </Card>
+
 
       <Card>
         <CardContent className="p-6">

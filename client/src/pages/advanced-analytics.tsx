@@ -138,7 +138,7 @@ export default function AdvancedAnalytics() {
     },
     {
       title: "Pending Approvals",
-      value: stats.pendingApprovals || 0,
+
       change: -18.2,
       icon: Clock,
       trend: 'down',

@@ -208,13 +208,7 @@ export default function Dashboard() {
       icon: Users,
       color: "text-orange-600",
     },
-    {
-      title: "Pending Approvals",
-      value: (stats && typeof stats.pendingApprovals === 'number') ? stats.pendingApprovals : 6,
-      description: "Wartende Genehmigungen",
-      icon: CheckCircle,
-      color: "text-indigo-600",
-    },
+
     {
       title: "Active Data Sources",
       value: (stats && typeof stats.activeDataSources === 'number') ? stats.activeDataSources : 70,
