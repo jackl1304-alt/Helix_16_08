@@ -51,7 +51,7 @@ class MorningStorage implements IStorage {
       console.log('[DB] getDashboardStats called - BEREINIGTE ECHTE DATEN');
       
       // Bereinigte Dashboard-Statistiken mit authentischen Daten + Live-Sync-Tracking
-      const [updates, sources, legalCases, newsletters, subscribers, approvals, runningSyncs] = await Promise.all([
+      const [updates, sources, legalCases, newsletters, subscribers, runningSyncs] = await Promise.all([
         sql`SELECT 
           COUNT(*) as total_count,
           COUNT(DISTINCT title) as unique_count,
@@ -65,7 +65,6 @@ class MorningStorage implements IStorage {
         FROM legal_cases`,
         sql`SELECT COUNT(*) as count FROM newsletters`,
         sql`SELECT COUNT(*) as count FROM subscribers WHERE is_active = true`,
-        sql`SELECT COUNT(*) as count FROM approvals WHERE status = 'pending'`,
         sql`SELECT 
           COUNT(*) FILTER (WHERE last_sync_at >= NOW() - INTERVAL '5 minutes') as active_syncs,
           COUNT(*) FILTER (WHERE last_sync_at >= NOW() - INTERVAL '1 hour') as recent_syncs,
@@ -100,7 +99,6 @@ class MorningStorage implements IStorage {
         // 🔴 MOCK DATA REPAIR - Calculate from actual database values
         totalArticles: parseInt(updates[0]?.total_count || '0') + parseInt(legalCases[0]?.total_count || '0'),
         totalSubscribers: parseInt(subscribers[0]?.count || '0'), // REAL DB VALUE - NOT HARDCODED
-        pendingApprovals: parseInt(approvals[0]?.count || '0'),
         totalNewsletters: parseInt(newsletters[0]?.count || '0'),
         
         // Live-Sync-Tracking für Data Collection Dashboard

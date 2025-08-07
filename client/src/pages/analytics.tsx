@@ -64,7 +64,7 @@ export default function AnalyticsPage() {
   interface DashboardStats {
     totalUpdates: number;
     totalLegalCases: number;
-    pendingApprovals: number;
+
     totalArticles: number;
     recentUpdates: number;
     activeDataSources: number;
@@ -83,7 +83,7 @@ export default function AnalyticsPage() {
     categoryBreakdown: [
       { category: "Regulatorische Updates", count: stats.totalUpdates || 0, color: COLORS.primary },
       { category: "Rechtsfälle", count: stats.totalLegalCases || 0, color: COLORS.secondary },
-      { category: "Wartende Genehmigungen", count: stats.pendingApprovals || 0, color: COLORS.info },
+
       { category: "Knowledge Articles", count: stats.totalArticles || 0, color: COLORS.warning }
     ],
     timelineData: Array.from({ length: 30 }, (_, i) => ({
@@ -211,7 +211,7 @@ export default function AnalyticsPage() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(stats.pendingApprovals || 0).toLocaleString()}</div>
+
             <p className="text-xs text-muted-foreground">
               -2.1% gegenüber letztem Monat
             </p>

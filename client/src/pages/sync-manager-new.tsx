@@ -314,7 +314,7 @@ export default function SyncManagerNew() {
               <Clock className="h-5 w-5 text-orange-600" />
               <div>
                 <p className="text-sm text-gray-600">Pending Approvals</p>
-                <p className="font-semibold text-orange-600">{dashboardStats?.pendingApprovals || 0}</p>
+
               </div>
             </div>
           </CardContent>
