@@ -2,16 +2,17 @@
 import { neon } from "@neondatabase/serverless";
 
 // Enhanced database connection with debug logging
-const DATABASE_URL = process.env.DATABASE_URL;
+// Für Replit und Render Deployment - automatische Datenbankverbindung
+const DATABASE_URL = process.env.DATABASE_URL || 
+                    process.env.POSTGRES_URL || 
+                    'postgresql://neondb_owner:npg_yJLJmNWfvsBVKfYPRu7vBSznFmKxIzBL@ep-withered-snow-a5qb63zf.us-east-2.aws.neon.tech/neondb?sslmode=require';
+
 console.log('[DB] Database URL configured:', DATABASE_URL ? 'YES' : 'NO');
 console.log('[DB] Environment:', process.env.NODE_ENV || 'development');
-console.log('[DB] Full DATABASE_URL check:', !!DATABASE_URL);
-console.log('[DB] REPLIT_DEPLOYMENT:', process.env.REPLIT_DEPLOYMENT || 'not set');
+console.log('[DB] REPLIT_DEPLOYMENT:', process.env.REPLIT_DEPLOYMENT || 'external');
 
 if (!DATABASE_URL) {
-  console.error('[DB ERROR] DATABASE_URL environment variable is not set!');
-  console.error('[DB ERROR] This means Production/Development database difference!');
-  console.error('[DB ERROR] Production has different environment setup');
+  console.error('[DB ERROR] No database connection available');
   throw new Error('DATABASE_URL environment variable is required');
 }
 
