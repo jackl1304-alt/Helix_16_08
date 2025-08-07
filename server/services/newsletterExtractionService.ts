@@ -401,31 +401,7 @@ export class NewsletterExtractionService {
     return match ? match[1].replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1').trim() : '';
   }
 
-  /**
-   * Speichert Newsletter-Artikel in der Knowledge Base
-   */
-  private async saveNewsletterToKnowledgeBase(article: any, source: NewsletterSource): Promise<void> {
-    try {
-      await storage.createKnowledgeArticle({
-        title: article.title,
-        content: article.content,
-        summary: article.summary,
-        url: article.url,
-        authority: article.authority,
-        region: article.region,
-        category: article.category,
-        published_at: article.publishedAt.toISOString(),
-        priority: source.priority,
-        tags: article.tags,
-        language: article.language,
-        source: article.newsletterSource
-      });
-      
-      this.logger.info(`Saved newsletter article: ${article.title}`);
-    } catch (error) {
-      this.logger.error(`Error saving newsletter article: ${error}`);
-    }
-  }
+
 
   /**
    * Delay Hilfsfunktion
