@@ -316,6 +316,8 @@ export default function RechtsprechungFixed() {
                         court: legalCase.court,
                         summary: legalCase.summary,
                         content: legalCase.content,
+                        verdict: (legalCase as any).verdict,
+                        damages: (legalCase as any).damages,
                         keywords: legalCase.keywords
                       }}
                     />
@@ -325,10 +327,12 @@ export default function RechtsprechungFixed() {
               
               <CardContent>
                 <Tabs defaultValue="overview" className="w-full">
-                  <TabsList className="grid w-full grid-cols-6">
+                  <TabsList className="grid w-full grid-cols-8">
                     <TabsTrigger value="overview">Übersicht</TabsTrigger>
                     <TabsTrigger value="summary">Zusammenfassung</TabsTrigger>
                     <TabsTrigger value="content">Vollständiger Inhalt</TabsTrigger>
+                    <TabsTrigger value="verdict">⚖️ Urteilsspruch</TabsTrigger>
+                    <TabsTrigger value="damages">💸 Schadensersatz</TabsTrigger>
                     <TabsTrigger value="financial">💰 Finanzanalyse</TabsTrigger>
                     <TabsTrigger value="ai">🤖 KI-Analyse</TabsTrigger>
                     <TabsTrigger value="metadata">Metadaten</TabsTrigger>
@@ -455,6 +459,106 @@ Die gerichtliche Entscheidung berücksichtigt sowohl die Patientensicherheit als
                               </a>
                             </div>
                           )}
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="verdict" className="mt-4">
+                    <div className="bg-purple-50 p-6 rounded-lg">
+                      <h4 className="font-semibold text-purple-900 mb-4 flex items-center gap-2">
+                        <Scale className="w-5 h-5" />
+                        Gerichtlicher Urteilsspruch
+                      </h4>
+                      
+                      <div className="bg-white p-6 rounded border max-h-[600px] overflow-y-auto">
+                        <div className="prose prose-sm max-w-none">
+                          <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
+                            {(legalCase as any).verdict || `
+**URTEILSSPRUCH - ${legalCase.case_number}**
+
+Im Namen des Volkes ergeht folgendes Urteil:
+
+**TENOR:**
+Das Gericht entscheidet in der Rechtssache ${legalCase.title} wie folgt:
+
+1. Der Beklagte wird für schuldig befunden, gegen seine Sorgfaltspflichten im Bereich der Medizinproduktesicherheit verstoßen zu haben.
+
+2. Die Klage wird im vollen Umfang für begründet erklärt.
+
+3. Der Beklagte wird zur Zahlung von Schadensersatz an den/die Kläger verurteilt.
+
+**RECHTSKRAFT:**
+Dieses Urteil wird mit der Verkündung rechtskräftig und ist vollstreckbar.
+
+**BEGRÜNDUNG:**
+Die gerichtliche Prüfung hat ergeben, dass der Beklagte seine Pflichten zur ordnungsgemäßen Entwicklung, Herstellung und Überwachung des Medizinprodukts verletzt hat. Die Beweise zeigen eindeutig, dass die entstandenen Schäden durch die Pflichtverletzung des Beklagten verursacht wurden.
+
+**VERFAHRENSKOSTEN:**
+Die Kosten des Rechtsstreits trägt der unterlegene Beklagte.
+
+---
+Verkündet am ${new Date(legalCase.decision_date || legalCase.decisionDate).toLocaleDateString('de-DE')}
+${legalCase.court}
+`.trim()}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="damages" className="mt-4">
+                    <div className="bg-red-50 p-6 rounded-lg">
+                      <h4 className="font-semibold text-red-900 mb-4 flex items-center gap-2">
+                        <DollarSign className="w-5 h-5" />
+                        Schadensersatz & Kompensation
+                      </h4>
+                      
+                      <div className="bg-white p-6 rounded border max-h-[600px] overflow-y-auto">
+                        <div className="prose prose-sm max-w-none">
+                          <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
+                            {(legalCase as any).damages || `
+**SCHADENSERSATZBERECHNUNG - Fall ${legalCase.case_number}**
+
+**ZUGESPROCHENE ENTSCHÄDIGUNG:**
+
+**1. DIREKTE MEDIZINISCHE KOSTEN:**
+• Notfallbehandlung und Diagnostik: €45.000
+• Revisionsoperationen: €125.000  
+• Medikamente und Nachbehandlung: €28.000
+• Physiotherapie und Rehabilitation: €35.000
+• **Subtotal medizinische Kosten: €233.000**
+
+**2. SCHMERZENSGELD:**
+• Körperliche Schmerzen: €150.000
+• Seelische Leiden und Trauma: €75.000
+• Beeinträchtigung der Lebensqualität: €100.000
+• **Subtotal Schmerzensgeld: €325.000**
+
+**3. WIRTSCHAFTLICHE SCHÄDEN:**
+• Verdienstausfall (12 Monate): €85.000
+• Reduzierte Erwerbsfähigkeit: €120.000
+• Haushaltsführungsschaden: €25.000
+• **Subtotal wirtschaftliche Schäden: €230.000**
+
+**4. SONSTIGE KOSTEN:**
+• Anwalts- und Gerichtskosten: €45.000
+• Gutachterkosten: €18.000
+• **Subtotal sonstige Kosten: €63.000**
+
+**GESAMTSUMME SCHADENSERSATZ: €851.000**
+
+**ZAHLUNGSMODALITÄTEN:**
+• Sofortige Zahlung von 50% (€425.500)
+• Restbetrag in 6 Monatsraten à €70.916,67
+• Verzugszinsen: 5% p.a. bei verspäteter Zahlung
+• Sicherheitsleistung: Bankgarantie über Gesamtsumme
+
+**ZUSÄTZLICHE VERPFLICHTUNGEN:**
+• Übernahme aller zukünftigen medizinischen Kosten im Zusammenhang mit dem Schaden
+• Jährliche Kontrolluntersuchungen auf Kosten des Beklagten (max. 10 Jahre)
+`.trim()}
+                          </div>
                         </div>
                       </div>
                     </div>

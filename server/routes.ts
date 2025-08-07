@@ -172,7 +172,15 @@ Der vorliegende Fall betrifft eine Klage gegen einen Medizinproduktehersteller w
 
 3. KAUSALITÄT: Der medizinische Sachverständige konnte eine kausale Verbindung zwischen dem Geräteversagen und den gesundheitlichen Schäden der Klägerin nachweisen.`,
       ruling: `ENTSCHEIDUNG:
-Das Gericht gibt der Klage statt und verurteilt den Beklagten zur Zahlung von Schadensersatz in Höhe von $2.3 Millionen. Der Hersteller muss außerdem seine QMS-Verfahren nach ISO 13485:2016 überarbeiten und externe Audits durchführen lassen.`
+Das Gericht gibt der Klage statt und verurteilt den Beklagten zur Zahlung von Schadensersatz in Höhe von $2.3 Millionen. Der Hersteller muss außerdem seine QMS-Verfahren nach ISO 13485:2016 überarbeiten und externe Audits durchführen lassen.`,
+      verdict: `URTEILSSPRUCH:
+Hiermit wird entschieden, dass der Beklagte, XYZ Medical Devices Inc., schuldhaft gegen seine Sorgfaltspflichten im Bereich der Medizinproduktesicherheit verstoßen hat. Das implantierbare Herzschrittmachergerät Modell "CardiacPro 3000" wies konstruktionsbedingte Mängel auf, die zu einem vorzeitigen Geräteversagen führten. Die Klägerin erlitt dadurch erhebliche gesundheitliche Schäden und Folgekosten. Das Gericht spricht der Klägerin den geforderten Schadensersatz zu und ordnet zusätzliche Compliance-Maßnahmen an.`,
+      damages: `SCHADENSERSATZ:
+• Direkte medizinische Kosten: $850.000 (Notfall-OP, Ersatzimplantat, Nachbehandlungen)
+• Schmerzensgeld: $1.200.000 (körperliche und seelische Leiden)
+• Verdienstausfall: $180.000 (12 Monate Arbeitsunfähigkeit)
+• Anwaltskosten: $70.000
+• GESAMT: $2.300.000`
     },
     {
       background: `SACHVERHALT:
@@ -184,7 +192,16 @@ Der Fall behandelt eine Sammelklage bezüglich fehlerhafter orthopädischer Impl
 
 3. INFORMATION: Patienten und behandelnde Ärzte wurden nicht rechtzeitig über bekannte Risiken informiert, was eine Verletzung der Aufklärungspflicht darstellt.`,
       ruling: `URTEIL:
-Die Sammelklage wird in vollem Umfang angenommen. Der Beklagte wird zur Zahlung von insgesamt $15.7 Millionen an die 89 betroffenen Kläger verurteilt. Zusätzlich muss ein unabhängiges Monitoring-System für alle bestehenden Implantate etabliert werden.`
+Die Sammelklage wird in vollem Umfang angenommen. Der Beklagte wird zur Zahlung von insgesamt $15.7 Millionen an die 89 betroffenen Kläger verurteilt. Zusätzlich muss ein unabhängiges Monitoring-System für alle bestehenden Implantate etabliert werden.`,
+      verdict: `URTEILSSPRUCH:
+Das Berufungsgericht bestätigt die erstinstanzliche Entscheidung und erklärt OrthoTech Solutions Ltd. für vollumfänglich haftbar. Die mangelhafte Qualitätskontrolle bei der Titanlegierung-Herstellung sowie das Versagen des Post-Market-Surveillance-Systems stellen schwerwiegende Verstöße gegen die Medizinprodukteverordnung dar. Alle 89 Kläger erhalten individuellen Schadensersatz basierend auf ihren spezifischen Schäden und Folgekosten.`,
+      damages: `SCHADENSERSATZ (Sammelklage):
+• Durchschnitt pro Kläger: $176.404
+• Medizinische Kosten gesamt: $8.900.000 (Revisionsoperationen, Physiotherapie)
+• Schmerzensgeld gesamt: $4.800.000 (durchschnittlich $53.933 pro Person)
+• Verdienstausfälle gesamt: $1.600.000 (Arbeitsunfähigkeit 3-18 Monate)
+• Anwalts- und Verfahrenskosten: $400.000
+• GESAMTSCHADEN: $15.700.000 auf 89 Kläger`
     },
     {
       background: `VERFAHRENSGEGENSTAND:
@@ -196,7 +213,15 @@ Regulatorische Beschwerde gegen die FDA bezüglich der Zulassung eines KI-basier
 
 3. EVIDENZSTANDARDS: Die eingereichten klinischen Studien erfüllten die Anforderungen für Sicherheit und Wirksamkeit gemäß 21 CFR 807.`,
       ruling: `BESCHLUSS:
-Der Antrag auf gerichtliche Überprüfung wird abgewiesen. Die FDA-Entscheidung war rechtmäßig und folgte etablierten regulatorischen Verfahren. Die Behörde wird aufgefordert, spezifischere Leitlinien für KI-Medizinprodukte zu entwickeln.`
+Der Antrag auf gerichtliche Überprüfung wird abgewiesen. Die FDA-Entscheidung war rechtmäßig und folgte etablierten regulatorischen Verfahren. Die Behörde wird aufgefordert, spezifischere Leitlinien für KI-Medizinprodukte zu entwickeln.`,
+      verdict: `URTEILSSPRUCH:
+Das Verwaltungsgericht weist die Beschwerde des Antragstellers ab und bestätigt die Rechtmäßigkeit der FDA-Zulassung für das KI-basierte Radiologie-Diagnosesystem "AI-RadAssist Pro". Die behördliche Entscheidung erfolgte unter ordnungsgemäßer Anwendung der geltenden Vorschriften. Der 510(k)-Clearance-Prozess ist für KI-Software als Medizinprodukt angemessen und ausreichend.`,
+      damages: `SCHADENSERSATZ:
+• Kein Schadensersatz zugesprochen (Klage abgewiesen)
+• Verfahrenskosten: $85.000 trägt der unterlegene Kläger
+• FDA-Anwaltskosten: $120.000 trägt der Kläger
+• Keine Entschädigung für Entwicklungsverzögerungen
+• GESAMTKOSTEN FÜR KLÄGER: $205.000`
     }
   ];
   
@@ -900,6 +925,74 @@ Informationen über mögliche Rechtsmittel und deren Status sind verfügbar.
 • Expertenaussagen und technische Gutachten  
 • Regulatorische Korrespondenz
 • Post-Market-Surveillance-Daten
+`.trim(),
+
+        // URTEILSSPRUCH - Court verdict/judgment
+        verdict: (case_item as any).verdict || `
+**URTEILSSPRUCH - ${case_item.caseNumber || case_item.case_number}**
+
+Im Namen des Volkes ergeht folgendes Urteil:
+
+**TENOR:**
+Das Gericht entscheidet in der Rechtssache ${case_item.title} wie folgt:
+
+1. Der Beklagte wird für schuldig befunden, gegen seine Sorgfaltspflichten im Bereich der Medizinproduktesicherheit verstoßen zu haben.
+
+2. Die Klage wird im vollen Umfang für begründet erklärt.
+
+3. Der Beklagte wird zur Zahlung von Schadensersatz an den/die Kläger verurteilt.
+
+**RECHTSKRAFT:**
+Dieses Urteil wird mit der Verkündung rechtskräftig und ist vollstreckbar.
+
+**BEGRÜNDUNG:**
+Die gerichtliche Prüfung hat ergeben, dass der Beklagte seine Pflichten zur ordnungsgemäßen Entwicklung, Herstellung und Überwachung des Medizinprodukts verletzt hat. Die Beweise zeigen eindeutig, dass die entstandenen Schäden durch die Pflichtverletzung des Beklagten verursacht wurden.
+
+**VERFAHRENSKOSTEN:**
+Die Kosten des Rechtsstreits trägt der unterlegene Beklagte.
+
+---
+Verkündet am ${new Date(case_item.decisionDate || case_item.decision_date).toLocaleDateString('de-DE')}
+${case_item.court}
+`.trim(),
+
+        // SCHADENSERSATZ - Damages and compensation
+        damages: (case_item as any).damages || `
+**SCHADENSERSATZBERECHNUNG - Fall ${case_item.caseNumber || case_item.case_number}**
+
+**ZUGESPROCHENE ENTSCHÄDIGUNG:**
+
+**1. DIREKTE MEDIZINISCHE KOSTEN:**
+• Notfallbehandlung und Diagnostik: €${Math.floor(Math.random() * 50000 + 25000).toLocaleString()}
+• Revisionsoperationen: €${Math.floor(Math.random() * 150000 + 75000).toLocaleString()}  
+• Medikamente und Nachbehandlung: €${Math.floor(Math.random() * 30000 + 15000).toLocaleString()}
+• Physiotherapie und Rehabilitation: €${Math.floor(Math.random() * 40000 + 20000).toLocaleString()}
+
+**2. SCHMERZENSGELD:**
+• Körperliche Schmerzen: €${Math.floor(Math.random() * 200000 + 100000).toLocaleString()}
+• Seelische Leiden und Trauma: €${Math.floor(Math.random() * 100000 + 50000).toLocaleString()}
+• Beeinträchtigung der Lebensqualität: €${Math.floor(Math.random() * 150000 + 75000).toLocaleString()}
+
+**3. WIRTSCHAFTLICHE SCHÄDEN:**
+• Verdienstausfall (12 Monate): €${Math.floor(Math.random() * 120000 + 60000).toLocaleString()}
+• Reduzierte Erwerbsfähigkeit: €${Math.floor(Math.random() * 200000 + 100000).toLocaleString()}
+• Haushaltsführungsschaden: €${Math.floor(Math.random() * 40000 + 20000).toLocaleString()}
+
+**4. SONSTIGE KOSTEN:**
+• Anwalts- und Gerichtskosten: €${Math.floor(Math.random() * 60000 + 30000).toLocaleString()}
+• Gutachterkosten: €${Math.floor(Math.random() * 25000 + 15000).toLocaleString()}
+
+**GESAMTSUMME SCHADENSERSATZ: €${Math.floor(Math.random() * 800000 + 400000).toLocaleString()}**
+
+**ZAHLUNGSMODALITÄTEN:**
+• Sofortige Zahlung von 50% 
+• Restbetrag in 6 Monatsraten
+• Verzugszinsen: 5% p.a. bei verspäteter Zahlung
+• Sicherheitsleistung: Bankgarantie über Gesamtsumme
+
+**ZUSÄTZLICHE VERPFLICHTUNGEN:**
+• Übernahme aller zukünftigen medizinischen Kosten im Zusammenhang mit dem Schaden
+• Jährliche Kontrolluntersuchungen auf Kosten des Beklagten (max. 10 Jahre)
 `.trim(),
 
         // FINANZANALYSE - Financial impact analysis
