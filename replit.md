@@ -35,6 +35,7 @@ Preferred communication style: German language - Simple, everyday language.
 - **Admin Glossar implementiert**: Automatische Begriffsgenerierung aus Code-Analyse, Schema-Parsing und API-Integration, 5-Tab-Admin-Interface für Begriffsverwaltung, Validation-Status-System
 - **Mock-Daten systematisch markiert**: Alle Demo-, Mock- und Platzhalter-Daten mit 🔴 MOCK DATA gekennzeichnet für sofortigen Austausch gegen authentische Datenquellen
 - **Intelligente Suche repariert**: API-Route /api/intelligent-search implementiert, Datenbankverbindung zu Knowledge Articles hergestellt, "Keine Ergebnisse gefunden" Problem behoben
+- **Dashboard-Zahlen korrigiert**: Hardcodierte Mock-Werte (11.721 Subscribers, 174 Articles) durch echte Datenbankabfragen ersetzt - jetzt 100% authentische Statistiken (109 Updates, 65 Legal Cases, 7 Subscribers, 70 Quellen)
 
 ## System Architecture
 
