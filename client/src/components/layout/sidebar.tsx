@@ -22,7 +22,9 @@ import {
   ChevronRight,
   Mail,
   Bot,
-  Sparkles
+  Sparkles,
+  Home,
+  Activity
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoPath from "@assets/ICON Helix_1753735921077.jpg";
