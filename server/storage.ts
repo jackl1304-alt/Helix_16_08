@@ -97,9 +97,9 @@ class MorningStorage implements IStorage {
         duplicatesRemoved: '12.964 Duplikate entfernt - 100% Datenqualität erreicht',
         dataQuality: 'PERFEKT - Alle Duplikate entfernt',
         
-        // Berechnete Knowledge Articles (Regulatory Updates + Legal Cases)
+        // 🔴 MOCK DATA REPAIR - Calculate from actual database values
         totalArticles: parseInt(updates[0]?.total_count || '0') + parseInt(legalCases[0]?.total_count || '0'),
-        totalSubscribers: 11721, // Alle Newsletter-Abonnenten zusammen (2847+1923+1534+892+756+1245+634)
+        totalSubscribers: parseInt(subscribers[0]?.count || '0'), // REAL DB VALUE - NOT HARDCODED
         pendingApprovals: parseInt(approvals[0]?.count || '0'),
         totalNewsletters: parseInt(newsletters[0]?.count || '0'),
         
@@ -112,28 +112,9 @@ class MorningStorage implements IStorage {
       console.log('[DB] Bereinigte Dashboard-Statistiken:', stats);
       return stats;
     } catch (error) {
-      console.error("Dashboard stats error:", error);
-      return {
-        totalUpdates: 2678,
-        uniqueUpdates: 2678,
-        totalLegalCases: 2015,
-        uniqueLegalCases: 2015,
-        recentUpdates: 0,
-        recentLegalCases: 0,
-        activeDataSources: 45,
-        currentData: 537,
-        archivedData: 0,
-        duplicatesRemoved: '12.964 Duplikate entfernt - 100% Datenqualität erreicht',
-        dataQuality: 'PERFEKT - Alle Duplikate entfernt',
-        totalArticles: 4693, // Fallback: Combined Updates + Legal Cases
-        totalSubscribers: 156,
-        pendingApprovals: 6,
-        totalNewsletters: 42,
-        // Fallback für Live-Sync-Tracking
-        runningSyncs: 0,
-        recentSyncs: 3,
-        pendingSyncs: 8
-      };
+      console.error("🔴 MOCK DATA - Dashboard stats error:", error);
+      // 🔴 MOCK DATA - REMOVE ALL HARDCODED FALLBACK VALUES
+      throw new Error("Dashboard stats failed - AUTHENTIC DATABASE CONNECTION REQUIRED");
     }
   }
 
