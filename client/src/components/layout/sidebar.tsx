@@ -76,10 +76,11 @@ const navigationStructure: Record<string, NavigationSection> = {
   advanced: {
     title: "ERWEITERT",
     items: [
-      { name: "KI-Analyse", href: "/ai-content-analysis", icon: Brain },
+      { name: "🧠", href: "/ai-content-analysis", icon: Brain },
+      { name: "🤖", href: "/ki-insights", icon: Bot },
       { name: "Sync-Verwaltung", href: "/sync-manager", icon: RefreshCw },
       { name: "Globale Quellen", href: "/global-sources", icon: Globe },
-      { name: "GRIP Integration", href: "/grip-integration", icon: Sparkles },
+      { name: "✨", href: "/grip-integration", icon: Sparkles },
       { name: "Newsletter Manager", href: "/newsletter-manager", icon: Newspaper },
       { name: "Genehmigungsprozess", href: "/approval-workflow", icon: CheckCircle },
       { name: "Historische Daten", href: "/historical-data", icon: Archive },
