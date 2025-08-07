@@ -111,6 +111,8 @@ export const legalCases = pgTable("legal_cases", {
   decisionDate: timestamp("decision_date", { mode: "date" }),
   summary: text("summary"),
   content: text("content"),
+  verdict: text("verdict"), // Urteilsspruch - Full court ruling/judgment text
+  damages: text("damages"), // Schadensersatz - Compensation/damages awarded
   documentUrl: text("document_url"),
   impactLevel: text("impact_level"),
   keywords: text("keywords").array(),
