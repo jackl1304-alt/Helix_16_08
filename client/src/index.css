@@ -1,69 +1,196 @@
-/* DELTA WAYS Brand Implementation */
+/* DELTA WAYS Brand Implementation - January 2024 */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+/* Performance Optimizations */
+@layer utilities {
+  .will-change-transform {
+    will-change: transform;
   }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+  
+  .contain-layout {
+    contain: layout;
+  }
+  
+  .contain-paint {
+    contain: paint;
+  }
+  
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+  
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(156 163 175) transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgb(156 163 175);
+    border-radius: 3px;
   }
 }
 
-/* DELTA WAYS Branding */
-.deltaways-nav {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  border-right: 1px solid #e2e8f0;
+/* CSS Containment for performance */
+.card-container {
+  contain: layout style;
 }
 
-.deltaways-brand-text {
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+/* Optimized animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
+.animate-slide-in {
+  animation: slideIn 0.2s ease-out forwards;
+}
+
+/* Reduce motion for better accessibility and performance */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+:root {
+  /* DELTA WAYS Primary Brand Colors */
+  --deltaways-navy: hsl(220, 100%, 15%); /* Primary Navy */
+  --deltaways-active: #0b3761; /* Active Navigation Elements */
+  --deltaways-ring: #b0d4f6; /* Logo Ring Color */
+  --deltaways-gold: #07233e; /* Accent Color (was Gold) */
+  --deltaways-gray: hsl(210, 15%, 92%); /* Secondary Gray */
+  --deltaways-dark: hsl(220, 50%, 8%); /* Deep Navy */
+  
+  /* Helix Platform adapted to DELTA WAYS Brand */
+  --background: hsl(0, 0%, 98%);
+  --foreground: var(--deltaways-navy);
+  --muted: var(--deltaways-gray);
+  --muted-foreground: hsl(220, 30%, 40%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: var(--deltaways-navy);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: var(--deltaways-navy);
+  --border: hsl(210, 20%, 88%);
+  --input: hsl(210, 20%, 94%);
+  --primary: var(--deltaways-navy);
+  --primary-foreground: hsl(210, 40%, 98%);
+  --secondary: var(--deltaways-gray);
+  --secondary-foreground: var(--deltaways-navy);
+  --accent: var(--deltaways-gold);
+  --accent-foreground: hsl(210, 40%, 98%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: var(--deltaways-gold);
+  --radius: 0.75rem; /* Premium rounded corners */
+  
+  /* Custom Helix colors matching design */
+  --helix-blue-50: hsl(214, 100%, 97%);
+  --helix-blue-100: hsl(214, 95%, 93%);
+  --helix-blue-500: hsl(207, 90%, 54%);
+  --helix-blue-600: hsl(207, 90%, 54%);
+  --helix-blue-700: hsl(207, 90%, 54%);
+  
+  --success-50: hsl(142, 76%, 96%);
+  --success-100: hsl(142, 85%, 91%);
+  --success-500: hsl(142, 76%, 36%);
+  --success-600: hsl(142, 76%, 36%);
+  
+  --warning-50: hsl(43, 96%, 96%);
+  --warning-100: hsl(43, 96%, 89%);
+  --warning-500: hsl(21, 90%, 48%);
+  --warning-600: hsl(21, 91%, 44%);
+  
+  --red-50: hsl(0, 86%, 97%);
+  --red-100: hsl(0, 93%, 94%);
+  --red-200: hsl(0, 96%, 89%);
+  --red-500: hsl(0, 84%, 60%);
+  --red-600: hsl(0, 72%, 51%);
+  --red-700: hsl(0, 74%, 42%);
+  --red-800: hsl(0, 70%, 35%);
+  
+  --yellow-50: hsl(55, 92%, 95%);
+  --yellow-100: hsl(55, 97%, 88%);
+  --yellow-200: hsl(53, 98%, 77%);
+  --yellow-500: hsl(45, 93%, 47%);
+  --yellow-600: hsl(32, 95%, 44%);
+  --yellow-700: hsl(26, 90%, 37%);
+  --yellow-800: hsl(23, 83%, 31%);
+  
+  --purple-100: hsl(270, 100%, 98%);
+  --purple-500: hsl(271, 91%, 65%);
+  
+  --green-100: hsl(142, 76%, 96%);
+  --green-500: hsl(142, 76%, 36%);
+  --green-600: hsl(142, 76%, 36%);
+  
+  --blue-50: hsl(214, 100%, 97%);
+  --blue-100: hsl(214, 95%, 93%);
+  --blue-200: hsl(213, 97%, 87%);
+  --blue-500: hsl(217, 91%, 60%);
+  --blue-600: hsl(221, 83%, 53%);
+  --blue-700: hsl(224, 76%, 48%);
+  --blue-800: hsl(226, 71%, 40%);
+}
+
+/* DELTA WAYS Dark Theme */
+.dark {
+  --background: var(--deltaways-dark);
+  --foreground: hsl(210, 40%, 98%);
+  --muted: hsl(220, 30%, 15%);
+  --muted-foreground: hsl(215, 20.2%, 65.1%);
+  --popover: hsl(220, 45%, 10%);
+  --popover-foreground: hsl(210, 40%, 98%);
+  --card: hsl(220, 45%, 10%);
+  --card-foreground: hsl(210, 40%, 98%);
+  --border: hsl(220, 30%, 18%);
+  --input: hsl(220, 30%, 18%);
+  --primary: #07233e; /* Dark accent in dark mode */
+  --primary-foreground: hsl(210, 40%, 98%);
+  --secondary: hsl(220, 30%, 15%);
+  --secondary-foreground: hsl(210, 40%, 98%);
+  --accent: #07233e;
+  --accent-foreground: hsl(210, 40%, 98%);
+  --ring: #07233e;
+}
+
+/* DELTA WAYS Typography System - Primary: Inter, Secondary: Segoe UI */
 body {
   font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   font-weight: 400;
@@ -76,4 +203,310 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.3;
+}
+
+/* DELTA WAYS Brand Styles */
+.deltaways-brand-text {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.deltaways-card {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(210, 15%, 96%) 100%);
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.deltaways-button-primary {
+  background: linear-gradient(135deg, #d95d2c 0%, #b8441f 100%);
+  color: white;
+  border: none;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: all 0.3s ease;
+}
+
+.deltaways-button-primary:hover {
+  background: linear-gradient(135deg, #b8441f 0%, #d95d2c 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(217, 93, 44, 0.25);
+}
+
+.deltaways-accent-border {
+  border-left: 4px solid hsl(var(--accent));
+}
+
+.deltaways-nav {
+  background: linear-gradient(135deg, 
+    hsl(210, 25%, 95%) 0%, 
+    hsl(210, 20%, 92%) 50%, 
+    hsl(210, 15%, 90%) 100%);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid hsl(var(--border));
+}
+
+/* DELTA WAYS Accent Highlights */
+.deltaways-gold-text {
+  color: #07233e;
+  font-weight: 600;
+}
+
+.deltaways-premium-card {
+  background: linear-gradient(135deg, 
+    hsl(var(--background)) 0%, 
+    hsl(var(--muted)) 50%, 
+    hsl(var(--background)) 100%);
+  border: 1px solid hsl(var(--accent));
+  box-shadow: 0 8px 32px rgba(45, 100, 50, 0.1);
+}
+
+/* Dark Mode Enhancements */
+.dark .deltaways-card {
+  background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(220, 40%, 12%) 100%);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+.dark .deltaways-nav {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(220, 45%, 12%) 100%);
+}
+
+.dark .deltaways-premium-card {
+  background: linear-gradient(135deg, 
+    hsl(var(--card)) 0%, 
+    hsl(220, 35%, 12%) 50%, 
+    hsl(var(--card)) 100%);
+  box-shadow: 0 8px 32px rgba(45, 100, 55, 0.2);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+/* Custom utility classes for Helix colors */
+.bg-primary-50 {
+  background-color: var(--helix-blue-50);
+}
+
+.bg-primary-100 {
+  background-color: var(--helix-blue-100);
+}
+
+.text-primary-500 {
+  color: var(--helix-blue-500);
+}
+
+.text-primary-600 {
+  color: var(--helix-blue-600);
+}
+
+.text-primary-700 {
+  color: var(--helix-blue-700);
+}
+
+.bg-green-100 {
+  background-color: var(--success-100);
+}
+
+.text-green-600 {
+  color: var(--success-600);
+}
+
+.bg-yellow-100 {
+  background-color: var(--warning-100);
+}
+
+.text-yellow-600 {
+  color: var(--warning-600);
+}
+
+.bg-red-100 {
+  background-color: var(--red-100);
+}
+
+.text-red-600 {
+  color: var(--red-600);
+}
+
+.bg-blue-100 {
+  background-color: var(--blue-100);
+}
+
+.text-blue-600 {
+  color: var(--blue-600);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Device-specific styles */
+.device-mobile {
+  --container-padding: 1rem;
+  --font-size-base: 14px;
+}
+
+.device-tablet {
+  --container-padding: 1.5rem;
+  --font-size-base: 15px;
+}
+
+.device-desktop {
+  --container-padding: 2rem;
+  --font-size-base: 16px;
+}
+
+.touch-device {
+  --touch-target-size: 44px;
+}
+
+/* Mobile dropdown menu styling */
+@media (max-width: 768px) {
+  /* Custom scrollbar for mobile dropdown */
+  [data-radix-dropdown-menu-content] {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 #f7fafc;
+  }
+  
+  [data-radix-dropdown-menu-content]::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  [data-radix-dropdown-menu-content]::-webkit-scrollbar-track {
+    background: #f7fafc;
+  }
+  
+  [data-radix-dropdown-menu-content]::-webkit-scrollbar-thumb {
+    background-color: #cbd5e0;
+    border-radius: 3px;
+  }
+  
+  /* Document viewer scrollbar styling */
+  .document-viewer-scroll-container {
+    scrollbar-width: thick;
+    scrollbar-color: #dc2626 #f3f4f6;
+  }
+  
+  .document-viewer-scroll-container::-webkit-scrollbar {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .document-viewer-scroll-container::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+  }
+  
+  .document-viewer-scroll-container::-webkit-scrollbar-thumb {
+    background: #dc2626;
+    border-radius: 10px;
+    border: 2px solid #f3f4f6;
+    min-height: 50px;
+    min-width: 50px;
+  }
+  
+  .document-viewer-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #b91c1c;
+  }
+  
+  .document-viewer-scroll-container::-webkit-scrollbar-thumb:active {
+    background: #991b1b;
+  }
+  
+  .document-viewer-scroll-container::-webkit-scrollbar-corner {
+    background: #f3f4f6;
+  }
+  
+  /* Mobile responsive classes */
+  .responsive-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .responsive-cards {
+    padding: 1rem;
+  }
+  
+  .responsive-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Tablet responsive classes */
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .responsive-cards {
+    padding: 1.5rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  /* Desktop responsive classes */
+  .responsive-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+  
+  .responsive-cards {
+    padding: 2rem;
+  }
+}
+
+.bg-purple-100 {
+  background-color: var(--purple-100);
+}
+
+.text-purple-500 {
+  color: var(--purple-500);
 }
