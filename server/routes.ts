@@ -4618,6 +4618,41 @@ Für vollständige Details und weitere Analysen besuchen Sie die ursprüngliche 
     }
   });
 
+  // 🔴 MOCK DATA REPAIR - Intelligent Search API Route
+  app.post("/api/intelligent-search", async (req, res) => {
+    try {
+      const { query, filters = { type: "all", region: "all", timeframe: "all" } } = req.body;
+      
+      if (!query) {
+        return res.status(400).json({ error: 'Search query is required' });
+      }
+      
+      console.log(`[SEARCH] Processing intelligent search: "${query}"`);
+      
+      // Import and use the search service
+      const { intelligentSearchService } = await import('./services/intelligentSearchService');
+      const searchResults = await intelligentSearchService.search(query, filters);
+      
+      console.log(`[SEARCH] Found ${searchResults.results.length} results for "${query}"`);
+      
+      res.json({
+        success: true,
+        query,
+        results: searchResults.results,
+        answer: searchResults.answer,
+        totalResults: searchResults.totalResults,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error('🔴 MOCK DATA - Intelligent search error:', error);
+      res.status(500).json({ 
+        error: 'Search failed', 
+        message: error.message,
+        success: false 
+      });
+    }
+  });
+
   // Mount GRIP routes
   app.use('/api/grip', gripRoutes);
 

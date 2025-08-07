@@ -36,8 +36,8 @@ interface SearchFilters {
 }
 
 class IntelligentSearchService {
-  // Knowledge Base wird durch echte Artikel aus der Datenbank geladen
-  private knowledgeBase: any[] = [];
+  // 🔴 MOCK DATA - Knowledge Base wird durch echte Artikel aus der Datenbank geladen
+  private knowledgeBase: any[] = []; // 🔴 MOCK - EMPTY ARRAY CAUSES "NO RESULTS" - NEEDS DB CONNECTION
 
   // Text similarity calculation using simple keyword matching
   private calculateSimilarity(text1: string, text2: string): number {
@@ -150,7 +150,17 @@ class IntelligentSearchService {
     const results: SearchResult[] = [];
     const keywords = this.extractKeywords(query);
     
-    for (const item of this.knowledgeBase) {
+    // 🔴 MOCK DATA REPAIR - Load real knowledge articles from database
+    let knowledgeData: any[] = [];
+    try {
+      const storage = await import('../storage');
+      knowledgeData = await storage.default.getAllKnowledgeArticles();
+      console.log(`[SEARCH] Loaded ${knowledgeData.length} knowledge articles from database`);
+    } catch (error) {
+      console.error('🔴 MOCK DATA - Error loading knowledge articles:', error);
+    }
+    
+    for (const item of knowledgeData) {
       const relevance = this.calculateSimilarity(query, item.title + " " + item.content);
       if (relevance > 0.1) {
         results.push({
@@ -159,14 +169,14 @@ class IntelligentSearchService {
           content: item.content,
           excerpt: item.content.substring(0, 200) + "...",
           type: 'knowledge',
-          source: "Helix Knowledge Base",
+          source: item.source || "Helix Knowledge Base",
           relevance,
-          date: "2025-01-20",
+          date: item.publishedAt || item.createdAt || "2025-01-20",
           metadata: {
             region: item.region,
             deviceClass: item.deviceClass,
             category: item.category,
-            tags: item.tags
+            tags: item.tags || keywords
           }
         });
       }
@@ -304,3 +314,6 @@ class IntelligentSearchService {
 }
 
 export const intelligentSearchService = new IntelligentSearchService();
+
+// 🔴 MOCK DATA REPAIR - Export service for API routes
+export { IntelligentSearchService };

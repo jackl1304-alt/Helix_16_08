@@ -146,7 +146,7 @@ export default function AIContentAnalysis() {
         </CardHeader>
         <CardContent className="space-y-4">
           <Textarea
-            placeholder="Geben Sie hier den zu analysierenden Regulatory Content ein..."
+            placeholder="🔴 MOCK DATA - Geben Sie hier den zu analysierenden Regulatory Content ein - AUTHENTIC AI SERVICE REQUIRED"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={6}
