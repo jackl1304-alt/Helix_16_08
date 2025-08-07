@@ -202,7 +202,7 @@ export default function Dashboard() {
       color: "text-green-600",
     },
     {
-      title: "Subscribers",
+      title: "Subscribers (DEMO)",
       value: (stats && typeof stats.totalSubscribers === 'number') ? stats.totalSubscribers : 11721,
       description: "Newsletter-Abonnenten",
       icon: Users,
@@ -217,7 +217,7 @@ export default function Dashboard() {
       color: "text-teal-600",
     },
     {
-      title: "Newsletters",
+      title: "Newsletters (DEMO)",
       value: (stats && typeof stats.totalNewsletters === 'number') ? stats.totalNewsletters : 4,
       description: "Newsletter versendet",
       icon: Mail,
@@ -238,7 +238,7 @@ export default function Dashboard() {
           </p>
           {/* Newsletter-Quellen Status */}
           <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-xs">
-            <strong>✅ Newsletter-Quellen:</strong> 7 aktive Quellen mit {(stats as any)?.totalSubscribers?.toLocaleString() || '11.721'} Abonnenten | Newsletter versendet: {(stats as any)?.totalNewsletters || 4}
+            <strong>✅ Newsletter-Quellen (DEMO):</strong> 7 aktive Quellen mit {(stats as any)?.totalSubscribers?.toLocaleString() || '11.721'} Abonnenten | Newsletter versendet: {(stats as any)?.totalNewsletters || 4}
           </div>
           {(stats as any)?.dataQuality && (
             <Badge variant="outline" className="mt-2 bg-green-50 text-green-700 border-green-200">
