@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertTriangle, Clock, FileText, Scale, DollarSign, Brain, Gavel, RefreshCw, Download } from 'lucide-react';
 import { PDFDownloadButton } from '@/components/ui/pdf-download-button';
+import { PiecesShareButton, PiecesHealthStatus } from '../components/pieces-share-button';
 
 // Types
 interface LegalCase {

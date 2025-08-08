@@ -150,6 +150,9 @@ const knowledgeArticleService = new KnowledgeArticleService();
 const jamaScrapingService = new JAMANetworkScrapingService();
 const universalExtractor = new UniversalKnowledgeExtractor();
 
+// Pieces API Service für Content Sharing
+const piecesApiService = await import('./services/piecesApiService.js').then(m => m.piecesApiService);
+
 // MEDITECH Integration Service
 console.log('[MEDITECH] Initializing MEDITECH FHIR API integration...');
 
@@ -1117,7 +1120,7 @@ ${case_item.court}
 `.trim()
       }));
       
-      console.log(`[API] Enhanced ${enhancedLegalCases.length} legal cases with 6-tab structure (Übersicht, Zusammenfassung, Vollständiger Inhalt, Finanzanalyse, KI-Analyse, Metadaten)`);
+      console.log(`[API] Enhanced ${enhancedLegalCases.length} legal cases with 8-tab structure (Übersicht, Zusammenfassung, Vollständiger Inhalt, Urteilsspruch, Schadensersatz, Finanzanalyse, KI-Analyse, Metadaten)`);
       res.json(enhancedLegalCases);
     } catch (error) {
       console.error("[API] Error in enhanced legal-cases endpoint:", String(error));
@@ -1143,6 +1146,112 @@ ${case_item.court}
     } catch (error) {
       console.error("Error creating legal case:", error);
       res.status(500).json({ message: "Failed to create legal case" });
+    }
+  });
+
+  // Pieces API Integration Routes
+  app.post("/api/pieces/share/regulatory", async (req, res) => {
+    try {
+      const { updateId } = req.body;
+      if (!updateId) {
+        return res.status(400).json({ error: "Update ID erforderlich" });
+      }
+      
+      const update = await storage.getRegulatoryUpdateById(updateId);
+      if (!update) {
+        return res.status(404).json({ error: "Regulatory Update nicht gefunden" });
+      }
+      
+      const shareUrl = await piecesApiService.shareRegulatoryUpdate(update);
+      if (shareUrl) {
+        res.json({ shareUrl, success: true });
+      } else {
+        res.status(503).json({ error: "Pieces API nicht verfügbar", success: false });
+      }
+    } catch (error) {
+      console.error("[API] Fehler beim Teilen des Regulatory Updates:", error);
+      res.status(500).json({ error: "Interner Serverfehler" });
+    }
+  });
+  
+  app.post("/api/pieces/share/legal", async (req, res) => {
+    try {
+      const { caseId } = req.body;
+      if (!caseId) {
+        return res.status(400).json({ error: "Case ID erforderlich" });
+      }
+      
+      const legalCase = await storage.getLegalCaseById(caseId);
+      if (!legalCase) {
+        return res.status(404).json({ error: "Rechtsfall nicht gefunden" });
+      }
+      
+      const shareUrl = await piecesApiService.shareLegalCase(legalCase);
+      if (shareUrl) {
+        res.json({ shareUrl, success: true });
+      } else {
+        res.status(503).json({ error: "Pieces API nicht verfügbar", success: false });
+      }
+    } catch (error) {
+      console.error("[API] Fehler beim Teilen des Rechtsfalls:", error);
+      res.status(500).json({ error: "Interner Serverfehler" });
+    }
+  });
+  
+  app.post("/api/pieces/share/newsletter", async (req, res) => {
+    try {
+      const { newsletterId } = req.body;
+      if (!newsletterId) {
+        return res.status(400).json({ error: "Newsletter ID erforderlich" });
+      }
+      
+      const newsletter = await storage.getNewsletterById(newsletterId);
+      if (!newsletter) {
+        return res.status(404).json({ error: "Newsletter nicht gefunden" });
+      }
+      
+      const shareUrl = await piecesApiService.shareNewsletterContent(newsletter);
+      if (shareUrl) {
+        res.json({ shareUrl, success: true });
+      } else {
+        res.status(503).json({ error: "Pieces API nicht verfügbar", success: false });
+      }
+    } catch (error) {
+      console.error("[API] Fehler beim Teilen des Newsletters:", error);
+      res.status(500).json({ error: "Interner Serverfehler" });
+    }
+  });
+  
+  app.get("/api/pieces/health", async (req, res) => {
+    try {
+      const isHealthy = await piecesApiService.isHealthy();
+      res.json({ 
+        healthy: isHealthy,
+        status: isHealthy ? 'Available' : 'Unavailable',
+        url: 'http://localhost:1000'
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        healthy: false,
+        status: 'Error',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+  
+  app.post("/api/pieces/auto-share", async (req, res) => {
+    try {
+      const updates = await storage.getAllRegulatoryUpdates();
+      const sharedUrls = await piecesApiService.autoShareCriticalUpdates(updates);
+      
+      res.json({ 
+        sharedCount: sharedUrls.length,
+        sharedUrls,
+        message: `${sharedUrls.length} kritische Updates automatisch geteilt`
+      });
+    } catch (error) {
+      console.error("[API] Fehler beim automatischen Teilen:", error);
+      res.status(500).json({ error: "Interner Serverfehler" });
     }
   });
 
