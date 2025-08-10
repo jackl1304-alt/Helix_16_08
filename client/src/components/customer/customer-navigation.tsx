@@ -186,11 +186,13 @@ export default function CustomerNavigation({ permissions, tenantName }: Customer
   };
 
   return (
-    <div className="flex flex-col h-full bg-white border-r border-gray-200">
+    <div className="fixed left-0 top-0 h-screen w-64 flex flex-col bg-white border-r border-gray-200 shadow-sm z-40">
       {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
-          <Building className="h-8 w-8 text-blue-600" />
+          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 via-purple-600 to-cyan-700 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+            {tenantName?.charAt(0) || 'H'}
+          </div>
           <div>
             <h2 className="text-lg font-semibold text-gray-900">
               {tenantName || "Customer Portal"}
@@ -202,7 +204,16 @@ export default function CustomerNavigation({ permissions, tenantName }: Customer
 
       {/* Navigation */}
       <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-        {allowedItems.map(renderNavigationItem)}
+        {allowedItems.length > 0 ? (
+          allowedItems.map(renderNavigationItem)
+        ) : (
+          <div className="text-center py-8">
+            <Shield className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+            <p className="text-sm text-gray-500">
+              Keine Berechtigung für Navigation
+            </p>
+          </div>
+        )}
       </nav>
 
       {/* Footer */}
