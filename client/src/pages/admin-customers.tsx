@@ -417,7 +417,7 @@ export default function AdminCustomers() {
 
         {/* Tenant Edit Dialog */}
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Tenant bearbeiten - {editingTenant?.name}</DialogTitle>
               <DialogDescription>
@@ -808,7 +808,9 @@ function TenantEditForm({ tenant, onClose }: { tenant: any, onClose: () => void 
           <p className="text-sm text-muted-foreground">
             Bestimmen Sie, welche Bereiche der Kunde in seinem Dashboard sehen und verwenden darf
           </p>
-          <CustomerPermissionsForm tenant={tenant} />
+          <div className="max-h-80 overflow-y-auto border rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
+            <CustomerPermissionsForm tenant={tenant} />
+          </div>
         </div>
 
         <div className="flex justify-end space-x-2 pt-4">
@@ -919,27 +921,29 @@ function CustomerPermissionsForm({ tenant }: { tenant: Tenant }) {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {permissionCategories.map((category) => (
-        <div key={category.title} className="space-y-3">
-          <div>
-            <h4 className="text-md font-medium">{category.title}</h4>
-            <p className="text-sm text-muted-foreground">{category.description}</p>
+        <div key={category.title} className="space-y-2">
+          <div className="pb-2 border-b">
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{category.title}</h4>
+            <p className="text-xs text-muted-foreground">{category.description}</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
             {category.permissions.map((perm) => (
               <div 
                 key={perm.key}
-                className="flex items-center justify-between rounded-lg border p-4 hover:bg-gray-50"
+                className="flex items-center justify-between rounded-md border p-2 hover:bg-white dark:hover:bg-gray-800 bg-gray-50 dark:bg-gray-900 transition-colors"
               >
-                <div className="space-y-0.5">
-                  <div className="text-sm font-medium">{perm.label}</div>
-                  <div className="text-xs text-muted-foreground">{perm.description}</div>
+                <div className="space-y-0 flex-1 pr-2">
+                  <div className="text-xs font-medium text-gray-900 dark:text-gray-100">{perm.label}</div>
+                  <div className="text-xs text-muted-foreground truncate">{perm.description}</div>
                 </div>
                 <Switch 
                   checked={permissions[perm.key]}
                   onCheckedChange={(checked) => handlePermissionChange(perm.key, checked)}
                   disabled={updatePermissionsMutation.isPending}
+                  className="flex-shrink-0"
+                  size="sm"
                 />
               </div>
             ))}
@@ -948,8 +952,8 @@ function CustomerPermissionsForm({ tenant }: { tenant: Tenant }) {
       ))}
       
       {updatePermissionsMutation.isPending && (
-        <div className="text-sm text-muted-foreground">
-          Speichere Änderungen...
+        <div className="text-xs text-muted-foreground text-center py-2">
+          💾 Speichere Änderungen...
         </div>
       )}
     </div>
