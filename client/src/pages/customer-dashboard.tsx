@@ -46,9 +46,9 @@ const usageData = [
 ];
 
 const complianceData = [
-  { region: 'USA (FDA)', score: 95, alerts: 2, trend: 'up' },
-  { region: 'EU (EMA)', score: 88, alerts: 5, trend: 'stable' },
-  { region: 'Asia-Pacific', score: 92, alerts: 1, trend: 'up' }
+  { region: 'USA (FDA)', score: 95, alerts: 2, trend: 'up' as const },
+  { region: 'EU (EMA)', score: 88, alerts: 5, trend: 'stable' as const },
+  { region: 'Asia-Pacific', score: 92, alerts: 1, trend: 'up' as const }
 ];
 
 const regionDistribution = [
@@ -287,48 +287,55 @@ export default function CustomerDashboard() {
         </div>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Monatliche Nutzung"
-          value={`${dashboardData?.usage.currentMonth.toLocaleString()} / ${dashboardData?.usage.limit.toLocaleString()}`}
-          change="+8.2%"
-          changeType="increase"
-          icon={Activity}
-          description={`${dashboardData?.usage.percentage}% vom Limit verbraucht`}
-          color="blue"
-        />
-        <StatCard
-          title="Compliance Score"
-          value={`${dashboardData?.dashboard.compliance.score}%`}
-          change="+2.1%"
-          changeType="increase"
-          icon={Shield}
-          description={`${dashboardData?.dashboard.compliance.alerts} aktive Warnungen`}
-          color="green"
-        />
-        <StatCard
-          title="Aktive Benutzer"
-          value={`${dashboardData?.usage.users} / ${dashboardData?.usage.userLimit}`}
-          change="Stabil"
-          changeType="stable"
-          icon={Users}
-          description="Team-Nutzung im Rahmen"
-          color="purple"
-        />
-        <StatCard
-          title="Data Quality"
-          value={`${dashboardData?.dashboard.analytics.dataQuality}%`}
-          change="+1.3%"
-          changeType="increase"
-          icon={Target}
-          description="Datenqualität hervorragend"
-          color="orange"
-        />
-      </div>
+      {/* Key Metrics - Only visible with dashboard permission */}
+      {permissions?.dashboard && (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            title="Monatliche Nutzung"
+            value={`${dashboardData?.usage.currentMonth.toLocaleString()} / ${dashboardData?.usage.limit.toLocaleString()}`}
+            change="+8.2%"
+            changeType="increase"
+            icon={Activity}
+            description={`${dashboardData?.usage.percentage}% vom Limit verbraucht`}
+            color="blue"
+          />
+          <StatCard
+            title="Compliance Score"
+            value={`${dashboardData?.dashboard.compliance.score}%`}
+            change="+2.1%"
+            changeType="increase"
+            icon={Shield}
+            description={`${dashboardData?.dashboard.compliance.alerts} aktive Warnungen`}
+            color="green"
+          />
+          {permissions?.userManagement && (
+            <StatCard
+              title="Aktive Benutzer"
+              value={`${dashboardData?.usage.users} / ${dashboardData?.usage.userLimit}`}
+              change="Stabil"
+              changeType="stable"
+              icon={Users}
+              description="Team-Nutzung im Rahmen"
+              color="purple"
+            />
+          )}
+          {permissions?.analytics && (
+            <StatCard
+              title="Data Quality"
+              value={`${dashboardData?.dashboard.analytics.dataQuality}%`}
+              change="+1.3%"
+              changeType="increase"
+              icon={Target}
+              description="Datenqualität hervorragend"
+              color="orange"
+            />
+          )}
+        </div>
+      )}
 
-      {/* Usage Analytics */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      {/* Usage Analytics - Only show with analytics permission */}
+      {permissions?.analytics && (
+        <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -392,7 +399,8 @@ export default function CustomerDashboard() {
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      )}
 
       {/* Compliance Overview */}
       <Card>
@@ -414,8 +422,9 @@ export default function CustomerDashboard() {
         </CardContent>
       </Card>
 
-      {/* Recent Activity & Alerts */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      {/* Recent Activity & Alerts - Only show if permitted */}
+      {(permissions?.dashboard || permissions?.auditLogs) && (
+        <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -490,7 +499,8 @@ export default function CustomerDashboard() {
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      )}
 
       {/* Subscription Status */}
       <Card>
