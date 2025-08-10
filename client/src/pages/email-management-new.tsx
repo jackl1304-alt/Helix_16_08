@@ -201,7 +201,7 @@ export default function EmailManagementNew() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Mail className="w-5 h-5 mr-2" />
-                Gmail-Provider (deltawaysnewsletter@gmail.com)
+                Gmail-Provider (deltawayshelixinfo@gmail.com)
               </CardTitle>
               <CardDescription>
                 Gmail SMTP-Konfiguration für E-Mail-Versand
