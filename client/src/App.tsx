@@ -114,8 +114,6 @@ function Router() {
         <Route path="/grip-data" component={GripData} />
         <Route path="/newsletter-admin" component={NewsletterAdmin} />
         <Route path="/advanced-analytics" component={AdvancedAnalytics} />
-        <Route path="/customer-dashboard" component={CustomerDashboard} />
-        <Route path="/customer-settings" component={CustomerSettings} />
         <Route path="/tenant-onboarding" component={TenantOnboarding} />
         <Route path="/email-management" component={EmailManagement} />
         <Route path="/documents/:sourceType/:documentId" component={DocumentViewer} />
@@ -138,7 +136,11 @@ function App() {
             <Route path="/landing" component={Landing} />
             <Route path="/404" component={NotFound} />
             
-            {/* All other pages with Sidebar */}
+            {/* Customer pages with their own navigation */}
+            <Route path="/customer-dashboard" component={CustomerDashboard} />
+            <Route path="/customer-settings" component={CustomerSettings} />
+            
+            {/* All other pages with Admin Sidebar */}
             <Route>
               <ResponsiveLayout>
                 <Router />
