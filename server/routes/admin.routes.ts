@@ -436,21 +436,23 @@ router.put('/tenants/:id/permissions', async (req: Request, res: Response) => {
       });
     }
     
-    // Use direct SQL query
-    const { neon } = await import('@neondatabase/serverless');
-    const sql = neon(process.env.DATABASE_URL!);
+    // Use Drizzle ORM instead of direct SQL
+    const { db } = await import('../db');
+    const { tenants } = await import('../../shared/schema');
+    const { eq } = await import('drizzle-orm');
     
-    const result = await sql`
-      UPDATE tenants 
-      SET 
-        customer_permissions = ${JSON.stringify(customerPermissions)},
-        updated_at = CURRENT_TIMESTAMP
-      WHERE id = ${id}
-      RETURNING 
-        id,
-        name,
-        customer_permissions as "customerPermissions"
-    `;
+    const result = await db
+      .update(tenants)
+      .set({
+        customerPermissions: customerPermissions,
+        updatedAt: new Date()
+      })
+      .where(eq(tenants.id, id))
+      .returning({
+        id: tenants.id,
+        name: tenants.name,
+        customerPermissions: tenants.customerPermissions
+      });
     
     if (result.length === 0) {
       return res.status(404).json({
