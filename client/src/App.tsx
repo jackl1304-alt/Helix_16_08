@@ -54,7 +54,7 @@ const AdvancedAnalytics = lazy(() => import("@/pages/advanced-analytics"));
 const CustomerDashboard = lazy(() => import("@/pages/customer-dashboard"));
 const CustomerSettings = lazy(() => import("@/pages/customer-settings"));
 const TenantOnboarding = lazy(() => import("@/pages/tenant-onboarding"));
-const EmailManagement = lazy(() => import("@/pages/email-management"));
+const EmailManagement = lazy(() => import("@/pages/email-management-new"));
 const RegulatoryUpdateDetail = lazy(() => import("@/pages/regulatory-update-detail-new"));
 const RechtsprechungFixed = lazy(() => import("@/pages/rechtsprechung-fixed"));
 const RechtsprechungKompakt = lazy(() => import("@/pages/rechtsprechung-kompakt"));
