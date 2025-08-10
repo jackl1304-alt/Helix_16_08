@@ -53,6 +53,23 @@ export default function EmailManagementNew() {
   const [selectedTemplate, setSelectedTemplate] = useState<GmailTemplate | null>(null);
   const [isEditingTemplate, setIsEditingTemplate] = useState(false);
   const [testEmail, setTestEmail] = useState('');
+  const [customerData, setCustomerData] = useState({
+    customerName: 'Max Mustermann',
+    companyName: 'Beispiel GmbH',
+    subscriptionPlan: 'Professional',
+    dashboardUrl: 'https://helix-platform.com/dashboard',
+    amount: '899',
+    dueDate: '31.08.2025',
+    invoiceUrl: 'https://helix-platform.com/invoice/123',
+    alertTitle: 'Neue EU MDR Änderung',
+    summary: 'Wichtige Aktualisierung der Medical Device Regulation',
+    urgency: 'high',
+    updatesCount: '23',
+    legalCasesCount: '8',
+    expiryDate: '20.08.2025',
+    upgradeUrl: 'https://helix-platform.com/upgrade',
+    endDate: '31.08.2025'
+  });
   const queryClient = useQueryClient();
 
   // Gmail Provider Query
@@ -102,13 +119,7 @@ export default function EmailManagementNew() {
       return await apiRequest('/api/email/send', 'POST', {
         to: email,
         templateId,
-        variables: {
-          customerName: 'Test Kunde',
-          alertTitle: 'Test Alert',
-          summary: 'Dies ist ein Test',
-          urgency: 'Mittel',
-          dashboardUrl: 'https://helix-platform.com/dashboard'
-        }
+        variables: customerData
       });
     },
     onSuccess: () => {
@@ -296,7 +307,7 @@ export default function EmailManagementNew() {
                         <Button 
                           size="sm" 
                           variant="outline"
-                          onClick={() => setSelectedTemplate(template)}
+                          onClick={() => setSelectedTemplate(selectedTemplate?.id === template.id ? null : template)}
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
@@ -315,24 +326,70 @@ export default function EmailManagementNew() {
                       ))}
                     </div>
 
-                    <div className="flex items-center space-x-2">
-                      <Input
-                        placeholder="test@example.com"
-                        value={testEmail}
-                        onChange={(e) => setTestEmail(e.target.value)}
-                        className="flex-1"
-                      />
-                      <Button 
-                        size="sm"
-                        onClick={() => handleSendTestEmail(template.id)}
-                        disabled={sendTestEmailMutation.isPending}
-                      >
-                        {sendTestEmailMutation.isPending ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        ) : (
-                          <Send className="w-4 h-4" />
-                        )}
-                      </Button>
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          placeholder="test@example.com"
+                          value={testEmail}
+                          onChange={(e) => setTestEmail(e.target.value)}
+                          className="flex-1"
+                        />
+                        <Button 
+                          size="sm"
+                          onClick={() => handleSendTestEmail(template.id)}
+                          disabled={sendTestEmailMutation.isPending}
+                        >
+                          {sendTestEmailMutation.isPending ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          ) : (
+                            <Send className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </div>
+                      
+                      {selectedTemplate?.id === template.id && (
+                        <div className="bg-gray-50 p-3 rounded-lg">
+                          <h4 className="font-medium mb-2">Kundendaten für Test-E-Mail:</h4>
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div>
+                              <label className="font-medium">Kunde:</label>
+                              <Input
+                                size="sm"
+                                value={customerData.customerName}
+                                onChange={(e) => setCustomerData({...customerData, customerName: e.target.value})}
+                              />
+                            </div>
+                            <div>
+                              <label className="font-medium">Plan:</label>
+                              <select 
+                                className="w-full p-1 border rounded text-sm"
+                                value={customerData.subscriptionPlan}
+                                onChange={(e) => setCustomerData({...customerData, subscriptionPlan: e.target.value})}
+                              >
+                                <option value="Starter">Starter (€299)</option>
+                                <option value="Professional">Professional (€899)</option>
+                                <option value="Enterprise">Enterprise (€2.499)</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="font-medium">Dashboard URL:</label>
+                              <Input
+                                size="sm"
+                                value={customerData.dashboardUrl}
+                                onChange={(e) => setCustomerData({...customerData, dashboardUrl: e.target.value})}
+                              />
+                            </div>
+                            <div>
+                              <label className="font-medium">Betrag:</label>
+                              <Input
+                                size="sm"
+                                value={customerData.amount}
+                                onChange={(e) => setCustomerData({...customerData, amount: e.target.value})}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
