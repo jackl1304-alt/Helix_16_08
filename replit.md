@@ -20,7 +20,7 @@ Preferred communication style: German language - Simple, everyday language.
 - **Build Tool**: Vite with ESBuild
 - **Responsive Design**: Mobile-first approach
 - **Code Quality**: ESLint with TypeScript rules, Prettier formatting
-- **UI/UX Decisions**: Individual tab navigation for articles (Übersicht, Zusammenfassung, Vollständiger Inhalt, Finanzanalyse, KI-Analyse, Metadaten), device preview, accessibility tools (WCAG 2.1 AA Compliance), customization settings, premium executive dashboard look with gradient icons, live statistics, and color-coded status badges.
+- **UI/UX Decisions**: Individual tab navigation for articles (Übersicht, Zusammenfassung, Vollständiger Inhalt, Finanzanalyse, KI-Analyse, Metadaten), device preview, accessibility tools (WCAG 2.1 AA Compliance), customization settings, premium executive dashboard look with gradient icons, live statistics, color-coded status badges, and comprehensive customer theme system with three color schemes (blue, purple, green) for personalized branding.
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js
@@ -36,7 +36,7 @@ Preferred communication style: German language - Simple, everyday language.
 ### System Design
 - **Core Services**: Clean Production Service, Data Collection Service, AI Approval System, Historical Data Management, AegisIntel Services Suite for AI-powered regulatory analysis.
 - **Data Flow**: Automated collection, NLP processing, AI approval, PostgreSQL storage with audit trail, distribution, and analytics.
-- **Key Features**: Multi-tenant SaaS architecture with subscription management and customer-specific dashboards, automated content categorization and evaluation using ML, intelligent categorization (device types, risk levels, compliance areas), real-time sentiment analysis, quality scoring, duplicate detection and cleanup, real-time monitoring, predictive analytics, data visualization, universal PDF export, comprehensive financial analysis (implementation costs, ROI, market impacts, risk assessments), advanced AI analysis (ML-based precedent analysis, success probabilities), intelligent search, color-coded hashtag system, comprehensive terminology compilation, global medical device approvals system, and ongoing approvals management with project tracking.
+- **Key Features**: Multi-tenant SaaS architecture with subscription management and customer-specific dashboards, automated content categorization and evaluation using ML, intelligent categorization (device types, risk levels, compliance areas), real-time sentiment analysis, quality scoring, duplicate detection and cleanup, real-time monitoring, predictive analytics, data visualization, universal PDF export, comprehensive financial analysis (implementation costs, ROI, market impacts, risk assessments), advanced AI analysis (ML-based precedent analysis, success probabilities), intelligent search, color-coded hashtag system, comprehensive terminology compilation, global medical device approvals system, ongoing approvals management with project tracking, and comprehensive customer portal theming system with three customizable color schemes (blue, purple, green), logo upload functionality, and company branding customization.
 - **Integration**: Secure connection to Pure Global's GRIP platform with encrypted credentials and automated data extraction.
 - **Production Infrastructure**: Docker, Kubernetes, Prometheus, Grafana for automated deployment, health checks, and rollbacks.
 
