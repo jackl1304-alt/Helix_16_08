@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,9 +31,16 @@ export default function CustomerSettings() {
     weeklyDigest: true,
     criticalOnly: false
   });
+  const [mounted, setMounted] = useState(true);
+
+  useEffect(() => {
+    return () => {
+      setMounted(false);
+    };
+  }, []);
 
   // Fetch tenant data including permissions
-  const { data: tenantData, isLoading: isTenantLoading } = useQuery({
+  const { data: tenantData, isLoading: isTenantLoading, error } = useQuery({
     queryKey: ['/api/customer/tenant', mockTenantId],
     queryFn: async () => {
       const response = await fetch(`/api/customer/tenant/${mockTenantId}`);
@@ -43,7 +50,9 @@ export default function CustomerSettings() {
       const data = await response.json();
       return data;
     },
-    enabled: true
+    enabled: mounted,
+    retry: 1,
+    staleTime: 5 * 60 * 1000 // 5 minutes
   });
   
   // Extract permissions from tenant data
@@ -72,6 +81,24 @@ export default function CustomerSettings() {
         <div className="animate-pulse space-y-4 p-6">
           <div className="h-8 bg-gray-200 rounded w-1/4"></div>
           <div className="h-32 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 items-center justify-center">
+        <div className="text-center space-y-4">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Fehler beim Laden der Einstellungen
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            Die Tenant-Daten konnten nicht geladen werden. Bitte versuchen Sie es später erneut.
+          </p>
+          <Button onClick={() => window.location.reload()}>
+            Seite neu laden
+          </Button>
         </div>
       </div>
     );
