@@ -47,8 +47,9 @@ Preferred communication style: German language - Simple, everyday language.
 - **Drizzle ORM**
 
 ### Email Services
-- **Gmail SMTP** (deltawayshelixinfo@gmail.com) - Requires App Password
+- **Gmail SMTP** (deltawayshelixinfo@gmail.com) - Production Ready with App Password
 - **Nodemailer** for Gmail integration
+- **6 Professional Templates**: Onboarding, Offboarding, Billing, Alerts, Digest, Trial
 - **SendGrid** (optional fallback)
 
 ### AI Services
