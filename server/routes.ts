@@ -619,21 +619,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { tenantId } = req.params;
       
-      // Use direct SQL query to get tenant with permissions
-      const { neon } = await import('@neondatabase/serverless');
-      const sql = neon(process.env.DATABASE_URL!);
+      // Use Drizzle ORM to get tenant with permissions
+      const { db } = await import('./db');
+      const { tenants } = await import('../shared/schema');
+      const { eq } = await import('drizzle-orm');
       
-      const result = await sql`
-        SELECT 
-          id,
-          name,
-          slug,
-          subscription_plan as "subscriptionPlan",
-          subscription_status as "subscriptionStatus",
-          customer_permissions as "customerPermissions"
-        FROM tenants 
-        WHERE id = ${tenantId}
-      `;
+      const result = await db
+        .select({
+          id: tenants.id,
+          name: tenants.name,
+          slug: tenants.slug,
+          subscriptionPlan: tenants.subscriptionPlan,
+          subscriptionStatus: tenants.subscriptionStatus,
+          customerPermissions: tenants.customerPermissions
+        })
+        .from(tenants)
+        .where(eq(tenants.id, tenantId));
       
       if (result.length === 0) {
         return res.status(404).json({
