@@ -73,7 +73,7 @@ export class TenantService {
   }
 
   // Create new tenant
-  static async createTenant(data: InsertTenant) {
+  static async createTenant(data: InsertTenant & { contactEmail?: string; contactName?: string }) {
     // Check if slug is unique
     const existingTenant = await this.getTenantBySlug(data.slug);
     if (existingTenant) {
@@ -90,6 +90,10 @@ export class TenantService {
       .values(data)
       .returning();
 
+    if (!tenant) {
+      throw new Error('Failed to create tenant');
+    }
+
     // Create default data access permissions
     await db.insert(tenantDataAccess).values({
       tenantId: tenant.id,
@@ -98,6 +102,37 @@ export class TenantService {
       monthlyLimit: data.subscriptionPlan === 'starter' ? 500 : 
                    data.subscriptionPlan === 'professional' ? 2500 : 999999
     });
+
+    // Send welcome email if contact email is provided
+    if (data.contactEmail) {
+      try {
+        const { emailService } = await import('./emailService');
+        const customerName = data.contactName || tenant.name;
+        const subscriptionPlan = tenant.subscriptionPlan || 'Professional';
+        const loginUrl = `${process.env.FRONTEND_URL || 'https://helix.replit.app'}/dashboard/${tenant.slug}`;
+        
+        const emailContent = emailService.generateCustomerOnboardingEmail(
+          customerName,
+          subscriptionPlan,
+          loginUrl
+        );
+        
+        const emailSent = await emailService.sendEmail(
+          data.contactEmail,
+          emailContent.subject,
+          emailContent.html
+        );
+
+        if (emailSent) {
+          console.log(`[TENANT] Welcome email sent to ${data.contactEmail} for tenant ${tenant.id}`);
+        } else {
+          console.warn(`[TENANT] Failed to send welcome email to ${data.contactEmail} for tenant ${tenant.id}`);
+        }
+      } catch (emailError) {
+        console.error(`[TENANT] Error sending welcome email for tenant ${tenant.id}:`, emailError);
+        // Don't fail tenant creation if email fails
+      }
+    }
 
     return tenant;
   }
