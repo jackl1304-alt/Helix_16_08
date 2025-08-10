@@ -3,6 +3,8 @@ import { logger } from '../services/logger.service';
 import { asyncHandler } from '../middleware/error.middleware';
 import { validateBody, validateParams } from '../middleware/validation.middleware';
 import { z } from 'zod';
+import { db } from '../storage/database';
+import { tenants } from '../../shared/schema';
 
 const router = Router();
 
@@ -250,6 +252,7 @@ router.get('/tenants', async (req: Request, res: Response) => {
         max_data_sources as "maxDataSources",
         api_access_enabled as "apiAccessEnabled",
         custom_branding_enabled as "customBrandingEnabled",
+        customer_permissions as "customerPermissions",
         trial_ends_at as "trialEndsAt",
         created_at as "createdAt",
         updated_at as "updatedAt"
@@ -411,6 +414,64 @@ router.delete('/tenants/:id', async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       error: error.message || 'Fehler beim Löschen des Tenants'
+    });
+  }
+});
+
+// PUT /api/admin/tenants/:id/permissions - Customer permissions verwalten
+router.put('/tenants/:id/permissions', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { customerPermissions } = req.body;
+    
+    console.log('[ADMIN] Updating customer permissions for tenant:', id);
+    console.log('[ADMIN] New permissions:', customerPermissions);
+    
+    // Validate permissions structure
+    if (!customerPermissions || typeof customerPermissions !== 'object') {
+      return res.status(400).json({
+        success: false,
+        error: 'Ungültige Berechtigungsstruktur',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    // Use direct SQL query
+    const { neon } = await import('@neondatabase/serverless');
+    const sql = neon(process.env.DATABASE_URL!);
+    
+    const result = await sql`
+      UPDATE tenants 
+      SET 
+        customer_permissions = ${JSON.stringify(customerPermissions)},
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ${id}
+      RETURNING 
+        id,
+        name,
+        customer_permissions as "customerPermissions"
+    `;
+    
+    if (result.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Tenant nicht gefunden'
+      });
+    }
+    
+    console.log('[ADMIN] Customer permissions updated successfully for tenant:', id);
+    
+    return res.json({
+      success: true,
+      data: result[0],
+      message: 'Kundenberechtigungen erfolgreich aktualisiert'
+    });
+    
+  } catch (error: any) {
+    console.error('[ADMIN] Error updating customer permissions:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message || 'Fehler beim Aktualisieren der Berechtigungen'
     });
   }
 });
