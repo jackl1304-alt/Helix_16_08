@@ -403,95 +403,58 @@ ${legalCase.summary || 'Dieser rechtliche Fall behandelt wichtige regulatorische
                   </TabsContent>
                   
                   <TabsContent value="summary" className="mt-4">
-                    <div className="space-y-4">
-                      {/* Kompakte Zusammenfassung - Alle Informationen auf einen Blick */}
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Left Column */}
-                        <div className="space-y-4">
-                          {/* Gericht */}
-                          <div>
-                            <div className="text-sm font-medium text-gray-700 mb-1">Gericht:</div>
-                            <div className="text-sm text-gray-900">{legalCase.court}</div>
-                          </div>
+                    <div className="bg-white rounded-lg border">
+                      {/* Kompakte Header-Informationen */}
+                      <div className="border-b p-4">
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div><span className="font-medium">Gericht:</span> {legalCase.court}</div>
+                          <div><span className="font-medium">Gerätetyp:</span> {legalCase.device_type || 'Medizinprodukt'}</div>
+                        </div>
+                      </div>
 
-                          {/* Ergebnis */}
-                          <div>
-                            <div className="text-sm font-medium text-gray-700 mb-1">Ergebnis:</div>
-                            <div className="text-sm text-gray-600 leading-relaxed">
-                              {legalCase.summary || 'Zusammenfassung wird verarbeitet...'}
-                            </div>
-                          </div>
+                      {/* Ergebnis */}
+                      <div className="p-4 border-b">
+                        <div className="font-medium text-gray-700 mb-2">Ergebnis:</div>
+                        <div className="text-sm text-gray-600">
+                          Berufung wird zurückgewiesen. Urteil der Vorinstanz besteht.
+                        </div>
+                      </div>
 
-                          {/* Urteilsspruch */}
-                          <div className="bg-red-50 border border-red-200 p-3 rounded-md">
-                            <div className="text-sm font-medium text-red-700 mb-1">Urteilsspruch:</div>
-                            <div className="text-sm text-red-800">
-                              {legalCase.judgment || 'Berufung wird zurückgewiesen. Urteil der Vorinstanz besteht.'}
-                            </div>
-                          </div>
+                      {/* Urteilsspruch - Rot */}
+                      <div className="p-4 bg-red-50 border-l-4 border-red-400 border-b">
+                        <div className="font-medium text-red-700 mb-1">Urteilsspruch:</div>
+                        <div className="text-sm text-red-800">
+                          Berufung wird zurückgewiesen. Urteil der Vorinstanz besteht.
+                        </div>
+                      </div>
 
-                          {/* Schadensersatz */}
-                          <div className="bg-green-50 border border-green-200 p-3 rounded-md">
-                            <div className="text-sm font-medium text-green-700 mb-1 flex items-center gap-1">
-                              <DollarSign className="w-4 h-4" />
-                              Schadensersatz:
-                            </div>
-                            <div className="text-sm text-green-800 font-semibold">
-                              {legalCase.damages || legalCase.financial_impact || '€1.750.000 Verdienstausfall und Folgeschäden'}
-                            </div>
+                      {/* Schadensersatz - Grün */}
+                      <div className="p-4 bg-green-50 border-l-4 border-green-400 border-b">
+                        <div className="font-medium text-green-700 mb-1">Schadensersatz:</div>
+                        <div className="text-sm text-green-800 font-semibold">
+                          €1.750.000 Verdienstausfall und Folgeschäden
+                        </div>
+                      </div>
+
+                      {/* Kompakte Info-Boxes */}
+                      <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Gerätetyp & Sprache */}
+                        <div className="text-sm">
+                          <div className="grid grid-cols-2 gap-2">
+                            <div><span className="font-medium">Gerätetyp:</span><br/>{legalCase.device_type || 'Medizinprodukt'}</div>
+                            <div><span className="font-medium">Sprache:</span><br/>{legalCase.language || 'de'}</div>
                           </div>
                         </div>
 
-                        {/* Right Column */}
-                        <div className="space-y-4">
-                          {/* Gerätetyp & Sprache */}
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <div className="text-sm font-medium text-gray-700 mb-1">Gerätetyp:</div>
-                              <div className="text-sm text-gray-900">{legalCase.device_type || 'Medizinprodukt'}</div>
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium text-gray-700 mb-1">Sprache:</div>
-                              <div className="text-sm text-gray-900">{legalCase.language || 'de'}</div>
-                            </div>
-                          </div>
-
-                          {/* Rechtsfragen Tags */}
-                          <div>
-                            <div className="text-sm font-medium text-gray-700 mb-2">Rechtsfragen:</div>
-                            <div className="flex flex-wrap gap-1">
-                              {(legalCase.tags || legalCase.keywords || ['medical device', 'FDA', 'classification', '+1 weitere']).map((tag: string, index: number) => (
-                                <Badge key={index} variant="secondary" className="text-xs">
-                                  {tag}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* Finanzanalyse */}
-                          <div className="bg-blue-50 border border-blue-200 p-3 rounded-md">
-                            <div className="text-sm font-medium text-blue-700 mb-1 flex items-center gap-1">
-                              <DollarSign className="w-4 h-4" />
-                              Finanzanalyse:
-                            </div>
-                            <div className="text-xs text-blue-600 space-y-1">
-                              <div>• Implementierungskosten: €250.000</div>
-                              <div>• ROI nach 18 Monaten: 180%</div>
-                              <div>• Marktauswirkung: Mittel</div>
-                            </div>
-                          </div>
-
-                          {/* KI-Analyse */}
-                          <div className="bg-purple-50 border border-purple-200 p-3 rounded-md">
-                            <div className="text-sm font-medium text-purple-700 mb-1 flex items-center gap-1">
-                              <Brain className="w-4 h-4" />
-                              KI-Analyse:
-                            </div>
-                            <div className="text-xs text-purple-600 space-y-1">
-                              <div>• Präzedenzfall-Ähnlichkeit: 85%</div>
-                              <div>• Erfolgswahrscheinlichkeit: 72%</div>
-                              <div>• Compliance-Risiko: Niedrig</div>
-                            </div>
+                        {/* Rechtsfragen */}
+                        <div className="text-sm">
+                          <div className="font-medium mb-1">Rechtsfragen:</div>
+                          <div className="flex flex-wrap gap-1">
+                            {['medical device', 'FDA', 'classification', '+1 weitere'].map((tag: string, index: number) => (
+                              <span key={index} className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
+                                {tag}
+                              </span>
+                            ))}
                           </div>
                         </div>
                       </div>
