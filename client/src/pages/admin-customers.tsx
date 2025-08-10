@@ -44,6 +44,25 @@ import {
 } from "lucide-react";
 
 // Type definitions
+interface CustomerPermissions {
+  dashboard: boolean;
+  regulatoryUpdates: boolean;
+  legalCases: boolean;
+  knowledgeBase: boolean;
+  newsletters: boolean;
+  analytics: boolean;
+  reports: boolean;
+  dataCollection: boolean;
+  globalSources: boolean;
+  historicalData: boolean;
+  administration: boolean;
+  userManagement: boolean;
+  systemSettings: boolean;
+  auditLogs: boolean;
+  aiInsights: boolean;
+  advancedAnalytics: boolean;
+}
+
 interface Tenant {
   id: string;
   name: string;
@@ -57,6 +76,7 @@ interface Tenant {
   maxDataSources: number;
   apiAccessEnabled: boolean;
   customBrandingEnabled?: boolean;
+  customerPermissions?: CustomerPermissions;
   trialEndsAt?: string;
   createdAt: string;
   updatedAt?: string;
@@ -782,6 +802,15 @@ function TenantEditForm({ tenant, onClose }: { tenant: any, onClose: () => void 
           />
         </div>
         
+        {/* Customer Permissions Section */}
+        <div className="space-y-4 border-t pt-6">
+          <h3 className="text-lg font-medium">Kundenberechtigung verwalten</h3>
+          <p className="text-sm text-muted-foreground">
+            Bestimmen Sie, welche Bereiche der Kunde in seinem Dashboard sehen und verwenden darf
+          </p>
+          <CustomerPermissionsForm tenant={tenant} />
+        </div>
+
         <div className="flex justify-end space-x-2 pt-4">
           <Button type="button" variant="outline" onClick={onClose}>
             Abbrechen
@@ -792,5 +821,137 @@ function TenantEditForm({ tenant, onClose }: { tenant: any, onClose: () => void 
         </div>
       </form>
     </Form>
+  );
+}
+
+// Customer Permissions Component
+function CustomerPermissionsForm({ tenant }: { tenant: Tenant }) {
+  const [permissions, setPermissions] = useState<CustomerPermissions>(() => {
+    return tenant.customerPermissions || {
+      dashboard: true,
+      regulatoryUpdates: true,
+      legalCases: true,
+      knowledgeBase: true,
+      newsletters: true,
+      analytics: false,
+      reports: false,
+      dataCollection: false,
+      globalSources: false,
+      historicalData: false,
+      administration: false,
+      userManagement: false,
+      systemSettings: false,
+      auditLogs: false,
+      aiInsights: false,
+      advancedAnalytics: false
+    };
+  });
+
+  const updatePermissionsMutation = useMutation({
+    mutationFn: async (newPermissions: CustomerPermissions) => {
+      return await apiRequest(`/api/admin/tenants/${tenant.id}/permissions`, 'PUT', {
+        customerPermissions: newPermissions
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/tenants'] });
+      toast({
+        title: "Berechtigungen aktualisiert",
+        description: "Die Kundenberechtigung wurden erfolgreich gespeichert.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fehler",
+        description: error.message || "Fehler beim Speichern der Berechtigungen.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handlePermissionChange = (permission: keyof CustomerPermissions, value: boolean) => {
+    const newPermissions = { ...permissions, [permission]: value };
+    setPermissions(newPermissions);
+    updatePermissionsMutation.mutate(newPermissions);
+  };
+
+  const permissionCategories = [
+    {
+      title: "Basis-Zugriff",
+      description: "Grundlegende Bereiche für alle Kunden",
+      permissions: [
+        { key: 'dashboard' as keyof CustomerPermissions, label: 'Dashboard', description: 'Hauptübersicht und Statistiken' },
+        { key: 'regulatoryUpdates' as keyof CustomerPermissions, label: 'Regulatory Updates', description: 'Regulatorische Änderungen und Updates' },
+        { key: 'legalCases' as keyof CustomerPermissions, label: 'Rechtsprechung', description: 'Gerichtsentscheidungen und Präzedenzfälle' },
+        { key: 'knowledgeBase' as keyof CustomerPermissions, label: 'Wissensdatenbank', description: 'Artikel und Dokumentation' },
+        { key: 'newsletters' as keyof CustomerPermissions, label: 'Newsletter', description: 'Newsletter-Verwaltung und -Abonnements' }
+      ]
+    },
+    {
+      title: "Erweiterte Features",
+      description: "Zusätzliche Funktionen je nach Subscription",
+      permissions: [
+        { key: 'analytics' as keyof CustomerPermissions, label: 'Analytics', description: 'Datenanalyse und Berichte' },
+        { key: 'reports' as keyof CustomerPermissions, label: 'Reports', description: 'Detaillierte Berichte generieren' },
+        { key: 'aiInsights' as keyof CustomerPermissions, label: 'KI-Insights', description: 'KI-gestützte Analysen und Erkenntnisse' },
+        { key: 'advancedAnalytics' as keyof CustomerPermissions, label: 'Erweiterte Analytics', description: 'Fortgeschrittene Analysefunktionen' }
+      ]
+    },
+    {
+      title: "Daten-Management",
+      description: "Datenquellen und -verwaltung",
+      permissions: [
+        { key: 'globalSources' as keyof CustomerPermissions, label: 'Globale Quellen', description: 'Zugang zu allen Datenquellen' },
+        { key: 'dataCollection' as keyof CustomerPermissions, label: 'Datensammlung', description: 'Eigene Daten sammeln und verwalten' },
+        { key: 'historicalData' as keyof CustomerPermissions, label: 'Historische Daten', description: 'Zugang zu historischen Datensätzen' }
+      ]
+    },
+    {
+      title: "Administrative Bereiche",
+      description: "Nur für besondere Fälle freigeben",
+      permissions: [
+        { key: 'systemSettings' as keyof CustomerPermissions, label: 'Systemeinstellungen', description: 'Zugang zu Systemkonfiguration' },
+        { key: 'userManagement' as keyof CustomerPermissions, label: 'Benutzerverwaltung', description: 'Benutzer innerhalb des Tenants verwalten' },
+        { key: 'administration' as keyof CustomerPermissions, label: 'Administration', description: 'Administrative Funktionen' },
+        { key: 'auditLogs' as keyof CustomerPermissions, label: 'Audit Logs', description: 'Zugang zu System-Audit-Protokollen' }
+      ]
+    }
+  ];
+
+  return (
+    <div className="space-y-6">
+      {permissionCategories.map((category) => (
+        <div key={category.title} className="space-y-3">
+          <div>
+            <h4 className="text-md font-medium">{category.title}</h4>
+            <p className="text-sm text-muted-foreground">{category.description}</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {category.permissions.map((perm) => (
+              <div 
+                key={perm.key}
+                className="flex items-center justify-between rounded-lg border p-4 hover:bg-gray-50"
+              >
+                <div className="space-y-0.5">
+                  <div className="text-sm font-medium">{perm.label}</div>
+                  <div className="text-xs text-muted-foreground">{perm.description}</div>
+                </div>
+                <Switch 
+                  checked={permissions[perm.key]}
+                  onCheckedChange={(checked) => handlePermissionChange(perm.key, checked)}
+                  disabled={updatePermissionsMutation.isPending}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+      
+      {updatePermissionsMutation.isPending && (
+        <div className="text-sm text-muted-foreground">
+          Speichere Änderungen...
+        </div>
+      )}
+    </div>
   );
 }

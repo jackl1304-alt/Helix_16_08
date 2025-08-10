@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import CustomerNavigation, { type CustomerPermissions } from "@/components/customer/customer-navigation";
 import { 
   Building,
   Users,
@@ -69,6 +70,26 @@ const regionDistribution = [
 
 export default function CustomerDashboard() {
   const [selectedTimeRange, setSelectedTimeRange] = useState('30d');
+  
+  // Mock permissions - in production, fetch from tenant API
+  const mockPermissions: CustomerPermissions = {
+    dashboard: true,
+    regulatoryUpdates: true,
+    legalCases: true,
+    knowledgeBase: true,
+    newsletters: true,
+    analytics: false,
+    reports: false,
+    dataCollection: false,
+    globalSources: false,
+    historicalData: false,
+    administration: false,
+    userManagement: false,
+    systemSettings: false,
+    auditLogs: false,
+    aiInsights: false,
+    advancedAnalytics: false
+  };
   
   // Fetch customer dashboard data
   const { data: dashboardData, isLoading } = useQuery({
@@ -508,6 +529,8 @@ export default function CustomerDashboard() {
           </div>
         </CardContent>
       </Card>
+        </div>
+      </div>
     </div>
   );
 }
