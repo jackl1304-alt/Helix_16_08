@@ -403,59 +403,45 @@ ${legalCase.summary || 'Dieser rechtliche Fall behandelt wichtige regulatorische
                   </TabsContent>
                   
                   <TabsContent value="summary" className="mt-4">
-                    <div className="bg-white rounded-lg border">
-                      {/* Kompakte Header-Informationen */}
-                      <div className="border-b p-4">
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div><span className="font-medium">Gericht:</span> {legalCase.court}</div>
-                          <div><span className="font-medium">Gerätetyp:</span> {legalCase.device_type || 'Medizinprodukt'}</div>
+                    <div className="bg-white rounded-lg border space-y-3">
+                      {/* Ultra-kompakte 2-Spalten Übersicht */}
+                      <div className="grid grid-cols-2 gap-3 p-3 text-xs">
+                        <div><strong>Gericht:</strong> {legalCase.court}</div>
+                        <div><strong>Gerätetyp:</strong> {legalCase.device_type || 'Medizinprodukt'}</div>
+                      </div>
+
+                      {/* Urteilsspruch - Rot - Kompakt */}
+                      <div className="p-3 bg-red-50 border-l-4 border-red-400">
+                        <div className="text-xs font-medium text-red-700">Urteilsspruch:</div>
+                        <div className="text-xs text-red-800 mt-1">
+                          {(() => {
+                            const judgment = legalCase.judgment || 'Urteilsspruch wird verarbeitet...';
+                            return judgment.length > 100 ? judgment.substring(0, 100) + '...' : judgment;
+                          })()}
                         </div>
                       </div>
 
-                      {/* Ergebnis */}
-                      <div className="p-4 border-b">
-                        <div className="font-medium text-gray-700 mb-2">Ergebnis:</div>
-                        <div className="text-sm text-gray-600">
-                          {legalCase.summary || 'Zusammenfassung wird verarbeitet...'}
+                      {/* Schadensersatz - Grün - Kompakt */}
+                      <div className="p-3 bg-green-50 border-l-4 border-green-400">
+                        <div className="text-xs font-medium text-green-700">Schadensersatz:</div>
+                        <div className="text-xs text-green-800 font-semibold mt-1">
+                          {(() => {
+                            const damages = legalCase.damages || legalCase.financial_impact || 'Wird ermittelt...';
+                            // Extract just the total amount from damages text
+                            const match = damages.match(/GESAMTSUMME.*?€([\d.,]+)/);
+                            return match ? `€${match[1]}` : (damages.length > 50 ? damages.substring(0, 50) + '...' : damages);
+                          })()}
                         </div>
                       </div>
 
-                      {/* Urteilsspruch - Rot */}
-                      <div className="p-4 bg-red-50 border-l-4 border-red-400 border-b">
-                        <div className="font-medium text-red-700 mb-1">Urteilsspruch:</div>
-                        <div className="text-sm text-red-800">
-                          {legalCase.judgment || legalCase.summary || 'Urteilsspruch wird verarbeitet...'}
-                        </div>
-                      </div>
-
-                      {/* Schadensersatz - Grün */}
-                      <div className="p-4 bg-green-50 border-l-4 border-green-400 border-b">
-                        <div className="font-medium text-green-700 mb-1">Schadensersatz:</div>
-                        <div className="text-sm text-green-800 font-semibold">
-                          {legalCase.damages || legalCase.financial_impact || 'Wird ermittelt...'}
-                        </div>
-                      </div>
-
-                      {/* Kompakte Info-Boxes */}
-                      <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Gerätetyp & Sprache */}
-                        <div className="text-sm">
-                          <div className="grid grid-cols-2 gap-2">
-                            <div><span className="font-medium">Gerätetyp:</span><br/>{legalCase.device_type || 'Medizinprodukt'}</div>
-                            <div><span className="font-medium">Sprache:</span><br/>{legalCase.language || 'de'}</div>
-                          </div>
-                        </div>
-
-                        {/* Rechtsfragen */}
-                        <div className="text-sm">
-                          <div className="font-medium mb-1">Rechtsfragen:</div>
-                          <div className="flex flex-wrap gap-1">
-                            {(legalCase.tags || legalCase.keywords || ['Wird geladen...']).map((tag: string, index: number) => (
-                              <span key={index} className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
+                      {/* Tags - Ultra-kompakt */}
+                      <div className="p-3 border-t">
+                        <div className="flex flex-wrap gap-1">
+                          {(legalCase.keywords || legalCase.tags || ['Wird geladen...']).slice(0, 4).map((tag: string, index: number) => (
+                            <span key={index} className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">
+                              {tag}
+                            </span>
+                          ))}
                         </div>
                       </div>
                     </div>
