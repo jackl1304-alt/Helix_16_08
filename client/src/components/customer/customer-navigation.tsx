@@ -60,70 +60,70 @@ const ALL_NAVIGATION_ITEMS: NavigationItem[] = [
   },
   {
     name: "Regulatory Updates",
-    href: "/regulatory-updates-new",
+    href: "/customer/regulatory-updates",
     icon: FileText,
     permission: "regulatoryUpdates",
     description: "Aktuelle regulatorische Änderungen"
   },
   {
     name: "Legal Cases",
-    href: "/rechtsprechung-fixed",
+    href: "/customer/legal-cases",
     icon: Scale,
     permission: "legalCases",
     description: "Rechtsprechung und Präzedenzfälle"
   },
   {
     name: "Knowledge Base",
-    href: "/knowledge-base-new",
+    href: "/customer/knowledge-base",
     icon: BookOpen,
     permission: "knowledgeBase",
     description: "Wissensdatenbank und Artikel"
   },
   {
     name: "Newsletter",
-    href: "/newsletter-manager",
+    href: "/customer/newsletters",
     icon: Mail,
     permission: "newsletters",
     description: "Newsletter-Verwaltung"
   },
   {
     name: "Analytics",
-    href: "/analytics",
+    href: "/customer/analytics",
     icon: BarChart3,
     permission: "analytics",
     description: "Datenanalyse und Berichte"
   },
   {
     name: "Advanced Analytics", 
-    href: "/advanced-analytics",
+    href: "/customer/advanced-analytics",
     icon: Activity,
     permission: "advancedAnalytics",
     description: "Erweiterte Analysetools"
   },
   {
     name: "AI Insights",
-    href: "/ai-insights",
+    href: "/customer/ai-insights",
     icon: Brain,
     permission: "aiInsights",
     description: "KI-gestützte Erkenntnisse"
   },
   {
     name: "Global Sources",
-    href: "/global-sources",
+    href: "/customer/global-sources",
     icon: Globe,
     permission: "globalSources",
     description: "Globale Datenquellen"
   },
   {
     name: "Data Collection",
-    href: "/data-collection", 
+    href: "/customer/data-collection", 
     icon: Database,
     permission: "dataCollection",
     description: "Datensammlung und -verwaltung"
   },
   {
     name: "Historical Data",
-    href: "/historical-data-simple",
+    href: "/customer/historical-data",
     icon: Clipboard,
     permission: "historicalData",
     description: "Historische Datenanalyse"

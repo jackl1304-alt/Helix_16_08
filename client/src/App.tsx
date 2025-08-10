@@ -139,6 +139,16 @@ function App() {
             {/* Customer pages with their own navigation */}
             <Route path="/customer-dashboard" component={CustomerDashboard} />
             <Route path="/customer-settings" component={CustomerSettings} />
+            <Route path="/customer/regulatory-updates" component={CustomerDashboard} />
+            <Route path="/customer/legal-cases" component={CustomerDashboard} />
+            <Route path="/customer/knowledge-base" component={CustomerDashboard} />
+            <Route path="/customer/newsletters" component={CustomerDashboard} />
+            <Route path="/customer/analytics" component={CustomerDashboard} />
+            <Route path="/customer/advanced-analytics" component={CustomerDashboard} />
+            <Route path="/customer/ai-insights" component={CustomerDashboard} />
+            <Route path="/customer/global-sources" component={CustomerDashboard} />
+            <Route path="/customer/data-collection" component={CustomerDashboard} />
+            <Route path="/customer/historical-data" component={CustomerDashboard} />
             
             {/* All other pages with Admin Sidebar */}
             <Route>
