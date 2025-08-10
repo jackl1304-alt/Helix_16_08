@@ -239,6 +239,122 @@ export const insertUserSchema = createInsertSchema(users).omit({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
+// Multi-Tenant SaaS Schema
+export const tenants = pgTable("tenants", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 100 }).unique().notNull(),
+  subscriptionPlan: varchar("subscription_plan", { 
+    length: 50 
+  }).$type<'starter' | 'professional' | 'enterprise'>().notNull().default('starter'),
+  subscriptionStatus: varchar("subscription_status", {
+    length: 50
+  }).$type<'active' | 'suspended' | 'cancelled' | 'trial'>().notNull().default('trial'),
+  settings: jsonb("settings").default(sql`'{}'`),
+  billingEmail: varchar("billing_email", { length: 255 }),
+  maxUsers: integer("max_users").default(5),
+  maxDataSources: integer("max_data_sources").default(10),
+  apiAccessEnabled: boolean("api_access_enabled").default(false),
+  customBrandingEnabled: boolean("custom_branding_enabled").default(false),
+  trialEndsAt: timestamp("trial_ends_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const tenantUsers = pgTable("tenant_users", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").references(() => tenants.id).notNull(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  role: varchar("role", { 
+    length: 50 
+  }).$type<'admin' | 'compliance_officer' | 'analyst' | 'viewer'>().notNull().default('viewer'),
+  permissions: jsonb("permissions").default(sql`'[]'`),
+  dashboardConfig: jsonb("dashboard_config").default(sql`'{}'`),
+  isActive: boolean("is_active").default(true),
+  invitedAt: timestamp("invited_at").defaultNow(),
+  joinedAt: timestamp("joined_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const tenantDataAccess = pgTable("tenant_data_access", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").references(() => tenants.id).notNull(),
+  dataSourceId: varchar("data_source_id"),
+  allowedRegions: jsonb("allowed_regions").default(sql`'["US", "EU"]'`),
+  monthlyLimit: integer("monthly_limit").default(500),
+  currentUsage: integer("current_usage").default(0),
+  lastResetAt: timestamp("last_reset_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const tenantDashboards = pgTable("tenant_dashboards", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").references(() => tenants.id).notNull(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: varchar("description", { length: 500 }),
+  layoutConfig: jsonb("layout_config").default(sql`'{}'`),
+  widgets: jsonb("widgets").default(sql`'[]'`),
+  isDefault: boolean("is_default").default(false),
+  isShared: boolean("is_shared").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const tenantInvitations = pgTable("tenant_invitations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").references(() => tenants.id).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  role: varchar("role", { 
+    length: 50 
+  }).$type<'admin' | 'compliance_officer' | 'analyst' | 'viewer'>().notNull(),
+  invitedBy: varchar("invited_by").references(() => users.id).notNull(),
+  token: varchar("token", { length: 255 }).unique().notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  acceptedAt: timestamp("accepted_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Relations for Multi-Tenant Schema
+export const tenantsRelations = relations(tenants, ({ many }) => ({
+  tenantUsers: many(tenantUsers),
+  dataAccess: many(tenantDataAccess),
+  dashboards: many(tenantDashboards),
+  invitations: many(tenantInvitations),
+}));
+
+export const tenantUsersRelations = relations(tenantUsers, ({ one }) => ({
+  tenant: one(tenants, {
+    fields: [tenantUsers.tenantId],
+    references: [tenants.id],
+  }),
+  user: one(users, {
+    fields: [tenantUsers.userId],
+    references: [users.id],
+  }),
+}));
+
+export const tenantDashboardsRelations = relations(tenantDashboards, ({ one }) => ({
+  tenant: one(tenants, {
+    fields: [tenantDashboards.tenantId],
+    references: [tenants.id],
+  }),
+  user: one(users, {
+    fields: [tenantDashboards.userId],
+    references: [users.id],
+  }),
+}));
+
+// Types for Multi-Tenant
+export type Tenant = typeof tenants.$inferSelect;
+export type InsertTenant = typeof tenants.$inferInsert;
+export type TenantUser = typeof tenantUsers.$inferSelect;
+export type InsertTenantUser = typeof tenantUsers.$inferInsert;
+export type TenantDashboard = typeof tenantDashboards.$inferSelect;
+export type InsertTenantDashboard = typeof tenantDashboards.$inferInsert;
+export type TenantInvitation = typeof tenantInvitations.$inferSelect;
+export type InsertTenantInvitation = typeof tenantInvitations.$inferInsert;
+
 export const insertDataSourceSchema = createInsertSchema(dataSources).omit({
   id: true,
   createdAt: true,
