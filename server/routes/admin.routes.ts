@@ -208,19 +208,130 @@ router.post('/tenants', async (req: Request, res: Response) => {
 // GET /api/admin/tenants - Alle Tenants auflisten
 router.get('/tenants', async (req: Request, res: Response) => {
   try {
-    const { TenantService } = await import('../services/tenantService');
-    const tenants = await TenantService.getAllTenants();
+    // Direct SQL query für bessere Kompatibilität
+    const { neon } = await import('@neondatabase/serverless');
+    const sql = neon(process.env.DATABASE_URL!);
     
-    res.json({
-      success: true,
-      data: tenants,
-      count: tenants.length
-    });
+    const result = await sql`
+      SELECT 
+        id,
+        name,
+        slug,
+        subscription_plan as "subscriptionPlan",
+        subscription_status as "subscriptionStatus", 
+        billing_email as "billingEmail",
+        max_users as "maxUsers",
+        max_data_sources as "maxDataSources",
+        api_access_enabled as "apiAccessEnabled",
+        custom_branding_enabled as "customBrandingEnabled",
+        trial_ends_at as "trialEndsAt",
+        created_at as "createdAt",
+        updated_at as "updatedAt"
+      FROM tenants 
+      ORDER BY created_at DESC
+    `;
+    
+    console.log('[ADMIN] Fetched tenants for frontend:', result.length);
+    
+    res.json(result);
   } catch (error: any) {
     console.error('[ADMIN] Error fetching tenants:', error);
     res.status(500).json({
       success: false,
       error: error.message || 'Fehler beim Laden der Tenants'
+    });
+  }
+});
+
+// PUT /api/admin/tenants/:id - Tenant bearbeiten
+router.put('/tenants/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+    
+    console.log('[ADMIN] Updating tenant:', id, updateData);
+    
+    const { db } = await import('../db');
+    const { tenants } = await import('../../shared/schema');
+    const { eq } = await import('drizzle-orm');
+    
+    // Build update object for Drizzle
+    const updateFields: any = {};
+    
+    if (updateData.name) updateFields.name = updateData.name;
+    if (updateData.subscriptionPlan) updateFields.subscriptionPlan = updateData.subscriptionPlan;
+    if (updateData.subscriptionStatus) updateFields.subscriptionStatus = updateData.subscriptionStatus;
+    if (updateData.billingEmail) updateFields.billingEmail = updateData.billingEmail;
+    if (updateData.maxUsers !== undefined) updateFields.maxUsers = updateData.maxUsers;
+    if (updateData.maxDataSources !== undefined) updateFields.maxDataSources = updateData.maxDataSources;
+    if (updateData.apiAccessEnabled !== undefined) updateFields.apiAccessEnabled = updateData.apiAccessEnabled;
+    if (updateData.customBrandingEnabled !== undefined) updateFields.customBrandingEnabled = updateData.customBrandingEnabled;
+    
+    updateFields.updatedAt = new Date();
+    
+    const result = await db.update(tenants)
+      .set(updateFields)
+      .where(eq(tenants.id, id))
+      .returning();
+    
+    if (result.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Tenant nicht gefunden'
+      });
+    }
+    
+    console.log('[ADMIN] Tenant updated successfully:', result[0].id);
+    
+    res.json({
+      success: true,
+      data: result[0],
+      message: 'Tenant erfolgreich aktualisiert'
+    });
+    
+  } catch (error: any) {
+    console.error('[ADMIN] Error updating tenant:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Fehler beim Aktualisieren des Tenants'
+    });
+  }
+});
+
+// DELETE /api/admin/tenants/:id - Tenant löschen
+router.delete('/tenants/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    
+    console.log('[ADMIN] Deleting tenant:', id);
+    
+    const { db } = await import('../db');
+    const { tenants } = await import('../../shared/schema');
+    const { eq } = await import('drizzle-orm');
+    
+    const result = await db.delete(tenants)
+      .where(eq(tenants.id, id))
+      .returning();
+    
+    if (result.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Tenant nicht gefunden'
+      });
+    }
+    
+    console.log('[ADMIN] Tenant deleted successfully:', id);
+    
+    res.json({
+      success: true,
+      message: 'Tenant erfolgreich gelöscht'
+    });
+    
+  } catch (error: any) {
+    console.error('[ADMIN] Error deleting tenant:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Fehler beim Löschen des Tenants'
     });
   }
 });
