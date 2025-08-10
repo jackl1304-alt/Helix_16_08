@@ -410,6 +410,28 @@ ${legalCase.summary || 'Dieser rechtliche Fall behandelt wichtige regulatorische
                         <div><strong>Gerätetyp:</strong> {legalCase.device_type || 'Medizinprodukt'}</div>
                       </div>
 
+                      {/* Kurzer Fallüberblick */}
+                      <div className="p-3 bg-blue-50 border-l-4 border-blue-400">
+                        <div className="text-xs font-medium text-blue-700 mb-1">Fallüberblick:</div>
+                        <div className="text-xs text-blue-800">
+                          {(() => {
+                            const summary = legalCase.summary || 'Fallübersicht wird verarbeitet...';
+                            // Extract key points from summary or create bullet points
+                            if (summary.includes('##') || summary.includes('•')) {
+                              // Extract first few bullet points or key sections
+                              const lines = summary.split('\n').filter(line => 
+                                line.includes('•') || line.includes('-') || line.startsWith('**')
+                              ).slice(0, 3);
+                              return lines.length > 0 ? lines.join(' • ') : summary.substring(0, 150) + '...';
+                            } else {
+                              // Create summary from first paragraph
+                              const firstPara = summary.split('\n')[0];
+                              return firstPara.length > 120 ? firstPara.substring(0, 120) + '...' : firstPara;
+                            }
+                          })()}
+                        </div>
+                      </div>
+
                       {/* Urteilsspruch - Rot - Kompakt */}
                       <div className="p-3 bg-red-50 border-l-4 border-red-400">
                         <div className="text-xs font-medium text-red-700">Urteilsspruch:</div>
