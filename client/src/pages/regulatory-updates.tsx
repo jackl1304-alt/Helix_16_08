@@ -682,12 +682,6 @@ EXPORT DETAILS:
                                         </div>
                                       </div>
                                     </div>
-                                  </TabsContent> 
-                                          text={update.description || update.content || 'Keine detaillierte Beschreibung verfügbar.'}
-                                          className="text-sm leading-relaxed"
-                                        />
-                                      </div>
-                                    </div>
                                   </TabsContent>
 
                                   <TabsContent value="financial" className="space-y-4 h-full overflow-auto">
@@ -1016,9 +1010,17 @@ EXPORT DETAILS:
                                         </div>
                                       </div>
                                     </div>
-                                        <div><strong>Update-Typ:</strong> {update.update_type}</div>
-                                        <div><strong>Prioritätsstufe:</strong> {priorityLabels[update.priority]}</div>
-                                        <div><strong>Zeichenanzahl:</strong> {update.description?.length || 0}</div>
+                                  </TabsContent>
+
+                                  <TabsContent value="analytics" className="space-y-4 h-full overflow-auto">
+                                    <div className="space-y-4">
+                                      <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg">
+                                        <h3 className="text-lg font-semibold mb-3">📊 Update-Analyse</h3>
+                                        <div className="grid grid-cols-2 gap-4 text-sm">
+                                          <div><strong>Update-Typ:</strong> {update.update_type}</div>
+                                          <div><strong>Prioritätsstufe:</strong> {priorityLabels[update.priority]}</div>
+                                          <div><strong>Zeichenanzahl:</strong> {update.description?.length || 0}</div>
+                                        </div>
                                       </div>
                                       
                                       {/* Farbkodierte Hashtags */}
