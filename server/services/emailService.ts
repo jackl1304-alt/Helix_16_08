@@ -571,12 +571,12 @@ class EmailService {
   getProviderInfo(): EmailProvider {
     return {
       id: 'gmail_primary',
-      name: 'Gmail (deltawaysnewsletter)',
+      name: 'Gmail (deltawaysnewsletter@gmail.com)',
       host: 'smtp.gmail.com',
       port: 587,
       secure: false,
       user: 'deltawaysnewsletter@gmail.com',
-      status: this.transporter ? 'active' : 'error',
+      status: 'error', // Needs App Password
       dailyLimit: 400,
       usedToday: this.emailCount,
       lastTest: new Date().toISOString()
