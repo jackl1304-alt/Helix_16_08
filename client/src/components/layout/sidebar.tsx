@@ -73,7 +73,17 @@ const navigationStructure: Record<string, NavigationSection> = {
     defaultOpen: true
   },
 
-  // 4. ERWEITERT (kollabierbar)
+  // 4. ZULASSUNGEN & REGISTRIERUNG
+  approvals: {
+    title: "ZULASSUNGEN & REGISTRIERUNG",
+    items: [
+      { name: "Globale Zulassungen", href: "/zulassungen/global", icon: Globe },
+      { name: "Laufende Zulassungen", href: "/zulassungen/laufende", icon: CheckCircle },
+    ],
+    defaultOpen: true
+  },
+
+  // 5. ERWEITERT (kollabierbar)
   advanced: {
     title: "ERWEITERT",
     items: [
