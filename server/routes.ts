@@ -614,6 +614,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get tenant data with permissions for customer dashboard
+  app.get('/api/customer/tenant/:tenantId', async (req, res) => {
+    try {
+      const { tenantId } = req.params;
+      
+      // Use direct SQL query to get tenant with permissions
+      const { neon } = await import('@neondatabase/serverless');
+      const sql = neon(process.env.DATABASE_URL!);
+      
+      const result = await sql`
+        SELECT 
+          id,
+          name,
+          slug,
+          subscription_plan as "subscriptionPlan",
+          subscription_status as "subscriptionStatus",
+          customer_permissions as "customerPermissions"
+        FROM tenants 
+        WHERE id = ${tenantId}
+      `;
+      
+      if (result.length === 0) {
+        return res.status(404).json({
+          error: 'Tenant nicht gefunden'
+        });
+      }
+      
+      const tenant = result[0];
+      
+      // Ensure customerPermissions has default values if null
+      if (!tenant.customerPermissions) {
+        tenant.customerPermissions = {
+          dashboard: true,
+          regulatoryUpdates: true,
+          legalCases: true,
+          knowledgeBase: true,
+          newsletters: true,
+          analytics: false,
+          reports: false,
+          dataCollection: false,
+          globalSources: false,
+          historicalData: false,
+          administration: false,
+          userManagement: false,
+          systemSettings: false,
+          auditLogs: false,
+          aiInsights: false,
+          advancedAnalytics: false
+        };
+      }
+      
+      console.log('[CUSTOMER] Fetched tenant permissions for:', tenantId, tenant.customerPermissions);
+      
+      res.json(tenant);
+    } catch (error) {
+      console.error('[CUSTOMER] Error fetching tenant:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.get('/api/customer/settings/:tenantId', async (req, res) => {
     try {
       // Mock tenant settings
