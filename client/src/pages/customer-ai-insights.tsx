@@ -57,7 +57,21 @@ export default function CustomerAIInsights() {
     retry: 1
   });
 
-  // Mock AI insights data
+  // Fetch AI insights from API
+  const { data: insights, isLoading: isInsightsLoading, error: insightsError } = useQuery({
+    queryKey: ['/api/customer/ai-analysis'],
+    queryFn: async () => {
+      const response = await fetch('/api/customer/ai-analysis');
+      if (!response.ok) {
+        throw new Error('Failed to fetch AI insights');
+      }
+      return await response.json();
+    },
+    enabled: mounted && tenantData?.customerPermissions?.aiInsights,
+    retry: 1
+  });
+
+  // Mock fallback data
   const mockInsights: AIInsight[] = [
     {
       id: "ai_insight_1",
@@ -152,9 +166,47 @@ export default function CustomerAIInsights() {
             </Button>
           </div>
 
+          {/* Loading State */}
+          {(isTenantLoading || isInsightsLoading) && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <Card key={i} className={`${colors.cardBg} animate-pulse`}>
+                  <CardHeader>
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="h-3 bg-gray-200 rounded"></div>
+                      <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {/* Error State */}
+          {insightsError && (
+            <Card className={`${colors.cardBg} border-red-200`}>
+              <CardHeader>
+                <CardTitle className="text-red-600 flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5" />
+                  Fehler beim Laden der KI-Insights
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Die KI-Insights konnten nicht geladen werden. Bitte versuchen Sie es später erneut.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Insights Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {mockInsights.map((insight) => (
+          {!isInsightsLoading && !insightsError && displayInsights && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {displayInsights.map((insight) => (
               <Card key={insight.id} className={`${colors.cardBg} hover:shadow-lg transition-shadow`}>
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between">
@@ -202,8 +254,26 @@ export default function CustomerAIInsights() {
                   </div>
                 </CardContent>
               </Card>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
+
+          {/* No Data State */}
+          {!isInsightsLoading && !insightsError && (!displayInsights || displayInsights.length === 0) && (
+            <Card className={`${colors.cardBg}`}>
+              <CardHeader>
+                <CardTitle className={`${colors.textPrimary} flex items-center gap-2`}>
+                  <Brain className="h-5 w-5" />
+                  Keine KI-Insights verfügbar
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className={`${colors.textSecondary}`}>
+                  Derzeit sind keine KI-Insights verfügbar. Das System analysiert kontinuierlich neue Daten.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

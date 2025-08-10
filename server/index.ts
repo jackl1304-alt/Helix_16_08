@@ -9,6 +9,7 @@ if (process.env.NODE_ENV === 'development') {
 import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
 import { registerRoutes } from "./routes";
+import { setupCustomerAIRoutes } from "./temp-ai-routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { emailService } from "./services/emailService";
 import { historicalDataService } from "./services/historicalDataService";
@@ -99,6 +100,9 @@ app.use((req, res, next) => {
   
   // Register all primary API routes
   await registerRoutes(app);
+  
+  // Register customer AI routes
+  setupCustomerAIRoutes(app);
   
   // Register all secondary API routes
   const { default: knowledgeExtractionRoutes } = await import("./routes/knowledge-extraction.routes");

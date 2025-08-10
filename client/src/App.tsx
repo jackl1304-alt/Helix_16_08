@@ -54,7 +54,7 @@ const NewsletterAdmin = lazy(() => import("@/pages/newsletter-admin"));
 const AdvancedAnalytics = lazy(() => import("@/pages/advanced-analytics"));
 const CustomerDashboard = lazy(() => import("@/pages/customer-dashboard"));
 const CustomerSettings = lazy(() => import("@/pages/customer-settings"));
-const CustomerAIInsights = lazy(() => import("@/pages/customer-ai-insights"));
+const CustomerAIInsightsClean = lazy(() => import("@/pages/customer-ai-insights-clean"));
 const TenantOnboarding = lazy(() => import("@/pages/tenant-onboarding"));
 const EmailManagement = lazy(() => import("@/pages/email-management-new"));
 const RegulatoryUpdateDetail = lazy(() => import("@/pages/regulatory-update-detail-new"));
@@ -151,7 +151,7 @@ function App() {
             </Route>
             <Route path="/customer-ai-insights">
               <CustomerThemeProvider>
-                <CustomerAIInsights />
+                <CustomerAIInsightsClean />
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer/regulatory-updates">
