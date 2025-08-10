@@ -201,7 +201,7 @@ export default function RegulatoryUpdateDetail({ params }: RegulatoryUpdateDetai
     };
 
     const productKey = Object.keys(productMap).find(key => update?.title?.includes(key));
-    return productMap[productKey] || productMap['K252056']; // Default fallback
+    return productKey ? productMap[productKey] : productMap['K252056']; // Safe fallback with null check
   };
 
   const generateAIAnalysis = (update: any) => {
@@ -497,7 +497,7 @@ export default function RegulatoryUpdateDetail({ params }: RegulatoryUpdateDetai
     };
 
     const productKey = Object.keys(aiMap).find(key => update?.title?.includes(key));
-    return aiMap[productKey] || aiMap['K252056']; // Default fallback
+    return productKey ? aiMap[productKey] : aiMap['K252056']; // Safe fallback with null check
   };
 
   if (isLoading) {
