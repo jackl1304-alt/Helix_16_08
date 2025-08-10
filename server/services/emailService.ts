@@ -57,7 +57,7 @@ class EmailService {
         secure: false,
         auth: {
           user: 'deltawaysnewsletter@gmail.com',
-          pass: '2021!Emil@Serpha'
+          pass: '7724@Serpha'
         },
         tls: {
           rejectUnauthorized: false
