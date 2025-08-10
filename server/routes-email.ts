@@ -12,7 +12,7 @@ export function registerEmailRoutes(app: Express) {
         port: 587,
         secure: false,
         user: 'deltawayshelixinfo@gmail.com',
-        status: 'error', // App-Passwort für deltawayshelixinfo@gmail.com erforderlich
+        status: 'active', // Gmail mit App-Passwort verbunden
         dailyLimit: 500,
         usedToday: 0,
         lastTest: new Date().toISOString()
