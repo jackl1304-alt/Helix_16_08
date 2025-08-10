@@ -96,7 +96,7 @@ function Router() {
         <Route path="/ai-content-analysis" component={AIContentAnalysis} />
 
         <Route path="/knowledge-base" component={KnowledgeBase} />
-        <Route path="/rechtsprechung" component={RechtsprechungKompakt} />
+        <Route path="/rechtsprechung" component={RechtsprechungFixed} />
         <Route path="/terminology" component={TerminologyGlossary} />
         <Route path="/admin/glossary" component={AdminGlossary} />
         <Route path="/grip-integration" component={GRIPIntegration} />
