@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CustomerNavigation, { type CustomerPermissions } from "@/components/customer/customer-navigation";
+import ThemeCustomizer from "@/components/customer/theme-customizer";
+import { useCustomerTheme } from "@/contexts/customer-theme-context";
 import { 
   Settings,
   User,
@@ -32,6 +34,8 @@ export default function CustomerSettings() {
     criticalOnly: false
   });
   const [mounted, setMounted] = useState(true);
+  const { themeSettings, getThemeColors } = useCustomerTheme();
+  const colors = getThemeColors();
 
   useEffect(() => {
     return () => {
@@ -141,8 +145,9 @@ export default function CustomerSettings() {
           </div>
 
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="profile">Profil</TabsTrigger>
+              <TabsTrigger value="themes">Themes</TabsTrigger>
               <TabsTrigger value="notifications">Benachrichtigungen</TabsTrigger>
               <TabsTrigger value="preferences">Präferenzen</TabsTrigger>
               <TabsTrigger value="security">Sicherheit</TabsTrigger>
@@ -184,6 +189,10 @@ export default function CustomerSettings() {
                   </Button>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="themes" className="space-y-6">
+              <ThemeCustomizer />
             </TabsContent>
 
             <TabsContent value="notifications" className="space-y-6">
