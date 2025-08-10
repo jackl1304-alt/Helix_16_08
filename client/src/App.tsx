@@ -54,6 +54,7 @@ const AdvancedAnalytics = lazy(() => import("@/pages/advanced-analytics"));
 const CustomerDashboard = lazy(() => import("@/pages/customer-dashboard"));
 const CustomerSettings = lazy(() => import("@/pages/customer-settings"));
 const TenantOnboarding = lazy(() => import("@/pages/tenant-onboarding"));
+const EmailManagement = lazy(() => import("@/pages/email-management"));
 const RegulatoryUpdateDetail = lazy(() => import("@/pages/regulatory-update-detail-new"));
 const RechtsprechungFixed = lazy(() => import("@/pages/rechtsprechung-fixed"));
 const TerminologyGlossary = lazy(() => import("@/pages/terminology-glossary"));
@@ -115,6 +116,7 @@ function Router() {
         <Route path="/customer-dashboard" component={CustomerDashboard} />
         <Route path="/customer-settings" component={CustomerSettings} />
         <Route path="/tenant-onboarding" component={TenantOnboarding} />
+        <Route path="/email-management" component={EmailManagement} />
         <Route path="/documents/:sourceType/:documentId" component={DocumentViewer} />
         
         {/* Fallback to 404 */}
