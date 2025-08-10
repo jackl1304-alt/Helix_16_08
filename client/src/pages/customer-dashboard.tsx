@@ -529,8 +529,6 @@ export default function CustomerDashboard() {
           </div>
         </CardContent>
       </Card>
-        </div>
-      </div>
     </div>
   );
 }
