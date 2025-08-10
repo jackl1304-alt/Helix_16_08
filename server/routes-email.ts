@@ -135,20 +135,68 @@ export function registerEmailRoutes(app: Express) {
       
       switch (templateId) {
         case 'customer_onboarding':
-          subject = 'Willkommen bei Helix Regulatory Intelligence!';
-          content = `<h2>Willkommen bei Helix!</h2>
-<p>Hallo ${variables.customerName},</p>
-<p>Vielen Dank für Ihr Vertrauen in Helix Regulatory Intelligence.</p>
-<p><strong>Ihr Plan:</strong> ${variables.subscriptionPlan}</p>
-<p><a href="${variables.dashboardUrl}">Zum Dashboard</a></p>`;
+          const onboarding = emailService.generateCustomerOnboardingEmail(
+            variables.customerName || 'Kunde',
+            variables.subscriptionPlan || 'Professional',
+            variables.loginUrl || 'https://helix-platform.com/login'
+          );
+          subject = onboarding.subject;
+          content = onboarding.html;
           break;
+          
+        case 'customer_offboarding':
+          const offboarding = emailService.generateCustomerOffboardingEmail(
+            variables.customerName || 'Kunde',
+            variables.subscriptionPlan || 'Professional',
+            variables.endDate || '31.12.2025'
+          );
+          subject = offboarding.subject;
+          content = offboarding.html;
+          break;
+          
+        case 'billing_reminder':
+          const billing = emailService.generateBillingReminderEmail(
+            variables.customerName || 'Kunde',
+            variables.amount || '299',
+            variables.dueDate || '31.12.2025',
+            variables.invoiceUrl || 'https://helix-platform.com/invoice'
+          );
+          subject = billing.subject;
+          content = billing.html;
+          break;
+          
         case 'regulatory_alert':
-          subject = `🚨 ${variables.alertTitle}`;
-          content = `<h2>${variables.alertTitle}</h2>
-<p><strong>Zusammenfassung:</strong> ${variables.summary}</p>
-<p><strong>Dringlichkeit:</strong> ${variables.urgency}</p>
-<p><a href="${variables.dashboardUrl}">Details anzeigen</a></p>`;
+          const alert = emailService.generateRegulatoryAlertEmail(
+            variables.alertTitle || 'Neue regulatorische Änderung',
+            variables.summary || 'Wichtige Aktualisierung verfügbar',
+            variables.urgency || 'medium',
+            variables.dashboardUrl || 'https://helix-platform.com/dashboard'
+          );
+          subject = alert.subject;
+          content = alert.html;
           break;
+          
+        case 'weekly_digest':
+          const digest = emailService.generateWeeklyDigestEmail(
+            variables.customerName || 'Kunde',
+            parseInt(variables.updatesCount) || 12,
+            parseInt(variables.legalCasesCount) || 65,
+            variables.dashboardUrl || 'https://helix-platform.com/dashboard'
+          );
+          subject = digest.subject;
+          content = digest.html;
+          break;
+          
+        case 'trial_expiry':
+          const trial = emailService.generateTrialExpiryEmail(
+            variables.customerName || 'Kunde',
+            variables.expiryDate || '31.12.2025',
+            variables.upgradeUrl || 'https://helix-platform.com/upgrade'
+          );
+          subject = trial.subject;
+          content = trial.html;
+          break;
+          
         default:
           subject = 'Helix Test-E-Mail';
           content = '<p>Dies ist eine Test-E-Mail von Helix.</p>';
