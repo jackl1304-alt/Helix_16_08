@@ -113,13 +113,17 @@ export function registerEmailRoutes(app: Express) {
   app.post('/api/email/test', async (req, res) => {
     try {
       const result = await emailService.testConnection();
+      
+      // Service now returns proper JSON object
       res.json(result);
     } catch (error) {
+      console.error('[EMAIL] Connection test error:', error);
       res.json({
         success: false,
         connected: false,
-        message: 'Gmail benötigt App-Passwort für deltawayshelixinfo@gmail.com',
-        details: 'Bitte erstellen Sie ein App-Passwort in den Google-Kontoeinstellungen'
+        message: 'Gmail-Verbindung fehlgeschlagen',
+        details: error.message || 'Unbekannter Fehler bei der Verbindung',
+        provider: 'Gmail (deltawayshelixinfo@gmail.com)'
       });
     }
   });

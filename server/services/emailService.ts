@@ -70,19 +70,38 @@ class EmailService {
     }
   }
 
-  async testConnection(): Promise<boolean> {
+  async testConnection(): Promise<any> {
     if (!this.transporter) {
       logger.error('Email transporter not initialized');
-      return false;
+      return {
+        success: false,
+        connected: false,
+        message: 'E-Mail-Transporter nicht initialisiert',
+        provider: 'Gmail'
+      };
     }
 
     try {
       await this.transporter.verify();
       logger.info('Gmail connection test successful');
-      return true;
-    } catch (error) {
+      return {
+        success: true,
+        connected: true,
+        message: 'Gmail-Verbindung erfolgreich',
+        details: 'E-Mail-Service ist betriebsbereit',
+        provider: 'Gmail (deltawayshelixinfo@gmail.com)',
+        dailyLimit: 400,
+        usedToday: this.emailCount
+      };
+    } catch (error: any) {
       logger.error('Gmail connection test failed', error);
-      return false;
+      return {
+        success: false,
+        connected: false,
+        message: 'Gmail-Verbindung fehlgeschlagen',
+        details: error.message || 'Unbekannter Verbindungsfehler',
+        provider: 'Gmail (deltawayshelixinfo@gmail.com)'
+      };
     }
   }
 
