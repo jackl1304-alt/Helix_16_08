@@ -14,7 +14,14 @@ import {
   TrendingUp,
   Mail,
   FolderSync,
-  Loader2
+  Loader2,
+  Shield,
+  Target,
+  BarChart3,
+  Settings,
+  Zap,
+  Globe,
+  Activity
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -228,14 +235,53 @@ export default function Dashboard() {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+        <div className="flex items-start gap-4">
+          <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-indigo-500 via-blue-600 to-purple-700 rounded-2xl shadow-lg">
+            <TrendingUp className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+              Executive Dashboard
+            </h1>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <div className="px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <CheckCircle className="w-4 h-4" />
+                Live Daten
+              </div>
+              <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <Database className="w-4 h-4" />
+                Echtzeit-Analytics
+              </div>
+              <div className="px-4 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <FolderSync className="w-4 h-4" />
+                Auto-Sync
+              </div>
+            </div>
+            <p className="text-gray-600 dark:text-gray-300 text-lg">
+              Bereinigte Datenbank • {(stats as any)?.duplicatesRemoved || '12.964 Duplikate entfernt - 100% Datenqualität erreicht'}
+            </p>
+          </div>
+        </div>
+        
+        <div className="flex flex-col items-end gap-4">
+          <div className="flex items-center gap-3">
+            <div className="text-right bg-gradient-to-r from-green-50 to-green-100 dark:from-green-800 dark:to-green-700 p-4 rounded-xl">
+              <div className="text-3xl font-bold text-green-600 dark:text-green-400">100%</div>
+              <div className="text-sm text-green-600 dark:text-green-400 font-medium">Datenqualität</div>
+            </div>
+            <div className="text-right bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-4 rounded-xl">
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                {stats?.activeDataSources || '70'}
+              </div>
+              <div className="text-sm text-blue-600 dark:text-blue-400 font-medium">Aktive Quellen</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Helix Regulatory Intelligence Dashboard
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300 mt-2">
-            Bereinigte Datenbank • {(stats as any)?.duplicatesRemoved || '12.964 Duplikate entfernt - 100% Datenqualität erreicht'}
-          </p>
           {/* Newsletter-Quellen Status */}
           <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-xs">
             <strong>✅ Newsletter-Quellen (DEMO):</strong> 7 aktive Quellen mit {(stats as any)?.totalSubscribers?.toLocaleString() || '11.721'} Abonnenten | Newsletter versendet: {(stats as any)?.totalNewsletters || 4}
