@@ -24,6 +24,7 @@ interface ThemeColors {
   sidebar: string;
   sidebarHover: string;
   cardBg: string;
+  background: string;
   textPrimary: string;
   textSecondary: string;
 }
@@ -37,6 +38,7 @@ const themeConfig: Record<CustomerTheme, ThemeColors> = {
     sidebar: 'bg-gradient-to-b from-blue-900 to-blue-800',
     sidebarHover: 'hover:bg-blue-700/50',
     cardBg: 'bg-white dark:bg-blue-900/10',
+    background: 'bg-blue-50 dark:bg-blue-900',
     textPrimary: 'text-blue-900 dark:text-blue-100',
     textSecondary: 'text-blue-600 dark:text-blue-300'
   },
@@ -48,6 +50,7 @@ const themeConfig: Record<CustomerTheme, ThemeColors> = {
     sidebar: 'bg-gradient-to-b from-purple-900 to-purple-800',
     sidebarHover: 'hover:bg-purple-700/50',
     cardBg: 'bg-white dark:bg-purple-900/10',
+    background: 'bg-purple-50 dark:bg-purple-900',
     textPrimary: 'text-purple-900 dark:text-purple-100',
     textSecondary: 'text-purple-600 dark:text-purple-300'
   },
@@ -59,6 +62,7 @@ const themeConfig: Record<CustomerTheme, ThemeColors> = {
     sidebar: 'bg-gradient-to-b from-green-900 to-green-800',
     sidebarHover: 'hover:bg-green-700/50',
     cardBg: 'bg-white dark:bg-green-900/10',
+    background: 'bg-green-50 dark:bg-green-900',
     textPrimary: 'text-green-900 dark:text-green-100',
     textSecondary: 'text-green-600 dark:text-green-300'
   }
