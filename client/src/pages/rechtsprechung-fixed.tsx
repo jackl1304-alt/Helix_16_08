@@ -111,14 +111,33 @@ export default function RechtsprechungFixed() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-            ⚖️ MedTech Rechtsprechung
-          </h1>
-          <p className="text-gray-600">
-            {legalCases.length} von {legalCases.length} Gerichtsentscheidungen und juristische Präzedenzfälle
-          </p>
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+        <div className="flex items-start gap-4">
+          <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-red-500 via-pink-600 to-rose-700 rounded-2xl shadow-lg">
+            <Scale className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              Legal Intelligence Center
+            </h1>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <div className="px-4 py-2 bg-red-100 text-red-800 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <Gavel className="w-4 h-4" />
+                Rechtsfälle
+              </div>
+              <div className="px-4 py-2 bg-pink-100 text-pink-800 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <FileText className="w-4 h-4" />
+                Gerichtsentscheidungen
+              </div>
+              <div className="px-4 py-2 bg-rose-100 text-rose-800 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <AlertTriangle className="w-4 h-4" />
+                Compliance
+              </div>
+            </div>
+            <p className="text-gray-600 text-lg">
+              {legalCases.length} Gerichtsentscheidungen und juristische Präzedenzfälle mit Executive-Analysen
+            </p>
+          </div>
         </div>
         <Button 
           onClick={() => syncMutation.mutate()}

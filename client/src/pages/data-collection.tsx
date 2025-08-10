@@ -373,9 +373,34 @@ export default function DataCollection() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Data Collection</h1>
-        <p className="text-gray-600 mt-1">Monitor and manage global regulatory data sources</p>
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+        <div className="flex items-start gap-4">
+          <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 via-emerald-600 to-teal-700 rounded-2xl shadow-lg">
+            <FolderSync className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+              Data Collection Center
+            </h1>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <div className="px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <Database className="w-4 h-4" />
+                Auto-Sync
+              </div>
+              <div className="px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <CheckCircle className="w-4 h-4" />
+                Data Quality
+              </div>
+              <div className="px-4 py-2 bg-teal-100 dark:bg-teal-900/30 text-teal-800 dark:text-teal-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <TrendingUp className="w-4 h-4" />
+                Live Monitoring
+              </div>
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              Monitor and manage {sources?.length || '70'} global regulatory data sources with Executive-Controls
+            </p>
+          </div>
+        </div>
       </div>
 
       <Tabs defaultValue="sources" className="space-y-6">

@@ -182,13 +182,32 @@ EXPORT DETAILS:
     )}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
-            Regulatory Updates
-          </h1>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1 sm:mt-2">
-            Aktuelle regulatorische Änderungen von FDA, EMA, BfArM
-          </p>
+        <div className="flex items-start gap-4">
+          <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 via-indigo-600 to-violet-700 rounded-2xl shadow-lg">
+            <FileText className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+              Regulatory Intelligence
+            </h1>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <Bell className="w-4 h-4" />
+                Live Updates
+              </div>
+              <div className="px-4 py-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <Shield className="w-4 h-4" />
+                Compliance-Ready
+              </div>
+              <div className="px-4 py-2 bg-violet-100 dark:bg-violet-900/30 text-violet-800 dark:text-violet-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <TrendingUp className="w-4 h-4" />
+                Global Tracking
+              </div>
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              {totalUpdates} aktuelle regulatorische Änderungen von FDA, EMA, BfArM mit Executive-Analysen
+            </p>
+          </div>
         </div>
         <Button 
           onClick={() => toast({ title: "Synchronisierung", description: "Updates werden synchronisiert..." })}

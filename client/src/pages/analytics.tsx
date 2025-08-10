@@ -150,12 +150,33 @@ export default function AnalyticsPage() {
 
   return (
     <div className="container mx-auto py-8">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Analytics Dashboard</h1>
-          <p className="text-muted-foreground">
-            Umfassende Analyse der regulatorischen Datenlandschaft
-          </p>
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+        <div className="flex items-start gap-4">
+          <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 via-indigo-600 to-blue-700 rounded-2xl shadow-lg">
+            <TrendingUp className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 mb-2">
+              Analytics Intelligence
+            </h1>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <div className="px-4 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <TrendingUp className="w-4 h-4" />
+                Live Charts
+              </div>
+              <div className="px-4 py-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <CheckCircle className="w-4 h-4" />
+                Echtzeit-Metriken
+              </div>
+              <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <Globe className="w-4 h-4" />
+                Global Insights
+              </div>
+            </div>
+            <p className="text-muted-foreground text-lg">
+              Umfassende Analyse der regulatorischen Datenlandschaft mit Executive-Insights
+            </p>
+          </div>
         </div>
         <div className="flex items-center space-x-4">
           <Select value={timeRange} onValueChange={setTimeRange}>

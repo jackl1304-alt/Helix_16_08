@@ -251,15 +251,33 @@ export default function AIInsights() {
 
   return (
     <div className="container mx-auto py-4 px-4 sm:py-8">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center">
-            <Brain className="mr-2 sm:mr-3 h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-            KI-Insights
-          </h1>
-          <p className="text-sm sm:text-base text-muted-foreground mt-1">
-            KI-gestützte Analyse und Vorhersagen für regulatorische Trends
-          </p>
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+        <div className="flex items-start gap-4">
+          <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-700 rounded-2xl shadow-lg">
+            <Brain className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white mb-2">
+              KI Intelligence Center
+            </h1>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <div className="px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <Brain className="w-4 h-4" />
+                ML-Powered
+              </div>
+              <div className="px-4 py-2 bg-teal-100 dark:bg-teal-900/30 text-teal-800 dark:text-teal-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <Target className="w-4 h-4" />
+                Zühlke Cases
+              </div>
+              <div className="px-4 py-2 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-800 dark:text-cyan-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <Shield className="w-4 h-4" />
+                Compliance AI
+              </div>
+            </div>
+            <p className="text-muted-foreground text-lg">
+              KI-gestützte Analyse und Vorhersagen für regulatorische Trends mit Executive-Intelligence
+            </p>
+          </div>
         </div>
         
         <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
