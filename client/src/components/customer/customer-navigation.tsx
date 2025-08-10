@@ -44,7 +44,7 @@ interface CustomerPermissions {
 interface NavigationItem {
   name: string;
   href: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: any;
   permission: keyof CustomerPermissions;
   description?: string;
 }
