@@ -175,6 +175,8 @@ class EmailService {
           .button { display: inline-block; background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
           .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; }
           .highlight { background: #e8f4f8; padding: 15px; border-left: 4px solid #667eea; margin: 20px 0; }
+          a { color: #667eea; text-decoration: underline; }
+          a:hover { color: #5a67d8; }
         </style>
       </head>
       <body>
@@ -195,7 +197,10 @@ class EmailService {
           
           <div class="highlight">
             <h3>🔐 Ihre Zugangsdaten:</h3>
-            <p><strong>Dashboard-URL:</strong> <a href="${loginUrl}">${loginUrl}</a></p>
+            <p><strong>Dashboard-URL:</strong></p>
+            <p style="background: #f8f9fa; padding: 10px; border-radius: 5px; word-break: break-all;">
+              <a href="${loginUrl}" style="color: #667eea; text-decoration: underline; font-weight: bold;">${loginUrl}</a>
+            </p>
             <p><strong>Benutzername:</strong> Ihre E-Mail-Adresse</p>
             <p><strong>Erstes Login:</strong> Nutzen Sie den "Passwort vergessen" Link für Ihr sicheres Passwort</p>
           </div>
@@ -209,7 +214,16 @@ class EmailService {
             <li>📱 Mobile-optimierte Oberfläche nutzen</li>
           </ul>
           
-          <a href="${loginUrl}" class="button">🚀 Jetzt Dashboard öffnen →</a>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${loginUrl}" class="button" style="display: inline-block; background: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+              🚀 Jetzt Dashboard öffnen →
+            </a>
+          </div>
+          
+          <p style="text-align: center; font-size: 14px; color: #666;">
+            Falls der Button nicht funktioniert, kopieren Sie diese URL in Ihren Browser:<br>
+            <a href="${loginUrl}" style="color: #667eea; word-break: break-all;">${loginUrl}</a>
+          </p>
           
           <h3>Benötigen Sie Hilfe?</h3>
           <p>Unser Support-Team steht Ihnen gerne zur Verfügung:</p>
