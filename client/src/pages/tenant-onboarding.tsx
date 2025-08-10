@@ -501,7 +501,7 @@ export default function TenantOnboarding() {
                       <div key={notif.key} className="flex items-center space-x-3 p-3 border rounded-lg">
                         <Checkbox 
                           id={notif.key}
-                          checked={formData.notifications[notif.key]}
+                          checked={!!formData.notifications[notif.key]}
                           onCheckedChange={(checked) => {
                             updateFormData('notifications', {
                               ...formData.notifications,

@@ -109,7 +109,11 @@ export class TenantService {
         const { emailService } = await import('./emailService');
         const customerName = data.contactName || tenant.name;
         const subscriptionPlan = tenant.subscriptionPlan || 'Professional';
-        const loginUrl = `${process.env.FRONTEND_URL || 'https://helix.replit.app'}/dashboard/${tenant.slug}`;
+        // Determine correct frontend URL
+        const baseUrl = process.env.FRONTEND_URL || 
+                       process.env.REPLIT_DEV_DOMAIN ||
+                       'https://helix.replit.app';
+        const loginUrl = `${baseUrl}/customer-dashboard`;
         
         const emailContent = emailService.generateCustomerOnboardingEmail(
           customerName,

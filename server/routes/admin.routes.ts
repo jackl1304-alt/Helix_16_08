@@ -330,12 +330,15 @@ router.put('/tenants/:id', async (req: Request, res: Response) => {
     values.push(new Date());
     values.push(id);
     
-    const result = await sql`
+    // Build proper parameterized query
+    const updateQuery = `
       UPDATE tenants 
-      SET ${sql(updates.join(', '))}
+      SET ${updates.join(', ')}
       WHERE id = $${paramIndex}
       RETURNING *
     `;
+    
+    const result = await sql(updateQuery, values);
     
     if (result.length === 0) {
       return res.status(404).json({
@@ -372,6 +375,17 @@ router.delete('/tenants/:id', async (req: Request, res: Response) => {
     const { neon } = await import('@neondatabase/serverless');
     const sql = neon(process.env.DATABASE_URL!);
     
+    // First, delete related data access records
+    await sql`DELETE FROM tenant_data_access WHERE tenant_id = ${id}`;
+    
+    // Delete any tenant users if they exist
+    try {
+      await sql`DELETE FROM tenant_users WHERE tenant_id = ${id}`;
+    } catch (err) {
+      // Table might not exist, continue
+    }
+    
+    // Now delete the tenant
     const result = await sql`
       DELETE FROM tenants 
       WHERE id = ${id}
