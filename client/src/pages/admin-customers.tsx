@@ -12,6 +12,11 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { 
   Building,
   Users,
@@ -35,7 +40,8 @@ import {
   Globe,
   Settings,
   Mail,
-  Phone
+  Phone,
+  Trash2
 } from "lucide-react";
 
 export default function AdminCustomers() {
@@ -45,10 +51,36 @@ export default function AdminCustomers() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingTenant, setEditingTenant] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [viewingTenant, setViewingTenant] = useState(null);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
 
   const editTenant = (tenant) => {
     setEditingTenant(tenant);
     setIsEditDialogOpen(true);
+  };
+
+  const viewTenant = (tenant) => {
+    setViewingTenant(tenant);
+    setIsViewDialogOpen(true);
+  };
+
+  const deleteTenant = async (tenantId) => {
+    if (confirm('Sind Sie sicher, dass Sie diesen Tenant löschen möchten?')) {
+      try {
+        await apiRequest(`/api/admin/tenants/${tenantId}`, 'DELETE');
+        queryClient.invalidateQueries({ queryKey: ['/api/admin/tenants'] });
+        toast({
+          title: "Tenant gelöscht",
+          description: "Der Tenant wurde erfolgreich gelöscht.",
+        });
+      } catch (error) {
+        toast({
+          title: "Fehler",
+          description: "Fehler beim Löschen des Tenants.",
+          variant: "destructive"
+        });
+      }
+    }
   };
 
   // Fetch tenants/customers
@@ -202,14 +234,14 @@ export default function AdminCustomers() {
               {customer.maxDataSources} Datenquellen / {customer.maxUsers} Max. Benutzer
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => viewTenant(customer)} title="Tenant anzeigen">
                 <Eye className="w-4 h-4" />
               </Button>
-              <Button variant="outline" size="sm" onClick={() => editTenant(customer)}>
+              <Button variant="outline" size="sm" onClick={() => editTenant(customer)} title="Tenant bearbeiten">
                 <Edit className="w-4 h-4" />
               </Button>
-              <Button variant="outline" size="sm">
-                <MoreHorizontal className="w-4 h-4" />
+              <Button variant="outline" size="sm" onClick={() => deleteTenant(customer.id)} title="Tenant löschen">
+                <Trash2 className="w-4 h-4" />
               </Button>
             </div>
           </div>
@@ -276,6 +308,85 @@ export default function AdminCustomers() {
                 Onboarding-Prozess starten
               </Button>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Tenant View Dialog */}
+        <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>Tenant Details - {viewingTenant?.name}</DialogTitle>
+              <DialogDescription>
+                Vollständige Informationen zum Tenant
+              </DialogDescription>
+            </DialogHeader>
+            {viewingTenant && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium">Firma</Label>
+                    <p className="text-sm text-muted-foreground">{viewingTenant.name}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Slug</Label>
+                    <p className="text-sm text-muted-foreground">{viewingTenant.slug}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">E-Mail</Label>
+                    <p className="text-sm text-muted-foreground">{viewingTenant.billingEmail}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Subscription Plan</Label>
+                    <Badge variant={viewingTenant.subscriptionPlan === 'enterprise' ? 'destructive' : 'default'}>
+                      {viewingTenant.subscriptionPlan}
+                    </Badge>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Status</Label>
+                    <Badge variant={viewingTenant.subscriptionStatus === 'active' ? 'default' : 'secondary'}>
+                      {viewingTenant.subscriptionStatus}
+                    </Badge>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium">Max. Benutzer</Label>
+                    <p className="text-sm text-muted-foreground">{viewingTenant.maxUsers}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Max. Datenquellen</Label>
+                    <p className="text-sm text-muted-foreground">{viewingTenant.maxDataSources}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">API-Zugang</Label>
+                    <p className="text-sm text-muted-foreground">{viewingTenant.apiAccessEnabled ? 'Aktiviert' : 'Deaktiviert'}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Erstellt am</Label>
+                    <p className="text-sm text-muted-foreground">{new Date(viewingTenant.createdAt).toLocaleDateString('de-DE')}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Trial endet am</Label>
+                    <p className="text-sm text-muted-foreground">
+                      {viewingTenant.trialEndsAt ? new Date(viewingTenant.trialEndsAt).toLocaleDateString('de-DE') : 'Kein Trial'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Tenant Edit Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Tenant bearbeiten - {editingTenant?.name}</DialogTitle>
+              <DialogDescription>
+                Tenant-Einstellungen ändern
+              </DialogDescription>
+            </DialogHeader>
+            {editingTenant && <TenantEditForm tenant={editingTenant} onClose={() => setIsEditDialogOpen(false)} />}
           </DialogContent>
         </Dialog>
       </div>
@@ -451,5 +562,217 @@ export default function AdminCustomers() {
         </Card>
       )}
     </div>
+  );
+}
+
+// Tenant Edit Form Schema
+const tenantEditSchema = z.object({
+  name: z.string().min(1, "Name ist erforderlich"),
+  subscriptionPlan: z.enum(["starter", "professional", "enterprise"]),
+  subscriptionStatus: z.enum(["trial", "active", "cancelled", "suspended"]),
+  billingEmail: z.string().email("Gültige E-Mail erforderlich"),
+  maxUsers: z.number().min(1),
+  maxDataSources: z.number().min(1),
+  apiAccessEnabled: z.boolean(),
+  customBrandingEnabled: z.boolean()
+});
+
+// Tenant Edit Form Component
+function TenantEditForm({ tenant, onClose }: { tenant: any, onClose: () => void }) {
+  const form = useForm({
+    resolver: zodResolver(tenantEditSchema),
+    defaultValues: {
+      name: tenant.name,
+      subscriptionPlan: tenant.subscriptionPlan,
+      subscriptionStatus: tenant.subscriptionStatus,
+      billingEmail: tenant.billingEmail,
+      maxUsers: tenant.maxUsers,
+      maxDataSources: tenant.maxDataSources,
+      apiAccessEnabled: tenant.apiAccessEnabled,
+      customBrandingEnabled: tenant.customBrandingEnabled || false
+    }
+  });
+
+  const updateTenantMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await apiRequest(`/api/admin/tenants/${tenant.id}`, 'PUT', data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/tenants'] });
+      toast({
+        title: "Tenant aktualisiert",
+        description: "Die Tenant-Einstellungen wurden erfolgreich gespeichert.",
+      });
+      onClose();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fehler",
+        description: error.message || "Fehler beim Speichern der Änderungen.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const onSubmit = (data: any) => {
+    updateTenantMutation.mutate(data);
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Firmenname</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="billingEmail"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Billing E-Mail</FormLabel>
+                <FormControl>
+                  <Input {...field} type="email" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="subscriptionPlan"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Subscription Plan</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="starter">Starter</SelectItem>
+                    <SelectItem value="professional">Professional</SelectItem>
+                    <SelectItem value="enterprise">Enterprise</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="subscriptionStatus"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="trial">Trial</SelectItem>
+                    <SelectItem value="active">Aktiv</SelectItem>
+                    <SelectItem value="cancelled">Gekündigt</SelectItem>
+                    <SelectItem value="suspended">Gesperrt</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="maxUsers"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Max. Benutzer</FormLabel>
+                <FormControl>
+                  <Input {...field} type="number" onChange={e => field.onChange(parseInt(e.target.value))} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="maxDataSources"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Max. Datenquellen</FormLabel>
+                <FormControl>
+                  <Input {...field} type="number" onChange={e => field.onChange(parseInt(e.target.value))} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        
+        <div className="flex items-center space-x-6">
+          <FormField
+            control={form.control}
+            name="apiAccessEnabled"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                <div className="space-y-0.5">
+                  <FormLabel>API-Zugang</FormLabel>
+                  <FormDescription>
+                    Erlaubt Zugang zu API-Endpunkten
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="customBrandingEnabled"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                <div className="space-y-0.5">
+                  <FormLabel>Custom Branding</FormLabel>
+                  <FormDescription>
+                    Erlaubt eigenes Branding
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
+        
+        <div className="flex justify-end space-x-2 pt-4">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Abbrechen
+          </Button>
+          <Button type="submit" disabled={updateTenantMutation.isPending}>
+            {updateTenantMutation.isPending ? "Speichere..." : "Speichern"}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }
