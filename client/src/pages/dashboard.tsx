@@ -340,8 +340,8 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {recentUpdates && recentUpdates.data && recentUpdates.data.length > 0 ? (
-              recentUpdates.data.slice(0, 5).map((update: any, index: number) => (
+            {recentUpdates && Array.isArray(recentUpdates) && recentUpdates.length > 0 ? (
+              recentUpdates.slice(0, 5).map((update: any, index: number) => (
                 <div 
                   key={index} 
                   className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
