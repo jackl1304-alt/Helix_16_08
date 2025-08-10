@@ -338,19 +338,9 @@ export default function RechtsprechungFixed() {
                       {legalCase.jurisdiction}
                     </Badge>
                     <PDFDownloadButton 
+                      type="legal-case"
+                      id={legalCase.id}
                       title={legalCase.title}
-                      content={{
-                        title: legalCase.title,
-                        case_number: legalCase.case_number,
-                        jurisdiction: legalCase.jurisdiction,
-                        decision_date: legalCase.decision_date,
-                        court: legalCase.court,
-                        summary: legalCase.summary,
-                        content: legalCase.content,
-                        verdict: (legalCase as any).verdict,
-                        damages: (legalCase as any).damages,
-                        keywords: legalCase.keywords
-                      }}
                     />
                   </div>
                 </div>
@@ -561,7 +551,10 @@ Die gerichtliche Prüfung hat ergeben, dass der Beklagte seine Pflichten zur ord
 Die Kosten des Rechtsstreits trägt der unterlegene Beklagte.
 
 ---
-Verkündet am ${legalCase.decision_date || legalCase.decisionDate ? new Date(legalCase.decision_date || legalCase.decisionDate).toLocaleDateString('de-DE') : 'TBD'}
+Verkündet am ${(() => {
+  const date = legalCase.decision_date || (legalCase as any).decisionDate;
+  return date ? new Date(date).toLocaleDateString('de-DE') : 'TBD';
+})()}
 ${legalCase.court}
 `.trim()}
                           </div>
