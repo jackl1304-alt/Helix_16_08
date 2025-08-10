@@ -56,8 +56,8 @@ class EmailService {
         port: 587,
         secure: false,
         auth: {
-          user: 'deltawaysnewsletter@gmail.com',
-          pass: '7724@Serpha'
+          user: 'deltawayshelixinfo@gmail.com',
+          pass: '2021!Emil@Serpha'
         },
         tls: {
           rejectUnauthorized: false
@@ -107,7 +107,7 @@ class EmailService {
 
     try {
       const mailOptions = {
-        from: 'Helix Regulatory Intelligence <deltawaysnewsletter@gmail.com>',
+        from: 'Helix Regulatory Intelligence <deltawayshelixinfo@gmail.com>',
         to,
         subject,
         html,

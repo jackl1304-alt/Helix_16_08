@@ -7,12 +7,12 @@ export function registerEmailRoutes(app: Express) {
     try {
       const gmailProvider = {
         id: 'gmail_deltaways',
-        name: 'Gmail (deltawaysnewsletter@gmail.com)',
+        name: 'Gmail (deltawayshelixinfo@gmail.com)',
         host: 'smtp.gmail.com',
         port: 587,
         secure: false,
-        user: 'deltawaysnewsletter@gmail.com',
-        status: 'error', // App password required
+        user: 'deltawayshelixinfo@gmail.com',
+        status: 'error', // App-Passwort für deltawayshelixinfo@gmail.com erforderlich
         dailyLimit: 500,
         usedToday: 0,
         lastTest: new Date().toISOString()
@@ -118,7 +118,8 @@ export function registerEmailRoutes(app: Express) {
       res.json({
         success: false,
         connected: false,
-        message: 'Gmail-Verbindung fehlgeschlagen'
+        message: 'Gmail benötigt App-Passwort für deltawayshelixinfo@gmail.com',
+        details: 'Bitte erstellen Sie ein App-Passwort in den Google-Kontoeinstellungen'
       });
     }
   });
@@ -153,7 +154,7 @@ export function registerEmailRoutes(app: Express) {
           content = '<p>Dies ist eine Test-E-Mail von Helix.</p>';
       }
       
-      const result = await emailService.sendEmail(to, 'Helix Team <deltawaysnewsletter@gmail.com>', subject, content);
+      const result = await emailService.sendEmail(to, subject, content);
       
       if (result) {
         res.json({
