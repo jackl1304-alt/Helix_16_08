@@ -31,19 +31,8 @@ import {
 } from "lucide-react";
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-// Mock tenant data - In production, get from authentication context
-const mockTenant = {
-  id: "tenant_abc123",
-  name: "MedTech Solutions GmbH",
-  slug: "medtech-solutions",
-  subscriptionPlan: "professional" as const,
-  subscriptionStatus: "active" as const,
-  subscriptionExpiry: new Date("2025-12-31"),
-  currentPeriod: {
-    start: new Date("2025-08-01"),
-    end: new Date("2025-08-31")
-  }
-};
+// Mock tenant ID - In production, get from authentication context  
+const mockTenantId = "030d3e01-32c4-4f95-8d54-98be948e8d4b";
 
 const usageData = [
   { month: 'Jan', dataRequests: 1850, apiCalls: 420 },
@@ -71,8 +60,23 @@ const regionDistribution = [
 export default function CustomerDashboard() {
   const [selectedTimeRange, setSelectedTimeRange] = useState('30d');
   
-  // Mock permissions - in production, fetch from tenant API
-  const mockPermissions: CustomerPermissions = {
+  // Fetch tenant data including permissions
+  const { data: tenantData, isLoading: isTenantLoading } = useQuery({
+    queryKey: ['/api/customer/tenant', mockTenantId],
+    queryFn: async () => {
+      const response = await fetch(`/api/customer/tenant/${mockTenantId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch tenant data');
+      }
+      const data = await response.json();
+      console.log('[CUSTOMER DASHBOARD] Fetched tenant permissions:', data);
+      return data;
+    },
+    enabled: true
+  });
+  
+  // Extract permissions from tenant data
+  const permissions = tenantData?.customerPermissions || {
     dashboard: true,
     regulatoryUpdates: true,
     legalCases: true,
@@ -93,7 +97,7 @@ export default function CustomerDashboard() {
   
   // Fetch customer dashboard data
   const { data: dashboardData, isLoading } = useQuery({
-    queryKey: ['/api/customer/dashboard', mockTenant.id, selectedTimeRange],
+    queryKey: ['/api/customer/dashboard', mockTenantId, selectedTimeRange],
     queryFn: async () => {
       // In production: await fetch(`/api/customer/dashboard/${tenantId}?range=${selectedTimeRange}`)
       return {
@@ -211,7 +215,7 @@ export default function CustomerDashboard() {
     </Card>
   );
 
-  if (isLoading) {
+  if (isLoading || isTenantLoading) {
     return (
       <div className="container mx-auto p-6 space-y-8 max-w-7xl">
         <div className="animate-pulse space-y-4">
@@ -227,7 +231,16 @@ export default function CustomerDashboard() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-8 max-w-7xl">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Navigation Sidebar */}
+      <CustomerNavigation 
+        permissions={permissions}
+        tenantName={tenantData?.name}
+      />
+      
+      {/* Main Content */}
+      <div className="flex-1 ml-64">
+        <div className="container mx-auto p-6 space-y-8 max-w-7xl">
       {/* Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div>
@@ -237,9 +250,9 @@ export default function CustomerDashboard() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 via-purple-600 to-cyan-700 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                {mockTenant.name.charAt(0)}
+                {tenantData?.name?.charAt(0) || 'M'}
               </div>
-              <span className="font-medium">{mockTenant.name}</span>
+              <span className="font-medium">{tenantData?.name || 'MedTech Solutions GmbH'}</span>
             </div>
             <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200">
               <Crown className="w-3 h-3 mr-1" />
@@ -515,7 +528,7 @@ export default function CustomerDashboard() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Datum</span>
-                  <span className="text-sm font-medium">{mockTenant.currentPeriod.end.toLocaleDateString('de-DE')}</span>
+                  <span className="text-sm font-medium">31.08.2025</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Zahlungsart</span>
@@ -529,6 +542,8 @@ export default function CustomerDashboard() {
           </div>
         </CardContent>
       </Card>
+        </div>
+      </div>
     </div>
   );
 }

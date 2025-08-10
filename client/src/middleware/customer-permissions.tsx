@@ -42,17 +42,17 @@ const mockTenant = {
 };
 
 export function CustomerPermissionsProvider({ children, tenantId }: CustomerPermissionsProviderProps) {
-  // In production, fetch tenant permissions from API
+  // Fetch tenant permissions from API
   const { data: tenantData, isLoading } = useQuery({
     queryKey: ['/api/customer/tenant', tenantId || mockTenant.id],
     queryFn: async () => {
-      // For now, return mock data with default permissions
-      // In production: return await apiRequest(`/api/customer/tenant/${tenantId || mockTenant.id}`);
-      return {
-        id: mockTenant.id,
-        name: mockTenant.name,
-        customerPermissions: mockTenant.permissions
-      };
+      const response = await fetch(`/api/customer/tenant/${tenantId || mockTenant.id}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch tenant permissions');
+      }
+      const data = await response.json();
+      console.log('[CUSTOMER] Fetched tenant permissions:', data);
+      return data;
     },
     enabled: true
   });
