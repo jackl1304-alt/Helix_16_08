@@ -368,13 +368,13 @@ export default function RechtsprechungFixed() {
                       <div className="bg-white p-6 rounded border max-h-[600px] overflow-y-auto">
                         <div className="prose prose-sm max-w-none">
                           <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
-                            {legalCase.overview || `
+                            {`
 **Fall:** ${legalCase.title}
 **Gericht:** ${legalCase.court}
-**Aktenzeichen:** ${legalCase.caseNumber || legalCase.case_number || 'N/A'}
-**Entscheidungsdatum:** ${new Date(legalCase.decisionDate || legalCase.decision_date).toLocaleDateString('de-DE')}
+**Aktenzeichen:** ${legalCase.case_number || 'N/A'}
+**Entscheidungsdatum:** ${new Date(legalCase.decision_date).toLocaleDateString('de-DE')}
 **Rechtsprechung:** ${legalCase.jurisdiction}
-**Impact Level:** ${legalCase.impactLevel || legalCase.impact_level || 'Medium'}
+**Impact Level:** ${legalCase.impact_level || 'Medium'}
 
 **Kurzzusammenfassung:**
 ${legalCase.summary || 'Dieser rechtliche Fall behandelt wichtige regulatorische Aspekte in der Medizintechnik-Industrie.'}
@@ -435,11 +435,11 @@ Die Entscheidung schafft wichtige Präzedenzfälle für ähnliche Fälle in der 
                       <div className="bg-white p-6 rounded border max-h-[600px] overflow-y-auto">
                         <div className="prose prose-sm max-w-none">
                           <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
-                            {legalCase.fullContent || legalCase.content || legalCase.summary || `
+                            {legalCase.content || legalCase.summary || `
 **Vollständiger Fallbericht: ${legalCase.title}**
 
 **Verfahrensgang:**
-Der vorliegende Fall wurde vor dem ${legalCase.court} verhandelt und am ${new Date(legalCase.decisionDate || legalCase.decision_date).toLocaleDateString('de-DE')} entschieden.
+Der vorliegende Fall wurde vor dem ${legalCase.court} verhandelt und am ${new Date(legalCase.decision_date).toLocaleDateString('de-DE')} entschieden.
 
 **Sachverhalt:**
 ${legalCase.summary || 'Detaillierte Sachverhaltsdarstellung liegt vor und umfasst alle relevanten technischen und rechtlichen Aspekte des Medizinprodukts.'}
@@ -595,7 +595,7 @@ ${legalCase.court}
                         <div className="prose prose-sm max-w-none">
                           <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
                             {legalCase.financialAnalysis || `
-**Finanzielle Auswirkungen - Fall ${legalCase.caseNumber || legalCase.case_number}**
+**Finanzielle Auswirkungen - Fall ${legalCase.case_number}**
 
 **Direkte Kosten:**
 • Rechtliche Verfahrenskosten: €500.000 - €2.000.000
@@ -775,7 +775,7 @@ ${legalCase.court}
                         <div className="prose prose-sm max-w-none">
                           <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
                             {legalCase.aiAnalysis || `
-**KI-gestützte Analyse - Fall ${legalCase.caseNumber || legalCase.case_number}**
+**KI-gestützte Analyse - Fall ${legalCase.case_number}**
 
 **Automatische Risikoklassifikation:**
 🔴 **Hohes Risiko** - Präzedenzbildende Entscheidung
@@ -816,8 +816,8 @@ ${legalCase.court}
                       <div className="bg-white p-6 rounded border max-h-[600px] overflow-y-auto">
                         <div className="prose prose-sm max-w-none">
                           <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
-                            {legalCase.metadata || `
-**Metadaten und technische Details - Fall ${legalCase.caseNumber || legalCase.case_number}**
+                            {`
+**Metadaten und technische Details - Fall ${legalCase.case_number}**
 
 **Datenherkunft:**
 • **Quelle:** ${legalCase.court} Rechtsprechungsdatenbank

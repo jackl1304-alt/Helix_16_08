@@ -456,11 +456,32 @@ export default function Administration() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Administration</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Entwicklungsphasen und System-Management
-          </p>
+        <div className="flex items-start gap-4">
+          <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-slate-600 via-gray-700 to-zinc-800 rounded-2xl shadow-lg">
+            <Settings className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+              System Administration
+            </h1>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <div className="px-4 py-2 bg-slate-100 dark:bg-slate-900/30 text-slate-800 dark:text-slate-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <Database className="w-4 h-4" />
+                Datenbank-Management
+              </div>
+              <div className="px-4 py-2 bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <Server className="w-4 h-4" />
+                System-Status
+              </div>
+              <div className="px-4 py-2 bg-zinc-100 dark:bg-zinc-900/30 text-zinc-800 dark:text-zinc-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <Shield className="w-4 h-4" />
+                Security & Cleanup
+              </div>
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              Entwicklungsphasen und System-Management für Helix Platform mit Executive-Controls
+            </p>
+          </div>
         </div>
         
         <div className="flex gap-2">
