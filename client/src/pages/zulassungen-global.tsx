@@ -9,7 +9,7 @@ import {
   Flag, Users, Clock, CheckCircle, AlertCircle, BookOpen,
   Gavel, Scale, Shield, Zap
 } from 'lucide-react';
-import { PiecesShareButton } from '../components/pieces-share-button';
+// import { PiecesShareButton } from '../components/pieces-share-button';
 
 interface RegulationRegion {
   id: string;
@@ -241,12 +241,7 @@ export default function ZulassungenGlobal() {
         </div>
         
         <div className="flex items-center gap-4">
-          <PiecesShareButton 
-            type="regulatory"
-            itemId="global-regulations"
-            title="Globale Medizintechnik-Zulassungen"
-            compact
-          />
+          {/* Pieces Share Button temporarily disabled due to plugin conflict */}
         </div>
       </div>
 

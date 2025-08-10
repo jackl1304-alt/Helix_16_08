@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { PiecesShareButton } from '../components/pieces-share-button';
+// import { PiecesShareButton } from '../components/pieces-share-button';
 import { 
   Clock, Plus, Search, Calendar, AlertCircle, CheckCircle, 
   FileText, Building2, Globe, Zap, Users, Flag, Edit, Trash2,
@@ -489,12 +489,7 @@ export default function LaufendeZulassungen() {
                 </div>
                 
                 <div className="flex items-center space-x-2">
-                  <PiecesShareButton 
-                    type="regulatory"
-                    itemId={approval.id}
-                    title={`${approval.productName} - Zulassung ${approval.region}`}
-                    compact
-                  />
+                  {/* Pieces Share Button temporarily disabled due to plugin conflict */}
                   <Button size="sm" variant="outline">
                     <Edit className="w-4 h-4" />
                   </Button>
