@@ -94,22 +94,27 @@ app.use((req, res, next) => {
   
 
 
-  // CRITICAL: Register ALL API routes BEFORE any middleware or Vite setup
-  registerRoutes(app);
+  // REGISTER ALL API ROUTES FIRST - BEFORE ANY CATCH-ALL MIDDLEWARE
+  console.log("[STARTUP] Registering all API routes...");
   
-  // CRITICAL: Block HTML fallback for ALL API routes - FORCE JSON ONLY
+  // Register all primary API routes
+  await registerRoutes(app);
+  
+  // Register all secondary API routes
+  const { default: knowledgeExtractionRoutes } = await import("./routes/knowledge-extraction.routes");
+  app.use("/api/knowledge-extraction", knowledgeExtractionRoutes);
+
+  console.log("[STARTUP] All API routes registered successfully");
+  
+  // ONLY AFTER ALL ROUTES ARE REGISTERED: Add 404 handler for missing API routes
   app.use('/api/*', (req, res, next) => {
-    // If we reach here, the API route wasn't found
-    console.log(`[CRITICAL] API ROUTE NOT FOUND: ${req.path} - Returning 404 JSON`);
+    console.log(`[API-404] Route not found: ${req.method} ${req.path}`);
     return res.status(404).json({ 
       error: `API endpoint not found: ${req.path}`,
+      method: req.method,
       timestamp: new Date().toISOString()
     });
   });
-
-  // REGISTER SECONDARY API ROUTES  
-  const { default: knowledgeExtractionRoutes } = await import("./routes/knowledge-extraction.routes");
-  app.use("/api/knowledge-extraction", knowledgeExtractionRoutes);
   
   const server = createServer(app);
 

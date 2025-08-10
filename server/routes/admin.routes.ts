@@ -136,4 +136,93 @@ router.get('/data-sources/:sourceId/credentials',
   })
 );
 
+// TENANT MANAGEMENT ROUTES
+import { z } from 'zod';
+
+// Validation schema für Tenant-Erstellung
+const createTenantSchema = z.object({
+  name: z.string().min(1, 'Firmenname ist erforderlich'),
+  slug: z.string().min(1, 'Slug ist erforderlich'),
+  subscriptionPlan: z.enum(['starter', 'professional', 'enterprise']),
+  subscriptionStatus: z.enum(['trial', 'active', 'expired', 'cancelled']),
+  billingEmail: z.string().email('Gültige E-Mail-Adresse erforderlich'),
+  contactName: z.string().min(1, 'Kontaktname ist erforderlich'),
+  contactEmail: z.string().email('Gültige Kontakt-E-Mail erforderlich'),
+  maxUsers: z.number().min(1),
+  maxDataSources: z.number().min(1),
+  apiAccessEnabled: z.boolean().default(true)
+});
+
+// POST /api/admin/tenants - Neuen Tenant erstellen
+router.post('/tenants', async (req: Request, res: Response) => {
+  try {
+    console.log('[ADMIN] Creating new tenant:', req.body);
+    
+    // Validate input
+    const validatedData = createTenantSchema.parse(req.body);
+    
+    // Import tenant service dynamically
+    const { TenantService } = await import('../services/tenantService');
+    
+    // Create tenant with email service integration
+    const newTenant = await TenantService.createTenant({
+      name: validatedData.name,
+      slug: validatedData.slug,
+      subscriptionPlan: validatedData.subscriptionPlan,
+      subscriptionStatus: validatedData.subscriptionStatus,
+      billingEmail: validatedData.billingEmail,
+      maxUsers: validatedData.maxUsers,
+      maxDataSources: validatedData.maxDataSources,
+      apiAccessEnabled: validatedData.apiAccessEnabled,
+      contactName: validatedData.contactName,
+      contactEmail: validatedData.contactEmail
+    });
+
+    console.log('[ADMIN] Tenant created successfully:', newTenant.id);
+    
+    res.status(201).json({
+      success: true,
+      data: newTenant,
+      message: 'Tenant erfolgreich erstellt'
+    });
+    
+  } catch (error: any) {
+    console.error('[ADMIN] Error creating tenant:', error);
+    
+    if (error.message === 'Slug already exists') {
+      return res.status(409).json({
+        success: false,
+        error: 'Slug bereits vergeben - bitte wählen Sie einen anderen',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Fehler beim Erstellen des Tenants',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// GET /api/admin/tenants - Alle Tenants auflisten
+router.get('/tenants', async (req: Request, res: Response) => {
+  try {
+    const { TenantService } = await import('../services/tenantService');
+    const tenants = await TenantService.getAllTenants();
+    
+    res.json({
+      success: true,
+      data: tenants,
+      count: tenants.length
+    });
+  } catch (error: any) {
+    console.error('[ADMIN] Error fetching tenants:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Fehler beim Laden der Tenants'
+    });
+  }
+});
+
 export default router;
