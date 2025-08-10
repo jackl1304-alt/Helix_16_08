@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Globe, Building2, FileText, Search, ExternalLink, Calendar,
   Flag, Users, Clock, CheckCircle, AlertCircle, BookOpen,
-  Gavel, Scale, Shield, Zap
+  Gavel, Scale, Shield, Zap, DollarSign, Target, TrendingUp
 } from 'lucide-react';
 // import { PiecesShareButton } from '../components/pieces-share-button';
 
