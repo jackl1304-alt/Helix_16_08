@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
+import { useCustomerTheme } from "@/contexts/customer-theme-context";
 import {
   LayoutDashboard,
   FileText,
@@ -102,7 +103,7 @@ const ALL_NAVIGATION_ITEMS: NavigationItem[] = [
   },
   {
     name: "AI Insights",
-    href: "/customer/ai-insights",
+    href: "/customer-ai-insights",
     icon: Brain,
     permission: "aiInsights",
     description: "KI-gestützte Erkenntnisse"

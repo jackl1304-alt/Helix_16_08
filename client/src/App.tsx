@@ -7,6 +7,7 @@ import { lazy, Suspense } from "react";
 import { ResponsiveLayout } from "@/components/responsive-layout";
 import { performanceMonitor, preloadCriticalResources } from "@/utils/performance";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { CustomerThemeProvider } from "@/contexts/customer-theme-context";
 
 // Initialize performance monitoring and preload resources
 if (typeof window !== 'undefined') {
@@ -53,6 +54,7 @@ const NewsletterAdmin = lazy(() => import("@/pages/newsletter-admin"));
 const AdvancedAnalytics = lazy(() => import("@/pages/advanced-analytics"));
 const CustomerDashboard = lazy(() => import("@/pages/customer-dashboard"));
 const CustomerSettings = lazy(() => import("@/pages/customer-settings"));
+const CustomerAIInsights = lazy(() => import("@/pages/customer-ai-insights"));
 const TenantOnboarding = lazy(() => import("@/pages/tenant-onboarding"));
 const EmailManagement = lazy(() => import("@/pages/email-management-new"));
 const RegulatoryUpdateDetail = lazy(() => import("@/pages/regulatory-update-detail-new"));
@@ -136,19 +138,67 @@ function App() {
             <Route path="/landing" component={Landing} />
             <Route path="/404" component={NotFound} />
             
-            {/* Customer pages with their own navigation */}
-            <Route path="/customer-dashboard" component={CustomerDashboard} />
-            <Route path="/customer-settings" component={CustomerSettings} />
-            <Route path="/customer/regulatory-updates" component={CustomerDashboard} />
-            <Route path="/customer/legal-cases" component={CustomerDashboard} />
-            <Route path="/customer/knowledge-base" component={CustomerDashboard} />
-            <Route path="/customer/newsletters" component={CustomerDashboard} />
-            <Route path="/customer/analytics" component={CustomerDashboard} />
-            <Route path="/customer/advanced-analytics" component={CustomerDashboard} />
-            <Route path="/customer/ai-insights" component={CustomerDashboard} />
-            <Route path="/customer/global-sources" component={CustomerDashboard} />
-            <Route path="/customer/data-collection" component={CustomerDashboard} />
-            <Route path="/customer/historical-data" component={CustomerDashboard} />
+            {/* Customer pages with their own navigation and theme */}
+            <Route path="/customer-dashboard">
+              <CustomerThemeProvider>
+                <CustomerDashboard />
+              </CustomerThemeProvider>
+            </Route>
+            <Route path="/customer-settings">
+              <CustomerThemeProvider>
+                <CustomerSettings />
+              </CustomerThemeProvider>
+            </Route>
+            <Route path="/customer-ai-insights">
+              <CustomerThemeProvider>
+                <CustomerAIInsights />
+              </CustomerThemeProvider>
+            </Route>
+            <Route path="/customer/regulatory-updates">
+              <CustomerThemeProvider>
+                <CustomerDashboard />
+              </CustomerThemeProvider>
+            </Route>
+            <Route path="/customer/legal-cases">
+              <CustomerThemeProvider>
+                <CustomerDashboard />
+              </CustomerThemeProvider>
+            </Route>
+            <Route path="/customer/knowledge-base">
+              <CustomerThemeProvider>
+                <CustomerDashboard />
+              </CustomerThemeProvider>
+            </Route>
+            <Route path="/customer/newsletters">
+              <CustomerThemeProvider>
+                <CustomerDashboard />
+              </CustomerThemeProvider>
+            </Route>
+            <Route path="/customer/analytics">
+              <CustomerThemeProvider>
+                <CustomerDashboard />
+              </CustomerThemeProvider>
+            </Route>
+            <Route path="/customer/advanced-analytics">
+              <CustomerThemeProvider>
+                <CustomerDashboard />
+              </CustomerThemeProvider>
+            </Route>
+            <Route path="/customer/global-sources">
+              <CustomerThemeProvider>
+                <CustomerDashboard />
+              </CustomerThemeProvider>
+            </Route>
+            <Route path="/customer/data-collection">
+              <CustomerThemeProvider>
+                <CustomerDashboard />
+              </CustomerThemeProvider>
+            </Route>
+            <Route path="/customer/historical-data">
+              <CustomerThemeProvider>
+                <CustomerDashboard />
+              </CustomerThemeProvider>
+            </Route>
             
             {/* All other pages with Admin Sidebar */}
             <Route>
