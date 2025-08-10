@@ -174,6 +174,38 @@ export default function LaufendeZulassungen() {
           ],
           contactPerson: 'Li Wei - China Operations',
           priority: 'high'
+        },
+        {
+          id: 'app-005',
+          productName: 'SecureConnect IoT Gateway',
+          company: 'MedNet Security Inc.',
+          region: 'USA',
+          regulatoryBody: 'FDA - Cybersecurity Section 524B',
+          submissionDate: '2025-07-10',
+          expectedApproval: '2026-02-15',
+          currentPhase: 'Cybersecurity Documentation Review',
+          deviceClass: 'Class II',
+          status: 'under-review',
+          progressPercentage: 40,
+          estimatedCosts: '$320.000',
+          keyMilestones: [
+            '✅ Pre-Submission Meeting abgehalten',
+            '✅ SBOM (Software Bill of Materials) eingereicht',
+            '🔄 Threat Modeling Review läuft',
+            '⏳ Vulnerability Disclosure Program ausstehend'
+          ],
+          challenges: [
+            'FDA Section 524B Cybersicherheitsanforderungen erfüllen',
+            'SBOM Datenqualität und -vollständigkeit sicherstellen',
+            'Legacy System Integration dokumentieren'
+          ],
+          nextSteps: [
+            'Vulnerability Management Plan überarbeiten',
+            'Cybersecurity Risk Assessment vervollständigen',
+            'Post-Market Update Prozess definieren'
+          ],
+          contactPerson: 'Dr. Michael Rodriguez - Cybersecurity Lead',
+          priority: 'critical'
         }
       ];
     }

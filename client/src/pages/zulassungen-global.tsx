@@ -151,6 +151,25 @@ export default function ZulassungenGlobal() {
       timeline: '180-540 Tage',
       costs: 'R$ 15.000-R$ 200.000',
       description: 'Brasilien als größter lateinamerikanischer Markt hat strenge Anforderungen und lokale Vertreterpflicht.'
+    },
+    {
+      id: 'australia-tga',
+      name: 'Australien - TGA',
+      flag: '🇦🇺',
+      agency: 'Therapeutic Goods Administration',
+      website: 'https://www.tga.gov.au',
+      keyRequirements: [
+        'Australian Register of Therapeutic Goods (ARTG)',
+        'Essential Principles Compliance',
+        'Conformity Assessment Evidence',
+        'TGA Conformity Assessment Certification',
+        'Comparable Overseas Regulator Evidence',
+        'Post-Market Monitoring'
+      ],
+      classes: ['Class I', 'Class IIa', 'Class IIb', 'Class III'],
+      timeline: '90-270 Tage',
+      costs: 'AUD $3.000-$50.000',
+      description: 'TGA bietet flexible Zulassungswege einschließlich Nutzung von Marktzulassungen vergleichbarer Übersee-Regulatoren.'
     }
   ];
 
@@ -162,11 +181,11 @@ export default function ZulassungenGlobal() {
       'Brasilien - ANVISA', 
       'Kanada - Health Canada',
       'China - National Medical Products Administration',
-      'EU - Europäische Kommission',
-      'Japan - PMDA',
+      'EU - Europäische Kommission - Generaldirektion Gesundheit',
+      'Japan - PMDA und Ministerium für Gesundheit, Arbeit und Soziales',
       'Singapur - Health Sciences Authority',
       'Südkorea - Ministry of Food and Drug Safety',
-      'UK - MHRA',
+      'UK - MHRA (Medicines and Healthcare products Regulatory Agency)',
       'USA - FDA'
     ],
     workingGroups: [
@@ -175,7 +194,15 @@ export default function ZulassungenGlobal() {
       'Good Regulatory Review Practices', 
       'Personalized Medical Devices',
       'Quality Management Systems (QMS)',
+      'Regulated Product Submission',
       'Software as a Medical Device (SaMD)'
+    ],
+    objectives: [
+      'Harmonisierung regulatorischer Anforderungen weltweit',
+      'Entwicklung international vereinbarter Dokumente',
+      'Förderung freiwilliger Zusammenarbeit zwischen Behörden',
+      'Öffentliche Konsultation zu Entwurfsdokumenten',
+      'Anpassung an spezifische regulatorische Anforderungen'
     ]
   };
 
@@ -185,16 +212,25 @@ export default function ZulassungenGlobal() {
     indicators: [
       'Nationale Politik für Gesundheitstechnologie',
       'Regulierung von Medizinprodukten', 
-      'Health Technology Assessment Einheiten',
+      'Nationale Health Technology Assessment Einheiten',
+      'Management von Gesundheitstechnologien',
       'Nomenklatursysteme für Medizinprodukte',
       'Nationale Listen prioritärer Medizinprodukte',
+      'Hochpreisige medizinische Geräte',
       'Dichte medizinischer Geräte'
     ],
     updates: [
-      '2010: Baseline Country Survey launched',
-      '2017: Global Atlas updated', 
-      '2022: Latest version published',
-      '2025: Next update in development'
+      '2009: WHO Baseline Country Survey entwickelt',
+      '2013: Als Global Atlas of Medical Devices neu aufgelegt', 
+      '2017: GAMD aktualisiert',
+      '2022: Aktuelle Aktualisierung in Arbeit',
+      '2025: Nächste Überarbeitung geplant'
+    ],
+    purpose: [
+      'Zentrale Anlaufstelle für Gesundheitstechnologien identifizieren',
+      'Globale, regionale und länderspezifische Datenbereitstellung',
+      'Verfügbarkeit von Medizinprodukten dokumentieren',
+      'Politische Entscheidungsfindung unterstützen'
     ]
   };
 
@@ -465,6 +501,58 @@ export default function ZulassungenGlobal() {
         </TabsContent>
 
         <TabsContent value="timeline" className="space-y-6 mt-6">
+          {/* Cybersecurity Requirements */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="w-5 h-5" />
+                Cybersicherheit in Medizinprodukten
+              </CardTitle>
+              <CardDescription>
+                Besondere Anforderungen für vernetzte Medizinprodukte (FDA Section 524B)
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">FDA Cybersicherheitsanforderungen</h4>
+                  <div className="space-y-2">
+                    {[
+                      'Consolidated Appropriations Act 2023 - Section 3305',
+                      'Cybersecurity in Medical Devices Guidance (Juni 2025)',
+                      'Software Bill of Materials (SBOM) erforderlich',
+                      'Threat Modeling für vernetzte Geräte',
+                      'Vulnerability Disclosure Programs'
+                    ].map((req, idx) => (
+                      <div key={idx} className="flex items-start gap-2">
+                        <Shield className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">{req}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Post-Market Surveillance (WHO)</h4>
+                  <div className="space-y-2">
+                    {[
+                      'Laufende Sicherheits- und Leistungsüberwachung',
+                      'Sammlung von Erfahrungsdaten nach Markteinführung',
+                      'Identifizierung von Korrekturbedarf',
+                      'Adverse Event Reporting Systeme',
+                      'Corrective and Preventive Actions (CAPA)'
+                    ].map((req, idx) => (
+                      <div key={idx} className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">{req}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Process Timeline */}
           <Card>
             <CardHeader>
