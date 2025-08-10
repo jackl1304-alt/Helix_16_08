@@ -42,7 +42,7 @@ export default function RegulatoryUpdateDetail({ params }: RegulatoryUpdateDetai
     }
   });
 
-  const update = updates?.find((u: any) => u.id === params.id);
+  const update = Array.isArray(updates) ? updates.find((u: any) => u.id === params.id) : null;
 
   // Generate comprehensive financial and AI analysis
   const generateFinancialAnalysis = (update: any) => {
