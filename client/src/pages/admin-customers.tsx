@@ -232,9 +232,9 @@ export default function AdminCustomers() {
           </div>
           <div className="text-center">
             <div className="text-lg font-semibold">
-              {Math.floor((Date.now() - customer.lastLogin.getTime()) / (1000 * 60 * 60 * 24))}d
+              {customer.subscriptionStatus === 'trial' ? 'Test' : 'Aktiv'}
             </div>
-            <div className="text-xs text-muted-foreground">Letzte Anmeldung</div>
+            <div className="text-xs text-muted-foreground">Status</div>
           </div>
         </div>
       </CardContent>
