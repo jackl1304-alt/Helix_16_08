@@ -2121,6 +2121,208 @@ ${case_item.court}
     }
   });
 
+  // Email Management API Routes
+  app.get('/api/email/providers', async (req, res) => {
+    try {
+      const { emailService } = await import('./services/emailService');
+      const providerInfo = emailService.getProviderInfo();
+      res.json([providerInfo]);
+    } catch (error) {
+      logger.error('Error fetching email providers', error);
+      res.status(500).json({ message: 'Failed to fetch email providers' });
+    }
+  });
+
+  app.get('/api/email/templates', async (req, res) => {
+    try {
+      const { emailService } = await import('./services/emailService');
+      const templates = emailService.getEmailTemplates();
+      res.json(templates);
+    } catch (error) {
+      logger.error('Error fetching email templates', error);
+      res.status(500).json({ message: 'Failed to fetch email templates' });
+    }
+  });
+
+  app.get('/api/email/statistics', async (req, res) => {
+    try {
+      const { emailService } = await import('./services/emailService');
+      const stats = emailService.getEmailStats();
+      res.json(stats);
+    } catch (error) {
+      logger.error('Error fetching email statistics', error);
+      res.status(500).json({ message: 'Failed to fetch email statistics' });
+    }
+  });
+
+  app.post('/api/email/test', async (req, res) => {
+    try {
+      const { emailService } = await import('./services/emailService');
+      const isConnected = await emailService.testConnection();
+      
+      if (isConnected) {
+        // Send test email
+        const testResult = await emailService.sendEmail(
+          'deltawaysnewsletter@gmail.com',
+          '✅ Helix Email Test - Erfolgreich',
+          '<h1>Test erfolgreich!</h1><p>Die Gmail-Integration funktioniert einwandfrei.</p><p>Gesendet am: ' + new Date().toLocaleString('de-DE') + '</p>'
+        );
+        
+        res.json({ 
+          success: true, 
+          connected: true,
+          emailSent: testResult,
+          message: 'Gmail-Verbindung erfolgreich getestet' 
+        });
+      } else {
+        res.json({ 
+          success: false, 
+          connected: false,
+          message: 'Gmail-Verbindung fehlgeschlagen' 
+        });
+      }
+    } catch (error) {
+      logger.error('Error testing email connection', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Email test failed',
+        error: error.message 
+      });
+    }
+  });
+
+  app.post('/api/email/send', async (req, res) => {
+    try {
+      const { to, templateId, variables } = req.body;
+      
+      if (!to || !templateId) {
+        return res.status(400).json({ message: 'Recipient and template ID are required' });
+      }
+      
+      const { emailService } = await import('./services/emailService');
+      
+      let emailContent;
+      
+      // Generate email based on template
+      switch (templateId) {
+        case 'customer_onboarding':
+          emailContent = emailService.generateCustomerOnboardingEmail(
+            variables.customerName,
+            variables.subscriptionPlan,
+            variables.loginUrl
+          );
+          break;
+        case 'customer_offboarding':
+          emailContent = emailService.generateCustomerOffboardingEmail(
+            variables.customerName,
+            variables.subscriptionPlan,
+            variables.endDate
+          );
+          break;
+        case 'billing_reminder':
+          emailContent = emailService.generateBillingReminderEmail(
+            variables.customerName,
+            variables.amount,
+            variables.dueDate,
+            variables.invoiceUrl
+          );
+          break;
+        case 'regulatory_alert':
+          emailContent = emailService.generateRegulatoryAlertEmail(
+            variables.alertTitle,
+            variables.summary,
+            variables.urgency,
+            variables.dashboardUrl
+          );
+          break;
+        case 'weekly_digest':
+          emailContent = emailService.generateWeeklyDigestEmail(
+            variables.customerName,
+            variables.updatesCount,
+            variables.legalCasesCount,
+            variables.dashboardUrl
+          );
+          break;
+        case 'trial_expiry':
+          emailContent = emailService.generateTrialExpiryEmail(
+            variables.customerName,
+            variables.expiryDate,
+            variables.upgradeUrl
+          );
+          break;
+        default:
+          return res.status(400).json({ message: 'Unknown template ID' });
+      }
+      
+      const success = await emailService.sendEmail(to, emailContent.subject, emailContent.html);
+      
+      if (success) {
+        res.json({ 
+          success: true, 
+          message: 'Email sent successfully',
+          template: templateId,
+          recipient: to
+        });
+      } else {
+        res.status(500).json({ 
+          success: false, 
+          message: 'Failed to send email' 
+        });
+      }
+      
+    } catch (error) {
+      logger.error('Error sending email', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Email sending failed',
+        error: error.message 
+      });
+    }
+  });
+
+  app.get('/api/email/automation-rules', async (req, res) => {
+    try {
+      // Return sample automation rules - can be extended with database storage
+      const automationRules = [
+        {
+          id: 'auto_onboarding',
+          name: 'Automatische Kundenanmeldung',
+          trigger: 'customer_signup',
+          templateId: 'customer_onboarding',
+          isActive: true,
+          conditions: ['new_customer', 'payment_confirmed'],
+          frequency: 'immediate',
+          nextRun: 'On customer signup'
+        },
+        {
+          id: 'weekly_digest',
+          name: 'Wöchentlicher Digest',
+          trigger: 'weekly_schedule',
+          templateId: 'weekly_digest',
+          isActive: true,
+          conditions: ['active_subscription'],
+          frequency: 'weekly',
+          nextRun: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+        },
+        {
+          id: 'billing_reminder',
+          name: 'Rechnungserinnerung',
+          trigger: 'invoice_due',
+          templateId: 'billing_reminder',
+          isActive: true,
+          conditions: ['unpaid_invoice', '3_days_before_due'],
+          frequency: 'immediate',
+          nextRun: 'On invoice due date'
+        }
+      ];
+      
+      res.json(automationRules);
+    } catch (error) {
+      logger.error('Error fetching automation rules', error);
+      res.status(500).json({ message: 'Failed to fetch automation rules' });
+    }
+  });
+
   app.delete('/api/newsletter/sources/:id', async (req, res) => {
     try {
       const sourceId = req.params.id;

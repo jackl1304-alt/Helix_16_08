@@ -31,10 +31,9 @@ interface EmailTemplate {
   name: string;
   subject: string;
   content: string;
-  type: 'regulatory_alert' | 'weekly_digest' | 'compliance_reminder' | 'welcome' | 'custom';
+  type: 'customer_onboarding' | 'customer_offboarding' | 'billing_reminder' | 'subscription_renewal' | 'regulatory_alert' | 'weekly_digest' | 'compliance_reminder' | 'welcome' | 'password_reset' | 'trial_expiry' | 'custom';
   isActive: boolean;
-  recipients: number;
-  lastSent: string;
+  variables: string[];
 }
 
 interface AutomationRule {
@@ -83,14 +82,47 @@ export default function EmailManagement() {
     }
   });
 
+  // Test Email Provider Mutation
   const testProviderMutation = useMutation({
-    mutationFn: (providerId: string) => apiRequest(`/api/email/providers/${providerId}/test`, 'POST'),
-    onSuccess: () => {
-      toast({ title: "Test erfolgreich", description: "Email-Provider funktioniert korrekt." });
+    mutationFn: async () => {
+      return await apiRequest('/api/email/test', 'POST');
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Gmail Test erfolgreich",
+        description: data.emailSent ? "Test-Email gesendet und Verbindung bestätigt" : "Verbindung erfolgreich getestet",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/email/providers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/email/statistics'] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Gmail Test fehlgeschlagen",
+        description: "Bitte überprüfen Sie die Anmeldedaten",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Send Test Email Mutation
+  const sendTestEmailMutation = useMutation({
+    mutationFn: async (templateData: { templateId: string; to: string; variables: any }) => {
+      return await apiRequest('/api/email/send', 'POST', templateData);
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Email gesendet",
+        description: `Template ${data.template} erfolgreich an ${data.recipient} gesendet`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/email/statistics'] });
     },
     onError: () => {
-      toast({ title: "Test fehlgeschlagen", description: "Email-Provider Verbindung fehlerhaft.", variant: "destructive" });
-    }
+      toast({
+        title: "Email-Versand fehlgeschlagen",
+        description: "Bitte versuchen Sie es erneut",
+        variant: "destructive",
+      });
+    },
   });
 
   // Template Mutations
@@ -108,11 +140,46 @@ export default function EmailManagement() {
     }
   });
 
-  const sendTestEmailMutation = useMutation({
-    mutationFn: ({ templateId, recipients }: { templateId: string; recipients: string }) => 
-      apiRequest(`/api/email/templates/${templateId}/test`, 'POST', { recipients: recipients.split(',').map(email => email.trim()) }),
-    onSuccess: () => {
-      toast({ title: "Test-Email versendet", description: "Die Test-Email wurde erfolgreich verschickt." });
+  // Template Test Email - Updated to use new service
+  const sendTemplateTestMutation = useMutation({
+    mutationFn: ({ templateId, recipients }: { templateId: string; recipients: string }) => {
+      const sampleVariables = {
+        customerName: 'Max Mustermann',
+        subscriptionPlan: 'Professional',
+        loginUrl: 'https://helix-platform.com/dashboard',
+        amount: '899',
+        dueDate: '15.08.2025',
+        invoiceUrl: 'https://helix-platform.com/invoice/123',
+        alertTitle: 'Neue FDA Guidance',
+        summary: 'Wichtige Änderung im Medical Device Approval Prozess',
+        urgency: 'medium' as 'low' | 'medium' | 'high',
+        dashboardUrl: 'https://helix-platform.com/dashboard',
+        updatesCount: 12,
+        legalCasesCount: 65,
+        expiryDate: '20.08.2025',
+        upgradeUrl: 'https://helix-platform.com/upgrade',
+        endDate: '31.08.2025'
+      };
+      
+      return apiRequest('/api/email/send', 'POST', {
+        to: recipients.split(',')[0].trim(),
+        templateId,
+        variables: sampleVariables
+      });
+    },
+    onSuccess: (data) => {
+      toast({ 
+        title: "Test-Email versendet", 
+        description: `Template ${data.template} erfolgreich gesendet.` 
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/email/statistics'] });
+    },
+    onError: () => {
+      toast({ 
+        title: "Fehler", 
+        description: "Test-Email konnte nicht versendet werden.", 
+        variant: "destructive" 
+      });
     }
   });
 
@@ -251,7 +318,7 @@ export default function EmailManagement() {
 
     const handleTestSend = () => {
       if (selectedTemplate && testRecipients) {
-        sendTestEmailMutation.mutate({
+        sendTemplateTestMutation.mutate({
           templateId: selectedTemplate.id,
           recipients: testRecipients
         });
@@ -277,8 +344,12 @@ export default function EmailManagement() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="customer_onboarding">Kunden Anmeldung</SelectItem>
+                <SelectItem value="customer_offboarding">Kunden Abmeldung</SelectItem>
+                <SelectItem value="billing_reminder">Rechnungserinnerung</SelectItem>
                 <SelectItem value="regulatory_alert">Regulatory Alert</SelectItem>
-                <SelectItem value="weekly_digest">Weekly Digest</SelectItem>
+                <SelectItem value="weekly_digest">Wöchentlicher Digest</SelectItem>
+                <SelectItem value="trial_expiry">Testphase läuft ab</SelectItem>
                 <SelectItem value="compliance_reminder">Compliance Reminder</SelectItem>
                 <SelectItem value="welcome">Welcome Email</SelectItem>
                 <SelectItem value="custom">Custom</SelectItem>
@@ -331,7 +402,7 @@ export default function EmailManagement() {
             <Button 
               variant="outline" 
               onClick={handleTestSend}
-              disabled={!testRecipients || sendTestEmailMutation.isPending}
+              disabled={!testRecipients || sendTemplateTestMutation.isPending}
             >
               <Send className="w-4 h-4 mr-2" />
               Test senden
@@ -443,7 +514,7 @@ export default function EmailManagement() {
                         <Button 
                           variant="outline" 
                           size="sm"
-                          onClick={() => testProviderMutation.mutate(provider.id)}
+                          onClick={() => testProviderMutation.mutate()}
                           disabled={testProviderMutation.isPending}
                         >
                           Testen

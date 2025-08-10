@@ -69,7 +69,13 @@ app.use((req, res, next) => {
   
   // Initialize email service and verify connection
   logger.info("Initializing email service...");
-  await emailService.verifyConnection();
+  try {
+    const { emailService } = await import("./services/emailService.js");
+    await emailService.testConnection();
+    logger.info("Email service initialized successfully");
+  } catch (error) {
+    logger.warn("Email service initialization failed", error);
+  }
   
   // Optimized: Start background initialization without blocking server startup
   logger.info("Starting background data initialization...");
