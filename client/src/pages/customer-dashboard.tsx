@@ -402,25 +402,27 @@ export default function CustomerDashboard() {
         </div>
       )}
 
-      {/* Compliance Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Compliance-Übersicht
-          </CardTitle>
-          <CardDescription>
-            Regionale Compliance-Scores und aktuelle Warnungen
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
-            {complianceData.map((item, index) => (
-              <ComplianceCard key={index} {...item} />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Compliance Overview - Only show with regulatoryUpdates permission */}
+      {permissions?.regulatoryUpdates && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Compliance-Übersicht
+            </CardTitle>
+            <CardDescription>
+              Regionale Compliance-Scores und aktuelle Warnungen
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-3">
+              {complianceData.map((item, index) => (
+                <ComplianceCard key={index} {...item} />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Recent Activity & Alerts - Only show if permitted */}
       {(permissions?.dashboard || permissions?.auditLogs) && (
@@ -502,56 +504,74 @@ export default function CustomerDashboard() {
         </div>
       )}
 
-      {/* Subscription Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Crown className="h-5 w-5" />
-            Subscription Status
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-6 md:grid-cols-2">
-            <div>
-              <h4 className="font-medium mb-4">Current Plan: Professional</h4>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Monatliche Updates</span>
-                  <span className="text-sm font-medium">{dashboardData?.usage.currentMonth} / 2.500</span>
-                </div>
-                <Progress value={dashboardData?.usage.percentage} />
-                
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Team-Mitglieder</span>
-                  <span className="text-sm font-medium">{dashboardData?.usage.users || 0} / {dashboardData?.usage.userLimit || 0}</span>
-                </div>
-                <Progress value={((dashboardData?.usage.users || 0) / (dashboardData?.usage.userLimit || 1)) * 100} />
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="font-medium mb-4">Nächste Abrechnung</h4>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Betrag</span>
-                  <span className="text-lg font-bold">€899</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Datum</span>
-                  <span className="text-sm font-medium">31.08.2025</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Zahlungsart</span>
-                  <span className="text-sm">**** 1234</span>
+      {/* Subscription Status - Only show with administration or systemSettings permission */}
+      {(permissions?.administration || permissions?.systemSettings) && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Crown className="h-5 w-5" />
+              Subscription Status
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-6 md:grid-cols-2">
+              <div>
+                <h4 className="font-medium mb-4">Current Plan: Professional</h4>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Monatliche Updates</span>
+                    <span className="text-sm font-medium">{dashboardData?.usage.currentMonth} / 2.500</span>
+                  </div>
+                  <Progress value={dashboardData?.usage.percentage} />
+                  
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Team-Mitglieder</span>
+                    <span className="text-sm font-medium">{dashboardData?.usage.users || 0} / {dashboardData?.usage.userLimit || 0}</span>
+                  </div>
+                  <Progress value={((dashboardData?.usage.users || 0) / (dashboardData?.usage.userLimit || 1)) * 100} />
                 </div>
               </div>
-              <Button className="w-full mt-4" variant="outline">
-                Plan verwalten
-              </Button>
+              
+              <div>
+                <h4 className="font-medium mb-4">Nächste Abrechnung</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Betrag</span>
+                    <span className="text-lg font-bold">€899</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Datum</span>
+                    <span className="text-sm font-medium">31.08.2025</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Zahlungsart</span>
+                    <span className="text-sm">**** 1234</span>
+                  </div>
+                </div>
+                <Button className="w-full mt-4" variant="outline">
+                  Plan verwalten
+                </Button>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
+        {/* Show message if no dashboard sections are visible */}
+        {!permissions?.dashboard && !permissions?.analytics && !permissions?.regulatoryUpdates && 
+         !permissions?.administration && !permissions?.systemSettings && !permissions?.auditLogs && (
+          <Card className="text-center py-12">
+            <CardContent>
+              <Shield className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Zugriff beschränkt
+              </h3>
+              <p className="text-gray-600 max-w-md mx-auto">
+                Ihr Administrator hat den Zugriff auf diese Dashboard-Bereiche beschränkt. 
+                Kontaktieren Sie Ihren Administrator, um weitere Berechtigungen zu erhalten.
+              </p>
+            </CardContent>
+          </Card>
+        )}
         </div>
       </div>
     </div>
