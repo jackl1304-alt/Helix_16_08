@@ -7,13 +7,13 @@ import { errorMonitor } from '@/utils/error-monitoring';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
-  fallback?: React.ComponentType<{ error?: Error; retry: () => void }>;
+  fallback?: React.ComponentType<{ error?: Error | undefined; retry: () => void }>;
   onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
 }
 
 interface ErrorBoundaryState {
   hasError: boolean;
-  error?: Error;
+  error?: Error | undefined;
 }
 
 export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
@@ -38,7 +38,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   retry = () => {
-    this.setState({ hasError: false, error: undefined });
+    this.setState({ hasError: false, error: undefined as undefined });
   };
 
   render() {
@@ -52,7 +52,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 }
 
 // Default Error Fallback Component
-const DefaultErrorFallback: React.FC<{ error?: Error; retry: () => void }> = ({ error, retry }) => (
+const DefaultErrorFallback: React.FC<{ error?: Error | undefined; retry: () => void }> = ({ error, retry }) => (
   <div className="min-h-[200px] flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200">
     <div className="text-center p-6">
       <div className="mb-4">
