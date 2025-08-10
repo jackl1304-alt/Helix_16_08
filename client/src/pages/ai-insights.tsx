@@ -27,7 +27,8 @@ import {
   Clock,
   CheckCircle,
   Eye,
-  ExternalLink
+  ExternalLink,
+  Shield
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
