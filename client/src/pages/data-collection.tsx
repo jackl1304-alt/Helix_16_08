@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { FolderSync, Plus, Trash2, Edit, AlertCircle, History, Settings, ExternalLink, Loader2, Database, RefreshCw } from "lucide-react";
+import { FolderSync, Plus, Trash2, Edit, AlertCircle, History, Settings, ExternalLink, Loader2, Database, RefreshCw, CheckCircle, Globe, Shield, Zap, TrendingUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { DataSource } from "@shared/schema";

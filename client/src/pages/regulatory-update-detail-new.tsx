@@ -18,7 +18,9 @@ import {
   AlertTriangle,
   Target,
   Lightbulb,
-  CheckCircle
+  CheckCircle,
+  MessageSquare,
+  Globe
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -198,7 +200,7 @@ export default function RegulatoryUpdateDetail({ params }: RegulatoryUpdateDetai
       }
     };
 
-    const productKey = Object.keys(productMap).find(key => update.title.includes(key));
+    const productKey = Object.keys(productMap).find(key => update?.title?.includes(key));
     return productMap[productKey] || productMap['K252056']; // Default fallback
   };
 
@@ -494,7 +496,7 @@ export default function RegulatoryUpdateDetail({ params }: RegulatoryUpdateDetai
       }
     };
 
-    const productKey = Object.keys(aiMap).find(key => update.title.includes(key));
+    const productKey = Object.keys(aiMap).find(key => update?.title?.includes(key));
     return aiMap[productKey] || aiMap['K252056']; // Default fallback
   };
 
