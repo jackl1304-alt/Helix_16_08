@@ -73,7 +73,7 @@ export default function EmailManagementNew() {
   // Test Gmail Connection Mutation
   const testConnectionMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest('/api/email/test', { method: 'POST' });
+      return await apiRequest('/api/email/test', 'POST');
     },
     onSuccess: (data) => {
       if (data.success) {
@@ -99,19 +99,16 @@ export default function EmailManagementNew() {
   // Send Test Email Mutation
   const sendTestEmailMutation = useMutation({
     mutationFn: async ({ templateId, email }: { templateId: string; email: string }) => {
-      return await apiRequest('/api/email/send', {
-        method: 'POST',
-        body: JSON.stringify({
-          to: email,
-          templateId,
-          variables: {
-            customerName: 'Test Kunde',
-            alertTitle: 'Test Alert',
-            summary: 'Dies ist ein Test',
-            urgency: 'Mittel',
-            dashboardUrl: 'https://helix-platform.com/dashboard'
-          }
-        })
+      return await apiRequest('/api/email/send', 'POST', {
+        to: email,
+        templateId,
+        variables: {
+          customerName: 'Test Kunde',
+          alertTitle: 'Test Alert',
+          summary: 'Dies ist ein Test',
+          urgency: 'Mittel',
+          dashboardUrl: 'https://helix-platform.com/dashboard'
+        }
       });
     },
     onSuccess: () => {
