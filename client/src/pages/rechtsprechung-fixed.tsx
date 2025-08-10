@@ -425,8 +425,8 @@ ${legalCase.summary || 'Dieser rechtliche Fall behandelt wichtige regulatorische
                               return lines.length > 0 ? lines.join(' • ') : summary.substring(0, 150) + '...';
                             } else {
                               // Create summary from first paragraph
-                              const firstPara = summary.split('\n')[0];
-                              return firstPara.length > 120 ? firstPara.substring(0, 120) + '...' : firstPara;
+                              const firstPara = summary.split('\n')[0] || summary;
+                              return firstPara && firstPara.length > 120 ? firstPara.substring(0, 120) + '...' : (firstPara || 'Fallübersicht wird verarbeitet...');
                             }
                           })()}
                         </div>
@@ -561,7 +561,7 @@ Die gerichtliche Prüfung hat ergeben, dass der Beklagte seine Pflichten zur ord
 Die Kosten des Rechtsstreits trägt der unterlegene Beklagte.
 
 ---
-Verkündet am ${new Date(legalCase.decision_date || legalCase.decisionDate).toLocaleDateString('de-DE')}
+Verkündet am ${legalCase.decision_date || legalCase.decisionDate ? new Date(legalCase.decision_date || legalCase.decisionDate).toLocaleDateString('de-DE') : 'TBD'}
 ${legalCase.court}
 `.trim()}
                           </div>
