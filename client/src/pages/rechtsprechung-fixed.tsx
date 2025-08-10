@@ -416,7 +416,7 @@ ${legalCase.summary || 'Dieser rechtliche Fall behandelt wichtige regulatorische
                       <div className="p-4 border-b">
                         <div className="font-medium text-gray-700 mb-2">Ergebnis:</div>
                         <div className="text-sm text-gray-600">
-                          Berufung wird zurückgewiesen. Urteil der Vorinstanz besteht.
+                          {legalCase.summary || 'Zusammenfassung wird verarbeitet...'}
                         </div>
                       </div>
 
@@ -424,7 +424,7 @@ ${legalCase.summary || 'Dieser rechtliche Fall behandelt wichtige regulatorische
                       <div className="p-4 bg-red-50 border-l-4 border-red-400 border-b">
                         <div className="font-medium text-red-700 mb-1">Urteilsspruch:</div>
                         <div className="text-sm text-red-800">
-                          Berufung wird zurückgewiesen. Urteil der Vorinstanz besteht.
+                          {legalCase.judgment || legalCase.summary || 'Urteilsspruch wird verarbeitet...'}
                         </div>
                       </div>
 
@@ -432,7 +432,7 @@ ${legalCase.summary || 'Dieser rechtliche Fall behandelt wichtige regulatorische
                       <div className="p-4 bg-green-50 border-l-4 border-green-400 border-b">
                         <div className="font-medium text-green-700 mb-1">Schadensersatz:</div>
                         <div className="text-sm text-green-800 font-semibold">
-                          €1.750.000 Verdienstausfall und Folgeschäden
+                          {legalCase.damages || legalCase.financial_impact || 'Wird ermittelt...'}
                         </div>
                       </div>
 
@@ -450,7 +450,7 @@ ${legalCase.summary || 'Dieser rechtliche Fall behandelt wichtige regulatorische
                         <div className="text-sm">
                           <div className="font-medium mb-1">Rechtsfragen:</div>
                           <div className="flex flex-wrap gap-1">
-                            {['medical device', 'FDA', 'classification', '+1 weitere'].map((tag: string, index: number) => (
+                            {(legalCase.tags || legalCase.keywords || ['Wird geladen...']).map((tag: string, index: number) => (
                               <span key={index} className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
                                 {tag}
                               </span>
