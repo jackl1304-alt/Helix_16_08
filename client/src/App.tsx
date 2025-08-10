@@ -57,6 +57,7 @@ const TenantOnboarding = lazy(() => import("@/pages/tenant-onboarding"));
 const EmailManagement = lazy(() => import("@/pages/email-management"));
 const RegulatoryUpdateDetail = lazy(() => import("@/pages/regulatory-update-detail-new"));
 const RechtsprechungFixed = lazy(() => import("@/pages/rechtsprechung-fixed"));
+const RechtsprechungKompakt = lazy(() => import("@/pages/rechtsprechung-kompakt"));
 const TerminologyGlossary = lazy(() => import("@/pages/terminology-glossary"));
 const AdminGlossary = lazy(() => import("@/pages/admin-glossary"));
 const GRIPIntegration = lazy(() => import("@/pages/grip-integration"));
@@ -95,7 +96,7 @@ function Router() {
         <Route path="/ai-content-analysis" component={AIContentAnalysis} />
 
         <Route path="/knowledge-base" component={KnowledgeBase} />
-        <Route path="/rechtsprechung" component={RechtsprechungFixed} />
+        <Route path="/rechtsprechung" component={RechtsprechungKompakt} />
         <Route path="/terminology" component={TerminologyGlossary} />
         <Route path="/admin/glossary" component={AdminGlossary} />
         <Route path="/grip-integration" component={GRIPIntegration} />
