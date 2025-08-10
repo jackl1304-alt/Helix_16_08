@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { registerEmailRoutes } from "./routes-email";
 import administrationRoutes from "./routes/administration";
 import adminDataSourcesRoutes from "./routes/adminDataSourcesRoutes";
 
@@ -277,6 +278,8 @@ Status: Rechtskräftig
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Register Gmail Email Management Routes
+  registerEmailRoutes(app);
   
   // Force JSON responses for all API routes - NO HTML EVER
   app.use('/api', (req, res, next) => {
@@ -687,202 +690,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get email templates
-  app.get('/api/email/templates', async (req, res) => {
-    try {
-      const templates = [
-        {
-          id: 'tpl_regulatory_alert',
-          name: 'Regulatory Alert',
-          subject: '🚨 Kritisches Regulatory Update - {{deviceType}}',
-          content: `<h2>Neues kritisches Update verfügbar</h2>
-<p>Hallo {{customerName}},</p>
-<p>Ein neues kritisches Regulatory Update wurde für {{deviceType}} veröffentlicht:</p>
-<div style="background: #f8f9fa; padding: 20px; margin: 20px 0; border-left: 4px solid #dc3545;">
-<h3>{{updateTitle}}</h3>
-<p><strong>Region:</strong> {{region}}</p>
-<p><strong>Gültigkeitsdatum:</strong> {{effectiveDate}}</p>
-<p><strong>Compliance-Deadline:</strong> {{complianceDeadline}}</p>
-</div>
-<a href="{{dashboardUrl}}" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;">Zum Dashboard</a>`,
-          type: 'regulatory_alert',
-          isActive: true,
-          recipients: 342,
-          lastSent: '2025-08-10T06:30:00Z'
-        },
-        {
-          id: 'tpl_weekly_digest',
-          name: 'Weekly Digest',
-          subject: '📊 Helix Weekly Digest - {{weekOf}}',
-          content: `<h2>Ihre wöchentliche Regulatory Zusammenfassung</h2>
-<p>Hallo {{customerName}},</p>
-<p>Hier ist Ihre Zusammenfassung der Regulatory Updates für die Woche {{weekOf}}:</p>
-<div style="background: #f8f9fa; padding: 20px; margin: 20px 0;">
-<h3>📈 Diese Woche</h3>
-<ul>
-<li>{{newUpdatesCount}} neue Updates</li>
-<li>{{criticalAlertsCount}} kritische Alerts</li>
-<li>{{complianceRemindersCount}} Compliance-Erinnerungen</li>
-</ul>
-</div>
-<a href="{{dashboardUrl}}">Zum vollständigen Dashboard</a>`,
-          type: 'weekly_digest',
-          isActive: true,
-          recipients: 892,
-          lastSent: '2025-08-09T09:00:00Z'
-        },
-        {
-          id: 'tpl_compliance_reminder',
-          name: 'Compliance Reminder',
-          subject: '⏰ Compliance-Deadline in {{daysLeft}} Tagen',
-          content: `<h2>Wichtige Compliance-Erinnerung</h2>
-<p>Hallo {{customerName}},</p>
-<p>Die Compliance-Deadline für {{regulationTitle}} läuft in {{daysLeft}} Tagen ab.</p>
-<div style="background: #fff3cd; padding: 20px; margin: 20px 0; border-left: 4px solid #ffc107;">
-<h3>{{regulationTitle}}</h3>
-<p><strong>Deadline:</strong> {{deadline}}</p>
-<p><strong>Betroffene Geräte:</strong> {{affectedDevices}}</p>
-<p><strong>Erforderliche Maßnahmen:</strong> {{requiredActions}}</p>
-</div>
-<a href="{{complianceUrl}}">Compliance-Details anzeigen</a>`,
-          type: 'compliance_reminder',
-          isActive: true,
-          recipients: 156,
-          lastSent: '2025-08-09T14:00:00Z'
-        }
-      ];
-      res.json(templates);
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch email templates' });
-    }
-  });
+  // REMOVED - Using Gmail templates at line 2116 instead
 
-  // Save email template
-  app.post('/api/email/templates', async (req, res) => {
-    try {
-      const template = {
-        id: `tpl_${Date.now()}`,
-        ...req.body,
-        recipients: 0,
-        lastSent: null
-      };
-      res.json(template);
-    } catch (error) {
-      res.status(400).json({ error: 'Failed to save email template' });
-    }
-  });
-
-  // Update email template
-  app.put('/api/email/templates/:id', async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updatedTemplate = { id, ...req.body };
-      res.json(updatedTemplate);
-    } catch (error) {
-      res.status(400).json({ error: 'Failed to update email template' });
-    }
-  });
-
-  // Send test email
-  app.post('/api/email/templates/:id/test', async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { recipients } = req.body;
-      
-      // In production: actually send test email
-      const result = {
-        success: true,
-        sentTo: recipients,
-        timestamp: new Date().toISOString(),
-        messageId: `test_${Date.now()}`
-      };
-      res.json(result);
-    } catch (error) {
-      res.status(400).json({ error: 'Failed to send test email' });
-    }
-  });
-
-  // Get automation rules
-  app.get('/api/email/automation-rules', async (req, res) => {
-    try {
-      const rules = [
-        {
-          id: 'auto_critical_alerts',
-          name: 'Kritische Regulatory Alerts',
-          trigger: 'new_critical_update',
-          templateId: 'tpl_regulatory_alert',
-          isActive: true,
-          conditions: ['severity=critical', 'region=EU|US'],
-          frequency: 'immediate',
-          nextRun: 'Bei neuen Updates'
-        },
-        {
-          id: 'auto_weekly_digest',
-          name: 'Wöchentlicher Digest',
-          trigger: 'schedule',
-          templateId: 'tpl_weekly_digest',
-          isActive: true,
-          conditions: ['subscription=professional|enterprise'],
-          frequency: 'weekly',
-          nextRun: '2025-08-16T09:00:00Z'
-        },
-        {
-          id: 'auto_compliance_reminders',
-          name: 'Compliance-Erinnerungen',
-          trigger: 'compliance_deadline',
-          templateId: 'tpl_compliance_reminder',
-          isActive: true,
-          conditions: ['days_before=30|14|7|1'],
-          frequency: 'daily',
-          nextRun: '2025-08-11T08:00:00Z'
-        }
-      ];
-      res.json(rules);
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch automation rules' });
-    }
-  });
-
-  // Save automation rule
-  app.post('/api/email/automation', async (req, res) => {
-    try {
-      const rule = {
-        id: `auto_${Date.now()}`,
-        ...req.body,
-        nextRun: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-      };
-      res.json(rule);
-    } catch (error) {
-      res.status(400).json({ error: 'Failed to save automation rule' });
-    }
-  });
-
-  // Get email statistics
-  app.get('/api/email/statistics', async (req, res) => {
-    try {
-      const stats = {
-        emailsSentToday: 1247,
-        emailsSentThisWeek: 8934,
-        emailsSentThisMonth: 34567,
-        activeTemplates: 8,
-        automationRules: 12,
-        averageOpenRate: 68.2,
-        averageClickRate: 24.8,
-        deliveryRate: 99.1,
-        bounceRate: 0.9,
-        unsubscribeRate: 0.3,
-        topPerformingTemplate: 'Weekly Digest',
-        recentActivity: [
-          { time: '09:15', action: 'Weekly Digest sent', count: 892 },
-          { time: '08:30', action: 'Compliance Reminder sent', count: 156 },
-          { time: '06:45', action: 'Critical Alert sent', count: 23 }
-        ]
-      };
-      res.json(stats);
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch email statistics' });
-    }
-  });
+  // ALL OLD EMAIL ROUTES REMOVED - Using Gmail routes in routes-email.ts
 
   // Update data source status
   app.patch("/api/data-sources/:id", async (req, res) => {
