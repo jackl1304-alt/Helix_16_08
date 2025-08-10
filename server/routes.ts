@@ -473,184 +473,181 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
-      
-      // Customer Dashboard & Self-Administration API Routes
-      app.get('/api/customer/dashboard/:tenantId', async (req, res) => {
-        try {
-          // Mock customer dashboard data - in production: get from TenantService
-          const dashboard = {
-            usage: {
-              currentMonth: 1247,
-              limit: 2500,
-              percentage: 50,
-              users: 12,
-              userLimit: 25,
-              apiCalls: 312,
-              apiLimit: 1000
-            },
-            dashboard: {
-              regulatoryUpdates: {
-                total: 1247,
-                thisMonth: 312,
-                critical: 23,
-                regions: { US: 498, EU: 436, Asia: 313 }
-              },
-              compliance: {
-                score: 92,
-                alerts: 8,
-                upcoming: 15,
-                resolved: 156
-              },
-              analytics: {
-                riskTrend: 'decreasing',
-                engagement: 89,
-                efficiency: 94,
-                dataQuality: 98
-              }
-            }
-          };
-          res.json(dashboard);
-        } catch (error) {
-          res.status(404).json({ error: error.message });
-        }
-      });
 
-      app.get('/api/customer/subscription/:tenantId', async (req, res) => {
-        try {
-          // Mock subscription data
-          const subscription = {
-            currentPlan: 'professional',
-            status: 'active',
-            nextBilling: new Date('2025-09-10'),
-            billingCycle: 'monthly',
-            usage: {
-              currentMonth: 1247,
-              limit: 2500,
-              percentage: 50,
-              users: 12,
-              userLimit: 25
-            },
-            invoices: [
-              { id: 'inv_001', date: '2025-08-10', amount: 899, status: 'paid', plan: 'Professional' },
-              { id: 'inv_002', date: '2025-07-10', amount: 899, status: 'paid', plan: 'Professional' },
-              { id: 'inv_003', date: '2025-06-10', amount: 899, status: 'paid', plan: 'Professional' }
-            ],
-            paymentMethod: {
-              type: 'card',
-              last4: '1234',
-              brand: 'Visa',
-              expiresAt: '12/27'
-            }
-          };
-          res.json(subscription);
-        } catch (error) {
-          res.status(404).json({ error: error.message });
-        }
-      });
-
-      app.get('/api/customer/usage/:tenantId', async (req, res) => {
-        try {
-          // Mock usage analytics
-          const usage = {
-            currentPeriod: {
-              dataRequests: 1247,
-              apiCalls: 312,
-              users: 12,
-              activeRegions: ['US', 'EU', 'Asia']
-            },
-            limits: {
-              monthlyUpdates: 2500,
-              maxUsers: 25,
-              apiCallsPerMonth: 10000
-            },
-            trends: {
-              dataRequests: { value: 8.2, direction: 'up' },
-              apiCalls: { value: -2.1, direction: 'down' },
-              users: { value: 0, direction: 'stable' }
-            },
-            dailyUsage: Array.from({ length: 30 }, (_, i) => ({
-              date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-              requests: Math.floor(Math.random() * 100) + 20,
-              apiCalls: Math.floor(Math.random() * 30) + 5,
-              users: Math.floor(Math.random() * 5) + 8
-            }))
-          };
-          res.json(usage);
-        } catch (error) {
-          res.status(400).json({ error: error.message });
-        }
-      });
-
-      app.get('/api/customer/settings/:tenantId', async (req, res) => {
-        try {
-          // Mock tenant settings
-          const settings = {
-            general: {
-              companyName: "MedTech Solutions GmbH",
-              industry: "Medizintechnik",
-              companySize: "51-200",
-              website: "https://medtech-solutions.com"
-            },
-            notifications: {
-              email: {
-                regulatoryUpdates: true,
-                criticalAlerts: true,
-                weeklyDigest: true
-              }
-            },
-            security: {
-              twoFactorEnabled: true,
-              sessionTimeout: 480
-            }
-          };
-          res.json(settings);
-        } catch (error) {
-          res.status(404).json({ error: error.message });
-        }
-      });
-
-      app.put('/api/customer/settings/:tenantId', async (req, res) => {
-        try {
-          const { section, data } = req.body;
-          // In production: update tenant settings in database
-          res.json({ success: true, section, data });
-        } catch (error) {
-          res.status(400).json({ error: error.message });
-        }
-      });
-      
-      const totalDuration = Date.now() - startTime;
-      const successfulSyncs = results.filter(r => r.success).length;
+      const totalSyncsCompleted = results.filter(r => r.success).length;
+      const totalErrorsSyncs = results.filter(r => !r.success).length;
       const totalNewUpdates = results.reduce((sum, r) => sum + r.newUpdatesCount, 0);
-      const totalExisting = results.reduce((sum, r) => sum + r.existingCount, 0);
-      
-      console.log(`[API] Bulk sync completed in ${totalDuration}ms: ${successfulSyncs}/${activeSources.length} successful, ${totalNewUpdates} new updates`);
-      
+      const totalDuration = Date.now() - startTime;
+
+      console.log(`[API] Bulk synchronization completed: ${totalSyncsCompleted}/${activeSources.length} successful, ${totalNewUpdates} new updates, ${totalDuration}ms`);
+
       res.json({
-        success: errors.length === 0,
-        total: activeSources.length,
-        successful: successfulSyncs,
-        failed: activeSources.length - successfulSyncs,
-        totalDuration,
-        totalNewUpdates,
-        totalExisting,
-        results,
-        errors,
-        message: `Bulk sync completed: ${successfulSyncs}/${activeSources.length} sources synchronized successfully`,
+        success: true,
+        summary: {
+          totalSources: activeSources.length,
+          successfulSyncs: totalSyncsCompleted,
+          failedSyncs: totalErrorsSyncs,
+          totalNewUpdates: totalNewUpdates,
+          totalDuration: totalDuration
+        },
+        results: results,
+        errors: errors.length > 0 ? errors : undefined
+      });
+
+    } catch (error: any) {
+      console.error('[API] Bulk synchronization failed:', error);
+      res.status(500).json({
+        error: 'Bulk synchronization failed',
+        message: error.message,
         timestamp: new Date().toISOString()
       });
-      
-    } catch (error: any) {
-      console.error('[API] Bulk sync failed completely:', error);
-      res.status(500).json({
-        success: false,
-        error: {
-          message: error.message,
-          code: 'BULK_SYNC_ERROR',
-          timestamp: new Date().toISOString()
-        }
-      });
     }
+  });
+
+  // Customer Dashboard & Self-Administration API Routes
+  app.get('/api/customer/dashboard/:tenantId', async (req, res) => {
+    try {
+      // Mock customer dashboard data - in production: get from TenantService
+      const dashboard = {
+        usage: {
+          currentMonth: 1247,
+          limit: 2500,
+          percentage: 50,
+          users: 12,
+          userLimit: 25,
+          apiCalls: 312,
+          apiLimit: 1000
+        },
+        dashboard: {
+          regulatoryUpdates: {
+            total: 1247,
+            thisMonth: 312,
+            critical: 23,
+            regions: { US: 498, EU: 436, Asia: 313 }
+          },
+          compliance: {
+            score: 92,
+            alerts: 8,
+            upcoming: 15,
+            resolved: 156
+          },
+          analytics: {
+            riskTrend: 'decreasing',
+            engagement: 89,
+            efficiency: 94,
+            dataQuality: 98
+          }
+        }
+      };
+      res.json(dashboard);
+    } catch (error) {
+      res.status(404).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/customer/subscription/:tenantId', async (req, res) => {
+    try {
+      // Mock subscription data
+      const subscription = {
+        currentPlan: 'professional',
+        status: 'active',
+        nextBilling: new Date('2025-09-10'),
+        billingCycle: 'monthly',
+        usage: {
+          currentMonth: 1247,
+          limit: 2500,
+          percentage: 50,
+          users: 12,
+          userLimit: 25
+        },
+        invoices: [
+          { id: 'inv_001', date: '2025-08-10', amount: 899, status: 'paid', plan: 'Professional' },
+          { id: 'inv_002', date: '2025-07-10', amount: 899, status: 'paid', plan: 'Professional' },
+          { id: 'inv_003', date: '2025-06-10', amount: 899, status: 'paid', plan: 'Professional' }
+        ],
+        paymentMethod: {
+          type: 'card',
+          last4: '1234',
+          brand: 'Visa',
+          expiresAt: '12/27'
+        }
+      };
+      res.json(subscription);
+    } catch (error) {
+      res.status(404).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/customer/usage/:tenantId', async (req, res) => {
+    try {
+      // Mock usage analytics
+      const usage = {
+        currentPeriod: {
+          dataRequests: 1247,
+          apiCalls: 312,
+          users: 12,
+          activeRegions: ['US', 'EU', 'Asia']
+        },
+        limits: {
+          monthlyUpdates: 2500,
+          maxUsers: 25,
+          apiCallsPerMonth: 10000
+        },
+        trends: {
+          dataRequests: { value: 8.2, direction: 'up' },
+          apiCalls: { value: -2.1, direction: 'down' },
+          users: { value: 0, direction: 'stable' }
+        },
+        dailyUsage: Array.from({ length: 30 }, (_, i) => ({
+          date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          requests: Math.floor(Math.random() * 100) + 20,
+          apiCalls: Math.floor(Math.random() * 30) + 5,
+          users: Math.floor(Math.random() * 5) + 8
+        }))
+      };
+      res.json(usage);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/customer/settings/:tenantId', async (req, res) => {
+    try {
+      // Mock tenant settings
+      const settings = {
+        general: {
+          companyName: "MedTech Solutions GmbH",
+          industry: "Medizintechnik",
+          companySize: "51-200",
+          website: "https://medtech-solutions.com"
+        },
+        notifications: {
+          email: {
+            regulatoryUpdates: true,
+            criticalAlerts: true,
+            weeklyDigest: true
+          }
+        },
+        security: {
+          twoFactorEnabled: true,
+          sessionTimeout: 480
+        }
+      };
+      res.json(settings);
+    } catch (error) {
+      res.status(404).json({ error: error.message });
+    }
+  });
+
+  app.put('/api/customer/settings/:tenantId', async (req, res) => {
+    try {
+      const { section, data } = req.body;
+      // In production: update tenant settings in database
+      res.json({ success: true, section, data });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+
   });
 
   // Update data source status
