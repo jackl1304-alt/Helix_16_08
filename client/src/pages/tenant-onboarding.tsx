@@ -77,24 +77,27 @@ export default function TenantOnboarding() {
     contactPhone: '',
     contactRole: '',
     // Step 3: Subscription
-    selectedPlan: 'professional',
+    selectedPlan: 'professional' as keyof typeof SUBSCRIPTION_PLANS,
     billingCycle: 'monthly',
     // Step 4: Preferences
-    regions: [],
+    regions: [] as string[],
     notifications: {
       email: true,
       sms: false,
       slack: false
-    },
-    integrations: []
+    } as Record<string, boolean>,
+    integrations: [] as string[]
   });
 
   const createTenantMutation = useMutation({
     mutationFn: async (tenantData: any) => {
       // Transform form data to match backend schema
+      const baseSlug = tenantData.companyName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      const timestamp = Date.now().toString().slice(-6); // Last 6 digits of timestamp for uniqueness
+      
       const payload = {
         name: tenantData.companyName,
-        slug: tenantData.companyName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+        slug: `${baseSlug}-${timestamp}`,
         industry: tenantData.industry || 'Medical Technology',
         description: tenantData.description,
         website: tenantData.website,
@@ -136,9 +139,15 @@ export default function TenantOnboarding() {
     },
     onError: (error) => {
       console.error('[TENANT-ONBOARDING] Error:', error);
+      let errorMessage = error.message || "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.";
+      
+      if (error.message?.includes('Slug bereits vergeben') || error.message?.includes('Slug already exists')) {
+        errorMessage = "Dieser Unternehmensname ist bereits registriert. Bitte wählen Sie einen anderen Namen oder kontaktieren Sie den Support.";
+      }
+      
       toast({
         title: "Fehler beim Erstellen",
-        description: error.message || "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+        description: errorMessage,
         variant: "destructive"
       });
     }
@@ -583,7 +592,7 @@ export default function TenantOnboarding() {
                         </div>
                         <div className="flex justify-between">
                           <span>Plan:</span>
-                          <span className="font-medium">{SUBSCRIPTION_PLANS[formData.selectedPlan]?.name}</span>
+                          <span className="font-medium">{SUBSCRIPTION_PLANS[formData.selectedPlan as keyof typeof SUBSCRIPTION_PLANS]?.name}</span>
                         </div>
                         <div className="flex justify-between">
                           <span>Regionen:</span>
