@@ -137,14 +137,13 @@ router.get('/data-sources/:sourceId/credentials',
 );
 
 // TENANT MANAGEMENT ROUTES
-import { z } from 'zod';
 
 // Validation schema für Tenant-Erstellung
 const createTenantSchema = z.object({
   name: z.string().min(1, 'Firmenname ist erforderlich'),
   slug: z.string().min(1, 'Slug ist erforderlich'),
   subscriptionPlan: z.enum(['starter', 'professional', 'enterprise']),
-  subscriptionStatus: z.enum(['trial', 'active', 'expired', 'cancelled']),
+  subscriptionStatus: z.enum(['trial', 'active', 'cancelled', 'suspended']),
   billingEmail: z.string().email('Gültige E-Mail-Adresse erforderlich'),
   contactName: z.string().min(1, 'Kontaktname ist erforderlich'),
   contactEmail: z.string().email('Gültige Kontakt-E-Mail erforderlich'),
@@ -180,7 +179,7 @@ router.post('/tenants', async (req: Request, res: Response) => {
 
     console.log('[ADMIN] Tenant created successfully:', newTenant.id);
     
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       data: newTenant,
       message: 'Tenant erfolgreich erstellt'
@@ -197,7 +196,7 @@ router.post('/tenants', async (req: Request, res: Response) => {
       });
     }
     
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message || 'Fehler beim Erstellen des Tenants',
       timestamp: new Date().toISOString()
@@ -233,10 +232,10 @@ router.get('/tenants', async (req: Request, res: Response) => {
     
     console.log('[ADMIN] Fetched tenants for frontend:', result.length);
     
-    res.json(result);
+    return res.json(result);
   } catch (error: any) {
     console.error('[ADMIN] Error fetching tenants:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message || 'Fehler beim Laden der Tenants'
     });
@@ -251,28 +250,65 @@ router.put('/tenants/:id', async (req: Request, res: Response) => {
     
     console.log('[ADMIN] Updating tenant:', id, updateData);
     
-    const { db } = await import('../db');
-    const { tenants } = await import('../../shared/schema');
-    const { eq } = await import('drizzle-orm');
+    // Use direct SQL query for better compatibility
+    const { neon } = await import('@neondatabase/serverless');
+    const sql = neon(process.env.DATABASE_URL!);
     
-    // Build update object for Drizzle
-    const updateFields: any = {};
+    // Build SQL update statement
+    const updates: string[] = [];
+    const values: any[] = [];
+    let paramIndex = 1;
     
-    if (updateData.name) updateFields.name = updateData.name;
-    if (updateData.subscriptionPlan) updateFields.subscriptionPlan = updateData.subscriptionPlan;
-    if (updateData.subscriptionStatus) updateFields.subscriptionStatus = updateData.subscriptionStatus;
-    if (updateData.billingEmail) updateFields.billingEmail = updateData.billingEmail;
-    if (updateData.maxUsers !== undefined) updateFields.maxUsers = updateData.maxUsers;
-    if (updateData.maxDataSources !== undefined) updateFields.maxDataSources = updateData.maxDataSources;
-    if (updateData.apiAccessEnabled !== undefined) updateFields.apiAccessEnabled = updateData.apiAccessEnabled;
-    if (updateData.customBrandingEnabled !== undefined) updateFields.customBrandingEnabled = updateData.customBrandingEnabled;
+    if (updateData.name) {
+      updates.push(`name = $${paramIndex++}`);
+      values.push(updateData.name);
+    }
+    if (updateData.subscriptionPlan) {
+      updates.push(`subscription_plan = $${paramIndex++}`);
+      values.push(updateData.subscriptionPlan);
+    }
+    if (updateData.subscriptionStatus) {
+      updates.push(`subscription_status = $${paramIndex++}`);
+      values.push(updateData.subscriptionStatus);
+    }
+    if (updateData.billingEmail) {
+      updates.push(`billing_email = $${paramIndex++}`);
+      values.push(updateData.billingEmail);
+    }
+    if (updateData.maxUsers !== undefined) {
+      updates.push(`max_users = $${paramIndex++}`);
+      values.push(updateData.maxUsers);
+    }
+    if (updateData.maxDataSources !== undefined) {
+      updates.push(`max_data_sources = $${paramIndex++}`);
+      values.push(updateData.maxDataSources);
+    }
+    if (updateData.apiAccessEnabled !== undefined) {
+      updates.push(`api_access_enabled = $${paramIndex++}`);
+      values.push(updateData.apiAccessEnabled);
+    }
+    if (updateData.customBrandingEnabled !== undefined) {
+      updates.push(`custom_branding_enabled = $${paramIndex++}`);
+      values.push(updateData.customBrandingEnabled);
+    }
     
-    updateFields.updatedAt = new Date();
+    if (updates.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Keine Daten zum Aktualisieren'
+      });
+    }
     
-    const result = await db.update(tenants)
-      .set(updateFields)
-      .where(eq(tenants.id, id))
-      .returning();
+    updates.push(`updated_at = $${paramIndex++}`);
+    values.push(new Date());
+    values.push(id);
+    
+    const result = await sql`
+      UPDATE tenants 
+      SET ${sql(updates.join(', '))}
+      WHERE id = $${paramIndex}
+      RETURNING *
+    `;
     
     if (result.length === 0) {
       return res.status(404).json({
@@ -283,7 +319,7 @@ router.put('/tenants/:id', async (req: Request, res: Response) => {
     
     console.log('[ADMIN] Tenant updated successfully:', result[0].id);
     
-    res.json({
+    return res.json({
       success: true,
       data: result[0],
       message: 'Tenant erfolgreich aktualisiert'
@@ -291,7 +327,7 @@ router.put('/tenants/:id', async (req: Request, res: Response) => {
     
   } catch (error: any) {
     console.error('[ADMIN] Error updating tenant:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message || 'Fehler beim Aktualisieren des Tenants'
     });
@@ -305,13 +341,15 @@ router.delete('/tenants/:id', async (req: Request, res: Response) => {
     
     console.log('[ADMIN] Deleting tenant:', id);
     
-    const { db } = await import('../db');
-    const { tenants } = await import('../../shared/schema');
-    const { eq } = await import('drizzle-orm');
+    // Use direct SQL query for better compatibility
+    const { neon } = await import('@neondatabase/serverless');
+    const sql = neon(process.env.DATABASE_URL!);
     
-    const result = await db.delete(tenants)
-      .where(eq(tenants.id, id))
-      .returning();
+    const result = await sql`
+      DELETE FROM tenants 
+      WHERE id = ${id}
+      RETURNING id
+    `;
     
     if (result.length === 0) {
       return res.status(404).json({
@@ -322,14 +360,14 @@ router.delete('/tenants/:id', async (req: Request, res: Response) => {
     
     console.log('[ADMIN] Tenant deleted successfully:', id);
     
-    res.json({
+    return res.json({
       success: true,
       message: 'Tenant erfolgreich gelöscht'
     });
     
   } catch (error: any) {
     console.error('[ADMIN] Error deleting tenant:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message || 'Fehler beim Löschen des Tenants'
     });
