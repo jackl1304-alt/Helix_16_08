@@ -246,9 +246,17 @@ export default function EmailManagementNew() {
                             <div>
                               <h4 className="font-medium text-red-800">App-Passwort erforderlich</h4>
                               <p className="text-sm text-red-700 mt-1">
-                                Gmail benötigt ein App-Passwort für die 2-Faktor-Authentifizierung.
-                                Erstellen Sie ein App-Passwort in Ihren Google-Kontoeinstellungen.
+                                <strong>deltawayshelixinfo@gmail.com</strong> benötigt ein App-Passwort für die 2-Faktor-Authentifizierung.
                               </p>
+                              <div className="mt-2 text-sm text-red-700">
+                                <p><strong>Schritte:</strong></p>
+                                <ol className="list-decimal list-inside mt-1 space-y-1">
+                                  <li>Google-Konto → Sicherheit → 2-Faktor-Authentifizierung</li>
+                                  <li>App-Passwörter generieren</li>
+                                  <li>Neues App-Passwort für "Helix Email" erstellen</li>
+                                  <li>16-stelliges Passwort in Server-Konfiguration einsetzen</li>
+                                </ol>
+                              </div>
                             </div>
                           </div>
                         </div>

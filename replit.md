@@ -47,8 +47,9 @@ Preferred communication style: German language - Simple, everyday language.
 - **Drizzle ORM**
 
 ### Email Services
-- **SendGrid**
-- **Nodemailer**
+- **Gmail SMTP** (deltawayshelixinfo@gmail.com) - Requires App Password
+- **Nodemailer** for Gmail integration
+- **SendGrid** (optional fallback)
 
 ### AI Services
 - **Anthropic Claude**
