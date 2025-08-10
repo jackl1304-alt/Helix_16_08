@@ -411,7 +411,6 @@ export default function EmailManagementNew() {
                               E-Mail mit konfigurierten Daten senden
                             </Button>
                           </div>
-                          </div>
                         </div>
                       )}
                     </div>
