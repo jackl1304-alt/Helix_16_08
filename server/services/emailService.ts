@@ -174,6 +174,13 @@ class EmailService {
             <br>Sie haben nun Zugang zu unserer vollständigen Regulatory Intelligence Plattform.
           </div>
           
+          <div class="highlight">
+            <h3>🔐 Ihre Zugangsdaten:</h3>
+            <p><strong>Dashboard-URL:</strong> <a href="${loginUrl}">${loginUrl}</a></p>
+            <p><strong>Benutzername:</strong> Ihre E-Mail-Adresse</p>
+            <p><strong>Erstes Login:</strong> Nutzen Sie den "Passwort vergessen" Link für Ihr sicheres Passwort</p>
+          </div>
+          
           <h3>Was Sie jetzt tun können:</h3>
           <ul>
             <li>📊 Dashboard mit aktuellen regulatorischen Updates durchsuchen</li>
@@ -183,7 +190,7 @@ class EmailService {
             <li>📱 Mobile-optimierte Oberfläche nutzen</li>
           </ul>
           
-          <a href="${loginUrl}" class="button">Jetzt Dashboard öffnen →</a>
+          <a href="${loginUrl}" class="button">🚀 Jetzt Dashboard öffnen →</a>
           
           <h3>Benötigen Sie Hilfe?</h3>
           <p>Unser Support-Team steht Ihnen gerne zur Verfügung:</p>

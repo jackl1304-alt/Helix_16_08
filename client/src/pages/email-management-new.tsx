@@ -55,9 +55,10 @@ export default function EmailManagementNew() {
   const [testEmail, setTestEmail] = useState('');
   const [customerData, setCustomerData] = useState({
     customerName: 'Max Mustermann',
-    companyName: 'Beispiel GmbH',
+    companyName: 'Beispiel GmbH', 
     subscriptionPlan: 'Professional',
     dashboardUrl: 'https://helix-platform.com/dashboard',
+    loginUrl: 'https://max-mustermann.helix-platform.com/login',
     amount: '899',
     dueDate: '31.08.2025',
     invoiceUrl: 'https://helix-platform.com/invoice/123',
@@ -377,6 +378,14 @@ export default function EmailManagementNew() {
                                 size="sm"
                                 value={customerData.dashboardUrl}
                                 onChange={(e) => setCustomerData({...customerData, dashboardUrl: e.target.value})}
+                              />
+                            </div>
+                            <div>
+                              <label className="font-medium">Login URL:</label>
+                              <Input
+                                size="sm"
+                                value={customerData.loginUrl}
+                                onChange={(e) => setCustomerData({...customerData, loginUrl: e.target.value})}
                               />
                             </div>
                             <div>
