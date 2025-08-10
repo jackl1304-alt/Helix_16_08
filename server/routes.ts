@@ -5785,6 +5785,62 @@ Für vollständige Details und weitere Analysen besuchen Sie die ursprüngliche 
   app.get('/api/health', healthCheckHandler);
   app.get('/api/metrics', metricsHandler);
 
+  // Multi-Tenant SaaS Admin Routes - Added at end to avoid conflicts
+  app.get('/api/admin/tenants', async (req, res) => {
+    try {
+      const { TenantService } = await import('./services/tenantService');
+      const tenants = await TenantService.getAllTenants();
+      res.json(tenants);
+    } catch (error) {
+      console.error("Error fetching tenants:", error);
+      res.status(500).json({ error: "Failed to fetch tenants" });
+    }
+  });
+
+  app.post('/api/admin/tenants', async (req, res) => {
+    try {
+      const { TenantService } = await import('./services/tenantService');
+      const tenant = await TenantService.createTenant(req.body);
+      res.status(201).json(tenant);
+    } catch (error: any) {
+      console.error("Error creating tenant:", error);
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.put('/api/admin/tenants/:id', async (req, res) => {
+    try {
+      const { TenantService } = await import('./services/tenantService');
+      const tenant = await TenantService.updateTenant(req.params.id, req.body);
+      res.json(tenant);
+    } catch (error: any) {
+      console.error("Error updating tenant:", error);
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.delete('/api/admin/tenants/:id', async (req, res) => {
+    try {
+      const { TenantService } = await import('./services/tenantService');
+      await TenantService.deleteTenant(req.params.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error deleting tenant:", error);
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/admin/stats', async (req, res) => {
+    try {
+      const { TenantService } = await import('./services/tenantService');
+      const stats = await TenantService.getTenantStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching admin stats:", error);
+      res.status(500).json({ error: "Failed to fetch stats" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

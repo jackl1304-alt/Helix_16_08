@@ -47,6 +47,7 @@ const Phase3Advanced = lazy(() => import("@/pages/phase3-advanced"));
 const RealTimeIntegration = lazy(() => import("@/pages/real-time-integration"));
 
 const Administration = lazy(() => import("@/pages/administration"));
+const AdminCustomers = lazy(() => import("@/pages/admin-customers"));
 const GripData = lazy(() => import("@/pages/grip-data"));
 const NewsletterAdmin = lazy(() => import("@/pages/newsletter-admin"));
 const AdvancedAnalytics = lazy(() => import("@/pages/advanced-analytics"));
@@ -104,6 +105,7 @@ function Router() {
         <Route path="/real-time-integration" component={RealTimeIntegration} />
 
         <Route path="/administration" component={Administration} />
+        <Route path="/admin-customers" component={AdminCustomers} />
         <Route path="/grip-data" component={GripData} />
         <Route path="/newsletter-admin" component={NewsletterAdmin} />
         <Route path="/advanced-analytics" component={AdvancedAnalytics} />

@@ -22,7 +22,8 @@ import {
   ChevronRight,
   Mail,
   Bot,
-  Sparkles
+  Sparkles,
+  Building
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoPath from "@assets/ICON Helix_1753735921077.jpg";
@@ -91,6 +92,7 @@ const navigationStructure: Record<string, NavigationSection> = {
       { name: "Globale Quellen", href: "/global-sources", icon: Globe },
       { name: "Newsletter Manager", href: "/newsletter-manager", icon: Newspaper },
       { name: "Historische Daten", href: "/historical-data", icon: Archive },
+      { name: "Kunden-Management", href: "/admin-customers", icon: Building },
       { name: "Benutzerverwaltung", href: "/user-management", icon: Users },
       { name: "System-Verwaltung", href: "/administration", icon: Settings },
       { name: "Audit-Protokolle", href: "/audit-logs", icon: FileSearch },
