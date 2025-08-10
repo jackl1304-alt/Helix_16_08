@@ -5841,6 +5841,67 @@ Für vollständige Details und weitere Analysen besuchen Sie die ursprüngliche 
     }
   });
 
+  // Customer Self-Administration Routes
+  app.get('/api/customer/dashboard/:tenantId', async (req, res) => {
+    try {
+      const { TenantService } = await import('./services/tenantService');
+      const dashboard = await TenantService.getCustomerDashboard(req.params.tenantId);
+      res.json(dashboard);
+    } catch (error: any) {
+      console.error("Error fetching customer dashboard:", error);
+      res.status(404).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/customer/subscription/:tenantId', async (req, res) => {
+    try {
+      const { TenantService } = await import('./services/tenantService');
+      const subscription = await TenantService.getTenantSubscription(req.params.tenantId);
+      res.json(subscription);
+    } catch (error: any) {
+      console.error("Error fetching subscription:", error);
+      res.status(404).json({ error: error.message });
+    }
+  });
+
+  app.put('/api/customer/settings/:tenantId', async (req, res) => {
+    try {
+      const { TenantService } = await import('./services/tenantService');
+      const settings = await TenantService.updateTenantSettings(req.params.tenantId, req.body);
+      res.json(settings);
+    } catch (error: any) {
+      console.error("Error updating tenant settings:", error);
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/customer/usage/:tenantId', async (req, res) => {
+    try {
+      const { TenantService } = await import('./services/tenantService');
+      const usage = await TenantService.getTenantUsage(req.params.tenantId);
+      res.json(usage);
+    } catch (error: any) {
+      console.error("Error fetching tenant usage:", error);
+      res.status(404).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/customer/data/:tenantId', async (req, res) => {
+    try {
+      const { TenantService } = await import('./services/tenantService');
+      const { region, category, limit } = req.query;
+      const data = await TenantService.getTenantFilteredData(req.params.tenantId, {
+        region: region as string,
+        category: category as string,
+        limit: parseInt(limit as string || '100')
+      });
+      res.json(data);
+    } catch (error: any) {
+      console.error("Error fetching tenant data:", error);
+      res.status(400).json({ error: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -51,6 +51,9 @@ const AdminCustomers = lazy(() => import("@/pages/admin-customers"));
 const GripData = lazy(() => import("@/pages/grip-data"));
 const NewsletterAdmin = lazy(() => import("@/pages/newsletter-admin"));
 const AdvancedAnalytics = lazy(() => import("@/pages/advanced-analytics"));
+const CustomerDashboard = lazy(() => import("@/pages/customer-dashboard"));
+const CustomerSettings = lazy(() => import("@/pages/customer-settings"));
+const TenantOnboarding = lazy(() => import("@/pages/tenant-onboarding"));
 const RegulatoryUpdateDetail = lazy(() => import("@/pages/regulatory-update-detail-new"));
 const RechtsprechungFixed = lazy(() => import("@/pages/rechtsprechung-fixed"));
 const TerminologyGlossary = lazy(() => import("@/pages/terminology-glossary"));
@@ -109,6 +112,9 @@ function Router() {
         <Route path="/grip-data" component={GripData} />
         <Route path="/newsletter-admin" component={NewsletterAdmin} />
         <Route path="/advanced-analytics" component={AdvancedAnalytics} />
+        <Route path="/customer-dashboard" component={CustomerDashboard} />
+        <Route path="/customer-settings" component={CustomerSettings} />
+        <Route path="/tenant-onboarding" component={TenantOnboarding} />
         <Route path="/documents/:sourceType/:documentId" component={DocumentViewer} />
         
         {/* Fallback to 404 */}
