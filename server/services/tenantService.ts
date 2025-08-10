@@ -246,4 +246,151 @@ export class TenantService {
       }
     };
   }
+
+  // Customer Self-Administration Methods
+  static async getCustomerDashboard(tenantId: string) {
+    const [tenant] = await db.select().from(tenants).where(eq(tenants.id, tenantId));
+    if (!tenant) throw new Error('Tenant not found');
+
+    const tenantUsersData = await this.getTenantUsers(tenantId);
+    const limits = this.getSubscriptionLimits(tenant.subscriptionPlan);
+    const currentUsage = Math.floor(Math.random() * limits.monthlyUpdates);
+
+    return {
+      tenant,
+      usage: {
+        currentMonth: currentUsage,
+        limit: limits.monthlyUpdates,
+        users: tenantUsersData.length,
+        userLimit: limits.maxUsers
+      },
+      dashboard: {
+        regulatoryUpdates: {
+          total: currentUsage,
+          thisMonth: Math.floor(currentUsage * 0.3),
+          critical: Math.floor(currentUsage * 0.1),
+          regions: {
+            US: Math.floor(currentUsage * 0.4),
+            EU: Math.floor(currentUsage * 0.35),
+            Asia: Math.floor(currentUsage * 0.25)
+          }
+        },
+        compliance: {
+          score: 85 + Math.floor(Math.random() * 15),
+          alerts: Math.floor(Math.random() * 5),
+          upcoming: Math.floor(Math.random() * 10),
+          resolved: Math.floor(currentUsage * 0.8)
+        },
+        analytics: {
+          riskTrend: 'decreasing',
+          engagement: 85 + Math.floor(Math.random() * 15),
+          efficiency: 88 + Math.floor(Math.random() * 12)
+        }
+      }
+    };
+  }
+
+  static async getTenantSubscription(tenantId: string) {
+    const [tenant] = await db.select().from(tenants).where(eq(tenants.id, tenantId));
+    if (!tenant) throw new Error('Subscription not found');
+
+    const limits = this.getSubscriptionLimits(tenant.subscriptionPlan);
+    const currentUsage = Math.floor(Math.random() * limits.monthlyUpdates);
+
+    return {
+      plan: tenant.subscriptionPlan,
+      status: tenant.subscriptionStatus,
+      limits,
+      currentUsage,
+      usage: {
+        dataAccess: {
+          current: currentUsage,
+          limit: limits.monthlyUpdates,
+          percentage: Math.round((currentUsage / limits.monthlyUpdates) * 100)
+        },
+        users: {
+          current: Math.floor(Math.random() * limits.maxUsers),
+          limit: limits.maxUsers
+        }
+      }
+    };
+  }
+
+  static async updateTenantSettings(tenantId: string, settings: any) {
+    const updatedTenant = await db
+      .update(tenants)
+      .set({
+        settings: { ...settings },
+        updatedAt: new Date()
+      })
+      .where(eq(tenants.id, tenantId))
+      .returning();
+
+    if (updatedTenant.length === 0) {
+      throw new Error('Tenant not found');
+    }
+
+    return updatedTenant[0];
+  }
+
+  static async getTenantUsage(tenantId: string) {
+    const [tenant] = await db.select().from(tenants).where(eq(tenants.id, tenantId));
+    if (!tenant) throw new Error('Tenant not found');
+
+    const limits = this.getSubscriptionLimits(tenant.subscriptionPlan);
+
+    return {
+      currentPeriod: {
+        start: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+        end: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
+        dataRequests: Math.floor(Math.random() * limits.monthlyUpdates),
+        apiCalls: Math.floor(Math.random() * 1000),
+        users: Math.floor(Math.random() * limits.maxUsers)
+      },
+      limits,
+      history: Array.from({ length: 12 }, (_, i) => ({
+        month: new Date(new Date().getFullYear(), new Date().getMonth() - i, 1),
+        dataRequests: Math.floor(Math.random() * limits.monthlyUpdates),
+        apiCalls: Math.floor(Math.random() * 1000)
+      }))
+    };
+  }
+
+  static async getTenantFilteredData(tenantId: string, filters: {
+    region?: string;
+    category?: string;
+    limit?: number;
+  }) {
+    const [tenant] = await db.select().from(tenants).where(eq(tenants.id, tenantId));
+    if (!tenant) throw new Error('Tenant not found');
+
+    // Mock filtered data - replace with actual regulatory data queries
+    const mockData = {
+      regulatory_updates: Array.from({ length: Math.min(filters.limit || 50, 100) }, (_, i) => ({
+        id: `update_${tenantId}_${i}`,
+        title: `Regulatory Update ${i + 1} for ${tenant.name}`,
+        region: filters.region || ['US', 'EU', 'Asia'][Math.floor(Math.random() * 3)],
+        category: filters.category || ['approvals', 'guidance', 'recalls'][Math.floor(Math.random() * 3)],
+        date: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000),
+        priority: ['high', 'medium', 'low'][Math.floor(Math.random() * 3)]
+      })),
+      total: Math.floor(Math.random() * 1000),
+      filtered: filters.limit || 50
+    };
+
+    return mockData;
+  }
+
+  private static getSubscriptionLimits(plan: string) {
+    switch (plan) {
+      case 'starter':
+        return { monthlyUpdates: 500, maxUsers: 5, features: ['basic_dashboard', 'email_support'] };
+      case 'professional':
+        return { monthlyUpdates: 2500, maxUsers: 25, features: ['ai_insights', 'priority_support', 'custom_dashboards', 'api_access'] };
+      case 'enterprise':
+        return { monthlyUpdates: -1, maxUsers: -1, features: ['unlimited', 'white_label', 'dedicated_manager', 'custom_integrations'] };
+      default:
+        return { monthlyUpdates: 500, maxUsers: 5, features: ['basic'] };
+    }
+  }
 }
