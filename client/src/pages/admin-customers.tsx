@@ -43,69 +43,17 @@ export default function AdminCustomers() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [planFilter, setPlanFilter] = useState('all');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [editingTenant, setEditingTenant] = useState(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const editTenant = (tenant) => {
+    setEditingTenant(tenant);
+    setIsEditDialogOpen(true);
+  };
 
   // Fetch tenants/customers
   const { data: customers, isLoading } = useQuery({
-    queryKey: ['/api/admin/tenants'],
-    queryFn: async () => {
-      // In production: await fetch('/api/admin/tenants')
-      return [
-        {
-          id: 'tenant_001',
-          name: 'MedTech Solutions GmbH',
-          slug: 'medtech-solutions',
-          contactEmail: 'admin@medtech-solutions.com',
-          contactName: 'Dr. Sarah Weber',
-          subscriptionPlan: 'professional',
-          subscriptionStatus: 'active',
-          createdAt: new Date('2024-01-15'),
-          lastLogin: new Date('2025-08-09'),
-          userCount: 12,
-          monthlyUsage: 1247,
-          monthlyLimit: 2500,
-          revenue: 899,
-          industry: 'Medizintechnik',
-          companySize: '51-200',
-          regions: ['US', 'EU']
-        },
-        {
-          id: 'tenant_002',
-          name: 'BioPharm Analytics Inc.',
-          slug: 'biopharm-analytics',
-          contactEmail: 'contact@biopharm-analytics.com',
-          contactName: 'Michael Johnson',
-          subscriptionPlan: 'enterprise',
-          subscriptionStatus: 'active',
-          createdAt: new Date('2024-03-22'),
-          lastLogin: new Date('2025-08-10'),
-          userCount: 45,
-          monthlyUsage: 8950,
-          monthlyLimit: -1,
-          revenue: 2499,
-          industry: 'Pharma',
-          companySize: '201-1000',
-          regions: ['US', 'EU', 'Asia']
-        },
-        {
-          id: 'tenant_003',
-          name: 'RegTech Startup',
-          slug: 'regtech-startup',
-          contactEmail: 'founders@regtech-startup.io',
-          contactName: 'Alex Chen',
-          subscriptionPlan: 'starter',
-          subscriptionStatus: 'trial',
-          createdAt: new Date('2025-07-28'),
-          lastLogin: new Date('2025-08-08'),
-          userCount: 3,
-          monthlyUsage: 156,
-          monthlyLimit: 500,
-          revenue: 0,
-          industry: 'Regulatory Consulting',
-          companySize: '1-10',
-          regions: ['US']
-        }
-      ];
-    }
+    queryKey: ['/api/admin/tenants']
   });
 
   // Fetch admin statistics
@@ -230,15 +178,15 @@ export default function AdminCustomers() {
               <div className="text-sm text-muted-foreground space-y-1">
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4" />
-                  {customer.contactEmail}
+                  {customer.billingEmail || customer.contactEmail || 'Keine E-Mail'}
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="w-4 h-4" />
-                  {customer.userCount} Benutzer
+                  {customer.maxUsers || 0} Max. Benutzer
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  Erstellt: {customer.createdAt.toLocaleDateString('de-DE')}
+                  Erstellt: {new Date(customer.createdAt).toLocaleDateString('de-DE')}
                 </div>
               </div>
             </div>
@@ -246,18 +194,18 @@ export default function AdminCustomers() {
 
           <div className="text-right">
             <div className="text-2xl font-bold text-green-600 mb-1">
-              €{customer.revenue.toLocaleString()}<span className="text-sm text-muted-foreground">/Monat</span>
+              {customer.subscriptionPlan === 'enterprise' ? '€2,499' : 
+               customer.subscriptionPlan === 'professional' ? '€899' : '€199'}
+              <span className="text-sm text-muted-foreground">/Monat</span>
             </div>
             <div className="text-sm text-muted-foreground mb-4">
-              {customer.monthlyUsage.toLocaleString()} / {
-                customer.monthlyLimit === -1 ? '∞' : customer.monthlyLimit.toLocaleString()
-              } Updates
+              {customer.maxDataSources} Datenquellen / {customer.maxUsers} Max. Benutzer
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm">
                 <Eye className="w-4 h-4" />
               </Button>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => editTenant(customer)}>
                 <Edit className="w-4 h-4" />
               </Button>
               <Button variant="outline" size="sm">
@@ -271,16 +219,16 @@ export default function AdminCustomers() {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-lg font-semibold">{customer.userCount}</div>
-            <div className="text-xs text-muted-foreground">Benutzer</div>
+            <div className="text-lg font-semibold">{customer.maxUsers}</div>
+            <div className="text-xs text-muted-foreground">Max. Benutzer</div>
           </div>
           <div className="text-center">
-            <div className="text-lg font-semibold">{Math.round((customer.monthlyUsage / (customer.monthlyLimit || 1)) * 100)}%</div>
-            <div className="text-xs text-muted-foreground">Auslastung</div>
+            <div className="text-lg font-semibold">{customer.maxDataSources}</div>
+            <div className="text-xs text-muted-foreground">Datenquellen</div>
           </div>
           <div className="text-center">
-            <div className="text-lg font-semibold">{customer.regions.length}</div>
-            <div className="text-xs text-muted-foreground">Regionen</div>
+            <div className="text-lg font-semibold">{customer.apiAccessEnabled ? 'Ja' : 'Nein'}</div>
+            <div className="text-xs text-muted-foreground">API-Zugang</div>
           </div>
           <div className="text-center">
             <div className="text-lg font-semibold">
