@@ -91,13 +91,40 @@ export default function TenantOnboarding() {
 
   const createTenantMutation = useMutation({
     mutationFn: async (tenantData: any) => {
-      // In production: await apiRequest('/api/admin/tenants', 'POST', tenantData)
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      return { 
-        id: 'tenant_' + Math.random().toString(36).substr(2, 9), 
+      // Transform form data to match backend schema
+      const payload = {
+        name: tenantData.companyName,
         slug: tenantData.companyName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
-        ...tenantData 
+        industry: tenantData.industry || 'Medical Technology',
+        description: tenantData.description,
+        website: tenantData.website,
+        subscriptionPlan: tenantData.selectedPlan || 'professional',
+        subscriptionStatus: 'trial',
+        billingEmail: tenantData.contactEmail,
+        contactName: tenantData.contactName,
+        contactEmail: tenantData.contactEmail,
+        maxUsers: tenantData.selectedPlan === 'starter' ? 5 : 
+                 tenantData.selectedPlan === 'professional' ? 25 : 999999,
+        maxDataSources: tenantData.selectedPlan === 'starter' ? 10 : 
+                       tenantData.selectedPlan === 'professional' ? 50 : 999999,
+        apiAccessEnabled: tenantData.selectedPlan !== 'starter',
+        customBrandingEnabled: tenantData.selectedPlan === 'enterprise'
       };
+
+      const response = await fetch('/api/admin/tenants', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to create tenant');
+      }
+
+      return await response.json();
     },
     onSuccess: (data) => {
       toast({

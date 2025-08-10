@@ -132,9 +132,23 @@ export default function AdminCustomers() {
   // Create tenant mutation
   const createTenantMutation = useMutation({
     mutationFn: async (tenantData: any) => {
-      // In production: await apiRequest('/api/admin/tenants', 'POST', tenantData)
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return { id: 'tenant_' + Math.random().toString(36).substr(2, 9), ...tenantData };
+      // Transform data to match backend schema  
+      const payload = {
+        name: tenantData.companyName,
+        slug: tenantData.companyName?.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || '',
+        industry: tenantData.industry || 'Medical Technology',
+        subscriptionPlan: tenantData.subscriptionPlan || 'professional',
+        subscriptionStatus: 'trial',
+        billingEmail: tenantData.contactEmail,
+        contactName: tenantData.contactName,
+        contactEmail: tenantData.contactEmail,
+        maxUsers: tenantData.subscriptionPlan === 'starter' ? 5 : 
+                 tenantData.subscriptionPlan === 'professional' ? 25 : 999999,
+        maxDataSources: 10,
+        apiAccessEnabled: tenantData.subscriptionPlan !== 'starter'
+      };
+
+      return await apiRequest('/api/admin/tenants', 'POST', payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/tenants'] });
