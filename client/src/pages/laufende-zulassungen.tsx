@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { 
   Clock, Plus, Search, Calendar, AlertCircle, CheckCircle, 
   FileText, Building2, Globe, Zap, Users, Flag, Edit, Trash2,
-  TrendingUp, DollarSign, Target, BarChart3
+  TrendingUp, DollarSign, Target, BarChart3, Shield, Scale
 } from 'lucide-react';
 
 interface OngoingApproval {
