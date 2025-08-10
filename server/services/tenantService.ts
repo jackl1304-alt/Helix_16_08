@@ -267,8 +267,8 @@ export class TenantService {
     return {
       users: {
         current: users.length,
-        max: tenant.maxUsers,
-        available: tenant.maxUsers - users.length
+        max: tenant.maxUsers || 0,
+        available: (tenant.maxUsers || 0) - users.length
       },
       dataAccess: {
         currentUsage: dataAccess?.currentUsage || 0,

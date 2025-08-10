@@ -47,6 +47,14 @@ router.post('/data-sources/:sourceId/credentials',
     const { sourceId } = req.params;
     const credentials = req.body;
     
+    if (!sourceId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Datenquellen-ID ist erforderlich',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
     logger.info('API: Saving credentials for data source', { sourceId });
     
     // In production, encrypt and store in database
@@ -54,7 +62,7 @@ router.post('/data-sources/:sourceId/credentials',
     
     logger.info('API: Credentials saved successfully', { sourceId });
     
-    res.json({
+    return res.json({
       success: true,
       message: 'Zugangsdaten erfolgreich gespeichert',
       timestamp: new Date().toISOString()
@@ -67,6 +75,14 @@ router.post('/data-sources/:sourceId/test',
   validateParams(sourceIdSchema),
   asyncHandler(async (req: Request, res: Response) => {
     const { sourceId } = req.params;
+    
+    if (!sourceId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Datenquellen-ID ist erforderlich',
+        timestamp: new Date().toISOString()
+      });
+    }
     
     logger.info('API: Testing connection for data source', { sourceId });
     
@@ -85,14 +101,14 @@ router.post('/data-sources/:sourceId/test',
     
     if (isSuccess) {
       logger.info('API: Connection test successful', { sourceId });
-      res.json({
+      return res.json({
         success: true,
         message: 'Verbindung erfolgreich getestet',
         timestamp: new Date().toISOString()
       });
     } else {
       logger.warn('API: Connection test failed', { sourceId });
-      res.status(400).json({
+      return res.status(400).json({
         success: false,
         error: 'Verbindungstest fehlgeschlagen - Überprüfen Sie die Zugangsdaten',
         timestamp: new Date().toISOString()
@@ -106,6 +122,14 @@ router.get('/data-sources/:sourceId/credentials',
   validateParams(sourceIdSchema),
   asyncHandler(async (req: Request, res: Response) => {
     const { sourceId } = req.params;
+    
+    if (!sourceId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Datenquellen-ID ist erforderlich',
+        timestamp: new Date().toISOString()
+      });
+    }
     
     logger.info('API: Fetching masked credentials for data source', { sourceId });
     
@@ -121,14 +145,17 @@ router.get('/data-sources/:sourceId/credentials',
     // Mask sensitive values
     const maskedCredentials: Record<string, string> = {};
     Object.keys(credentials).forEach(key => {
-      if (key.toLowerCase().includes('password') || key.toLowerCase().includes('secret') || key.toLowerCase().includes('key')) {
-        maskedCredentials[key] = '****' + credentials[key].slice(-4);
-      } else {
-        maskedCredentials[key] = credentials[key];
+      const value = credentials[key];
+      if (value && typeof value === 'string') {
+        if (key.toLowerCase().includes('password') || key.toLowerCase().includes('secret') || key.toLowerCase().includes('key')) {
+          maskedCredentials[key] = '****' + value.slice(-4);
+        } else {
+          maskedCredentials[key] = value;
+        }
       }
     });
     
-    res.json({
+    return res.json({
       success: true,
       data: maskedCredentials,
       timestamp: new Date().toISOString()
@@ -317,7 +344,7 @@ router.put('/tenants/:id', async (req: Request, res: Response) => {
       });
     }
     
-    console.log('[ADMIN] Tenant updated successfully:', result[0].id);
+    console.log('[ADMIN] Tenant updated successfully:', result[0]?.id);
     
     return res.json({
       success: true,
