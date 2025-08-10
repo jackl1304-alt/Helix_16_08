@@ -301,23 +301,53 @@ export default function LaufendeZulassungen() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-3">
-            <Clock className="w-8 h-8" />
-            Laufende Zulassungen
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            {filteredApprovals.length} von {approvals.length} aktiven Zulassungsprozessen
-          </p>
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+        <div className="flex items-start gap-4">
+          <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 via-teal-600 to-blue-700 rounded-2xl shadow-lg">
+            <Clock className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+              Laufende Zulassungen
+            </h1>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <div className="px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <CheckCircle className="w-4 h-4" />
+                {filteredApprovals.length} Aktive Projekte
+              </div>
+              <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <TrendingUp className="w-4 h-4" />
+                Live Tracking
+              </div>
+              <div className="px-4 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <Target className="w-4 h-4" />
+                Meilenstein-Management
+              </div>
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              Vollständiges Projektmanagement für regulatorische Zulassungsprozesse
+            </p>
+          </div>
         </div>
         
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col items-end gap-4">
+          <div className="flex items-center gap-3">
+            <div className="text-right bg-gradient-to-r from-green-50 to-green-100 dark:from-green-800 dark:to-green-700 p-4 rounded-xl">
+              <div className="text-3xl font-bold text-green-600 dark:text-green-400">
+                {Math.round(approvals.reduce((sum, app) => sum + app.progressPercentage, 0) / approvals.length)}%
+              </div>
+              <div className="text-sm text-green-600 dark:text-green-400 font-medium">Ø Fortschritt</div>
+            </div>
+            <div className="text-right bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-4 rounded-xl">
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{approvals.length}</div>
+              <div className="text-sm text-blue-600 dark:text-blue-400 font-medium">Gesamt Projekte</div>
+            </div>
+          </div>
           <Dialog open={isCreating} onOpenChange={setIsCreating}>
             <DialogTrigger asChild>
-              <Button className="flex items-center gap-2">
+              <Button className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white shadow-lg px-6 py-3 flex items-center gap-2">
                 <Plus className="w-4 h-4" />
-                Neue Zulassung
+                Neue Zulassung starten
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">

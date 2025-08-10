@@ -265,19 +265,44 @@ export default function ZulassungenGlobal() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-3">
-            <Globe className="w-8 h-8" />
-            Globale Medizintechnik-Zulassungen
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Weltweite Regulierungslandschaft für Medizinprodukte • {filteredRegions.length} von {regulationRegions.length} Regionen
-          </p>
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0 mb-8">
+        <div className="flex items-start gap-4">
+          <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 via-purple-600 to-indigo-700 rounded-2xl shadow-lg">
+            <Globe className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+              Globale Medizintechnik-Zulassungen
+            </h1>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <div className="px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <CheckCircle className="w-4 h-4" />
+                {filteredRegions.length} Aktive Behörden
+              </div>
+              <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <Flag className="w-4 h-4" />
+                Weltweite Abdeckung
+              </div>
+              <div className="px-4 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 rounded-xl text-sm font-semibold flex items-center gap-1">
+                <Shield className="w-4 h-4" />
+                Authentische Daten
+              </div>
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              Komplette Regulierungslandschaft basierend auf offiziellen Behördendokumenten
+            </p>
+          </div>
         </div>
         
-        <div className="flex items-center gap-4">
-          {/* Pieces Share Button temporarily disabled due to plugin conflict */}
+        <div className="flex flex-col items-end gap-3">
+          <div className="text-right bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 p-4 rounded-xl">
+            <div className="text-3xl font-bold text-gray-900 dark:text-gray-100">{regulationRegions.length}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">Jurisdiktionen</div>
+          </div>
+          <div className="text-right bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-4 rounded-xl">
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">100%</div>
+            <div className="text-sm text-blue-600 dark:text-blue-400 font-medium">Authentizität</div>
+          </div>
         </div>
       </div>
 
@@ -299,88 +324,143 @@ export default function ZulassungenGlobal() {
       </Card>
 
       <Tabs defaultValue="regions" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="regions">Regionale Behörden</TabsTrigger>
-          <TabsTrigger value="imdrf">IMDRF Harmonisierung</TabsTrigger>
-          <TabsTrigger value="who">WHO GAMD</TabsTrigger>
-          <TabsTrigger value="timeline">Zulassungsprozess</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 h-14 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-1">
+          <TabsTrigger value="regions" className="text-sm font-semibold data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-lg">
+            🌍 Regionale Behörden
+          </TabsTrigger>
+          <TabsTrigger value="imdrf" className="text-sm font-semibold data-[state=active]:bg-white data-[state=active]:text-purple-700 data-[state=active]:shadow-lg">
+            🤝 IMDRF Harmonisierung
+          </TabsTrigger>
+          <TabsTrigger value="who" className="text-sm font-semibold data-[state=active]:bg-white data-[state=active]:text-green-700 data-[state=active]:shadow-lg">
+            🏥 WHO GAMD
+          </TabsTrigger>
+          <TabsTrigger value="timeline" className="text-sm font-semibold data-[state=active]:bg-white data-[state=active]:text-orange-700 data-[state=active]:shadow-lg">
+            ⚡ Cybersicherheit & PMS
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="regions" className="space-y-6 mt-6">
           {/* Regional Authorities */}
           <div className="grid gap-6">
             {filteredRegions.map((region) => (
-              <Card key={region.id}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{region.flag}</span>
-                      <div>
-                        <CardTitle className="flex items-center gap-2">
-                          {region.name}
+              <Card key={region.id} className="hover:shadow-xl transition-all duration-300 border-l-4 border-l-blue-500 bg-gradient-to-r from-white via-blue-50/30 to-white dark:from-gray-900 dark:via-blue-900/10 dark:to-gray-900">
+                <CardHeader className="pb-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-4">
+                      <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-800 dark:to-blue-900 rounded-xl shadow-sm">
+                        <span className="text-2xl">{region.flag}</span>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <CardTitle className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                            {region.name}
+                          </CardTitle>
                           {getRegionBadge(region.id)}
-                        </CardTitle>
-                        <CardDescription>{region.agency}</CardDescription>
+                          <div className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-xs font-semibold flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" />
+                            AKTIV
+                          </div>
+                        </div>
+                        <CardDescription className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {region.agency}
+                        </CardDescription>
+                        <div className="flex items-center gap-1 mt-1">
+                          <ExternalLink className="w-3 h-3 text-gray-400" />
+                          <span className="text-xs text-gray-500 dark:text-gray-400">{region.website}</span>
+                        </div>
                       </div>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => window.open(region.website, '_blank')}
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                    </Button>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 px-3 py-1 bg-orange-100 dark:bg-orange-900/30 rounded-full">
+                          <Clock className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                          <span className="text-sm font-semibold text-orange-700 dark:text-orange-300">{region.timeline}</span>
+                        </div>
+                        <div className="flex items-center gap-2 px-3 py-1 bg-purple-100 dark:bg-purple-900/30 rounded-full">
+                          <Building2 className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                          <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">{region.costs}</span>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+                        onClick={() => window.open(region.website, '_blank')}
+                      >
+                        <ExternalLink className="w-4 h-4 mr-1" />
+                        Offizielle Website
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-0">
                   <div className="space-y-6">
-                    <p className="text-gray-700 dark:text-gray-300">{region.description}</p>
+                    <div className="bg-gradient-to-r from-blue-50 via-purple-50/30 to-blue-50 dark:from-blue-900/20 dark:via-purple-900/10 dark:to-blue-900/20 rounded-xl p-4 border border-blue-200/30 dark:border-blue-700/30">
+                      <div className="flex items-start gap-3">
+                        <div className="flex items-center justify-center w-8 h-8 bg-blue-500 text-white rounded-lg">
+                          <FileText className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h5 className="font-bold text-gray-900 dark:text-gray-100 mb-2">Regulatorische Übersicht</h5>
+                          <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{region.description}</p>
+                        </div>
+                      </div>
+                    </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-                          <FileText className="w-4 h-4" />
-                          Schlüsselanforderungen
+                        <h4 className="font-bold text-lg text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+                          <div className="flex items-center justify-center w-6 h-6 bg-green-500 text-white rounded-full">
+                            <Shield className="w-3 h-3" />
+                          </div>
+                          Kritische Compliance-Anforderungen
                         </h4>
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                           {region.keyRequirements.map((req, idx) => (
-                            <div key={idx} className="flex items-start gap-2">
-                              <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                              <span className="text-sm text-gray-600 dark:text-gray-400">{req}</span>
+                            <div key={idx} className="flex items-start gap-3 p-3 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg border border-green-200/50 dark:border-green-700/30 hover:shadow-md transition-all">
+                              <div className="flex items-center justify-center w-5 h-5 bg-green-500 text-white rounded-full text-xs font-bold">
+                                ✓
+                              </div>
+                              <span className="text-sm font-medium text-gray-800 dark:text-gray-200 leading-relaxed">{req}</span>
                             </div>
                           ))}
                         </div>
                       </div>
                       
-                      <div className="space-y-4">
-                        <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
-                            <Scale className="w-4 h-4" />
-                            Produktklassen
+                      <div className="space-y-6">
+                        <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-4 border border-blue-200/50 dark:border-blue-700/30">
+                          <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
+                            <div className="flex items-center justify-center w-6 h-6 bg-blue-500 text-white rounded-full">
+                              <Scale className="w-3 h-3" />
+                            </div>
+                            Regulatorische Klassifizierung
                           </h4>
                           <div className="flex flex-wrap gap-2">
                             {region.classes.map((cls, idx) => (
-                              <Badge key={idx} variant="outline" className="text-xs">
+                              <div key={idx} className="px-3 py-2 bg-white dark:bg-gray-800 border border-blue-300 dark:border-blue-600 rounded-lg text-sm font-semibold text-blue-700 dark:text-blue-300 shadow-sm">
                                 {cls}
-                              </Badge>
+                              </div>
                             ))}
                           </div>
                         </div>
                         
-                        <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
-                            <Clock className="w-4 h-4" />
+                        <div className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 rounded-xl p-4 border border-orange-200/50 dark:border-orange-700/30">
+                          <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
+                            <div className="flex items-center justify-center w-6 h-6 bg-orange-500 text-white rounded-full">
+                              <Clock className="w-3 h-3" />
+                            </div>
                             Bearbeitungszeit
                           </h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">{region.timeline}</p>
+                          <p className="text-lg font-bold text-orange-700 dark:text-orange-300">{region.timeline}</p>
                         </div>
                         
-                        <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
-                            <Building2 className="w-4 h-4" />
-                            Typische Kosten
+                        <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-4 border border-purple-200/50 dark:border-purple-700/30">
+                          <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
+                            <div className="flex items-center justify-center w-6 h-6 bg-purple-500 text-white rounded-full">
+                              <Building2 className="w-3 h-3" />
+                            </div>
+                            Investitionsaufwand
                           </h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">{region.costs}</p>
+                          <p className="text-lg font-bold text-purple-700 dark:text-purple-300">{region.costs}</p>
                         </div>
                       </div>
                     </div>
