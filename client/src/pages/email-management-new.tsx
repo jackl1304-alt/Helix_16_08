@@ -338,7 +338,7 @@ export default function EmailManagementNew() {
                         <Button 
                           size="sm"
                           onClick={() => handleSendTestEmail(template.id)}
-                          disabled={sendTestEmailMutation.isPending}
+                          disabled={!testEmail || sendTestEmailMutation.isPending}
                         >
                           {sendTestEmailMutation.isPending ? (
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -355,9 +355,9 @@ export default function EmailManagementNew() {
                             <div>
                               <label className="font-medium">Kunde:</label>
                               <Input
-                                size="sm"
                                 value={customerData.customerName}
                                 onChange={(e) => setCustomerData({...customerData, customerName: e.target.value})}
+                                className="text-sm"
                               />
                             </div>
                             <div>
@@ -375,27 +375,42 @@ export default function EmailManagementNew() {
                             <div>
                               <label className="font-medium">Dashboard URL:</label>
                               <Input
-                                size="sm"
                                 value={customerData.dashboardUrl}
                                 onChange={(e) => setCustomerData({...customerData, dashboardUrl: e.target.value})}
+                                className="text-sm"
                               />
                             </div>
                             <div>
                               <label className="font-medium">Login URL:</label>
                               <Input
-                                size="sm"
                                 value={customerData.loginUrl}
                                 onChange={(e) => setCustomerData({...customerData, loginUrl: e.target.value})}
+                                className="text-sm"
                               />
                             </div>
                             <div>
                               <label className="font-medium">Betrag:</label>
                               <Input
-                                size="sm"
                                 value={customerData.amount}
                                 onChange={(e) => setCustomerData({...customerData, amount: e.target.value})}
+                                className="text-sm"
                               />
                             </div>
+                          </div>
+                          <div className="mt-3">
+                            <Button
+                              onClick={() => handleSendTestEmail(template.id)}
+                              disabled={!testEmail || sendTestEmailMutation.isPending}
+                              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                              {sendTestEmailMutation.isPending ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                              ) : (
+                                <Send className="w-4 h-4 mr-2" />
+                              )}
+                              E-Mail mit konfigurierten Daten senden
+                            </Button>
+                          </div>
                           </div>
                         </div>
                       )}
