@@ -127,16 +127,18 @@ export default function TenantOnboarding() {
       return await response.json();
     },
     onSuccess: (data) => {
+      console.log('[TENANT-ONBOARDING] Success response:', data);
       toast({
         title: "Tenant erfolgreich erstellt!",
-        description: `Willkommen bei Helix! Ihr Tenant-ID: ${data.id}`,
+        description: `Willkommen bei Helix! Ihr Tenant-ID: ${data.data?.id || 'Unbekannt'}`,
       });
       setCurrentStep(5);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('[TENANT-ONBOARDING] Error:', error);
       toast({
         title: "Fehler beim Erstellen",
-        description: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+        description: error.message || "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
         variant: "destructive"
       });
     }
