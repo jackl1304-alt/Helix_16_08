@@ -3,370 +3,508 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
-  BarChart3,
-  Building2,
+  Building,
   Users,
-  Settings,
-  Bell,
   TrendingUp,
-  Shield,
-  CheckCircle,
   AlertTriangle,
-  Clock,
+  CheckCircle,
+  Activity,
+  BarChart3,
   Globe,
-  FileText,
-  Filter,
   Download,
-  Eye,
-  Star,
+  Settings,
+  Crown,
   Zap,
+  Shield,
+  FileText,
+  Calendar,
+  Clock,
   Target,
-  Activity
+  ArrowUp,
+  ArrowDown,
+  Minus
 } from "lucide-react";
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-// Mock tenant data for demo - In production, get from authentication context
+// Mock tenant data - In production, get from authentication context
 const mockTenant = {
   id: "tenant_abc123",
   name: "MedTech Solutions GmbH",
   slug: "medtech-solutions",
   subscriptionPlan: "professional" as const,
   subscriptionStatus: "active" as const,
-  settings: {
-    theme: "light",
-    language: "de",
-    notifications: true,
-    autoSync: true
-  },
-  limits: {
-    users: { current: 12, max: 25, available: 13 },
-    dataAccess: { currentUsage: 1247, monthlyLimit: 2500, remaining: 1253 },
-    features: { apiAccess: true, customBranding: true }
+  subscriptionExpiry: new Date("2025-12-31"),
+  currentPeriod: {
+    start: new Date("2025-08-01"),
+    end: new Date("2025-08-31")
   }
 };
 
-const SUBSCRIPTION_PLANS = {
-  starter: { name: 'Starter', price: '€299/Monat', color: 'bg-blue-100 text-blue-800', features: ['500 Updates/Monat', 'Basic Dashboard', 'Email Support'] },
-  professional: { name: 'Professional', price: '€899/Monat', color: 'bg-purple-100 text-purple-800', features: ['2.500 Updates/Monat', 'AI-Insights', 'Priority Support', 'Custom Dashboards'] },
-  enterprise: { name: 'Enterprise', price: '€2.499/Monat', color: 'bg-orange-100 text-orange-800', features: ['Unlimited Updates', 'Full AI-Analytics', 'White-label', 'API-Access', 'Dedicated Manager'] }
-};
+const usageData = [
+  { month: 'Jan', dataRequests: 1850, apiCalls: 420 },
+  { month: 'Feb', dataRequests: 2100, apiCalls: 380 },
+  { month: 'Mar', dataRequests: 1950, apiCalls: 450 },
+  { month: 'Apr', dataRequests: 2300, apiCalls: 520 },
+  { month: 'May', dataRequests: 2200, apiCalls: 480 },
+  { month: 'Jun', dataRequests: 2400, apiCalls: 550 },
+  { month: 'Jul', dataRequests: 2150, apiCalls: 490 },
+  { month: 'Aug', dataRequests: 1247, apiCalls: 312 }
+];
+
+const complianceData = [
+  { region: 'USA (FDA)', score: 95, alerts: 2, trend: 'up' },
+  { region: 'EU (EMA)', score: 88, alerts: 5, trend: 'stable' },
+  { region: 'Asia-Pacific', score: 92, alerts: 1, trend: 'up' }
+];
+
+const regionDistribution = [
+  { name: 'USA', value: 45, color: '#3B82F6' },
+  { name: 'Europa', value: 35, color: '#8B5CF6' },
+  { name: 'Asien', value: 20, color: '#10B981' }
+];
 
 export default function CustomerDashboard() {
-  const [activeRegion, setActiveRegion] = useState('all');
-  const [timeRange, setTimeRange] = useState('30d');
-
-  // Fetch customer-specific data based on tenant
+  const [selectedTimeRange, setSelectedTimeRange] = useState('30d');
+  
+  // Fetch customer dashboard data
   const { data: dashboardData, isLoading } = useQuery({
-    queryKey: ['/api/customer/dashboard', mockTenant.id],
+    queryKey: ['/api/customer/dashboard', mockTenant.id, selectedTimeRange],
     queryFn: async () => {
-      // In production: await fetch(`/api/customer/dashboard/${tenantId}`)
+      // In production: await fetch(`/api/customer/dashboard/${tenantId}?range=${selectedTimeRange}`)
       return {
-        regulatoryUpdates: {
-          total: 1247,
-          thisMonth: 89,
-          critical: 12,
-          regions: { US: 456, EU: 523, Asia: 268 }
+        usage: {
+          currentMonth: 1247,
+          limit: 2500,
+          percentage: 50,
+          users: 12,
+          userLimit: 25,
+          apiCalls: 312,
+          apiLimit: 1000
         },
-        compliance: {
-          score: 94,
-          alerts: 3,
-          upcoming: 7,
-          resolved: 156
-        },
-        analytics: {
-          riskTrend: 'decreasing',
-          engagement: 87,
-          efficiency: 92
+        dashboard: {
+          regulatoryUpdates: {
+            total: 1247,
+            thisMonth: 312,
+            critical: 23,
+            regions: {
+              US: 498,
+              EU: 436,
+              Asia: 313
+            }
+          },
+          compliance: {
+            score: 92,
+            alerts: 8,
+            upcoming: 15,
+            resolved: 156
+          },
+          analytics: {
+            riskTrend: 'decreasing',
+            engagement: 89,
+            efficiency: 94,
+            dataQuality: 98
+          }
         }
       };
     }
   });
 
-  const currentPlan = SUBSCRIPTION_PLANS[mockTenant.subscriptionPlan];
-  const usagePercentage = (mockTenant.limits.dataAccess.currentUsage / mockTenant.limits.dataAccess.monthlyLimit) * 100;
+  const StatCard = ({ title, value, change, changeType, icon: Icon, description, color = "blue" }: {
+    title: string;
+    value: string;
+    change?: string;
+    changeType?: 'increase' | 'decrease' | 'stable';
+    icon: any;
+    description?: string;
+    color?: string;
+  }) => {
+    const changeIcon = changeType === 'increase' ? <ArrowUp className="h-3 w-3" /> : 
+                      changeType === 'decrease' ? <ArrowDown className="h-3 w-3" /> : 
+                      <Minus className="h-3 w-3" />;
+    
+    const changeColor = changeType === 'increase' ? 'text-green-600' : 
+                       changeType === 'decrease' ? 'text-red-600' : 
+                       'text-gray-500';
 
-  const DashboardCard = ({ title, value, change, icon: Icon, color = "blue" }) => (
-    <Card className="hover:shadow-lg transition-all duration-200">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">{title}</p>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold">{value}</span>
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">{title}</p>
+              <div className="text-2xl font-bold">{value}</div>
               {change && (
-                <Badge variant="secondary" className={`text-xs ${change > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                  {change > 0 ? '+' : ''}{change}%
-                </Badge>
+                <p className={`text-xs ${changeColor} flex items-center gap-1 mt-1`}>
+                  {changeIcon}
+                  {change}
+                </p>
               )}
             </div>
+            <div className={`h-12 w-12 rounded-lg bg-${color}-100 dark:bg-${color}-900/20 flex items-center justify-center`}>
+              <Icon className={`h-6 w-6 text-${color}-600`} />
+            </div>
           </div>
-          <div className={`flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-${color}-500 to-${color}-600`}>
-            <Icon className="w-6 h-6 text-white" />
+          {description && (
+            <p className="text-xs text-muted-foreground mt-2">{description}</p>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const ComplianceCard = ({ region, score, alerts, trend }: {
+    region: string;
+    score: number;
+    alerts: number;
+    trend: 'up' | 'down' | 'stable';
+  }) => (
+    <Card className="hover:shadow-md transition-shadow">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="font-medium">{region}</h4>
+          <Badge className={trend === 'up' ? 'bg-green-100 text-green-800' : 
+                           trend === 'down' ? 'bg-red-100 text-red-800' : 
+                           'bg-blue-100 text-blue-800'}>
+            {trend === 'up' ? <TrendingUp className="w-3 h-3 mr-1" /> : 
+             trend === 'down' ? <ArrowDown className="w-3 h-3 mr-1" /> : 
+             <Minus className="w-3 h-3 mr-1" />}
+            {trend}
+          </Badge>
+        </div>
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm">
+            <span>Compliance Score</span>
+            <span className="font-medium">{score}%</span>
+          </div>
+          <Progress value={score} className="h-2" />
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>{alerts} aktive Warnungen</span>
+            <span>{score >= 90 ? 'Excellent' : score >= 80 ? 'Good' : 'Needs Attention'}</span>
           </div>
         </div>
       </CardContent>
     </Card>
   );
 
-  const RegionCard = ({ region, count, percentage }) => (
-    <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
-      <div className="flex items-center gap-3">
-        <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-        <span className="font-medium">{region}</span>
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-6 space-y-8 max-w-7xl">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-32 bg-gray-200 rounded"></div>
+            ))}
+          </div>
+        </div>
       </div>
-      <div className="text-right">
-        <div className="font-semibold">{count}</div>
-        <div className="text-xs text-muted-foreground">{percentage}%</div>
-      </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-8 max-w-7xl">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
-        <div className="flex items-start gap-4">
-          <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 via-purple-600 to-cyan-700 rounded-2xl shadow-lg text-white font-bold text-xl">
-            {mockTenant.name.charAt(0)}
-          </div>
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-              {mockTenant.name}
-            </h1>
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <Badge className={currentPlan.color}>
-                {currentPlan.name}
-              </Badge>
-              <Badge className="bg-green-100 text-green-800">
-                <CheckCircle className="w-3 h-3 mr-1" />
-                Aktiv
-              </Badge>
-              <div className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded-lg text-sm">
-                /{mockTenant.slug}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            Customer Dashboard
+          </h1>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 via-purple-600 to-cyan-700 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                {mockTenant.name.charAt(0)}
               </div>
+              <span className="font-medium">{mockTenant.name}</span>
             </div>
-            <p className="text-gray-600 dark:text-gray-300">
-              Ihr personalisiertes Regulatory Intelligence Dashboard
-            </p>
+            <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200">
+              <Crown className="w-3 h-3 mr-1" />
+              Professional Plan
+            </Badge>
+            <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200">
+              <CheckCircle className="w-3 h-3 mr-1" />
+              Active
+            </Badge>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-3">
+          <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7d">7 Tage</SelectItem>
+              <SelectItem value="30d">30 Tage</SelectItem>
+              <SelectItem value="90d">90 Tage</SelectItem>
+              <SelectItem value="12m">12 Monate</SelectItem>
+            </SelectContent>
+          </Select>
           <Button variant="outline">
-            <Settings className="mr-2 h-4 w-4" />
-            Einstellungen
-          </Button>
-          <Button>
-            <Download className="mr-2 h-4 w-4" />
+            <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
+          <Button>
+            <Settings className="w-4 h-4 mr-2" />
+            Einstellungen
+          </Button>
         </div>
       </div>
 
-      {/* Usage & Limits */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Activity className="h-5 w-5" />
-            Nutzung & Limits
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <div className="flex justify-between mb-2">
-                <span className="text-sm font-medium">Benutzer</span>
-                <span className="text-sm text-muted-foreground">
-                  {mockTenant.limits.users.current} / {mockTenant.limits.users.max}
-                </span>
-              </div>
-              <Progress value={(mockTenant.limits.users.current / mockTenant.limits.users.max) * 100} className="mb-2" />
-              <p className="text-xs text-muted-foreground">{mockTenant.limits.users.available} verfügbar</p>
-            </div>
-            
-            <div>
-              <div className="flex justify-between mb-2">
-                <span className="text-sm font-medium">Monatliche Updates</span>
-                <span className="text-sm text-muted-foreground">
-                  {mockTenant.limits.dataAccess.currentUsage.toLocaleString()} / {mockTenant.limits.dataAccess.monthlyLimit.toLocaleString()}
-                </span>
-              </div>
-              <Progress value={usagePercentage} className="mb-2" />
-              <p className="text-xs text-muted-foreground">
-                {mockTenant.limits.dataAccess.remaining.toLocaleString()} verbleibend
-              </p>
-            </div>
-            
-            <div className="space-y-2">
-              <span className="text-sm font-medium">Features</span>
-              <div className="flex flex-wrap gap-1">
-                <Badge variant={mockTenant.limits.features.apiAccess ? "default" : "secondary"} className="text-xs">
-                  API-Zugang
-                </Badge>
-                <Badge variant={mockTenant.limits.features.customBranding ? "default" : "secondary"} className="text-xs">
-                  Custom Branding
-                </Badge>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Filters */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Filter className="h-5 w-5" />
-              Dashboard-Filter
-            </CardTitle>
-            <div className="flex gap-2">
-              <Select value={activeRegion} onValueChange={setActiveRegion}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle Regionen</SelectItem>
-                  <SelectItem value="US">USA</SelectItem>
-                  <SelectItem value="EU">Europa</SelectItem>
-                  <SelectItem value="Asia">Asien</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={timeRange} onValueChange={setTimeRange}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="7d">7 Tage</SelectItem>
-                  <SelectItem value="30d">30 Tage</SelectItem>
-                  <SelectItem value="90d">90 Tage</SelectItem>
-                  <SelectItem value="12m">12 Monate</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
-
-      {/* Dashboard Metrics */}
+      {/* Key Metrics */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <DashboardCard
-          title="Regulatory Updates"
-          value={dashboardData?.regulatoryUpdates?.total.toLocaleString() || "0"}
-          change={8}
-          icon={FileText}
+        <StatCard
+          title="Monatliche Nutzung"
+          value={`${dashboardData?.usage.currentMonth.toLocaleString()} / ${dashboardData?.usage.limit.toLocaleString()}`}
+          change="+8.2%"
+          changeType="increase"
+          icon={Activity}
+          description={`${dashboardData?.usage.percentage}% vom Limit verbraucht`}
           color="blue"
         />
-        <DashboardCard
+        <StatCard
           title="Compliance Score"
-          value={`${dashboardData?.compliance?.score || 0}%`}
-          change={2}
+          value={`${dashboardData?.dashboard.compliance.score}%`}
+          change="+2.1%"
+          changeType="increase"
           icon={Shield}
+          description={`${dashboardData?.dashboard.compliance.alerts} aktive Warnungen`}
           color="green"
         />
-        <DashboardCard
-          title="Kritische Alerts"
-          value={dashboardData?.compliance?.alerts || "0"}
-          change={-15}
-          icon={AlertTriangle}
-          color="red"
-        />
-        <DashboardCard
-          title="Effizienz"
-          value={`${dashboardData?.analytics?.efficiency || 0}%`}
-          change={5}
-          icon={TrendingUp}
+        <StatCard
+          title="Aktive Benutzer"
+          value={`${dashboardData?.usage.users} / ${dashboardData?.usage.userLimit}`}
+          change="Stabil"
+          changeType="stable"
+          icon={Users}
+          description="Team-Nutzung im Rahmen"
           color="purple"
+        />
+        <StatCard
+          title="Data Quality"
+          value={`${dashboardData?.dashboard.analytics.dataQuality}%`}
+          change="+1.3%"
+          changeType="increase"
+          icon={Target}
+          description="Datenqualität hervorragend"
+          color="orange"
         />
       </div>
 
-      {/* Detailed Analytics */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+      {/* Usage Analytics */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5" />
-              Regionale Verteilung
+              Nutzungstrend
             </CardTitle>
+            <CardDescription>
+              Monatliche Datenabfragen und API-Calls
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {dashboardData?.regulatoryUpdates?.regions && Object.entries(dashboardData.regulatoryUpdates.regions).map(([region, count]) => {
-              const percentage = Math.round((count / dashboardData.regulatoryUpdates.total) * 100);
-              return (
-                <RegionCard
-                  key={region}
-                  region={region}
-                  count={count}
-                  percentage={percentage}
-                />
-              );
-            })}
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={usageData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="dataRequests" stroke="#3B82F6" strokeWidth={2} />
+                <Line type="monotone" dataKey="apiCalls" stroke="#8B5CF6" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5" />
-              Compliance Status
+              <Globe className="h-5 w-5" />
+              Regionale Verteilung
             </CardTitle>
+            <CardDescription>
+              Anteil der Updates nach Regionen
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Gesamt-Score</span>
-              <span className="text-lg font-bold text-green-600">
-                {dashboardData?.compliance?.score || 0}%
-              </span>
-            </div>
-            <Progress value={dashboardData?.compliance?.score || 0} className="mb-4" />
-            
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Aktive Alerts</span>
-                <span className="font-medium">{dashboardData?.compliance?.alerts || 0}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Anstehende Reviews</span>
-                <span className="font-medium">{dashboardData?.compliance?.upcoming || 0}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Erledigte Aufgaben</span>
-                <span className="font-medium">{dashboardData?.compliance?.resolved || 0}</span>
-              </div>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={regionDistribution}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={120}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {regionDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="flex justify-center gap-4 mt-4">
+              {regionDistribution.map((item, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded" style={{ backgroundColor: item.color }}></div>
+                  <span className="text-sm">{item.name}</span>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Custom Widgets Area */}
+      {/* Compliance Overview */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5" />
-            Ihre personalisierten Widgets
+            <Shield className="h-5 w-5" />
+            Compliance-Übersicht
           </CardTitle>
           <CardDescription>
-            Konfigurieren Sie Ihr Dashboard nach Ihren spezifischen Anforderungen
+            Regionale Compliance-Scores und aktuelle Warnungen
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-12">
-            <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-              <Star className="w-8 h-8 text-gray-400" />
+          <div className="grid gap-4 md:grid-cols-3">
+            {complianceData.map((item, index) => (
+              <ComplianceCard key={index} {...item} />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Recent Activity & Alerts */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Aktuelle Aktivitäten
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {[
+                { action: 'Neue FDA 510(k) Zulassung', time: '2 Stunden', type: 'approval', critical: false },
+                { action: 'EU MDR Update verfügbar', time: '5 Stunden', type: 'update', critical: true },
+                { action: 'API-Limit zu 75% erreicht', time: '1 Tag', type: 'warning', critical: false },
+                { action: 'Compliance-Score aktualisiert', time: '2 Tage', type: 'info', critical: false }
+              ].map((activity, index) => (
+                <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+                  <div className="flex items-center gap-3">
+                    {activity.type === 'approval' && <CheckCircle className="h-4 w-4 text-green-500" />}
+                    {activity.type === 'update' && <FileText className="h-4 w-4 text-blue-500" />}
+                    {activity.type === 'warning' && <AlertTriangle className="h-4 w-4 text-yellow-500" />}
+                    {activity.type === 'info' && <Activity className="h-4 w-4 text-gray-500" />}
+                    <div>
+                      <p className="text-sm font-medium">{activity.action}</p>
+                      <p className="text-xs text-muted-foreground">vor {activity.time}</p>
+                    </div>
+                  </div>
+                  {activity.critical && (
+                    <Badge variant="destructive" className="text-xs">
+                      Kritisch
+                    </Badge>
+                  )}
+                </div>
+              ))}
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Personalisierte Widgets
-            </h3>
-            <p className="text-gray-600 mb-4">
-              Erstellen Sie benutzerdefinierte Widgets für Ihre spezifischen Use Cases
-            </p>
-            <Button>
-              <Settings className="mr-2 h-4 w-4" />
-              Widget hinzufügen
-            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
+              Aktive Warnungen
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {[
+                { title: 'EU MDR Deadline approaching', severity: 'high', date: '2025-08-15' },
+                { title: 'FDA Cybersecurity Requirements', severity: 'medium', date: '2025-09-01' },
+                { title: 'API Rate Limit Warning', severity: 'low', date: '2025-08-12' }
+              ].map((alert, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-800">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-2 h-2 rounded-full ${
+                      alert.severity === 'high' ? 'bg-red-500' :
+                      alert.severity === 'medium' ? 'bg-yellow-500' : 'bg-blue-500'
+                    }`}></div>
+                    <div>
+                      <p className="text-sm font-medium">{alert.title}</p>
+                      <p className="text-xs text-muted-foreground">Fällig: {alert.date}</p>
+                    </div>
+                  </div>
+                  <Badge className={
+                    alert.severity === 'high' ? 'bg-red-100 text-red-800' :
+                    alert.severity === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-blue-100 text-blue-800'
+                  }>
+                    {alert.severity}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Subscription Status */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Crown className="h-5 w-5" />
+            Subscription Status
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div>
+              <h4 className="font-medium mb-4">Current Plan: Professional</h4>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Monatliche Updates</span>
+                  <span className="text-sm font-medium">{dashboardData?.usage.currentMonth} / 2.500</span>
+                </div>
+                <Progress value={dashboardData?.usage.percentage} />
+                
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Team-Mitglieder</span>
+                  <span className="text-sm font-medium">{dashboardData?.usage.users || 0} / {dashboardData?.usage.userLimit || 0}</span>
+                </div>
+                <Progress value={((dashboardData?.usage.users || 0) / (dashboardData?.usage.userLimit || 1)) * 100} />
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-medium mb-4">Nächste Abrechnung</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Betrag</span>
+                  <span className="text-lg font-bold">€899</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Datum</span>
+                  <span className="text-sm font-medium">{mockTenant.currentPeriod.end.toLocaleDateString('de-DE')}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Zahlungsart</span>
+                  <span className="text-sm">**** 1234</span>
+                </div>
+              </div>
+              <Button className="w-full mt-4" variant="outline">
+                Plan verwalten
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
