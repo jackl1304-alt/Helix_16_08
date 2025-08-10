@@ -59,6 +59,7 @@ const navigationStructure: Record<string, NavigationSection> = {
     items: [
       { name: "Datensammlung", href: "/data-collection", icon: Database },
       { name: "Newsletter-Verwaltung", href: "/newsletter-admin", icon: Mail },
+      { name: "Email-Verwaltung", href: "/email-management", icon: Mail },
       { name: "Wissensdatenbank", href: "/knowledge-base", icon: Book },
     ],
     defaultOpen: true
