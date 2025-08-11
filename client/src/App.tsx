@@ -140,7 +140,14 @@ function App() {
             <Route path="/landing" component={Landing} />
             <Route path="/404" component={NotFound} />
             
-            {/* Customer pages with unified router */}
+            {/* Multi-Tenant Customer Portal - Each customer gets their own portal */}
+            <Route path="/tenant/:tenantId/*">
+              <CustomerThemeProvider>
+                <CustomerRouter />
+              </CustomerThemeProvider>
+            </Route>
+            
+            {/* Legacy customer routes - redirect to tenant-specific URLs */}
             <Route path="/customer-dashboard">
               <CustomerThemeProvider>
                 <CustomerRouter />
@@ -157,27 +164,6 @@ function App() {
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer/regulatory-updates">
-              <CustomerThemeProvider>
-                <CustomerRouter />
-              </CustomerThemeProvider>
-            </Route>
-            {/* Tenant-specific customer routes */}
-            <Route path="/tenant/:tenantId/customer-dashboard">
-              <CustomerThemeProvider>
-                <CustomerRouter />
-              </CustomerThemeProvider>
-            </Route>
-            <Route path="/tenant/:tenantId/customer/regulatory-updates">
-              <CustomerThemeProvider>
-                <CustomerRouter />
-              </CustomerThemeProvider>
-            </Route>
-            <Route path="/tenant/:tenantId/customer-ai-insights">
-              <CustomerThemeProvider>
-                <CustomerRouter />
-              </CustomerThemeProvider>
-            </Route>
-            <Route path="/tenant/:tenantId/customer-settings">
               <CustomerThemeProvider>
                 <CustomerRouter />
               </CustomerThemeProvider>

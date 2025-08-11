@@ -18,26 +18,50 @@ export default function CustomerRouter() {
   const params = useParams();
 
   const renderComponent = () => {
-    // Check if it's a tenant-specific route
-    if (location.includes('/tenant/')) {
+    // Multi-tenant routing: /tenant/:tenantId/*
+    if (location.includes('/tenant/') && params.tenantId) {
       // Extract the route part after tenant ID
-      const routePart = location.split('/').slice(3).join('/'); // Get everything after /tenant/:id
+      const urlParts = location.split('/');
+      const tenantIndex = urlParts.indexOf('tenant');
+      const routeParts = urlParts.slice(tenantIndex + 2); // Skip 'tenant' and tenantId
+      const route = routeParts.join('/');
       
-      switch (routePart) {
+      switch (route) {
+        case "":
+        case "dashboard":
         case "customer-dashboard":
           return <CustomerDashboard />;
+        case "regulatory-updates":
         case "customer/regulatory-updates":
           return <CustomerRegulatoryUpdates />;
+        case "ai-insights":
         case "customer-ai-insights":
           return <CustomerAIInsightsClean />;
+        case "settings":
         case "customer-settings":
           return <CustomerSettings />;
+        case "legal-cases":
+          return <CustomerDashboard />; // Placeholder
+        case "knowledge-base":
+          return <CustomerDashboard />; // Placeholder
+        case "newsletters":
+          return <CustomerDashboard />; // Placeholder
+        case "analytics":
+          return <CustomerDashboard />; // Placeholder
+        case "advanced-analytics":
+          return <CustomerDashboard />; // Placeholder
+        case "global-sources":
+          return <CustomerDashboard />; // Placeholder
+        case "data-collection":
+          return <CustomerDashboard />; // Placeholder
+        case "historical-data":
+          return <CustomerDashboard />; // Placeholder
         default:
           return <CustomerDashboard />;
       }
     }
 
-    // Standard customer routes (non-tenant specific)
+    // Legacy customer routes (fallback for old URLs)
     switch (location) {
       case "/customer-dashboard":
         return <CustomerDashboard />;
