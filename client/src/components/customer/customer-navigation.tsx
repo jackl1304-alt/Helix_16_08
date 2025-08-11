@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "wouter";
+import { Link, useLocation, useParams } from "wouter";
 import { cn } from "@/lib/utils";
 import { useCustomerTheme } from "@/contexts/customer-theme-context";
 import {
@@ -54,84 +54,84 @@ interface NavigationItem {
 const ALL_NAVIGATION_ITEMS: NavigationItem[] = [
   {
     name: "Dashboard",
-    href: "/customer-dashboard",
+    href: "/dashboard",
     icon: LayoutDashboard,
     permission: "dashboard",
     description: "Übersicht und aktuelle Statistiken"
   },
   {
     name: "Regulatory Updates",
-    href: "/customer/regulatory-updates",
+    href: "/regulatory-updates",
     icon: FileText,
     permission: "regulatoryUpdates",
     description: "Aktuelle regulatorische Änderungen"
   },
   {
     name: "Legal Cases",
-    href: "/customer/legal-cases",
+    href: "/legal-cases",
     icon: Scale,
     permission: "legalCases",
     description: "Rechtsprechung und Präzedenzfälle"
   },
   {
     name: "Knowledge Base",
-    href: "/customer/knowledge-base",
+    href: "/knowledge-base",
     icon: BookOpen,
     permission: "knowledgeBase",
     description: "Wissensdatenbank und Artikel"
   },
   {
     name: "Newsletter",
-    href: "/customer/newsletters",
+    href: "/newsletters",
     icon: Mail,
     permission: "newsletters",
     description: "Newsletter-Verwaltung"
   },
   {
     name: "Analytics",
-    href: "/customer/analytics",
+    href: "/analytics",
     icon: BarChart3,
     permission: "analytics",
     description: "Datenanalyse und Berichte"
   },
   {
     name: "Advanced Analytics", 
-    href: "/customer/advanced-analytics",
+    href: "/advanced-analytics",
     icon: Activity,
     permission: "advancedAnalytics",
     description: "Erweiterte Analysetools"
   },
   {
     name: "AI Insights",
-    href: "/customer-ai-insights",
+    href: "/ai-insights",
     icon: Brain,
     permission: "aiInsights",
     description: "KI-gestützte Erkenntnisse"
   },
   {
     name: "Global Sources",
-    href: "/customer/global-sources",
+    href: "/global-sources",
     icon: Globe,
     permission: "globalSources",
     description: "Globale Datenquellen"
   },
   {
     name: "Data Collection",
-    href: "/customer/data-collection", 
+    href: "/data-collection", 
     icon: Database,
     permission: "dataCollection",
     description: "Datensammlung und -verwaltung"
   },
   {
     name: "Historical Data",
-    href: "/customer/historical-data",
+    href: "/historical-data",
     icon: Clipboard,
     permission: "historicalData",
     description: "Historische Datenanalyse"
   },
   {
     name: "Settings",
-    href: "/customer-settings",
+    href: "/settings",
     icon: Settings,
     permission: "systemSettings",
     description: "Kundeneinstellungen"
@@ -146,6 +146,15 @@ interface CustomerNavigationProps {
 
 export default function CustomerNavigation({ permissions, tenantName }: CustomerNavigationProps) {
   const [location, setLocation] = useLocation();
+  const params = useParams();
+  
+  // Build tenant-specific URLs
+  const buildTenantUrl = (path: string) => {
+    if (params.tenantId) {
+      return `/tenant/${params.tenantId}${path}`;
+    }
+    return path;
+  };
 
   // Filter navigation items based on permissions
   const allowedItems = ALL_NAVIGATION_ITEMS.filter(item => 
@@ -153,13 +162,14 @@ export default function CustomerNavigation({ permissions, tenantName }: Customer
   );
 
   const renderNavigationItem = (item: NavigationItem) => {
-    const isActive = location === item.href;
+    const tenantUrl = buildTenantUrl(item.href);
+    const isActive = location === tenantUrl || location === item.href;
     const IconComponent = item.icon;
     
     return (
       <button
         key={item.href}
-        onClick={() => setLocation(item.href)}
+        onClick={() => setLocation(tenantUrl)}
         className={cn(
           "w-full flex items-center justify-start px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer group",
           isActive
