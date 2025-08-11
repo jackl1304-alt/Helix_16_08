@@ -1,4 +1,4 @@
-import { useLocation } from "wouter";
+import { useLocation, useParams } from "wouter";
 import { lazy, Suspense } from "react";
 
 // Lazy load components to avoid circular dependencies
@@ -15,9 +15,29 @@ const LoadingFallback = () => (
 
 export default function CustomerRouter() {
   const [location] = useLocation();
+  const params = useParams();
 
   const renderComponent = () => {
-    // Route mapping for customer pages
+    // Check if it's a tenant-specific route
+    if (location.includes('/tenant/')) {
+      // Extract the route part after tenant ID
+      const routePart = location.split('/').slice(3).join('/'); // Get everything after /tenant/:id
+      
+      switch (routePart) {
+        case "customer-dashboard":
+          return <CustomerDashboard />;
+        case "customer/regulatory-updates":
+          return <CustomerRegulatoryUpdates />;
+        case "customer-ai-insights":
+          return <CustomerAIInsightsClean />;
+        case "customer-settings":
+          return <CustomerSettings />;
+        default:
+          return <CustomerDashboard />;
+      }
+    }
+
+    // Standard customer routes (non-tenant specific)
     switch (location) {
       case "/customer-dashboard":
         return <CustomerDashboard />;
