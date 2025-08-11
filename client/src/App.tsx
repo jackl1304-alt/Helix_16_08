@@ -56,6 +56,7 @@ const CustomerDashboard = lazy(() => import("@/pages/customer-dashboard"));
 const CustomerSettings = lazy(() => import("@/pages/customer-settings"));
 const CustomerAIInsightsClean = lazy(() => import("@/pages/customer-ai-insights-clean"));
 const CustomerRegulatoryUpdates = lazy(() => import("@/pages/customer-regulatory-updates"));
+const CustomerRouter = lazy(() => import("@/components/customer/customer-router"));
 const TenantOnboarding = lazy(() => import("@/pages/tenant-onboarding"));
 const EmailManagement = lazy(() => import("@/pages/email-management-new"));
 const RegulatoryUpdateDetail = lazy(() => import("@/pages/regulatory-update-detail-new"));
@@ -139,65 +140,65 @@ function App() {
             <Route path="/landing" component={Landing} />
             <Route path="/404" component={NotFound} />
             
-            {/* Customer pages with their own navigation and theme */}
+            {/* Customer pages with unified router */}
             <Route path="/customer-dashboard">
               <CustomerThemeProvider>
-                <CustomerDashboard />
+                <CustomerRouter />
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer-settings">
               <CustomerThemeProvider>
-                <CustomerSettings />
+                <CustomerRouter />
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer-ai-insights">
               <CustomerThemeProvider>
-                <CustomerAIInsightsClean />
+                <CustomerRouter />
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer/regulatory-updates">
               <CustomerThemeProvider>
-                <CustomerRegulatoryUpdates />
+                <CustomerRouter />
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer/legal-cases">
               <CustomerThemeProvider>
-                <CustomerDashboard />
+                <CustomerRouter />
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer/knowledge-base">
               <CustomerThemeProvider>
-                <CustomerDashboard />
+                <CustomerRouter />
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer/newsletters">
               <CustomerThemeProvider>
-                <CustomerDashboard />
+                <CustomerRouter />
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer/analytics">
               <CustomerThemeProvider>
-                <CustomerDashboard />
+                <CustomerRouter />
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer/advanced-analytics">
               <CustomerThemeProvider>
-                <CustomerDashboard />
+                <CustomerRouter />
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer/global-sources">
               <CustomerThemeProvider>
-                <CustomerDashboard />
+                <CustomerRouter />
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer/data-collection">
               <CustomerThemeProvider>
-                <CustomerDashboard />
+                <CustomerRouter />
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer/historical-data">
               <CustomerThemeProvider>
-                <CustomerDashboard />
+                <CustomerRouter />
               </CustomerThemeProvider>
             </Route>
             
