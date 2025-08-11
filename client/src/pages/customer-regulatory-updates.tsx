@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useParams } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import CustomerNavigation from "@/components/customer/customer-navigation";
 import { useCustomerTheme } from "@/contexts/customer-theme-context";
+import { useLiveTenantPermissions } from "@/hooks/use-live-tenant-permissions";
 import { FileText, Calendar, Globe, Filter } from "lucide-react";
-
-import { useParams } from "wouter";
 
 const mockTenantId = "030d3e01-32c4-4f95-8d54-98be948e8d4b";
 
@@ -18,15 +18,35 @@ export default function CustomerRegulatoryUpdates() {
   // Use tenant ID from URL if available, otherwise use mock ID
   const tenantId = params.tenantId || mockTenantId;
 
-  // Fetch tenant permissions
-  const { data: tenantData, isLoading: isTenantLoading } = useQuery({
-    queryKey: ['/api/customer/tenant', tenantId],
-    queryFn: async () => {
-      const response = await fetch(`/api/customer/tenant/${tenantId}`);
-      if (!response.ok) throw new Error('Failed to fetch tenant data');
-      return await response.json();
-    }
+  // Use live tenant permissions hook for real-time updates
+  const { 
+    permissions: livePermissions, 
+    tenantName, 
+    isLoading: isTenantLoading 
+  } = useLiveTenantPermissions({ 
+    tenantId,
+    pollInterval: 3000 // Poll alle 3 Sekunden für schnelle Updates
   });
+
+  // Use live permissions with fallback
+  const permissions = livePermissions || {
+    dashboard: true,
+    regulatoryUpdates: true,
+    legalCases: false,
+    knowledgeBase: false,
+    newsletters: false,
+    analytics: false,
+    reports: false,
+    dataCollection: false,
+    globalSources: false,
+    historicalData: false,
+    administration: false,
+    userManagement: false,
+    systemSettings: false,
+    auditLogs: false,
+    aiInsights: false,
+    advancedAnalytics: false
+  };
 
   // Fetch regulatory updates
   const { data: updates, isLoading: isUpdatesLoading } = useQuery({
@@ -36,10 +56,8 @@ export default function CustomerRegulatoryUpdates() {
       if (!response.ok) throw new Error('Failed to fetch regulatory updates');
       return await response.json();
     },
-    enabled: tenantData?.customerPermissions?.regulatoryUpdates
+    enabled: Boolean(permissions?.regulatoryUpdates)
   });
-
-  const permissions = tenantData?.customerPermissions || {};
 
   if (isTenantLoading) {
     return (
@@ -55,7 +73,7 @@ export default function CustomerRegulatoryUpdates() {
     <div className="flex h-screen bg-gray-50">
       <CustomerNavigation 
         permissions={permissions} 
-        tenantName={tenantData?.tenant?.name || "Customer Portal"} 
+        tenantName={tenantName || "Customer Portal"} 
       />
       
       <main className="ml-64 flex-1 p-8 overflow-y-auto">
@@ -79,7 +97,7 @@ export default function CustomerRegulatoryUpdates() {
                 </div>
               ))}
             </div>
-          ) : updates && updates.length > 0 ? (
+          ) : updates && Array.isArray(updates) && updates.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {updates.map((update: any) => (
                 <Card key={update.id} className="hover:shadow-md transition-shadow">

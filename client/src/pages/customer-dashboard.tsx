@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useParams } from "wouter";
+import { useLiveTenantPermissions } from "@/hooks/use-live-tenant-permissions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -59,24 +61,23 @@ const regionDistribution = [
 
 export default function CustomerDashboard() {
   const [selectedTimeRange, setSelectedTimeRange] = useState('30d');
+  const params = useParams();
   
-  // Fetch tenant data including permissions
-  const { data: tenantData, isLoading: isTenantLoading } = useQuery({
-    queryKey: ['/api/customer/tenant', mockTenantId],
-    queryFn: async () => {
-      const response = await fetch(`/api/customer/tenant/${mockTenantId}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch tenant data');
-      }
-      const data = await response.json();
-      console.log('[CUSTOMER DASHBOARD] Fetched tenant permissions:', data);
-      return data;
-    },
-    enabled: true
+  // Use tenant ID from URL if available, otherwise use mock ID
+  const tenantId = params.tenantId || mockTenantId;
+  
+  // Use live tenant permissions hook for real-time updates
+  const { 
+    permissions: livePermissions, 
+    tenantName: liveTenantName, 
+    isLoading: isTenantLoading 
+  } = useLiveTenantPermissions({ 
+    tenantId,
+    pollInterval: 3000 // Poll alle 3 Sekunden für schnelle Updates
   });
   
-  // Extract permissions from tenant data
-  const permissions = tenantData?.customerPermissions || {
+  // Use live permissions with fallback
+  const permissions = livePermissions || {
     dashboard: true,
     regulatoryUpdates: true,
     legalCases: true,
@@ -97,7 +98,7 @@ export default function CustomerDashboard() {
   
   // Fetch customer dashboard data
   const { data: dashboardData, isLoading } = useQuery({
-    queryKey: ['/api/customer/dashboard', mockTenantId, selectedTimeRange],
+    queryKey: ['/api/customer/dashboard', tenantId, selectedTimeRange],
     queryFn: async () => {
       // In production: await fetch(`/api/customer/dashboard/${tenantId}?range=${selectedTimeRange}`)
       return {
@@ -235,7 +236,7 @@ export default function CustomerDashboard() {
       {/* Navigation Sidebar */}
       <CustomerNavigation 
         permissions={permissions}
-        tenantName={tenantData?.name}
+        tenantName={liveTenantName}
       />
       
       {/* Main Content */}
@@ -250,9 +251,9 @@ export default function CustomerDashboard() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 via-purple-600 to-cyan-700 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                {tenantData?.name?.charAt(0) || 'M'}
+                {liveTenantName?.charAt(0) || 'M'}
               </div>
-              <span className="font-medium">{tenantData?.name || 'MedTech Solutions GmbH'}</span>
+              <span className="font-medium">{liveTenantName || 'MedTech Solutions GmbH'}</span>
             </div>
             <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200">
               <Crown className="w-3 h-3 mr-1" />
