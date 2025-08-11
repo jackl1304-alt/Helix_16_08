@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "wouter";
+import { Link, useLocation, useRouter } from "wouter";
 import { cn } from "@/lib/utils";
 import { useCustomerTheme } from "@/contexts/customer-theme-context";
 import {
@@ -146,6 +146,7 @@ interface CustomerNavigationProps {
 
 export default function CustomerNavigation({ permissions, tenantName }: CustomerNavigationProps) {
   const [location] = useLocation();
+  const [, navigate] = useRouter();
 
   // Filter navigation items based on permissions
   const allowedItems = ALL_NAVIGATION_ITEMS.filter(item => 
@@ -157,11 +158,11 @@ export default function CustomerNavigation({ permissions, tenantName }: Customer
     const IconComponent = item.icon;
     
     return (
-      <Link
+      <button
         key={item.href}
-        href={item.href}
+        onClick={() => navigate(item.href)}
         className={cn(
-          "flex items-center justify-start px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer group",
+          "w-full flex items-center justify-start px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer group",
           isActive
             ? "bg-blue-600 text-white shadow-md"
             : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
@@ -182,7 +183,7 @@ export default function CustomerNavigation({ permissions, tenantName }: Customer
             </span>
           )}
         </div>
-      </Link>
+      </button>
     );
   };
 
