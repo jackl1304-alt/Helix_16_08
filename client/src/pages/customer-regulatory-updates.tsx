@@ -6,17 +6,23 @@ import CustomerNavigation from "@/components/customer/customer-navigation";
 import { useCustomerTheme } from "@/contexts/customer-theme-context";
 import { FileText, Calendar, Globe, Filter } from "lucide-react";
 
+import { useParams } from "wouter";
+
 const mockTenantId = "030d3e01-32c4-4f95-8d54-98be948e8d4b";
 
 export default function CustomerRegulatoryUpdates() {
   const { themeSettings, getThemeColors } = useCustomerTheme();
   const colors = getThemeColors();
+  const params = useParams();
+  
+  // Use tenant ID from URL if available, otherwise use mock ID
+  const tenantId = params.tenantId || mockTenantId;
 
   // Fetch tenant permissions
   const { data: tenantData, isLoading: isTenantLoading } = useQuery({
-    queryKey: ['/api/customer/tenant', mockTenantId],
+    queryKey: ['/api/customer/tenant', tenantId],
     queryFn: async () => {
-      const response = await fetch(`/api/customer/tenant/${mockTenantId}`);
+      const response = await fetch(`/api/customer/tenant/${tenantId}`);
       if (!response.ok) throw new Error('Failed to fetch tenant data');
       return await response.json();
     }

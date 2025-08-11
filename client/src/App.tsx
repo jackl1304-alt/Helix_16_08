@@ -161,6 +161,27 @@ function App() {
                 <CustomerRouter />
               </CustomerThemeProvider>
             </Route>
+            {/* Tenant-specific customer routes */}
+            <Route path="/tenant/:tenantId/customer-dashboard">
+              <CustomerThemeProvider>
+                <CustomerRouter />
+              </CustomerThemeProvider>
+            </Route>
+            <Route path="/tenant/:tenantId/customer/regulatory-updates">
+              <CustomerThemeProvider>
+                <CustomerRouter />
+              </CustomerThemeProvider>
+            </Route>
+            <Route path="/tenant/:tenantId/customer-ai-insights">
+              <CustomerThemeProvider>
+                <CustomerRouter />
+              </CustomerThemeProvider>
+            </Route>
+            <Route path="/tenant/:tenantId/customer-settings">
+              <CustomerThemeProvider>
+                <CustomerRouter />
+              </CustomerThemeProvider>
+            </Route>
             <Route path="/customer/legal-cases">
               <CustomerThemeProvider>
                 <CustomerRouter />
