@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useParams } from "wouter";
 import { cn } from "@/lib/utils";
 import { useCustomerTheme } from "@/contexts/customer-theme-context";
@@ -142,11 +142,13 @@ const ALL_NAVIGATION_ITEMS: NavigationItem[] = [
 interface CustomerNavigationProps {
   permissions: CustomerPermissions;
   tenantName?: string;
+  onPermissionsUpdate?: (newPermissions: CustomerPermissions) => void;
 }
 
-export default function CustomerNavigation({ permissions, tenantName }: CustomerNavigationProps) {
+export default function CustomerNavigation({ permissions, tenantName, onPermissionsUpdate }: CustomerNavigationProps) {
   const [location, setLocation] = useLocation();
   const params = useParams();
+  const [currentPermissions, setCurrentPermissions] = useState(permissions);
   
   // Build tenant-specific URLs
   const buildTenantUrl = (path: string) => {
@@ -156,9 +158,37 @@ export default function CustomerNavigation({ permissions, tenantName }: Customer
     return path;
   };
 
-  // Filter navigation items based on permissions
+  // Polling für Live-Updates der Berechtigungen
+  useEffect(() => {
+    if (!params.tenantId) return;
+    
+    const pollPermissions = async () => {
+      try {
+        const response = await fetch(`/api/customer/tenant/${params.tenantId}`);
+        if (response.ok) {
+          const tenantData = await response.json();
+          if (tenantData.customerPermissions) {
+            setCurrentPermissions(tenantData.customerPermissions);
+            onPermissionsUpdate?.(tenantData.customerPermissions);
+          }
+        }
+      } catch (error) {
+        console.error('Fehler beim Abrufen der aktuellen Berechtigungen:', error);
+      }
+    };
+
+    // Initial load
+    pollPermissions();
+    
+    // Poll alle 5 Sekunden für Live-Updates
+    const interval = setInterval(pollPermissions, 5000);
+    
+    return () => clearInterval(interval);
+  }, [params.tenantId, onPermissionsUpdate]);
+
+  // Filter navigation items based on current permissions
   const allowedItems = ALL_NAVIGATION_ITEMS.filter(item => 
-    permissions[item.permission]
+    currentPermissions[item.permission]
   );
 
   const renderNavigationItem = (item: NavigationItem) => {
