@@ -97,7 +97,7 @@ if (!isProd) {
 }
 
 // Server starten
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const port = parseInt(process.env.PORT || "5174", 10);
   server.listen(port, () => {
     log(`Server läuft auf Port ${port}`);
