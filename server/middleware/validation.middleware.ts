@@ -1,7 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { logger } from '../services/logger.service';
-import { ValidationError } from '@shared/types/errors';
+// Define ValidationError locally since @shared/types doesn't exist
+class ValidationError extends Error {
+  public readonly field?: string;
+  public readonly errors?: any;
+
+  constructor(message: string, errors?: any) {
+    super(message);
+    this.errors = errors;
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
 
 export const validateBody = (schema: z.ZodSchema) => {
   return (req: Request, res: Response, next: NextFunction) => {

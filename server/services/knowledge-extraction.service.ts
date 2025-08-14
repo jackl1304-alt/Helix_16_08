@@ -1,7 +1,42 @@
 import { Logger } from './logger.service';
-import { IStorage } from '@shared/types/storage';
-import { RegulatoryUpdate, LegalCase } from '@shared/types/api';
-import { AppError, DatabaseError } from '@shared/types/errors';
+// Define types locally since @shared/types doesn't exist
+interface IStorage {
+  // Add minimal interface for the methods we need
+  getAllRegulatoryUpdates(): Promise<any[]>;
+  getAllLegalCases(): Promise<any[]>;
+  getAllKnowledgeArticles(): Promise<any[]>;
+  createKnowledgeArticle(data: any): Promise<any>;
+}
+
+interface RegulatoryUpdate {
+  id: string;
+  title: string;
+  description?: string;
+  content?: string;
+}
+
+interface LegalCase {
+  id: string;
+  title: string;
+  content?: string;
+  summary?: string;
+}
+
+class AppError extends Error {
+  public readonly statusCode: number;
+  
+  constructor(message: string, statusCode: number = 500) {
+    super(message);
+    this.statusCode = statusCode;
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+class DatabaseError extends AppError {
+  constructor(message: string) {
+    super(message, 500);
+  }
+}
 
 const logger = new Logger('KnowledgeExtraction');
 

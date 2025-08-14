@@ -1,14 +1,62 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import { Logger } from '../services/logger.service';
-import { 
-  AppError, 
-  isAppError, 
-  isOperationalError, 
-  formatErrorResponse,
-  ValidationError,
-  DatabaseError
-} from '@shared/types/errors';
+// Define error types locally since @shared/types doesn't exist
+class AppError extends Error {
+  public readonly statusCode: number;
+  public readonly isOperational: boolean;
+
+  constructor(message: string, statusCode: number = 500, isOperational: boolean = true) {
+    super(message);
+    this.statusCode = statusCode;
+    this.isOperational = isOperational;
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+class ValidationError extends AppError {
+  public readonly field: string;
+  public readonly value: unknown;
+  public readonly expectedType: string;
+
+  constructor(message: string, field: string, value: unknown, expectedType: string) {
+    super(message, 400);
+    this.field = field;
+    this.value = value;
+    this.expectedType = expectedType;
+  }
+}
+
+class DatabaseError extends AppError {
+  public readonly operation: string;
+  public readonly table?: string;
+  public readonly originalError: Error;
+
+  constructor(message: string, operation: string, table?: string, originalError?: Error) {
+    super(message, 500);
+    this.operation = operation;
+    this.table = table;
+    this.originalError = originalError || new Error(message);
+  }
+}
+
+const isAppError = (error: any): error is AppError => {
+  return error instanceof AppError;
+};
+
+const isOperationalError = (error: AppError): boolean => {
+  return error.isOperational;
+};
+
+const formatErrorResponse = (error: AppError) => {
+  return {
+    error: {
+      message: error.message,
+      statusCode: error.statusCode,
+      ...(process.env.NODE_ENV !== 'production' && { stack: error.stack })
+    }
+  };
+};
 
 const logger = new Logger('ErrorMiddleware');
 

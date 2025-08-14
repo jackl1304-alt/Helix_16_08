@@ -1,9 +1,64 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '../services/logger.service';
-import { ApiResponse, RegulatoryUpdate } from '@shared/types/api';
-import { AppError, asyncHandler } from '../middleware/error.middleware';
-import { ValidationError, NotFoundError } from '@shared/types/errors';
-import { StorageRegulatoryUpdate } from '@shared/types/storage';
+// Import from local files since @shared/types doesn't exist
+import { asyncHandler } from '../middleware/error.middleware';
+
+// Define types locally
+interface ApiResponse<T = any> {
+  success: boolean;
+  data?: T;
+  message?: string;
+}
+
+interface RegulatoryUpdate {
+  id: string;
+  title: string;
+  description?: string;
+  region?: string;
+  update_type?: string;
+  priority?: string;
+  device_classes?: string[];
+  published_at?: string;
+  created_at?: string;
+  effective_date?: string;
+  source_id?: string;
+  source_url?: string;
+  content?: string;
+  categories?: string[];
+  raw_data?: any;
+}
+
+interface StorageRegulatoryUpdate {
+  id: string;
+  title: string;
+  description?: string;
+  region?: string;
+  update_type?: string;
+  priority?: string;
+  device_classes?: string[];
+  published_at?: string;
+  created_at?: string;
+  effective_date?: string;
+  source_id?: string;
+  source_url?: string;
+  content?: string;
+  categories?: string[];
+  raw_data?: any;
+}
+
+class ValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+class NotFoundError extends Error {
+  constructor(message: string) {
+    super(message);
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
 import { storage } from '../storage';
 
 export class RegulatoryController {
