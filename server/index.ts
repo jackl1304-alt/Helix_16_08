@@ -1,146 +1,105 @@
-import express, { type Express, type Request, type Response } from "express";
-import { createServer, type Server } from "http";
+import express, { type Request, type Response, type NextFunction } from "express";
+import { createServer } from "http";
+import cors from "cors";
 import { registerRoutes } from "./routes";
-import { setupVite } from "./vite";
+import { setupCustomerAIRoutes } from "./temp-ai-routes";
+import { setupVite, log } from "./vite";
+import fs from "fs";
+import path from "path";
+import { Logger } from "./services/logger.service";
+import fetch from "node-fetch";
+import { EventEmitter } from "events";
 
-// Initialize Express app
-const app: Express = express();
-const port = process.env.PORT || 5000;
+// Listener-Warnungen entschärfen
+EventEmitter.defaultMaxListeners = 30;
+process.setMaxListeners(30);
 
-// Middleware
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+// Express-App initialisieren
+export const app = express();
+const server = createServer(app);
 
-// CORS middleware for development
-if (process.env.NODE_ENV === 'development') {
-  app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    if (req.method === 'OPTIONS') {
-      res.sendStatus(200);
-    } else {
-      next();
-    }
+// CORS aktivieren (für alle Ursprünge, später einschränken)
+app.use(cors({ origin: "*" }));
+
+// Body-Parser
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: false, limit: "50mb" }));
+
+// Simple Perplexity-Client
+async function perplexityChat(prompt: string, model = "sonar"): Promise<string> {
+  const API_KEY = process.env.PERPLEXITY_API_KEY;
+  if (!API_KEY) throw new Error("PERPLEXITY_API_KEY ist nicht gesetzt");
+
+  const res = await fetch("https://api.perplexity.ai/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ model, messages: [{ role: "user", content: prompt }] }),
   });
+  if (!res.ok) throw new Error(`Perplexity API Error ${res.status}`);
+  const data = await res.json() as any;
+  return data.choices?.[0]?.message?.content || "";
 }
 
-// Simple Perplexity Chat function placeholder
-async function perplexityChat(prompt: string, model: string = "sonar"): Promise<string> {
-  try {
-    // This is a placeholder implementation since the original function is missing
-    // In a real implementation, this would call the Perplexity API
-    console.log('Perplexity Chat called with prompt:', prompt.substring(0, 100) + '...');
-    
-    // Return a simple response based on the prompt
-    const responses = [
-      "Medizin Regulatorik Innovation",
-      "FDA Zulassung Sicherheit",
-      "Compliance Überwachung Standards",
-      "Diagnostik Therapie Monitoring",
-      "Qualität Kontrolle Validierung"
-    ];
-    
-    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-    return randomResponse;
-  } catch (error) {
-    console.error('Perplexity Chat error:', error);
-    return "System Fehler Aufgetreten";
-  }
-}
+// Logger
+const logger = new Logger("ServerMain");
 
-// Perplexity AI endpoint (antwort strikt auf 3 Wörter begrenzen)
+// Health-Check
+app.get("/api/health", (_req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+// AI-Route
 app.post("/api/ai", async (req: Request, res: Response) => {
   try {
     const prompt = req.body?.prompt;
-    const model = req.body?.model ?? "sonar";
-    if (!prompt || typeof prompt !== "string") {
-      return res.status(400).json({ error: "Feld 'prompt' (string) ist erforderlich." });
-    }
-
-    // Strikte Anweisung
-    const strictPrompt = `Antworte NUR mit genau drei deutschen Wörtern, ohne Satzzeichen, ohne Erklärungen. Aufgabe: ${prompt}`;
-
-    let answer = await perplexityChat(strictPrompt, model);
-
-    // Post-Processing: nur die ersten 3 Wörter lassen
-    answer = answer
-      .replace(/[^\p{L}\p{N}\s\-äöüÄÖÜß]/gu, " ") // Sonderzeichen raus
-      .trim()
-      .split(/\s+/)
-      .slice(0, 3)
-      .join(" ");
-
-    if (!answer) answer = "Hallo Hallo Hallo";
-
-    return res.json({ answer });
+    if (!prompt) return res.status(400).json({ error: "Feld 'prompt' erforderlich." });
+    const answer = await perplexityChat(prompt);
+    res.json({ answer });
   } catch (err: any) {
-    console.error("AI route error:", err?.message || err);
-    return res.status(500).json({ error: "AI-Service momentan nicht verfügbar." });
+    console.error(err);
+    res.status(500).json({ error: "AI-Service nicht verfügbar." });
   }
 });
 
-// Health check endpoint
-app.get('/api/health', (req: Request, res: Response) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+// Weitere Routen
+app.post("/api/webhook", (req: Request, res: Response) => {
+  console.log("Webhook empfangen:", req.body);
+  res.json({ received: true });
 });
 
-async function startServer() {
-  try {
-    // Create HTTP server
-    const server: Server = createServer(app);
-    
-    // Register all routes
-    await registerRoutes(app);
-    
-    // Setup Vite in development mode
-    if (process.env.NODE_ENV === 'development') {
-      await setupVite(app, server);
-    } else {
-      // Serve static files in production
-      app.use(express.static('dist/public'));
-      
-      // Serve index.html for all non-API routes
-      app.get('*', (req, res) => {
-        if (!req.path.startsWith('/api/')) {
-          res.sendFile('index.html', { root: 'dist/public' });
-        }
-      });
-    }
-    
-    // Start server
-    server.listen(port, '0.0.0.0', () => {
-      console.log(`🚀 Helix server running on port ${port}`);
-      console.log(`📊 Environment: ${process.env.NODE_ENV}`);
-      console.log(`🌐 Server available at http://0.0.0.0:${port}`);
-    });
+// 404-Handler nur für API
+app.use("/api/*", (req, res) => {
+  res.status(404).json({ error: `API nicht gefunden: ${req.path}` });
+});
 
-    // Graceful shutdown
-    process.on('SIGTERM', () => {
-      console.log('⏹️ SIGTERM received, shutting down gracefully');
-      server.close(() => {
-        console.log('✅ Server closed');
-        process.exit(0);
-      });
-    });
+// Globaler Error-Handler
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  res.status(err.status || 500).json({ error: err.message || "Internal Server Error" });
+});
 
-    process.on('SIGINT', () => {
-      console.log('⏹️ SIGINT received, shutting down gracefully');
-      server.close(() => {
-        console.log('✅ Server closed');
-        process.exit(0);
-      });
+// Entwicklungs- vs. Produktionsmodus
+const isProd = process.env.NODE_ENV === "production" || app.get("env") !== "development";
+if (!isProd) {
+  // Vite Dev-Server im Dev-Modus
+  setupVite(app, server).catch(console.error);
+} else {
+  // Statische Dateien im Prod-Modus
+  const distPath = path.resolve(import.meta.url.replace("file://", ""), "../public");
+  if (fs.existsSync(distPath)) {
+    app.use(express.static(distPath));
+    app.get("*", (_req, res) => {
+      res.sendFile(path.resolve(distPath, "index.html"));
     });
-
-    return server;
-  } catch (error) {
-    console.error('❌ Failed to start server:', error);
-    process.exit(1);
   }
 }
 
-// Start the server
-startServer().catch((error) => {
-  console.error('❌ Server startup failed:', error);
-  process.exit(1);
-});
+// Server starten
+if (require.main === module) {
+  const port = parseInt(process.env.PORT || "5174", 10);
+  server.listen(port, () => {
+    log(`Server läuft auf Port ${port}`);
+  });
+}
