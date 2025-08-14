@@ -57,12 +57,18 @@ app.post("/api/ai", async (req: Request, res: Response) => {
     const prompt = req.body?.prompt;
     if (!prompt) return res.status(400).json({ error: "Feld 'prompt' erforderlich." });
     const answer = await perplexityChat(prompt);
-    res.json({ answer });
+    return res.json({ answer });
   } catch (err: any) {
     console.error(err);
-    res.status(500).json({ error: "AI-Service nicht verfügbar." });
+    return res.status(500).json({ error: "AI-Service nicht verfügbar." });
   }
 });
+
+// Register main routes
+registerRoutes(app);
+
+// Setup customer AI routes  
+setupCustomerAIRoutes(app);
 
 // Weitere Routen
 app.post("/api/webhook", (req: Request, res: Response) => {
@@ -70,7 +76,7 @@ app.post("/api/webhook", (req: Request, res: Response) => {
   res.json({ received: true });
 });
 
-// 404-Handler nur für API
+// 404-Handler nur für API (must be AFTER all other routes)
 app.use("/api/*", (req, res) => {
   res.status(404).json({ error: `API nicht gefunden: ${req.path}` });
 });

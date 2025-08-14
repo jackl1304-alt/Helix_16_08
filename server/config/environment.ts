@@ -1,5 +1,14 @@
 import { z } from 'zod';
-import { ConfigurationError } from '@shared/types/errors';
+// Define ConfigurationError locally since @shared/types doesn't exist
+class ConfigurationError extends Error {
+  public readonly code: string;
+  
+  constructor(code: string, message: string) {
+    super(message);
+    this.code = code;
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
 import { Logger } from '../services/logger.service';
 
 const logger = new Logger('Environment');
