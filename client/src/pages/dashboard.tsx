@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { NavigationHeader } from "@/components/ui/navigation-header";
+import { ResponsiveLayout } from "@/components/responsive-layout";
 import { AISearchPanel } from "@/components/admin/ai-search-panel";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
@@ -170,7 +171,7 @@ export default function Dashboard() {
   const handleAnalytics = () => setLocation('/analytics');
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <ResponsiveLayout>
       {/* Navigation Header */}
       <NavigationHeader showTenantLinks={true} currentView="admin" />
       
@@ -439,7 +440,10 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
+
+        {/* AI Search Panel */}
+        <AISearchPanel />
       </div>
-    </div>
+    </ResponsiveLayout>
   );
 }
