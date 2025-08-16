@@ -145,12 +145,12 @@ export function invalidateCache(pattern?: string): void {
 // Export cache instance for direct access
 export { queryCache };
 
-// Cache configuration for different endpoints
+// Cache configuration for different endpoints - AGGRESSIVE CACHING
 export const CACHE_CONFIG = {
-  SHORT: 1 * 60 * 1000,        // 1 minute
-  MEDIUM: 5 * 60 * 1000,       // 5 minutes  
-  LONG: 30 * 60 * 1000,        // 30 minutes
-  DASHBOARD: 2 * 60 * 1000,    // 2 minutes for dashboard
-  ARTICLES: 10 * 60 * 1000,    // 10 minutes for articles
-  REGULATORY: 5 * 60 * 1000,   // 5 minutes for regulatory updates
+  SHORT: 5 * 60 * 1000,         // 5 minutes (increased from 1)
+  MEDIUM: 15 * 60 * 1000,       // 15 minutes (increased from 5)
+  LONG: 60 * 60 * 1000,         // 60 minutes (increased from 30)
+  DASHBOARD: 10 * 60 * 1000,    // 10 minutes (increased from 2) 
+  ARTICLES: 30 * 60 * 1000,     // 30 minutes (increased from 10)
+  REGULATORY: 15 * 60 * 1000,   // 15 minutes (increased from 5) 
 };

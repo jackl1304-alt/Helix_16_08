@@ -1,7 +1,15 @@
-// Performance: Fix memory leaks and event listener issues - VERY FIRST
+// Performance: EventEmitter fix - ES module compatible
 import { EventEmitter } from "events";
 EventEmitter.defaultMaxListeners = 0; // Unlimited to prevent warnings
 process.setMaxListeners(0); // Unlimited for process listeners
+
+// Performance optimized warning handling
+process.on('warning', (warning) => {
+  if (warning.name === 'MaxListenersExceededWarning') {
+    // Just log, don't crash
+    console.log(`[PERF-WARN] ${warning.name} suppressed`);
+  }
+});
 
 import express, { type Request, type Response, type NextFunction } from "express";
 import { createServer } from "http";

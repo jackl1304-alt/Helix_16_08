@@ -62,10 +62,11 @@ export default function Dashboard() {
       console.log('[QUERY] Stats received:', data);
       return data;
     },
-    staleTime: 10000,
-    gcTime: 30000,
-    refetchOnMount: true,
-    retry: 2,
+    staleTime: 5 * 60 * 1000, // 5 minutes - drastically reduced calls
+    gcTime: 10 * 60 * 1000, // 10 minutes cache
+    refetchOnMount: false, // Don't refetch on every mount
+    refetchOnWindowFocus: false, // Don't refetch on focus
+    retry: 1, // Reduce retries
   });
 
   const { data: recentUpdates, error: updatesError } = useQuery({
@@ -89,9 +90,11 @@ export default function Dashboard() {
       console.log('[ADMIN] Updates received:', data?.length || 0);
       return data;
     },
-    staleTime: 30000,
-    gcTime: 60000,
-    retry: 2,
+    staleTime: 10 * 60 * 1000, // 10 minutes - much longer
+    gcTime: 20 * 60 * 1000, // 20 minutes cache
+    refetchOnMount: false, // Don't refetch on mount
+    refetchOnWindowFocus: false, // Don't refetch on focus
+    retry: 1, // Reduce retries
   });
 
   // Hard-coded newsletter sources for testing - bypassing all fetching issues
