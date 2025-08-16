@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ interface SearchResult {
   excerpt: string;
   type: 'regulatory' | 'legal' | 'knowledge' | 'historical';
   source: string;
+  dataSource: 'database' | 'ai' | 'hybrid'; // Neue Eigenschaft für Datenquelle
   relevance: number;
   date: string;
   url?: string;
@@ -44,6 +46,7 @@ interface SearchResult {
     category?: string;
     tags?: string[];
     language?: string;
+    aiConfidence?: number; // Für KI-generierte Ergebnisse
   };
 }
 
@@ -59,6 +62,7 @@ interface IntelligentAnswer {
 
 export default function IntelligentSearch() {
   const { toast } = useToast();
+  const [location] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilters, setSelectedFilters] = useState({
     type: "all",
@@ -69,20 +73,34 @@ export default function IntelligentSearch() {
   const [intelligentAnswer, setIntelligentAnswer] = useState<IntelligentAnswer | null>(null);
   const [isSearching, setIsSearching] = useState(false);
 
+  // Automatische Suche bei URL-Query-Parameter
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryParam = urlParams.get('q');
+    if (queryParam && queryParam.trim()) {
+      setSearchQuery(queryParam.trim());
+      // Automatisch suchen wenn aus Sidebar kommt
+      setIsSearching(true);
+      searchMutation.mutate(queryParam.trim());
+    }
+  }, [location]);
+
   const searchMutation = useMutation({
     mutationFn: async (query: string) => {
+      console.log('[INTELLIGENT-SEARCH] Starting search for:', query);
       return await apiRequest("/api/intelligent-search", "POST", { 
         query, 
         filters: selectedFilters 
       });
     },
     onSuccess: (data: any) => {
+      console.log('[INTELLIGENT-SEARCH] Search results received:', data);
       setSearchResults(data.results || []);
       setIntelligentAnswer(data.answer || null);
       setIsSearching(false);
     },
     onError: (error) => {
-      console.error("Search error:", error);
+      console.error('[INTELLIGENT-SEARCH] Search error:', error);
       toast({
         title: "Suchfehler",
         description: "Fehler bei der intelligenten Suche",
@@ -302,6 +320,17 @@ export default function IntelligentSearch() {
                       <Badge variant="outline">
                         {result.source}
                       </Badge>
+                      {/* Datenquelle anzeigen */}
+                      <Badge 
+                        variant={result.dataSource === 'database' ? 'default' : result.dataSource === 'ai' ? 'destructive' : 'secondary'}
+                        className={result.dataSource === 'database' ? 'bg-blue-100 text-blue-800' : 
+                                  result.dataSource === 'ai' ? 'bg-purple-100 text-purple-800' : 
+                                  'bg-orange-100 text-orange-800'}
+                      >
+                        {result.dataSource === 'database' ? '🗄️ Eigene Daten' : 
+                         result.dataSource === 'ai' ? '🤖 KI-Ergebnis' : 
+                         '🔄 Hybrid'}
+                      </Badge>
                       {result.metadata.region && (
                         <Badge variant="outline">
                           <Globe className="mr-1 h-3 w-3" />
@@ -313,6 +342,11 @@ export default function IntelligentSearch() {
                       <span className="text-sm font-medium text-green-600">
                         {Math.round(result.relevance * 100)}% Relevanz
                       </span>
+                      {result.metadata.aiConfidence && (
+                        <span className="text-xs text-purple-600">
+                          KI: {result.metadata.aiConfidence}%
+                        </span>
+                      )}
                     </div>
                   </div>
                   
