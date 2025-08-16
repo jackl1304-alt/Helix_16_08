@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -204,9 +204,9 @@ export default function CustomerAIInsights() {
           )}
 
           {/* Insights Grid */}
-          {!isInsightsLoading && !insightsError && displayInsights && (
+          {!isInsightsLoading && !insightsError && (insights || mockInsights) && (
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {displayInsights.map((insight) => (
+              {(insights || mockInsights).map((insight) => (
               <Card key={insight.id} className={`${colors.cardBg} hover:shadow-lg transition-shadow`}>
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between">
@@ -259,7 +259,7 @@ export default function CustomerAIInsights() {
           )}
 
           {/* No Data State */}
-          {!isInsightsLoading && !insightsError && (!displayInsights || displayInsights.length === 0) && (
+          {!isInsightsLoading && !insightsError && (!(insights || mockInsights) || (insights || mockInsights).length === 0) && (
             <Card className={`${colors.cardBg}`}>
               <CardHeader>
                 <CardTitle className={`${colors.textPrimary} flex items-center gap-2`}>
