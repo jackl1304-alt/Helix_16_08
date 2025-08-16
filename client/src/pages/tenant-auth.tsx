@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { CustomCursor } from "@/components/ui/custom-cursor";
+import { NavigationHeader } from "@/components/ui/navigation-header";
 import { Building, Shield, User, Lock, Eye, EyeOff } from "lucide-react";
 import { useLocation } from "wouter";
 
