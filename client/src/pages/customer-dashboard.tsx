@@ -11,7 +11,28 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import CustomerNavigation, { type CustomerPermissions } from "@/components/customer/customer-navigation";
+// import CustomerNavigation, { type CustomerPermissions } from "@/components/customer/customer-navigation";
+import { ResponsiveLayout } from "@/components/responsive-layout";
+
+// Customer permissions type
+export interface CustomerPermissions {
+  dashboard: boolean;
+  regulatoryUpdates: boolean;
+  legalCases: boolean;
+  knowledgeBase: boolean;
+  newsletters: boolean;
+  analytics: boolean;
+  reports: boolean;
+  dataCollection: boolean;
+  globalSources: boolean;
+  historicalData: boolean;
+  administration: boolean;
+  userManagement: boolean;
+  systemSettings: boolean;
+  auditLogs: boolean;
+  aiInsights: boolean;
+  advancedAnalytics: boolean;
+}
 import { 
   Building,
   Users,
@@ -246,11 +267,7 @@ export default function CustomerDashboard() {
         <LanguageSelector />
       </div>
       
-      {/* Navigation Sidebar */}
-      <CustomerNavigation 
-        permissions={permissions}
-        tenantName={liveTenantName}
-      />
+      {/* Main Layout with Sidebar */}
       
       {/* Main Content */}
       <div className="flex-1 ml-64">

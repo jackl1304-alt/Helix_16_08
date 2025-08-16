@@ -4,7 +4,8 @@ import { useParams } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import CustomerNavigation from "@/components/customer/customer-navigation";
+// import CustomerNavigation from "@/components/customer/customer-navigation"; // Disabled temporarily
+import { ResponsiveLayout } from "@/components/responsive-layout";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLiveTenantPermissions } from "@/hooks/use-live-tenant-permissions";
@@ -144,12 +145,9 @@ export default function CustomerAIInsights() {
   }
 
   return (
-    <div className={`flex min-h-screen ${colors.background}`}>
+    <ResponsiveLayout>
       {/* Navigation Sidebar */}
-      <CustomerNavigation 
-        permissions={permissions}
-        tenantName={tenantData?.name}
-      />
+      {/* CustomerNavigation replaced with ResponsiveLayout wrapper */}
       
       {/* Main Content */}
       <div className="flex-1 ml-64">
@@ -357,6 +355,6 @@ export default function CustomerAIInsights() {
           </Card>
         </div>
       </div>
-    </div>
+    </ResponsiveLayout>
   );
 }

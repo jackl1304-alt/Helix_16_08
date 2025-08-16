@@ -3,7 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import CustomerNavigation from "@/components/customer/customer-navigation";
+// import CustomerNavigation from "@/components/customer/customer-navigation"; // Disabled temporarily
+import { ResponsiveLayout } from "@/components/responsive-layout";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLiveTenantPermissions } from "@/hooks/use-live-tenant-permissions";
@@ -72,13 +73,8 @@ export default function CustomerRegulatoryUpdates() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <CustomerNavigation 
-        permissions={permissions} 
-        tenantName={tenantName || "Customer Portal"} 
-      />
-      
-      <main className="ml-64 flex-1 p-8 overflow-y-auto">
+    <ResponsiveLayout>
+      <main className="flex-1 p-8 overflow-y-auto">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -155,6 +151,6 @@ export default function CustomerRegulatoryUpdates() {
           )}
         </div>
       </main>
-    </div>
+    </ResponsiveLayout>
   );
 }
