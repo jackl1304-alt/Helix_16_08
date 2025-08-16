@@ -79,10 +79,10 @@ registerRoutes(app);
 // Setup customer AI routes  
 setupCustomerAIRoutes(app);
 
-// Register tenant-specific routes
-app.use('/api/tenant', tenantRoutes);
+// Register tenant-specific routes - ONLY new real data API
 app.use('/api/tenant/auth', tenantAuthRoutes);
-app.use('/api/tenant', tenantApiRoutes);
+app.use('/api/tenant', tenantApiRoutes);  // NEW real data API with database connections
+// OLD tenant routes REMOVED to prevent conflicts
 
 // Register AI-powered search and analysis routes (Admin only)
 app.use('/api/ai', aiSearchRoutes);
