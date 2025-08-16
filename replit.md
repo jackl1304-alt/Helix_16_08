@@ -4,6 +4,11 @@
 Helix is a comprehensive regulatory intelligence platform for the medical device industry. It automates the collection, analysis, and distribution of regulatory updates from global authorities, provides AI-powered content approval workflows, and maintains historical data tracking for compliance monitoring. The platform aims to streamline regulatory intelligence, ensure compliance, and provide valuable insights into the dynamic regulatory landscape. Its business vision includes ensuring compliance, providing valuable insights, and achieving 100% data quality, making it production-ready with advanced analytics and a polished user experience.
 
 ## Recent Changes (August 2025)
+- **Multi-Tenant System**: Vollständige Implementierung der Tenant-Isolation mit abonnement-basiertem Dashboard (16. August 2025)
+- **Subscription-Based Access**: Tenant-Dashboard zeigt nur Inhalte basierend auf Abonnement-Level (Basic/Professional/Enterprise)
+- **Tenant Authentication**: Funktionierende Tenant-Anmeldung mit Demo-Credentials (admin@demo-medical.local/demo123)
+- **Usage Limits**: Implementation von monatlichen Nutzungslimits und Feature-Beschränkungen je Abonnement
+- **Isolated Dashboard**: Tenant-Dashboard ist vollständig getrennt vom Admin-Bereich mit eigener UI/UX
 - **Deployment Fix**: Kritischer Deployment-Fehler behoben - Express app initialization komplett wiederhergestellt in server/index.ts (14. August 2025)
 - **Production Build**: Build-Prozess funktioniert einwandfrei - dist/index.js wird korrekt generiert (995kb)
 - **Server Startup**: Vollständige Express-Server-Konfiguration mit Middleware, CORS, Health-Check und graceful shutdown
