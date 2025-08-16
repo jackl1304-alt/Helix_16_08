@@ -7,6 +7,7 @@ import CustomerNavigation from "@/components/customer/customer-navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLiveTenantPermissions } from "@/hooks/use-live-tenant-permissions";
+import { useCustomerTheme } from "@/contexts/customer-theme-context";
 import { FileText, Calendar, Globe, Filter } from "lucide-react";
 
 const mockTenantId = "030d3e01-32c4-4f95-8d54-98be948e8d4b";
