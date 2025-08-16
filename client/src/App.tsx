@@ -1,201 +1,122 @@
-import React, { useState, useEffect } from "react";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { LanguageProvider } from "@/contexts/LanguageContext";
-import { useLocation } from "wouter";
-import { ResponsiveLayout } from "@/components/responsive-layout";
+import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { lazy, Suspense } from "react";
+import { ResponsiveLayout } from "@/components/responsive-layout";
+import { performanceMonitor, preloadCriticalResources } from "@/utils/performance";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { CustomerThemeProvider } from "@/contexts/customer-theme-context";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/use-auth";
 import Login from "@/pages/login";
 
-// Direct imports - no lazy loading to eliminate Suspense issues
+// Initialize performance monitoring and preload resources
+if (typeof window !== 'undefined') {
+  preloadCriticalResources();
+}
+
+// Critical pages loaded immediately
 import Dashboard from "@/pages/dashboard";
 import NotFound from "@/pages/not-found";
-import CustomerDashboard from "@/pages/customer-dashboard";
-import Analytics from "@/pages/analytics";
-import DataCollection from "@/pages/data-collection";
-import GlobalSources from "@/pages/global-sources";
-import RegulatoryUpdates from "@/pages/regulatory-updates-fixed-complete";
-import Administration from "@/pages/administration";
-import UserManagement from "@/pages/user-management";
-import KnowledgeBase from "@/pages/knowledge-base";
-import NewsletterAdmin from "@/pages/newsletter-admin";
-import EmailManagement from "@/pages/email-management-new";
-import ZulassungenGlobal from "@/pages/zulassungen-global";
-import LaufendeZulassungen from "@/pages/laufende-zulassungen";
-import Rechtsprechung from "@/pages/rechtsprechung-fixed";
-import SyncManager from "@/pages/sync-manager-new";
-import AIInsights from "@/pages/ai-insights";
-import HistoricalData from "@/pages/historical-data-simple";
-import AdminCustomers from "@/pages/admin-customers";
-import AuditLogs from "@/pages/audit-logs";
-import SystemSettings from "@/pages/system-settings";
-import IntelligentSearch from "@/pages/intelligent-search";
 
-// JSON-based Navigation State
-interface AppState {
-  currentPage: string;
-  userData: any;
-  isLoading: boolean;
-}
+// Lazy load components for better performance
+const CustomerRouter = lazy(() => import("@/components/customer/customer-router"));
+const DataCollection = lazy(() => import("@/pages/data-collection"));
+const Analytics = lazy(() => import("@/pages/analytics"));
+const Administration = lazy(() => import("@/pages/administration"));
+const UserManagement = lazy(() => import("@/pages/user-management"));
+const RegulatoryUpdates = lazy(() => import("@/pages/regulatory-updates-fixed-complete"));
 
-// JSON-based page renderer with all essential routes
-function renderCurrentPage(page: string, userData: any) {
-  switch (page) {
-    case '/':
-    case '/dashboard':
-      return <Dashboard />;
-    
-    // Customer Area - Multiple paths
-    case '/customer-dashboard':
-    case '/customer/dashboard':
-    case '/customer-area':
-    case '/tenant/dashboard':
-    case '/tenant/demo-medical':
-    case '/tenant/demo-medical/dashboard':
-      return <CustomerDashboard />;
-    
-    // Admin Pages
-    case '/analytics':
-      return <Analytics />;
-    case '/data-collection':
-      return <DataCollection />;
-    case '/global-sources':
-      return <GlobalSources />;
-    case '/regulatory-updates':
-      return <RegulatoryUpdates />;
-    case '/administration':
-      return <Administration />;
-    case '/user-management':
-      return <UserManagement />;
-    case '/knowledge-base':
-      return <KnowledgeBase />;
-    
-    // Data Management
-    case '/newsletter-admin':
-      return <NewsletterAdmin />;
-    case '/email-management':
-      return <EmailManagement />;
-    
-    // Compliance & Regulation
-    case '/rechtsprechung':
-      return <Rechtsprechung />;
-    
-    // Approvals & Registration
-    case '/zulassungen/global':
-      return <ZulassungenGlobal />;
-    case '/zulassungen/laufende':
-      return <LaufendeZulassungen />;
-    
-    // Advanced Features
-    case '/sync-manager':
-      return <SyncManager />;
-    case '/ai-insights':
-    case '/ki-insights':
-      return <AIInsights />;
-    case '/historical-data':
-      return <HistoricalData />;
-    case '/admin-customers':
-      return <AdminCustomers />;
-    case '/audit-logs':
-      return <AuditLogs />;
-    case '/system-settings':
-      return <SystemSettings />;
-    case '/intelligent-search':
-      return <IntelligentSearch />;
-    
-    case '/404':
-      return <NotFound />;
-    default:
-      return <NotFound />;
-  }
-}
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+  </div>
+);
 
-// JSON-based Simple App with working navigation
-function App() {
-  const [location] = useLocation(); // Use wouter for navigation
-  const [appState, setAppState] = useState<AppState>({
-    currentPage: location,
-    userData: null,
-    isLoading: true
-  });
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
-  // Update current page when location changes
-  useEffect(() => {
-    setAppState(prev => ({ ...prev, currentPage: location }));
-  }, [location]);
-
-  // Initialize app with JSON data
-  useEffect(() => {
-    const initializeApp = async () => {
-      try {
-        // Check authentication
-        const authStatus = localStorage.getItem('isAuthenticated') === 'true';
-        setIsAuthenticated(authStatus);
+function Router() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <Switch>
+        {/* Admin Dashboard */}
+        <Route path="/" component={Dashboard} />
+        <Route path="/dashboard" component={Dashboard} />
         
-        // Load user data from JSON endpoint if authenticated
-        if (authStatus) {
-          const userData = await fetch('/api/user/profile')
-            .then(res => res.ok ? res.json() : null)
-            .catch(() => null);
-          
-          setAppState(prev => ({
-            ...prev,
-            userData,
-            isLoading: false
-          }));
-        } else {
-          setAppState(prev => ({ ...prev, isLoading: false }));
-        }
-      } catch (error) {
-        console.error('App initialization error:', error);
-        setAppState(prev => ({ ...prev, isLoading: false }));
-      }
-    };
+        {/* Admin Pages */}
+        <Route path="/data-collection" component={DataCollection} />
+        <Route path="/analytics" component={Analytics} />
+        <Route path="/regulatory-updates" component={RegulatoryUpdates} />
+        <Route path="/administration" component={Administration} />
+        <Route path="/user-management" component={UserManagement} />
+        
+        {/* Fallback */}
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
+  );
+}
 
-    initializeApp();
-  }, []);
+function App() {
+  const { isAuthenticated } = useAuth();
 
-  // Navigation is now handled by wouter automatically
-
-  // Loading state
-  if (appState.isLoading || isAuthenticated === null) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Helix wird geladen...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show login if not authenticated
   if (!isAuthenticated) {
     return (
-      <LanguageProvider>
-        <QueryClientProvider client={queryClient}>
-          <div className="min-h-screen bg-gray-50">
-            <Toaster />
-            <Login onLogin={() => setIsAuthenticated(true)} />
-          </div>
-        </QueryClientProvider>
-      </LanguageProvider>
+      <ErrorBoundary>
+        <LanguageProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <Toaster />
+              <Login />
+            </TooltipProvider>
+          </QueryClientProvider>
+        </LanguageProvider>
+      </ErrorBoundary>
     );
   }
 
-  // Main app with JSON-based navigation
   return (
-    <LanguageProvider>
-      <QueryClientProvider client={queryClient}>
-        <div className="min-h-screen bg-gray-50">
-          <Toaster />
-          <ResponsiveLayout>
-            {renderCurrentPage(location, appState.userData)}
-          </ResponsiveLayout>
-        </div>
-      </QueryClientProvider>
-    </LanguageProvider>
+    <ErrorBoundary>
+      <LanguageProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <Switch>
+              {/* Customer Portal - Multi-Tenant */}
+              <Route path="/customer-dashboard">
+                <CustomerThemeProvider>
+                  <Suspense fallback={<LoadingFallback />}>
+                    <CustomerRouter />
+                  </Suspense>
+                </CustomerThemeProvider>
+              </Route>
+              <Route path="/customer/*">
+                <CustomerThemeProvider>
+                  <Suspense fallback={<LoadingFallback />}>
+                    <CustomerRouter />
+                  </Suspense>
+                </CustomerThemeProvider>
+              </Route>
+              <Route path="/tenant/*">
+                <CustomerThemeProvider>
+                  <Suspense fallback={<LoadingFallback />}>
+                    <CustomerRouter />
+                  </Suspense>
+                </CustomerThemeProvider>
+              </Route>
+              
+              {/* Admin Pages with Sidebar */}
+              <Route>
+                <ResponsiveLayout>
+                  <Router />
+                </ResponsiveLayout>
+              </Route>
+            </Switch>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </LanguageProvider>
+    </ErrorBoundary>
   );
 }
 
