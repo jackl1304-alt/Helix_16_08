@@ -27,7 +27,7 @@ import {
   LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-// import logoPath from "@assets/ICON Helix_1753735921077.jpg"; // Logo temporär deaktiviert
+// Logo wird als Gradient-Element erstellt
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -218,11 +218,9 @@ export function Sidebar() {
       <div className="p-6 border-b border-gray-200">
         <Link href="/">
           <div className="flex flex-col items-center cursor-pointer space-y-2">
-            <img 
-              src="/favicon.ico" 
-              alt="Helix Logo" 
-              className="h-32 w-32 object-cover rounded-lg ring-2 ring-[#b0d4f6]"
-            />
+            <div className="h-32 w-32 bg-gradient-to-br from-blue-600 to-purple-700 rounded-lg ring-2 ring-[#b0d4f6] flex items-center justify-center text-white font-bold text-6xl">
+              H
+            </div>
             <span className="text-lg deltaways-brand-text text-[#07233e]">HELIX</span>
             <p className="text-xs font-medium text-gray-600">Powered by DELTA WAYS</p>
           </div>

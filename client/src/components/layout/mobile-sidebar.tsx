@@ -65,11 +65,9 @@ export function MobileSidebar() {
       <div className="sticky top-0 z-40 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
         <Link href="/">
           <div className="flex flex-col items-center cursor-pointer">
-            <img 
-              src="/favicon.ico" 
-              alt="Helix Logo" 
-              className="h-10 w-10 rounded-lg object-cover"
-            />
+            <div className="h-10 w-10 bg-gradient-to-br from-blue-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+              H
+            </div>
             <span className="text-xs font-medium text-gray-700 mt-1">MedTech Intelligence</span>
           </div>
         </Link>
@@ -89,11 +87,9 @@ export function MobileSidebar() {
             {/* Header */}
             <div className="p-4 border-b border-gray-200">
               <div className="flex flex-col items-center">
-                <img 
-                  src="/favicon.ico" 
-                  alt="Helix Logo" 
-                  className="h-12 w-12 rounded-lg object-cover mb-2"
-                />
+                <div className="h-12 w-12 bg-gradient-to-br from-blue-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-bold text-xl mb-2">
+                  H
+                </div>
                 <div className="text-sm font-medium text-gray-700">MedTech Intelligence</div>
               </div>
             </div>

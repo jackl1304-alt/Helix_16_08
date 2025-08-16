@@ -13,35 +13,45 @@ interface ResponsiveLayoutProps {
 export function ResponsiveLayout({ children, showSidebar = true }: ResponsiveLayoutProps) {
   const device = useDevice();
 
+  if (device.isMobile || device.isTablet) {
+    // Mobile/Tablet Layout
+    return (
+      <div className={cn(
+        "min-h-screen bg-gray-50 dark:bg-gray-900",
+        getDeviceClasses(device)
+      )}>
+        {showSidebar && <MobileSidebar />}
+        
+        {/* Language Selector - Top Right */}
+        <div className="fixed top-4 right-4 z-50">
+          <LanguageSelector />
+        </div>
+        
+        {/* Main Content - Full Width on Mobile */}
+        <div className="min-h-screen">
+          {children}
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop Layout
   return (
     <div className={cn(
       "min-h-screen bg-gray-50 dark:bg-gray-900",
       getDeviceClasses(device)
     )}>
-      {showSidebar && (
-        <>
-          {/* Desktop Sidebar - only show on screens larger than 1024px */}
-          <div className="hidden lg:block">
-            <Sidebar />
-          </div>
-          
-          {/* Mobile/Tablet Sidebar - show on screens smaller than 1024px */}
-          <div className="lg:hidden">
-            <MobileSidebar />
-          </div>
-        </>
-      )}
+      {showSidebar && <Sidebar />}
       
       {/* Language Selector - Top Right */}
       <div className="fixed top-4 right-4 z-50">
         <LanguageSelector />
       </div>
       
-      {/* Main Content */}
+      {/* Main Content - With Sidebar Margin on Desktop */}
       <div className={cn(
-        "transition-all duration-300",
-        showSidebar ? "ml-64" : "ml-0", // Sidebar width margin
-        "min-h-screen" // Full height
+        "transition-all duration-300 min-h-screen",
+        showSidebar ? "ml-64" : "ml-0"
       )}>
         {children}
       </div>
