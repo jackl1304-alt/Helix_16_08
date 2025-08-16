@@ -5,6 +5,7 @@ import { registerRoutes } from "./routes";
 import { setupCustomerAIRoutes } from "./temp-ai-routes";
 import tenantRoutes from "./routes/tenant-routes";
 import tenantAuthRoutes from "./routes/tenant-auth-simple";
+import aiSearchRoutes from "./routes/ai-search-routes";
 import { tenantIsolationMiddleware } from "./middleware/tenant-isolation";
 import { setupVite, log } from "./vite";
 import fs from "fs";
@@ -80,6 +81,9 @@ setupCustomerAIRoutes(app);
 // Register tenant-specific routes
 app.use('/api/tenant', tenantRoutes);
 app.use('/api/tenant/auth', tenantAuthRoutes);
+
+// Register AI-powered search and analysis routes (Admin only)
+app.use('/api/ai', aiSearchRoutes);
 
 // Weitere Routen
 app.post("/api/webhook", (req: Request, res: Response) => {
