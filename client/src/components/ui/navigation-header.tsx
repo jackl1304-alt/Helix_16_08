@@ -34,16 +34,6 @@ export function NavigationHeader({ showTenantLinks = true, currentView = 'admin'
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setLocation('/tenant/auth')}
-                className="flex items-center space-x-2 text-sm"
-                data-testid="button-goto-tenant-auth"
-              >
-                <LogIn className="h-4 w-4" />
-                <span>Tenant Login</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
                 onClick={() => setLocation('/tenant/dashboard')}
                 className="flex items-center space-x-2 text-sm"
                 data-testid="button-goto-tenant-dashboard"
@@ -68,18 +58,6 @@ export function NavigationHeader({ showTenantLinks = true, currentView = 'admin'
             </Button>
           )}
 
-          {currentView === 'public' && (
-            <Button
-              variant="default"
-              size="sm"
-              onClick={() => setLocation('/tenant/auth')}
-              className="flex items-center space-x-2 text-sm bg-blue-600 hover:bg-blue-700"
-              data-testid="button-tenant-login"
-            >
-              <LogIn className="h-4 w-4" />
-              <span>Tenant Login</span>
-            </Button>
-          )}
         </div>
       )}
     </div>
