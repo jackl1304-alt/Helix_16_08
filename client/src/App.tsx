@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import Login from "@/pages/login";
@@ -8,6 +9,14 @@ import Login from "@/pages/login";
 // Direct imports - no lazy loading to eliminate Suspense issues
 import Dashboard from "@/pages/dashboard";
 import NotFound from "@/pages/not-found";
+import CustomerDashboard from "@/pages/customer-dashboard";
+import Analytics from "@/pages/analytics";
+import DataCollection from "@/pages/data-collection";
+import GlobalSources from "@/pages/global-sources";
+import RegulatoryUpdates from "@/pages/regulatory-updates-fixed-complete";
+import Administration from "@/pages/administration";
+import UserManagement from "@/pages/user-management";
+import KnowledgeBase from "@/pages/knowledge-base";
 
 // JSON-based Navigation State
 interface AppState {
@@ -16,26 +25,55 @@ interface AppState {
   isLoading: boolean;
 }
 
-// Simple page renderer without complex routing
+// JSON-based page renderer with all essential routes
 function renderCurrentPage(page: string, userData: any) {
   switch (page) {
     case '/':
     case '/dashboard':
       return <Dashboard />;
+    
+    // Customer Area
+    case '/customer-dashboard':
+    case '/customer/dashboard':
+      return <CustomerDashboard />;
+    
+    // Admin Pages
+    case '/analytics':
+      return <Analytics />;
+    case '/data-collection':
+      return <DataCollection />;
+    case '/global-sources':
+      return <GlobalSources />;
+    case '/regulatory-updates':
+      return <RegulatoryUpdates />;
+    case '/administration':
+      return <Administration />;
+    case '/user-management':
+      return <UserManagement />;
+    case '/knowledge-base':
+      return <KnowledgeBase />;
+    
     case '/404':
+      return <NotFound />;
     default:
       return <NotFound />;
   }
 }
 
-// JSON-based Simple App without React Suspense issues
+// JSON-based Simple App with working navigation
 function App() {
+  const [location] = useLocation(); // Use wouter for navigation
   const [appState, setAppState] = useState<AppState>({
-    currentPage: window.location.pathname,
+    currentPage: location,
     userData: null,
     isLoading: true
   });
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  // Update current page when location changes
+  useEffect(() => {
+    setAppState(prev => ({ ...prev, currentPage: location }));
+  }, [location]);
 
   // Initialize app with JSON data
   useEffect(() => {
@@ -68,11 +106,7 @@ function App() {
     initializeApp();
   }, []);
 
-  // Handle navigation via JSON state
-  const handleNavigation = (page: string) => {
-    setAppState(prev => ({ ...prev, currentPage: page }));
-    window.history.pushState({}, '', page);
-  };
+  // Navigation is now handled by wouter automatically
 
   // Loading state
   if (appState.isLoading || isAuthenticated === null) {
@@ -106,7 +140,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <div className="min-h-screen bg-gray-50">
           <Toaster />
-          {renderCurrentPage(appState.currentPage, appState.userData)}
+          {renderCurrentPage(location, appState.userData)}
         </div>
       </QueryClientProvider>
     </LanguageProvider>
