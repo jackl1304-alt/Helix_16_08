@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+// useQuery entfernt - war orphaned component mit unnötigen API-Calls
 import { Card, CardContent } from "@/components/ui/card";
 import { Database, FolderSync, Clock, Users } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,10 +14,13 @@ interface DashboardStats {
   urgentApprovals: number;
 }
 
-export function StatusCards() {
-  const { data: stats, isLoading } = useQuery<DashboardStats>({
-    queryKey: ["/api/dashboard/stats"],
-  });
+interface StatusCardsProps {
+  stats?: DashboardStats;
+  isLoading: boolean;
+}
+
+export function StatusCards({ stats, isLoading }: StatusCardsProps) {
+  // DOPPELTE API-CALLS BEHOBEN: Daten werden als Props übergeben
 
   if (isLoading) {
     return (
