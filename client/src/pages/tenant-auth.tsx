@@ -95,7 +95,7 @@ export default function TenantAuth({
 
   const handleDemo = () => {
     // Demo login with predefined credentials
-    setEmail('user@demo-medical.helix.local');
+    setEmail('admin@demo-medical.local');
     setPassword('demo123');
   };
 
