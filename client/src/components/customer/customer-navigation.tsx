@@ -166,32 +166,11 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
     return path.startsWith('/') ? path : `/${path}`;
   };
 
-  // Load permissions only once - no aggressive polling
+  // Use provided permissions directly - no additional API calls
   useEffect(() => {
-    if (!params.tenantId) return;
-    
-    const loadPermissions = async () => {
-      try {
-        const response = await fetch(`/api/customer/tenant/${params.tenantId}`);
-        if (response.ok) {
-          const tenantData = await response.json();
-          if (tenantData.customerPermissions) {
-            setCurrentPermissions(tenantData.customerPermissions);
-            onPermissionsUpdate?.(tenantData.customerPermissions);
-          }
-        } else {
-          console.warn(`[CUSTOMER] Tenant API response not ok: ${response.status}`);
-        }
-      } catch (error) {
-        console.error('[CUSTOMER] Fehler beim Abrufen der aktuellen Berechtigungen:', error);
-        // Use fallback permissions if API fails
-        console.log('[CUSTOMER] Using fallback permissions');
-      }
-    };
-
-    // Load only once on mount
-    loadPermissions();
-  }, [params.tenantId, onPermissionsUpdate]);
+    // Simply use the permissions passed as props
+    setCurrentPermissions(permissions);
+  }, [permissions]);
 
   // Filter navigation items based on current permissions
   const allowedItems = ALL_NAVIGATION_ITEMS.filter(item => 
@@ -271,7 +250,10 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
           variant="outline" 
           size="sm" 
           className="w-full" 
-          onClick={() => window.open('/chat-support', '_blank')}
+          onClick={() => {
+            const chatUrl = params.tenantId ? `/tenant/${params.tenantId}/chat-support` : '/customer/chat-support';
+            setLocation(chatUrl);
+          }}
         >
           <MessageCircle className="w-4 h-4 mr-2" />
           Support Chat
