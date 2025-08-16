@@ -168,9 +168,9 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 
 // Performance: Add security and optimization middleware
 app.use((req, res, next) => {
-  // Security headers
+  // Security headers (Replit-friendly)
   res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN'); // Allow embedding in Replit
   res.setHeader('X-XSS-Protection', '1; mode=block');
   
   // Performance headers
