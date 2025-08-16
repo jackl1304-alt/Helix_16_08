@@ -1,345 +1,325 @@
-import React from 'react';
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CustomCursor } from "@/components/ui/custom-cursor";
-import { DarkModeToggle } from "@/components/ui/dark-mode-toggle";
-import { useQuery } from "@tanstack/react-query";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Building2, Users, FileText, TrendingUp, Clock, Shield, Star, Zap, Crown, Lock } from "lucide-react";
 import { useLocation } from "wouter";
-import { 
-  FileText, 
-  Database, 
-  BookOpen, 
-  Users, 
-  CheckCircle, 
-  TrendingUp,
-  Mail,
-  Loader2,
-  Shield,
-  BarChart3,
-  Settings,
-  Globe,
-  Activity,
-  Sparkles,
-  Heart,
-  Award,
-  Building
-} from "lucide-react";
-
-interface TenantUser {
-  id: string;
-  tenantId: string;
-  email: string;
-  name: string;
-  role: 'tenant_admin' | 'tenant_user';
-}
 
 interface TenantContext {
   id: string;
   name: string;
   subdomain: string;
-  colorScheme: 'blue' | 'purple' | 'green';
-  subscriptionTier: string;
+  colorScheme: string;
+  subscriptionTier: 'basic' | 'professional' | 'enterprise';
+  settings?: any;
 }
+
+interface TenantStats {
+  totalUpdates: number;
+  totalLegalCases: number;
+  activeDataSources: number;
+  monthlyUsage: number;
+  usageLimit: number;
+}
+
+const subscriptionLimits = {
+  basic: {
+    name: 'Basic Plan',
+    icon: Shield,
+    monthlyUpdates: 50,
+    legalCases: 10,
+    dataSources: 5,
+    features: ['Grundlegende Updates', 'Email-Benachrichtigungen', 'Standard-Support']
+  },
+  professional: {
+    name: 'Professional Plan', 
+    icon: Star,
+    monthlyUpdates: 200,
+    legalCases: 50,
+    dataSources: 20,
+    features: ['Erweiterte Analytics', 'Priority Support', 'Custom Reports', 'API Access']
+  },
+  enterprise: {
+    name: 'Enterprise Plan',
+    icon: Crown,
+    monthlyUpdates: 1000,
+    legalCases: 500,
+    dataSources: 100,
+    features: ['Unbegrenzte Updates', 'Dedicated Support', 'White-label', 'Custom Integrations']
+  }
+};
 
 export default function TenantDashboard() {
   const [, setLocation] = useLocation();
 
-  // Fetch tenant-specific dashboard data
-  const { data: stats, isLoading, error } = useQuery({
-    queryKey: ['/api/tenant/dashboard/stats'],
-    queryFn: async () => {
-      const response = await fetch('/api/tenant/dashboard/stats', {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      return response.json();
-    },
-    staleTime: 10000,
-    gcTime: 30000,
-    refetchOnMount: true,
-    retry: 2,
-  });
-
-  // Fetch tenant context
-  const { data: tenantContext } = useQuery({
+  const { data: tenantContext, isLoading: contextLoading } = useQuery({
     queryKey: ['/api/tenant/context'],
-    queryFn: async (): Promise<TenantContext> => {
-      const response = await fetch('/api/tenant/context');
-      if (!response.ok) throw new Error('Failed to fetch tenant context');
-      return response.json();
-    }
+    retry: 1
   });
 
-  // Fetch tenant updates
-  const { data: recentUpdates } = useQuery({
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ['/api/tenant/dashboard/stats'],
+    retry: 1
+  });
+
+  const { data: updates, isLoading: updatesLoading } = useQuery({
     queryKey: ['/api/tenant/regulatory-updates'],
-    staleTime: 30000,
-    gcTime: 60000,
+    retry: 1
   });
 
-  // Navigation handlers (tenant-scoped)
-  const handleRegulatoryUpdates = () => setLocation('/tenant/regulatory-updates');
-  const handleLegalCases = () => setLocation('/tenant/legal-cases');
-  const handleKnowledgeBase = () => setLocation('/tenant/knowledge-base');
-  const handleAnalytics = () => setLocation('/tenant/analytics');
-  const handleSettings = () => setLocation('/tenant/settings');
+  if (contextLoading || statsLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
+          <div className="animate-pulse flex space-x-4">
+            <div className="rounded-full bg-blue-200 h-12 w-12"></div>
+            <div className="flex-1 space-y-2">
+              <div className="h-4 bg-blue-200 rounded w-3/4"></div>
+              <div className="h-4 bg-blue-200 rounded w-1/2"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  // Color scheme based on tenant
-  const getColorScheme = () => {
-    switch (tenantContext?.colorScheme) {
-      case 'purple':
-        return {
-          primary: 'from-purple-500 to-indigo-600',
-          badge: 'text-purple-600',
-          glow: 'from-purple-100 to-indigo-100 dark:from-purple-900 dark:to-indigo-900'
-        };
-      case 'green':
-        return {
-          primary: 'from-green-500 to-emerald-600',
-          badge: 'text-green-600',
-          glow: 'from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900'
-        };
-      default:
-        return {
-          primary: 'from-blue-500 to-cyan-600',
-          badge: 'text-blue-600',
-          glow: 'from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900'
-        };
-    }
+  const tenant = tenantContext as TenantContext;
+  const dashboardStats = stats as TenantStats;
+  const subscription = subscriptionLimits[tenant?.subscriptionTier || 'basic'];
+  const SubscriptionIcon = subscription.icon;
+
+  const usagePercentage = dashboardStats ? (dashboardStats.monthlyUsage / subscription.monthlyUpdates) * 100 : 0;
+
+  const handleLogout = () => {
+    setLocation('/tenant/auth');
   };
 
-  const colors = getColorScheme();
-
-  if (isLoading) {
-    return (
-      <div className="p-6 space-y-6">
-        <div className="text-center mb-4">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
-          <p className="text-gray-600">Lade Ihr Dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <h3 className="text-red-800 font-semibold">Fehler beim Laden des Dashboards</h3>
-          <p className="text-red-600">Bitte versuchen Sie es erneut oder kontaktieren Sie den Support.</p>
-        </div>
-      </div>
-    );
-  }
-
-  const dashboardCards = [
-    {
-      title: "Regulatory Updates",
-      value: stats?.totalUpdates || 0,
-      description: `${stats?.uniqueUpdates || 0} eindeutige Updates • ${stats?.recentUpdates || 0} diese Woche`,
-      icon: FileText,
-      color: colors.badge,
-    },
-    {
-      title: "Legal Cases", 
-      value: stats?.totalLegalCases || 0,
-      description: `${stats?.uniqueLegalCases || 0} eindeutige Fälle • ${stats?.recentLegalCases || 0} neue diese Monat`,
-      icon: Database,
-      color: colors.badge,
-    },
-    {
-      title: "Data Sources",
-      value: stats?.activeDataSources || 0,
-      description: "Aktive Datenquellen",
-      icon: Globe,
-      color: colors.badge,
-    },
-    {
-      title: "Analytics",
-      value: stats?.totalUpdates || 0,
-      description: "Compliance Tracking",
-      icon: BarChart3,
-      color: colors.badge,
-    }
-  ];
-
   return (
-    <div className="custom-cursor min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-950">
-      <CustomCursor />
-      
-      {/* Tenant Navigation Header */}
-      <div className="glass-nav sticky top-0 z-50 px-6 py-4">
-        <div className="flex justify-between items-center max-w-7xl mx-auto">
-          <div className="flex items-center gap-4">
-            <div className={`emotional-float w-12 h-12 bg-gradient-to-r ${colors.primary} rounded-xl shadow-lg flex items-center justify-center`}>
-              <Building className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className={`text-2xl font-bold bg-gradient-to-r ${colors.primary} bg-clip-text text-transparent`}>
-                {tenantContext?.name || 'Helix Intelligence'}
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                {tenantContext?.subscriptionTier} Plan
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Badge variant="secondary" className="emotional-pulse">
-              <Activity className="h-3 w-3 mr-1" />
-              Tenant Dashboard
-            </Badge>
-            <DarkModeToggle />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSettings}
-              className="cursor-hover"
-            >
-              <Settings className="h-4 w-4 mr-2" />
-              Einstellungen
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-6 pb-6 space-y-8">
-        {/* Tenant Hero Section */}
-        <div className="relative overflow-hidden rounded-3xl mb-12">
-          <div className="absolute inset-0 opacity-10">
-            <div className={`absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-r ${colors.primary} rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob`}></div>
-            <div className={`absolute top-0 right-1/4 w-96 h-96 bg-gradient-to-r ${colors.primary} rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000`}></div>
-          </div>
-
-          <div className="relative z-10 text-center py-16 px-8 bg-gradient-to-br from-white/80 to-blue-50/80 dark:from-slate-900/80 dark:to-blue-950/80 backdrop-blur-sm">
-            <h1 className="headline-hero mb-6">
-              Regulatory Intelligence
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Ihr persönlicher Bereich für <span className={`font-semibold ${colors.badge}`}>Medizintechnik-Regulierungen</span> 
-              mit sicherer Datentrennung
-            </p>
-            <div className="flex justify-center gap-4 mt-8">
-              <Badge variant="outline" className="emotional-glow px-6 py-3 text-base">
-                <Shield className="h-5 w-5 mr-2 text-green-500" />
-                Sichere Isolation
-              </Badge>
-              <Badge variant="outline" className="emotional-pulse px-6 py-3 text-base">
-                <Award className="h-5 w-5 mr-2 text-yellow-500" />
-                Tenant Dashboard
-              </Badge>
-            </div>
-          </div>
-        </div>
-
-        {/* Tenant Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {dashboardCards.map((card, index) => {
-            const IconComponent = card.icon;
-            return (
-              <Card key={index} className="glass-card minimal-focus cursor-hover group">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                  <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
-                    {card.title}
-                  </CardTitle>
-                  <div className={`emotional-float p-2 rounded-lg bg-gradient-to-br ${colors.glow} group-hover:scale-110 transition-transform`}>
-                    <IconComponent className={`h-5 w-5 ${card.color}`} />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent mb-2">
-                    {Number(card.value).toLocaleString()}
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {card.description}
-                  </p>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {/* Tenant Quick Actions */}
-        <Card className="glass-card">
-          <CardHeader>
-            <CardTitle className="headline-section text-2xl flex items-center gap-3">
-              <div className={`emotional-glow p-2 rounded-lg bg-gradient-to-br ${colors.primary} text-white`}>
-                <Sparkles className="h-6 w-6" />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Header */}
+      <header className="bg-white/80 backdrop-blur-lg border-b border-white/20 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-2xl">
+                <Building2 className="h-6 w-6 text-white" />
               </div>
-              Ihre Funktionen
-            </CardTitle>
-            <CardDescription className="text-base">
-              Zugang zu Ihren <span className={`font-semibold ${colors.badge}`}>personalisierten Helix-Tools</span>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Button 
-                variant="outline" 
-                className="minimal-card cursor-hover flex-col items-center gap-3 h-24 hover:border-blue-400 transition-all group"
-                onClick={handleRegulatoryUpdates}
-              >
-                <div className={`emotional-float p-2 rounded-lg bg-gradient-to-br ${colors.glow} group-hover:scale-110 transition-transform`}>
-                  <FileText className={`h-6 w-6 ${colors.badge}`} />
-                </div>
-                <div className="text-center">
-                  <div className="font-semibold text-sm">Regulatory Updates</div>
-                  <div className="text-xs text-muted-foreground">Ihre Updates</div>
-                </div>
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                className="minimal-card cursor-hover flex-col items-center gap-3 h-24 hover:border-purple-400 transition-all group"
-                onClick={handleLegalCases}
-              >
-                <div className={`emotional-pulse p-2 rounded-lg bg-gradient-to-br ${colors.glow} group-hover:scale-110 transition-transform`}>
-                  <Database className={`h-6 w-6 ${colors.badge}`} />
-                </div>
-                <div className="text-center">
-                  <div className="font-semibold text-sm">Legal Cases</div>
-                  <div className="text-xs text-muted-foreground">Rechtsprechung</div>
-                </div>
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                className="minimal-card cursor-hover flex-col items-center gap-3 h-24 hover:border-green-400 transition-all group"
-                onClick={handleKnowledgeBase}
-              >
-                <div className={`emotional-float p-2 rounded-lg bg-gradient-to-br ${colors.glow} group-hover:scale-110 transition-transform`}>
-                  <BookOpen className={`h-6 w-6 ${colors.badge}`} />
-                </div>
-                <div className="text-center">
-                  <div className="font-semibold text-sm">Knowledge Base</div>
-                  <div className="text-xs text-muted-foreground">Wissensdatenbank</div>
-                </div>
-              </Button>
-
-              <Button 
-                variant="outline" 
-                className="minimal-card cursor-hover flex-col items-center gap-3 h-24 hover:border-orange-400 transition-all group"
-                onClick={handleAnalytics}
-              >
-                <div className={`emotional-glow p-2 rounded-lg bg-gradient-to-br ${colors.glow} group-hover:scale-110 transition-transform`}>
-                  <BarChart3 className={`h-6 w-6 ${colors.badge}`} />
-                </div>
-                <div className="text-center">
-                  <div className="font-semibold text-sm">Analytics</div>
-                  <div className="text-xs text-muted-foreground">Compliance Trends</div>
-                </div>
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-900 to-purple-900 bg-clip-text text-transparent">
+                  {tenant?.name || 'Tenant Dashboard'}
+                </h1>
+                <p className="text-sm text-gray-600">Regulatory Intelligence Portal</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <Badge variant="secondary" className="bg-blue-100 text-blue-900 hover:bg-blue-200">
+                <SubscriptionIcon className="h-3 w-3 mr-1" />
+                {subscription.name}
+              </Badge>
+              <Button variant="outline" onClick={handleLogout} data-testid="button-logout">
+                Abmelden
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Subscription Status Alert */}
+        <Alert className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+          <SubscriptionIcon className="h-4 w-4 text-blue-600" />
+          <AlertDescription className="text-blue-900">
+            Sie verwenden den <strong>{subscription.name}</strong>. 
+            Monatliche Nutzung: {dashboardStats?.monthlyUsage || 0} von {subscription.monthlyUpdates} Updates
+          </AlertDescription>
+        </Alert>
+
+        {/* Usage Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-white/80 backdrop-blur-lg border-white/20 shadow-xl">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Monatliche Nutzung</CardTitle>
+              <Clock className="h-4 w-4 text-blue-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-900">{dashboardStats?.monthlyUsage || 0}</div>
+              <Progress value={usagePercentage} className="mt-2" />
+              <p className="text-xs text-gray-500 mt-1">von {subscription.monthlyUpdates} verfügbar</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-blur-lg border-white/20 shadow-xl">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Verfügbare Updates</CardTitle>
+              <FileText className="h-4 w-4 text-green-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-900">{dashboardStats?.totalUpdates || 0}</div>
+              <p className="text-xs text-gray-500">Aktuelle Regulatory Updates</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-blur-lg border-white/20 shadow-xl">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Rechtsfälle</CardTitle>
+              <Users className="h-4 w-4 text-purple-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-purple-900">{dashboardStats?.totalLegalCases || 0}</div>
+              <p className="text-xs text-gray-500">Verfügbare Analysen</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-blur-lg border-white/20 shadow-xl">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Datenquellen</CardTitle>
+              <TrendingUp className="h-4 w-4 text-orange-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-orange-900">{dashboardStats?.activeDataSources || 0}</div>
+              <p className="text-xs text-gray-500">von {subscription.dataSources} erlaubt</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="updates" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 bg-white/50 backdrop-blur-lg">
+            <TabsTrigger value="updates" data-testid="tab-updates">Updates</TabsTrigger>
+            <TabsTrigger value="features" data-testid="tab-features">Features</TabsTrigger>
+            <TabsTrigger value="upgrade" data-testid="tab-upgrade">Upgrade</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="updates" className="space-y-4">
+            <Card className="bg-white/80 backdrop-blur-lg border-white/20 shadow-xl">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <FileText className="h-5 w-5 text-blue-600" />
+                  <span>Aktuelle Regulatory Updates</span>
+                </CardTitle>
+                <CardDescription>
+                  Für Ihr {subscription.name} Abonnement verfügbare Updates
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {updatesLoading ? (
+                  <div className="space-y-3">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="animate-pulse flex space-x-4">
+                        <div className="rounded-full bg-gray-200 h-10 w-10"></div>
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : updates && updates.length > 0 ? (
+                  <div className="space-y-4">
+                    {updates.slice(0, subscription.monthlyUpdates === 50 ? 3 : 10).map((update: any, index: number) => (
+                      <div key={update.id || index} className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                        <h4 className="font-semibold text-blue-900">{update.title}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{update.description}</p>
+                        <Badge variant="outline" className="mt-2 text-xs">
+                          {update.type || 'regulatory'}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                    <p>Keine Updates verfügbar</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="features" className="space-y-4">
+            <Card className="bg-white/80 backdrop-blur-lg border-white/20 shadow-xl">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Zap className="h-5 w-5 text-purple-600" />
+                  <span>Verfügbare Features</span>
+                </CardTitle>
+                <CardDescription>
+                  Funktionen Ihres {subscription.name} Abonnements
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {subscription.features.map((feature, index) => (
+                    <div key={index} className="flex items-center space-x-3 p-3 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg">
+                      <div className="bg-green-100 p-2 rounded-full">
+                        <Zap className="h-4 w-4 text-green-600" />
+                      </div>
+                      <span className="font-medium text-green-900">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="upgrade" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {Object.entries(subscriptionLimits).map(([tier, plan]) => {
+                const PlanIcon = plan.icon;
+                const isCurrentPlan = tier === tenant?.subscriptionTier;
+                
+                return (
+                  <Card key={tier} className={`relative overflow-hidden ${
+                    isCurrentPlan 
+                      ? 'bg-gradient-to-br from-blue-50 to-purple-50 border-blue-300 shadow-xl' 
+                      : 'bg-white/80 backdrop-blur-lg border-white/20 shadow-lg'
+                  }`}>
+                    {isCurrentPlan && (
+                      <div className="absolute top-4 right-4">
+                        <Badge className="bg-blue-600 text-white">Aktuell</Badge>
+                      </div>
+                    )}
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <PlanIcon className={`h-6 w-6 ${
+                          tier === 'basic' ? 'text-gray-600' :
+                          tier === 'professional' ? 'text-blue-600' : 'text-purple-600'
+                        }`} />
+                        <span>{plan.name}</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-600">Monatliche Updates: <strong>{plan.monthlyUpdates}</strong></p>
+                        <p className="text-sm text-gray-600">Rechtsfälle: <strong>{plan.legalCases}</strong></p>
+                        <p className="text-sm text-gray-600">Datenquellen: <strong>{plan.dataSources}</strong></p>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        {plan.features.map((feature, index) => (
+                          <div key={index} className="flex items-center space-x-2 text-sm">
+                            <Zap className="h-3 w-3 text-green-500" />
+                            <span>{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {!isCurrentPlan && (
+                        <Button className="w-full" disabled data-testid={`button-upgrade-${tier}`}>
+                          <Lock className="h-4 w-4 mr-2" />
+                          Upgrade erforderlich
+                        </Button>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

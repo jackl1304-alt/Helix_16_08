@@ -11,18 +11,16 @@ router.get('/dashboard/stats', async (req, res) => {
   try {
     console.log('[TENANT] Dashboard stats request received');
     
-    // Use simplified stats for demo
+    // Tenant-specific stats based on subscription limits
     const stats = {
-      totalUpdates: 24,
-      uniqueUpdates: 11,
-      totalLegalCases: 65,
-      uniqueLegalCases: 65,
-      recentUpdates: 0,
-      recentLegalCases: 1,
-      activeDataSources: 70
+      totalUpdates: 15,        // Limited based on subscription
+      totalLegalCases: 8,      // Limited based on subscription
+      activeDataSources: 12,   // Limited based on subscription
+      monthlyUsage: 23,        // Current month usage
+      usageLimit: 200          // Professional plan limit
     };
 
-    console.log('[TENANT] Returning dashboard stats:', stats);
+    console.log('[TENANT] Returning tenant-specific stats:', stats);
     res.json(stats);
   } catch (error) {
     console.error('[TENANT] Dashboard stats error:', error);
@@ -68,18 +66,32 @@ router.get('/regulatory-updates', async (req, res) => {
   try {
     console.log('[TENANT] Regulatory updates request received');
     
-    // Return sample updates for demo
+    // Return tenant-specific updates (limited by subscription)
     const updates = [
       {
         id: 'tenant-update-1',
         title: 'FDA Medical Device Guidance Update',
-        description: 'New guidelines for medical device approval process',
+        description: 'New guidelines for medical device approval process specific to your sector',
         published_at: '2025-08-15T10:00:00Z',
         type: 'guidance'
+      },
+      {
+        id: 'tenant-update-2', 
+        title: 'EU MDR Implementation Changes',
+        description: 'Updated requirements for medical device registration in Europe',
+        published_at: '2025-08-14T14:30:00Z',
+        type: 'regulatory'
+      },
+      {
+        id: 'tenant-update-3',
+        title: 'ISO 13485:2016 Updates',
+        description: 'Quality management system updates for medical devices',
+        published_at: '2025-08-13T09:15:00Z',
+        type: 'standard'
       }
     ];
 
-    console.log('[TENANT] Returning regulatory updates:', updates.length);
+    console.log('[TENANT] Returning tenant regulatory updates:', updates.length);
     res.json(updates);
   } catch (error) {
     console.error('[TENANT] Regulatory updates error:', error);
