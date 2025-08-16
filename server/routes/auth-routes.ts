@@ -52,12 +52,16 @@ router.post('/login', async (req: TenantRequest, res) => {
       });
     }
 
-    // Update last login
-    await sql`
-      UPDATE users 
-      SET last_login = NOW() 
-      WHERE id = ${user.id}
-    `;
+    // Update last login (skip for demo)
+    try {
+      await sql`
+        UPDATE users 
+        SET updated_at = NOW() 
+        WHERE id = ${user.id}
+      `;
+    } catch (error) {
+      console.log('[AUTH] Update user login time skipped:', error.message);
+    }
 
     // Create session
     const sessionUser = {
