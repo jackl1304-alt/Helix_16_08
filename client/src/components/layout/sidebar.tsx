@@ -47,56 +47,35 @@ interface NavigationSection {
   hiddenItems?: NavigationItem[];
 }
 
-const getNavigationStructure = (t: (key: string) => string): Record<string, NavigationSection> => ({
-  // 1. OVERVIEW & CONTROL
-  overview: {
-    title: t('nav.sections.overview'),
+// Vereinfachte Navigation - nur existierende Seiten
+const getNavigationStructure = (): Record<string, NavigationSection> => ({
+  // Hauptmodule
+  main: {
+    title: "Hauptmodule",
     items: [
-      { name: t('nav.dashboard'), href: "/", icon: BarChart3 },
-      { name: t('nav.analytics'), href: "/analytics", icon: TrendingUp },
+      { name: "Dashboard", href: "/", icon: BarChart3 },
+      { name: "Regulatory Updates", href: "/regulatory-updates", icon: FileText },
+      { name: "Analytics", href: "/analytics", icon: TrendingUp },
     ],
     defaultOpen: true
   },
 
-  // 2. DATA MANAGEMENT 
-  dataManagement: {
-    title: t('nav.sections.dataManagement'),
+  // Datenmanagement
+  data: {
+    title: "Datenmanagement",
     items: [
-      { name: t('nav.dataCollection'), href: "/data-collection", icon: Database },
-      { name: t('nav.knowledgeBase'), href: "/knowledge-base", icon: Book },
+      { name: "Data Collection", href: "/data-collection", icon: Database },
+      { name: "Knowledge Base", href: "/knowledge-base", icon: Book },
     ],
     defaultOpen: true
   },
 
-  // 3. COMPLIANCE & REGULATION
-  compliance: {
-    title: t('nav.sections.compliance'),
+  // Administration
+  admin: {
+    title: "Administration",
     items: [
-      { name: t('nav.regulatoryUpdates'), href: "/regulatory-updates", icon: FileText },
-      { name: t('nav.legalCases'), href: "/rechtsprechung", icon: Scale },
-    ],
-    defaultOpen: true
-  },
-
-  // 4. APPROVALS & REGISTRATION
-  approvals: {
-    title: t('nav.sections.approvals'),
-    items: [
-      { name: t('nav.globalApprovals'), href: "/zulassungen/global", icon: Globe },
-      { name: t('nav.ongoingApprovals'), href: "/zulassungen/laufende", icon: CheckCircle },
-    ],
-    defaultOpen: true
-  },
-
-  // 5. ADVANCED (collapsible)
-  advanced: {
-    title: t('nav.sections.advanced'),
-    items: [
-      { name: t('nav.syncManager'), href: "/sync-manager", icon: RefreshCw },
-      { name: t('nav.newsletterManager'), href: "/newsletter-manager", icon: Newspaper },
-      { name: t('nav.historicalData'), href: "/historical-data", icon: Archive },
-      { name: t('nav.userManagement'), href: "/user-management", icon: Users },
-      { name: t('nav.systemAdmin'), href: "/administration", icon: Settings },
+      { name: "User Management", href: "/user-management", icon: Users },
+      { name: "System Settings", href: "/system-settings", icon: Settings },
     ],
     defaultOpen: false
   }
@@ -144,7 +123,7 @@ export function Sidebar() {
   const { t } = useLanguage();
   const [location] = useLocation();
   const { logout } = useAuth();
-  const navigationStructure = getNavigationStructure(t);
+  const navigationStructure = getNavigationStructure();
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
     // Initialize with default open states
     const initial: Record<string, boolean> = {};
@@ -234,7 +213,7 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 deltaways-nav shadow-lg z-50 overflow-y-auto">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-white shadow-lg z-30 overflow-y-auto border-r border-gray-200">
       {/* DELTA WAYS Logo Header */}
       <div className="p-6 border-b border-gray-200">
         <Link href="/">

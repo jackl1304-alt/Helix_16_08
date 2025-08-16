@@ -23,19 +23,13 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-// Einheitliche Navigation - KEINE DUPLIKATE
+// Vereinfachte Navigation - nur existierende Seiten
 const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
   { name: "Regulatory Updates", href: "/regulatory-updates", icon: FileText },
   { name: "Analytics", href: "/analytics", icon: TrendingUp },
-];
-
-const knowledgeBase = [
   { name: "Data Collection", href: "/data-collection", icon: Database },
   { name: "Knowledge Base", href: "/knowledge-base", icon: Book },
-];
-
-const administration = [
   { name: "User Management", href: "/user-management", icon: Users },
   { name: "System Settings", href: "/system-settings", icon: Settings },
 ];
@@ -104,65 +98,11 @@ export function MobileSidebar() {
               </div>
             </div>
 
-            {/* Main Navigation */}
+            {/* Alle Navigation Items */}
             <DropdownMenuLabel className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-              Hauptmodule
+              Navigation
             </DropdownMenuLabel>
             {navigation.map((item) => {
-              const isActive = location === item.href;
-              return (
-                <Link key={item.name} href={item.href}>
-                  <DropdownMenuItem 
-                    className={cn(
-                      "flex items-center px-4 py-3 cursor-pointer",
-                      isActive && "bg-blue-50 text-blue-600"
-                    )}
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    <item.icon className={cn(
-                      "mr-3 h-4 w-4",
-                      isActive ? "text-blue-600" : "text-gray-400"
-                    )} />
-                    {item.name}
-                  </DropdownMenuItem>
-                </Link>
-              );
-            })}
-
-            <DropdownMenuSeparator />
-
-            {/* Knowledge Base */}
-            <DropdownMenuLabel className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-              Knowledge Base
-            </DropdownMenuLabel>
-            {knowledgeBase.map((item) => {
-              const isActive = location === item.href;
-              return (
-                <Link key={item.name} href={item.href}>
-                  <DropdownMenuItem 
-                    className={cn(
-                      "flex items-center px-4 py-3 cursor-pointer",
-                      isActive && "bg-blue-50 text-blue-600"
-                    )}
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    <item.icon className={cn(
-                      "mr-3 h-4 w-4",
-                      isActive ? "text-blue-600" : "text-gray-400"
-                    )} />
-                    {item.name}
-                  </DropdownMenuItem>
-                </Link>
-              );
-            })}
-
-            <DropdownMenuSeparator />
-
-            {/* Administration */}
-            <DropdownMenuLabel className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-              Administration
-            </DropdownMenuLabel>
-            {administration.map((item) => {
               const isActive = location === item.href;
               return (
                 <Link key={item.name} href={item.href}>
