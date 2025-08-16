@@ -6,6 +6,7 @@ import Login from "@/pages/login";
 
 // Direct imports - no lazy loading to eliminate Suspense issues
 import Dashboard from "@/pages/dashboard";
+import RegulatoryUpdates from "@/pages/regulatory-updates";
 import NotFound from "@/pages/not-found";
 
 // JSON-based Navigation State
@@ -21,6 +22,8 @@ function renderCurrentPage(page: string, userData: any) {
     case '/':
     case '/dashboard':
       return <Dashboard />;
+    case '/regulatory-updates':
+      return <RegulatoryUpdates />;
     case '/404':
     default:
       return <NotFound />;
