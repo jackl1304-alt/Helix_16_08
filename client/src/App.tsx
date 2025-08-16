@@ -218,6 +218,12 @@ function App() {
               </CustomerThemeProvider>
             </Route>
             
+            {/* Tenant Routes - Direct access without sidebar */}
+            <Route path="/tenant/auth" component={TenantAuth} />
+            <Route path="/tenant/dashboard" component={TenantDashboard} />
+            <Route path="/tenant-auth" component={TenantAuth} />
+            <Route path="/tenant-dashboard" component={TenantDashboard} />
+            
             {/* All other pages with Admin Sidebar */}
             <Route>
               <ResponsiveLayout>
