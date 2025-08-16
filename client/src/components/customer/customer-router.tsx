@@ -1,8 +1,8 @@
 import { useLocation, useParams } from "wouter";
 import { lazy, Suspense, useState, useEffect } from "react";
 
-// Lazy load customer components with proper error handling
-const CustomerDashboard = lazy(() => import("@/pages/customer-dashboard"));
+// NEW: Clean JSON-based customer components
+const CustomerDashboardNew = lazy(() => import("@/pages/customer-dashboard-new"));
 const CustomerSettings = lazy(() => import("@/pages/customer-settings"));
 const CustomerAIInsights = lazy(() => import("@/pages/customer-ai-insights-clean"));
 const CustomerRegulatoryUpdates = lazy(() => import("@/pages/customer-regulatory-updates"));
@@ -69,7 +69,7 @@ export default function CustomerRouter() {
         case "":
         case "dashboard":
         case "customer-dashboard":
-          return <CustomerDashboard />;
+          return <CustomerDashboardNew />;
         case "regulatory-updates":
         case "customer/regulatory-updates":
           return <CustomerRegulatoryUpdates />;
@@ -98,14 +98,14 @@ export default function CustomerRouter() {
         case "chat-support":
           return <CustomerChatSupport />;
         default:
-          return <CustomerDashboard />;
+          return <CustomerDashboardNew />;
       }
     }
 
     // Legacy customer routes (fallback for old URLs)
     switch (location) {
       case "/customer-dashboard":
-        return <CustomerDashboard />;
+        return <CustomerDashboardNew />;
       case "/customer-settings":
         return <CustomerSettings />;
       case "/customer-ai-insights":
@@ -123,7 +123,7 @@ export default function CustomerRouter() {
       case "/customer/chat-support":
         return <CustomerChatSupport />;
       default:
-        return <CustomerDashboard />;
+        return <CustomerDashboardNew />;
     }
   };
 

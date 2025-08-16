@@ -34,9 +34,9 @@ export function useLiveTenantPermissions({
 
   // Fetch tenant data ONCE - no polling to prevent spam
   const { data: tenantData, isLoading, error } = useQuery({
-    queryKey: ['/api/customer/tenant', tenantId],
+    queryKey: ['/api/customer/tenant-new', tenantId],
     queryFn: async () => {
-      const response = await fetch(`/api/customer/tenant/${tenantId}`);
+      const response = await fetch(`/api/customer/tenant-new/${tenantId}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch tenant data: ${response.status}`);
       }
