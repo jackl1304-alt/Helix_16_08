@@ -243,37 +243,25 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
 
       {/* Navigation */}
       <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-        {/* Debug Test Button */}
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="w-full justify-start mb-4 bg-red-50 border-red-200"
-          onClick={() => {
-            console.log('[DEBUG] Test button clicked!');
-            alert('Test button works!');
-          }}
-        >
-          🔴 TEST BUTTON - Click me!
-        </Button>
-        
         {allowedItems.length > 0 ? (
           <div className="space-y-2">
-            <p className="text-xs text-gray-500 mb-2">Debug: {allowedItems.length} Navigation items:</p>
             {allowedItems.map((item, index) => {
-              console.log('[DEBUG] Rendering navigation item:', item.name);
+              const tenantUrl = buildTenantUrl(item.href);
+              const isActive = location === tenantUrl || location.includes(item.href);
+              
               return (
                 <Button 
                   key={`nav-${index}-${item.href}`}
-                  variant="outline" 
+                  variant={isActive ? "default" : "outline"}
                   size="sm" 
-                  className="w-full justify-start mb-2 h-auto py-3"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('[CUSTOMER NAV] Button clicked:', item.name, item.href);
-                    alert(`Navigation clicked: ${item.name}`);
-                    const tenantUrl = buildTenantUrl(item.href);
-                    console.log('[CUSTOMER NAV] Navigating to:', tenantUrl);
+                  className={cn(
+                    "w-full justify-start mb-2 h-auto py-3 transition-all duration-200",
+                    isActive 
+                      ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700" 
+                      : "hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300"
+                  )}
+                  onClick={() => {
+                    console.log(`[CUSTOMER NAV] Navigating to: ${item.name} -> ${tenantUrl}`);
                     setLocation(tenantUrl);
                   }}
                 >
@@ -294,10 +282,10 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
           <div className="text-center py-8">
             <Shield className="w-12 h-12 mx-auto text-gray-400 mb-3" />
             <p className="text-sm text-gray-500">
-              Keine Berechtigung für Navigation
+              Keine Navigation verfügbar
             </p>
             <p className="text-xs text-gray-400 mt-2">
-              Debug: currentPermissions = {JSON.stringify(currentPermissions)}
+              Berechtigung wird geladen...
             </p>
           </div>
         )}
