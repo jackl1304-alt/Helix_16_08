@@ -4,6 +4,7 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { Router, Route, Switch } from "wouter";
 import { ResponsiveLayout } from "@/components/responsive-layout";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/use-auth";
 import Login from "@/pages/login";
 
@@ -31,35 +32,39 @@ function App() {
   // Show login if not authenticated
   if (!isAuthenticated) {
     return (
-      <QueryClientProvider client={queryClient}>
-        <div className="min-h-screen bg-gray-50">
-          <Toaster />
-          <Login onLogin={login} />
-        </div>
-      </QueryClientProvider>
+      <LanguageProvider>
+        <QueryClientProvider client={queryClient}>
+          <div className="min-h-screen bg-gray-50">
+            <Toaster />
+            <Login onLogin={login} />
+          </div>
+        </QueryClientProvider>
+      </LanguageProvider>
     );
   }
 
   // Main app with proper wouter routing
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <ResponsiveLayout>
-          <Toaster />
-          <Switch>
-            <Route path="/" component={Dashboard} />
-            <Route path="/dashboard" component={Dashboard} />
-            <Route path="/regulatory-updates" component={RegulatoryUpdates} />
-            <Route path="/analytics" component={NotFound} />
-            <Route path="/data-collection" component={NotFound} />
-            <Route path="/knowledge-base" component={NotFound} />
-            <Route path="/user-management" component={NotFound} />
-            <Route path="/system-settings" component={NotFound} />
-            <Route component={NotFound} />
-          </Switch>
-        </ResponsiveLayout>
-      </Router>
-    </QueryClientProvider>
+    <LanguageProvider>
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <ResponsiveLayout>
+            <Toaster />
+            <Switch>
+              <Route path="/" component={Dashboard} />
+              <Route path="/dashboard" component={Dashboard} />
+              <Route path="/regulatory-updates" component={RegulatoryUpdates} />
+              <Route path="/analytics" component={NotFound} />
+              <Route path="/data-collection" component={NotFound} />
+              <Route path="/knowledge-base" component={NotFound} />
+              <Route path="/user-management" component={NotFound} />
+              <Route path="/system-settings" component={NotFound} />
+              <Route component={NotFound} />
+            </Switch>
+          </ResponsiveLayout>
+        </Router>
+      </QueryClientProvider>
+    </LanguageProvider>
   );
 }
 
