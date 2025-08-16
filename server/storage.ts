@@ -28,6 +28,7 @@ interface CacheEntry {
 
 class StorageCache {
   private cache = new Map<string, CacheEntry>();
+  private pendingRequests = new Map<string, Promise<any>>(); // REQUEST DEDUPLICATION
   
   get<T>(key: string): T | null {
     const entry = this.cache.get(key);
@@ -51,13 +52,47 @@ class StorageCache {
     console.log(`[CACHE-SET] ${key} (TTL: ${ttlMs}ms) - PERFORMANCE OPTIMIERT`);
   }
   
+  // REQUEST DEDUPLICATION - VERHINDERT PARALLELE IDENTISCHE CALLS
+  async getOrFetch<T>(key: string, fetchFn: () => Promise<T>, ttlMs: number = 300000): Promise<T> {
+    // Prüfe Cache zuerst
+    const cached = this.get<T>(key);
+    if (cached) return cached;
+    
+    // Prüfe, ob derselbe Request bereits läuft
+    if (this.pendingRequests.has(key)) {
+      console.log(`[REQUEST-DEDUP] ${key} - WARTE AUF LAUFENDEN REQUEST`);
+      return this.pendingRequests.get(key)!;
+    }
+    
+    // Starte neuen Request
+    console.log(`[REQUEST-START] ${key} - NEUER DB-REQUEST`);
+    const promise = fetchFn().then(result => {
+      // Cache setzen und pending request entfernen
+      this.set(key, result, ttlMs);
+      this.pendingRequests.delete(key);
+      return result;
+    }).catch(error => {
+      // Bei Fehler auch pending request entfernen
+      this.pendingRequests.delete(key);
+      throw error;
+    });
+    
+    this.pendingRequests.set(key, promise);
+    return promise;
+  }
+  
   clear(): void {
     this.cache.clear();
-    console.log('[CACHE-CLEAR] All cache cleared');
+    this.pendingRequests.clear();
+    console.log('[CACHE-CLEAR] Cache und pending requests gelöscht');
   }
 }
 
 const storageCache = new StorageCache();
+
+// CLEAR CACHE - User Request - KOMPLETT RESET
+storageCache.clear();
+console.log('🗑️🔄 CACHE + PENDING REQUESTS GELÖSCHT - REQUEST DEDUPLICATION RESET');
 
 export interface IStorage {
   getDashboardStats(): Promise<any>;
@@ -98,16 +133,10 @@ export interface IStorage {
 // Direct SQL Storage Implementation for 7AM Morning State
 class MorningStorage implements IStorage {
   async getDashboardStats() {
-    try {
-      // STOP DOPPELTE CALLS: Prüfe Cache zuerst
-      const cacheKey = 'dashboard-stats';
-      const cachedResult = storageCache.get(cacheKey);
-      if (cachedResult) {
-        console.log('[DB] getDashboardStats - CACHE HIT (DOPPELTE CALLS VERHINDERT - KEINE DB QUERY)');
-        return cachedResult;
-      }
-      
-      console.log('[DB] getDashboardStats called - BEREINIGTE ECHTE DATEN (CACHE MISS - NEUE DB QUERY)');
+    // REQUEST DEDUPLICATION - VERHINDERT PARALLELE DOPPELTE CALLS
+    return storageCache.getOrFetch('dashboard-stats', async () => {
+      try {
+        console.log('[DB] getDashboardStats - ECHTE DB-ABFRAGE (REQUEST DEDUPLICATION AKTIV)');
       
       // Bereinigte Dashboard-Statistiken mit authentischen Daten + Live-Sync-Tracking
       const [updates, sources, legalCases, newsletters, subscribers, runningSyncs] = await Promise.all([
@@ -165,16 +194,13 @@ class MorningStorage implements IStorage {
         recentSyncs: parseInt(runningSyncs[0]?.recent_syncs || '0'),
         pendingSyncs: parseInt(runningSyncs[0]?.pending_syncs || '0')
       };
-      
-      console.log('[DB] Bereinigte Dashboard-Statistiken:', stats);
-      
-      // CACHE für 10 Minuten speichern - VERHINDERT DOPPELTE CALLS
-      storageCache.set(cacheKey, stats, 600000); // 10min TTL
-      return stats;
-    } catch (error) {
-      console.error("⚠️ DB Endpoint deaktiviert - verwende Fallback mit echten Strukturen:", error);
-      // Fallback basierend auf letzten erfolgreichen DB-Snapshot
-      return {
+        
+        console.log('[DB] Bereinigte Dashboard-Statistiken:', stats);
+        return stats;
+      } catch (error) {
+        console.error("⚠️ DB Endpoint deaktiviert - verwende Fallback mit echten Strukturen:", error);
+        // Fallback basierend auf letzten erfolgreichen DB-Snapshot
+        return {
         totalUpdates: 30,        // Letzte bekannte Anzahl aus DB
         uniqueUpdates: 12,       // Bereinigte Updates ohne Duplikate
         totalLegalCases: 65,     // Authentische Cases aus legal_cases
@@ -192,8 +218,9 @@ class MorningStorage implements IStorage {
         runningSyncs: 0,         // Keine aktiven Syncs
         recentSyncs: 70,         // Erfolgreiche Syncs
         pendingSyncs: 2          // Wartende Syncs
-      };
-    }
+        };
+      }
+    }, 600000); // 10min TTL
   }
 
   async getAllDataSources() {
@@ -479,16 +506,10 @@ class MorningStorage implements IStorage {
   }
 
   async getAllRegulatoryUpdates() {
-    try {
-      // STOP DOPPELTE CALLS: Prüfe Cache zuerst - KRITISCH FÜR PERFORMANCE
-      const cacheKey = 'all-regulatory-updates';
-      const cachedResult = storageCache.get(cacheKey);
-      if (cachedResult) {
-        console.log('[DB] getAllRegulatoryUpdates - CACHE HIT (DOPPELTE CALLS VERHINDERT - KEINE DB QUERY)');
-        return cachedResult;
-      }
-      
-      console.log('[DB] getAllRegulatoryUpdates called - ALLE DATEN FÜR FRONTEND (CACHE MISS - NEUE DB QUERY)');
+    // REQUEST DEDUPLICATION - VERHINDERT PARALLELE DOPPELTE CALLS
+    return storageCache.getOrFetch('all-regulatory-updates', async () => {
+      try {
+        console.log('[DB] getAllRegulatoryUpdates - ECHTE DB-ABFRAGE (REQUEST DEDUPLICATION AKTIV)');
       // Frontend-Anzeige: Priorität auf authentische FDA-Daten, dann andere Updates
       const result = await sql`
         SELECT * FROM regulatory_updates 
@@ -497,15 +518,12 @@ class MorningStorage implements IStorage {
           created_at DESC
         LIMIT 5000
       `;
-      console.log(`[DB] Alle regulatory updates für Frontend: ${result.length} Einträge`);
-      
-      // CACHE für 15 Minuten speichern - VERHINDERT DOPPELTE CALLS
-      storageCache.set(cacheKey, result, 900000); // 15min TTL
-      return result;
-    } catch (error) {
-      console.error("⚠️ DB Endpoint deaktiviert - verwende Fallback Updates:", error);
-      // Fallback Updates basierend auf echten DB-Strukturen
-      const fallbackData = [
+        console.log(`[DB] Alle regulatory updates für Frontend: ${result.length} Einträge`);
+        return result;
+      } catch (error) {
+        console.error("⚠️ DB Endpoint deaktiviert - verwende Fallback Updates:", error);
+        // Fallback Updates basierend auf echten DB-Strukturen
+        const fallbackData = [
         {
           id: 'dd701b8c-73a2-4bb8-b775-3d72d8ee9721',
           title: 'BfArM Leitfaden: Umfassende neue Anforderungen für Medizinprodukte - Detaillierte Regulierungsupdate 7.8.2025',
@@ -542,13 +560,11 @@ class MorningStorage implements IStorage {
           published_at: '2025-08-05T09:15:00Z',
           created_at: '2025-08-05T09:15:00Z'
         }
-      ];
-      
-      // AUCH FALLBACK CACHEN - VERHINDERT DOPPELTE ERROR-CALLS
-      const cacheKey = 'all-regulatory-updates';
-      storageCache.set(cacheKey, fallbackData, 300000); // 5min TTL für Fallback
-      return fallbackData;
-    }
+        ];
+        
+        return fallbackData;
+      }
+    }, 900000); // 15min TTL
   }
 
   async createDataSource(data: any) {
