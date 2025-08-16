@@ -28,6 +28,7 @@ const Analytics = lazy(() => import("@/pages/analytics"));
 const Administration = lazy(() => import("@/pages/administration"));
 const UserManagement = lazy(() => import("@/pages/user-management"));
 const RegulatoryUpdates = lazy(() => import("@/pages/regulatory-updates-fixed-complete"));
+const KnowledgeBase = lazy(() => import("@/pages/knowledge-base"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -48,6 +49,7 @@ function Router() {
         <Route path="/data-collection" component={DataCollection} />
         <Route path="/analytics" component={Analytics} />
         <Route path="/regulatory-updates" component={RegulatoryUpdates} />
+        <Route path="/knowledge-base" component={KnowledgeBase} />
         <Route path="/administration" component={Administration} />
         <Route path="/user-management" component={UserManagement} />
         
