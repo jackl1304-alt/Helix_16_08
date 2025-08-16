@@ -1,5 +1,4 @@
 import { Link } from "wouter";
-import logoPath from "@assets/ICON Helix_1753735921077.jpg";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -31,14 +30,14 @@ export function Logo({
 
   const content = (
     <div className={cn("flex items-center", className)}>
-      <img 
-        src={logoPath} 
-        alt="Helix Logo" 
+      <div 
         className={cn(
           sizeClasses[size],
-          "object-cover rounded-lg"
+          "bg-gradient-to-br from-blue-600 to-purple-700 rounded-lg flex items-center justify-center text-white font-bold text-xl"
         )}
-      />
+      >
+        H
+      </div>
       {showText && (
         <div>
           <h1 className={cn(
