@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -93,7 +94,24 @@ export default function Dashboard() {
 
   const { data: newsletterSources, isLoading: isLoadingNewsletterSources } = useQuery({
     queryKey: ['/api/newsletter-sources'],
+    staleTime: 0,
+    gcTime: 0,
   });
+
+  // Debug Newsletter Sources
+  console.log('Newsletter Sources Debug:', {
+    isLoading: isLoadingNewsletterSources,
+    data: newsletterSources,
+    dataType: typeof newsletterSources,
+    isArray: Array.isArray(newsletterSources),
+    length: newsletterSources?.length
+  });
+
+  // Force invalidate newsletter sources cache on mount
+  React.useEffect(() => {
+    console.log('Invalidating newsletter sources cache...');
+    queryClient.invalidateQueries({ queryKey: ['/api/newsletter-sources'] });
+  }, []);
 
   // Optimierte Dashboard-Cards mit konsistenten Deltaways-Farben
   const dashboardCards = [
