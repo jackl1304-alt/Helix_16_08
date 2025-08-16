@@ -1,19 +1,16 @@
-/**
- * Error Boundary Wrapper für bessere Performance und Fehlerbehandlung
- */
-
 import React from 'react';
-import { errorMonitor } from '@/utils/error-monitoring';
-
-interface ErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback?: React.ComponentType<{ error?: Error | undefined; retry: () => void }>;
-  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
-}
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertTriangle } from "lucide-react";
 
 interface ErrorBoundaryState {
   hasError: boolean;
-  error?: Error | undefined;
+  error?: Error;
+}
+
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback?: React.ComponentType<{ error?: Error; retry: () => void }>;
 }
 
 export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
@@ -27,58 +24,75 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Report to error monitoring
-    errorMonitor.captureError(error, 'react-boundary', 'critical', {
-      componentStack: errorInfo.componentStack,
-      errorBoundary: true
-    });
-
-    // Call custom error handler if provided
-    this.props.onError?.(error, errorInfo);
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
 
   retry = () => {
-    this.setState({ hasError: false, error: undefined as undefined });
+    this.setState({ hasError: false, error: undefined });
   };
 
   render() {
     if (this.state.hasError) {
-      const FallbackComponent = this.props.fallback || DefaultErrorFallback;
-      return <FallbackComponent error={this.state.error} retry={this.retry} />;
+      if (this.props.fallback) {
+        const Fallback = this.props.fallback;
+        return <Fallback error={this.state.error} retry={this.retry} />;
+      }
+
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex items-center justify-center p-6">
+          <Card className="w-full max-w-md">
+            <CardHeader className="text-center">
+              <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                <AlertTriangle className="h-8 w-8 text-red-600" />
+              </div>
+              <CardTitle className="text-red-600">Unerwarteter Fehler</CardTitle>
+              <CardDescription>
+                Beim Laden der Komponente ist ein Fehler aufgetreten
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center space-y-4">
+              <p className="text-sm text-gray-600">
+                {this.state.error?.message || 'Ein unbekannter Fehler ist aufgetreten'}
+              </p>
+              <div className="flex gap-2 justify-center">
+                <Button onClick={this.retry} variant="outline">
+                  Erneut versuchen
+                </Button>
+                <Button onClick={() => window.location.reload()}>
+                  Seite neu laden
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
     }
 
     return this.props.children;
   }
 }
 
-// Default Error Fallback Component
-const DefaultErrorFallback: React.FC<{ error?: Error | undefined; retry: () => void }> = ({ error, retry }) => (
-  <div className="min-h-[200px] flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200">
-    <div className="text-center p-6">
-      <div className="mb-4">
-        <div className="mx-auto h-12 w-12 text-red-600">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" 
-            />
-          </svg>
-        </div>
-      </div>
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">
-        Komponente konnte nicht geladen werden
-      </h3>
-      <p className="text-sm text-gray-600 mb-4">
-        {error?.message || 'Ein unerwarteter Fehler ist aufgetreten.'}
-      </p>
-      <button
-        onClick={retry}
-        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+// Wrapper component for easier use with startTransition
+export function SuspenseErrorBoundary({ children }: { children: React.ReactNode }) {
+  return (
+    <ErrorBoundary>
+      <React.Suspense 
+        fallback={
+          <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+            <div className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
+              <div className="animate-pulse flex space-x-4">
+                <div className="rounded-full bg-blue-200 h-12 w-12"></div>
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-blue-200 rounded w-3/4"></div>
+                  <div className="h-4 bg-blue-200 rounded w-1/2"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
       >
-        Erneut versuchen
-      </button>
-    </div>
-  </div>
-);
+        {children}
+      </React.Suspense>
+    </ErrorBoundary>
+  );
+}

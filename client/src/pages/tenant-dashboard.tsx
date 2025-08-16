@@ -55,22 +55,55 @@ const subscriptionLimits = {
 export default function TenantDashboard() {
   const [, setLocation] = useLocation();
 
-  const { data: tenantContext, isLoading: contextLoading } = useQuery({
+  const { data: tenantContext, isLoading: contextLoading, error: contextError } = useQuery({
     queryKey: ['/api/tenant/context'],
-    retry: 1
+    retry: 3,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false
   });
 
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  const { data: stats, isLoading: statsLoading, error: statsError } = useQuery({
     queryKey: ['/api/tenant/dashboard/stats'],
-    retry: 1
+    retry: 3,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    enabled: !!tenantContext // Only fetch when context is available
   });
 
-  const { data: updates, isLoading: updatesLoading } = useQuery({
+  const { data: updates, isLoading: updatesLoading, error: updatesError } = useQuery({
     queryKey: ['/api/tenant/regulatory-updates'],
-    retry: 1
+    retry: 3,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    enabled: !!tenantContext // Only fetch when context is available
   });
 
-  if (contextLoading || statsLoading) {
+  // Handle errors first
+  if (contextError || statsError || updatesError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-6">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-red-600">Verbindungsfehler</CardTitle>
+            <CardDescription>
+              Es gab ein Problem beim Laden der Daten
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center">
+            <Button 
+              onClick={() => window.location.reload()} 
+              className="mt-4"
+            >
+              Seite neu laden
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show loading state
+  if (contextLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
         <div className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
