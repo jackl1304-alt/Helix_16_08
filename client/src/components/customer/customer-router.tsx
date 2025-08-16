@@ -43,6 +43,13 @@ export default function CustomerRouter() {
   const params = useParams();
 
   const renderComponent = () => {
+    // Debug logging for customer router
+    console.log('[CUSTOMER ROUTER] Processing route:', {
+      location,
+      tenantId: params.tenantId,
+      allParams: params
+    });
+    
     // Multi-tenant routing: /tenant/:tenantId/*
     if (location.includes('/tenant/') && params.tenantId) {
       // Extract the route part after tenant ID
@@ -50,6 +57,13 @@ export default function CustomerRouter() {
       const tenantIndex = urlParts.indexOf('tenant');
       const routeParts = urlParts.slice(tenantIndex + 2); // Skip 'tenant' and tenantId
       const route = routeParts.join('/');
+      
+      console.log('[CUSTOMER ROUTER] Tenant route detected:', {
+        urlParts,
+        tenantIndex,
+        routeParts,
+        finalRoute: route
+      });
       
       switch (route) {
         case "":

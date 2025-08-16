@@ -158,11 +158,23 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
   
   // Build tenant-specific URLs
   const buildTenantUrl = (path: string) => {
-    if (params.tenantId) {
+    // Use mockTenantId as fallback if params.tenantId not available
+    const mockTenantId = '030d3e01-32c4-4f95-8d54-98be948e8d4b';
+    const tenantId = params.tenantId || mockTenantId;
+    
+    if (tenantId) {
       // Ensure path starts with slash for proper URL construction
       const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-      return `/tenant/${params.tenantId}${normalizedPath}`;
+      const finalUrl = `/tenant/${tenantId}${normalizedPath}`;
+      console.log('[CUSTOMER NAV] buildTenantUrl:', {
+        inputPath: path,
+        tenantId,
+        normalizedPath,
+        finalUrl
+      });
+      return finalUrl;
     }
+    // Fallback to regular path
     return path.startsWith('/') ? path : `/${path}`;
   };
 
@@ -183,10 +195,21 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
     const isActive = location === tenantUrl || location === item.href;
     const IconComponent = item.icon;
     
+    // Debug logging for navigation
+    const handleClick = () => {
+      console.log('[CUSTOMER NAV] Clicking navigation item:', {
+        itemHref: item.href,
+        tenantUrl,
+        tenantId: params.tenantId,
+        currentLocation: location
+      });
+      setLocation(tenantUrl);
+    };
+    
     return (
       <button
         key={item.href}
-        onClick={() => setLocation(tenantUrl)}
+        onClick={handleClick}
         className={cn(
           "w-full flex items-center justify-start px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer group",
           isActive
