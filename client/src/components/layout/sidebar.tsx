@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoPath from "@assets/ICON Helix_1753735921077.jpg";
+import { Input } from "@/components/ui/input";
 
 // Verbesserte thematische Sidebar-Struktur basierend auf Benutzeranalyse
 interface NavigationItem {
@@ -106,6 +107,43 @@ const navigationStructure: Record<string, NavigationSection> = {
     ]
   }
 };
+
+// Sidebar Search Field Component
+function SidebarSearchField() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [, setLocation] = useLocation();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Navigate to intelligent search page with query
+      setLocation(`/intelligent-search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch(e);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSearch}>
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#07233e]" />
+        <Input
+          type="text"
+          placeholder="Frage stellen..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyPress={handleKeyPress}
+          className="pl-10 pr-4 py-2 bg-[#f0f8ff] border border-[#b0d4f6] rounded-lg text-sm text-[#07233e] placeholder-[#07233e]/70 focus:outline-none focus:ring-2 focus:ring-[#07233e] focus:border-transparent hover:bg-[#e6f3ff] transition-colors duration-200"
+          data-testid="sidebar-search-input"
+        />
+      </div>
+    </form>
+  );
+}
 
 export function Sidebar() {
   const [location] = useLocation();
@@ -214,14 +252,9 @@ export function Sidebar() {
         </Link>
       </div>
       
-      {/* Optimierter Suchbereich */}
+      {/* Funktionsfähiger Suchbereich */}
       <div className="p-4 border-b border-gray-100">
-        <Link href="/intelligent-search">
-          <div className="flex items-center px-3 py-2 bg-[#f0f8ff] rounded-lg border border-[#b0d4f6] hover:bg-[#e6f3ff] transition-colors duration-200 cursor-pointer">
-            <Search className="h-4 w-4 text-[#07233e] mr-2" />
-            <span className="text-sm text-[#07233e] font-medium">Intelligente Suche</span>
-          </div>
-        </Link>
+        <SidebarSearchField />
       </div>
       
       {/* Thematisch organisierte Navigation */}
