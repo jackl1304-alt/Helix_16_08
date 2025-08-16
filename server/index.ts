@@ -189,23 +189,23 @@ app.use((req, res, next) => {
 // Entwicklungs- vs. Produktionsmodus
 const isProd = process.env.NODE_ENV === "production" || app.get("env") !== "development";
 if (!isProd) {
-  // Vite Dev-Server im Dev-Modus
-  setupVite(app, server).catch(console.error);
+  // DEV SETUP: Serve compiled frontend from dist/public
+  const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
+  console.log(`[DEV-FRONTEND] Serving compiled assets from: ${distPath}`);
   
-  // Serve static assets from client directory
-  app.use(express.static(path.resolve(import.meta.dirname, "..", "client")));
+  app.use(express.static(distPath, {
+    maxAge: 0, // No caching in dev
+    etag: false
+  }));
   
-  // FALLBACK: Frontend routing für Customer-Dashboard und andere SPA-Routen
-  app.get([
-    "/customer-dashboard",
-    "/customer/*", 
-    "/tenant/*",
-    "/login",
-    "/not-found"
-  ], (_req, res) => {
-    const clientHtmlPath = path.resolve(import.meta.dirname, "..", "client", "index.html");
-    console.log(`[FRONTEND-SPA] Serving ${clientHtmlPath} for SPA route`);
-    res.sendFile(clientHtmlPath);
+  // SPA routing for all non-API routes
+  app.get('*', (req, res) => {
+    // Skip API routes
+    if (req.url.startsWith('/api/')) return;
+    
+    const htmlPath = path.resolve(distPath, "index.html");
+    console.log(`[SPA-ROUTE] Serving ${htmlPath} for ${req.url}`);
+    res.sendFile(htmlPath);
   });
 } else {
   // Optimized static file serving
@@ -230,7 +230,9 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 // Server starten
 if (import.meta.url === `file://${process.argv[1]}`) {
   const port = parseInt(process.env.PORT || "5174", 10);
-  server.listen(port, () => {
-    log(`Server läuft auf Port ${port}`);
+  server.listen(port, '0.0.0.0', () => {
+    console.log(`[SERVER] ✅ Server läuft auf Port ${port}`);
+    console.log(`[SERVER] 🌐 Frontend: http://localhost:${port}`);
+    console.log(`[SERVER] 🔧 Admin Login: admin / admin123`);
   });
 }
