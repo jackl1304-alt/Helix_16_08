@@ -31,8 +31,12 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: false, limit: "50mb" }));
 
 // Multi-Tenant Isolation Middleware
-app.use('/api/tenant', tenantIsolationMiddleware);
-app.use('/tenant', tenantIsolationMiddleware);
+app.use('/api/tenant', (req, res, next) => {
+  tenantIsolationMiddleware(req as any, res, next).catch(next);
+});
+app.use('/tenant', (req, res, next) => {
+  tenantIsolationMiddleware(req as any, res, next).catch(next);
+});
 
 // Simple Perplexity-Client
 async function perplexityChat(prompt: string, model = "sonar"): Promise<string> {

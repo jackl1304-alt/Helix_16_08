@@ -27,7 +27,8 @@ import {
   Activity,
   Sparkles,
   Heart,
-  Award
+  Award,
+  MessageCircle
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
