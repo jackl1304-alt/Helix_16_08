@@ -166,7 +166,7 @@ export default function Dashboard() {
 
   const newsletterSyncMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest('/api/sync/newsletter', { method: 'POST' });
+      return apiRequest('/api/sync/newsletter');
     },
     onSuccess: () => {
       toast({
