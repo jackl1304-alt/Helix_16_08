@@ -8,6 +8,8 @@ import { CustomCursor } from "@/components/ui/custom-cursor";
 import { NavigationHeader } from "@/components/ui/navigation-header";
 import { Building, Shield, User, Lock, Eye, EyeOff } from "lucide-react";
 import { useLocation } from "wouter";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 interface TenantAuthProps {
   tenantSubdomain?: string;
@@ -26,6 +28,7 @@ export default function TenantAuth({
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const { t } = useLanguage();
 
   // Color scheme configuration
   const getColorScheme = () => {
@@ -89,7 +92,7 @@ export default function TenantAuth({
       
     } catch (err: any) {
       console.error('Login error:', err);
-      setError(err.message || 'Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.');
+      setError(err.message || t('auth.loginFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -102,8 +105,13 @@ export default function TenantAuth({
   };
 
   return (
-    <div className="custom-cursor min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-950 flex items-center justify-center p-6">
+    <div className="custom-cursor min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-950 flex items-center justify-center p-6 relative">
       <CustomCursor />
+      
+      {/* Language Selector - Top Right */}
+      <div className="fixed top-4 right-4 z-50">
+        <LanguageSelector />
+      </div>
       
       <div className="w-full max-w-md space-y-8">
         {/* Tenant Header */}
