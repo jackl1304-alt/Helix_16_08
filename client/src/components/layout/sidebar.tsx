@@ -31,6 +31,7 @@ import logoPath from "@assets/ICON Helix_1753735921077.jpg";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { useAuth } from "@/hooks/use-auth";
 
 // Verbesserte thematische Sidebar-Struktur basierend auf Benutzeranalyse
 interface NavigationItem {
@@ -152,6 +153,7 @@ function SidebarSearchField() {
 export function Sidebar() {
   const { t } = useLanguage();
   const [location] = useLocation();
+  const { logout } = useAuth();
   const navigationStructure = getNavigationStructure(t);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
     // Initialize with default open states
@@ -289,7 +291,10 @@ export function Sidebar() {
         {/* Logout Button */}
         <div className="mt-3 pt-3 border-t border-gray-300">
           <button
-            onClick={() => window.location.href = '/login'}
+            onClick={() => {
+              logout();
+              window.location.reload();
+            }}
             className="flex items-center w-full px-2 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
           >
             <LogOut className="h-4 w-4 mr-2" />

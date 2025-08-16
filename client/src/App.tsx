@@ -9,6 +9,8 @@ import { performanceMonitor, preloadCriticalResources } from "@/utils/performanc
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { CustomerThemeProvider } from "@/contexts/customer-theme-context";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/use-auth";
+import Login from "@/pages/login";
 
 // Initialize performance monitoring and preload resources
 if (typeof window !== 'undefined') {
@@ -144,6 +146,24 @@ function Router() {
 }
 
 function App() {
+  const { isAuthenticated } = useAuth();
+
+  // Show login screen if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <ErrorBoundary>
+        <LanguageProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <Toaster />
+              <Login />
+            </TooltipProvider>
+          </QueryClientProvider>
+        </LanguageProvider>
+      </ErrorBoundary>
+    );
+  }
+
   return (
     <ErrorBoundary>
       <LanguageProvider>
@@ -154,6 +174,7 @@ function App() {
             {/* Pages without Sidebar */}
             <Route path="/landing" component={Landing} />
             <Route path="/404" component={NotFound} />
+            <Route path="/login" component={Login} />
             
             {/* Multi-Tenant Customer Portal - Each customer gets their own portal */}
             <Route path="/tenant/:tenantId/*">
