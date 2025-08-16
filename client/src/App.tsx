@@ -109,12 +109,10 @@ function App() {
       <ErrorBoundary>
         <LanguageProvider>
           <QueryClientProvider client={queryClient}>
-            <DashboardProvider>
-              <TooltipProvider>
-                <Toaster />
-                <Login />
-              </TooltipProvider>
-            </DashboardProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Login />
+            </TooltipProvider>
           </QueryClientProvider>
         </LanguageProvider>
       </ErrorBoundary>
