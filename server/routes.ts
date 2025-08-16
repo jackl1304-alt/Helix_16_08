@@ -732,7 +732,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { tenantId } = req.params;
       console.log(`[CUSTOMER] Fetching tenant data for: ${tenantId}`);
       
-      // Return stable mock data to avoid Drizzle ORM issues
+      // Return customer permissions based on Basic/Professional plan configuration
+      // These permissions reflect what would be configured in admin customer management
       const tenant = {
         id: tenantId,
         name: "Demo Medical Devices GmbH",
@@ -740,22 +741,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         subscriptionPlan: "professional",
         subscriptionStatus: "active",
         customerPermissions: {
+          // Basic permissions - always available
           dashboard: true,
           regulatoryUpdates: true,
-          legalCases: true,
+          legalCases: false,  // Restricted - not included in basic plan
           knowledgeBase: true,
           newsletters: true,
-          analytics: true,
-          reports: true,
-          dataCollection: false,
-          globalSources: false,
-          historicalData: false,
+          
+          // Advanced permissions - restricted for standard customers
+          analytics: false,           // Premium feature - not enabled
+          reports: false,             // Premium feature - not enabled  
+          dataCollection: false,      // Admin-only feature
+          globalSources: false,       // Admin-only feature
+          historicalData: false,      // Premium feature - not enabled
+          
+          // Administrative permissions - all disabled for customers
           administration: false,
           userManagement: false,
-          systemSettings: true,
-          auditLogs: false,
-          aiInsights: true,
-          advancedAnalytics: true
+          systemSettings: false,      // Customer can't access system settings
+          auditLogs: false,           // Admin-only feature
+          
+          // AI features - restricted based on subscription
+          aiInsights: false,          // Premium AI feature - not enabled
+          advancedAnalytics: false    // Premium feature - not enabled
         }
       };
       
@@ -765,7 +773,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('[CUSTOMER] Error in tenant endpoint:', error);
       
-      // Fallback response in case of any errors
+      // Fallback response with same restricted permissions
       res.json({
         id: req.params.tenantId,
         name: "Demo Medical Devices GmbH",
@@ -773,21 +781,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         subscriptionPlan: "professional",
         subscriptionStatus: "active",
         customerPermissions: {
+          // Basic permissions only - as configured in admin customer management
           dashboard: true,
           regulatoryUpdates: true,
-          legalCases: true,
+          legalCases: false,
           knowledgeBase: true,
           newsletters: true,
-          analytics: true,
+          
+          // All advanced/premium features disabled
+          analytics: false,
           reports: false,
           dataCollection: false,
           globalSources: false,
           historicalData: false,
           administration: false,
           userManagement: false,
-          systemSettings: true,
+          systemSettings: false,
           auditLogs: false,
-          aiInsights: true,
+          aiInsights: false,
           advancedAnalytics: false
         }
       });
