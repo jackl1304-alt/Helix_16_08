@@ -23,30 +23,21 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import logoPath from "@assets/ICON Helix_1753735921077.jpg";
-
+// Einheitliche Navigation - KEINE DUPLIKATE
 const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
-  { name: "Data Collection", href: "/data-collection", icon: Database },
-  { name: "Global Sources", href: "/global-sources", icon: Globe },
   { name: "Regulatory Updates", href: "/regulatory-updates", icon: FileText },
-  { name: "Approval Workflow", href: "/approval-workflow", icon: CheckCircle },
   { name: "Analytics", href: "/analytics", icon: TrendingUp },
 ];
 
 const knowledgeBase = [
-  { name: "AI Insights", href: "/ai-insights", icon: Brain },
-  { name: "Custom Knowledge", href: "/knowledge-base", icon: Book },
-  { name: "Historische Daten", href: "/historical-data", icon: Archive },
-  { name: "Rechtsfälle", href: "/legal-cases", icon: Scale },
+  { name: "Data Collection", href: "/data-collection", icon: Database },
+  { name: "Knowledge Base", href: "/knowledge-base", icon: Book },
 ];
 
 const administration = [
   { name: "User Management", href: "/user-management", icon: Users },
-  { name: "Data Sources Admin", href: "/administration/data-sources", icon: Database },
-  { name: "Newsletter-Verwaltung", href: "/newsletter-admin", icon: Mail },
   { name: "System Settings", href: "/system-settings", icon: Settings },
-  { name: "Audit Logs", href: "/audit-logs", icon: FileText },
 ];
 
 export function MobileSidebar() {
@@ -81,7 +72,7 @@ export function MobileSidebar() {
         <Link href="/">
           <div className="flex flex-col items-center cursor-pointer">
             <img 
-              src={logoPath} 
+              src="/favicon.ico" 
               alt="Helix Logo" 
               className="h-10 w-10 rounded-lg object-cover"
             />
@@ -105,7 +96,7 @@ export function MobileSidebar() {
             <div className="p-4 border-b border-gray-200">
               <div className="flex flex-col items-center">
                 <img 
-                  src={logoPath} 
+                  src="/favicon.ico" 
                   alt="Helix Logo" 
                   className="h-12 w-12 rounded-lg object-cover mb-2"
                 />
