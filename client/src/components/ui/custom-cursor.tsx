@@ -16,14 +16,14 @@ export function CustomCursor() {
 
     const handleMouseEnter = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (target.matches('button, a, [role="button"], .cursor-hover')) {
+      if (target && typeof target.matches === 'function' && target.matches('button, a, [role="button"], .cursor-hover')) {
         setIsHovering(true);
       }
     };
 
     const handleMouseLeave = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (target.matches('button, a, [role="button"], .cursor-hover')) {
+      if (target && typeof target.matches === 'function' && target.matches('button, a, [role="button"], .cursor-hover')) {
         setIsHovering(false);
       }
     };
