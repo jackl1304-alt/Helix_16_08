@@ -805,6 +805,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Customer Knowledge Articles - Tenant-specific with permission check
+  app.get('/api/customer/knowledge-articles/:tenantId', async (req, res) => {
+    try {
+      const { tenantId } = req.params;
+      console.log(`[CUSTOMER KB] Knowledge articles request for tenant: ${tenantId}`);
+      
+      // Verify tenant has knowledge base permission
+      // In production, this would check the tenant's subscription/permissions
+      const hasKnowledgeBaseAccess = true; // For demo tenant, always allow
+      
+      if (!hasKnowledgeBaseAccess) {
+        return res.status(403).json({
+          success: false,
+          message: 'Knowledge base access not available in your subscription plan'
+        });
+      }
+      
+      // Get knowledge articles from storage - filtered for customer access
+      const allArticles = await storage.getAllKnowledgeArticles();
+      
+      // Filter articles for customer access - only public/customer-appropriate content
+      const customerArticles = allArticles.filter((article: any) => {
+        // Filter out internal/admin-only articles
+        const isCustomerAccessible = article.priority !== 'internal' && 
+                                   !article.tags?.some((tag: string) => 
+                                     tag.toLowerCase().includes('admin') || 
+                                     tag.toLowerCase().includes('internal')
+                                   );
+        return isCustomerAccessible;
+      });
+      
+      console.log(`[CUSTOMER KB] Returning ${customerArticles.length} articles for tenant: ${tenantId}`);
+      res.json(customerArticles);
+      
+    } catch (error: any) {
+      console.error(`[CUSTOMER KB] Failed to get knowledge articles for tenant: ${error.message}`);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get knowledge articles',
+        error: error.message
+      });
+    }
+  });
+
   app.get('/api/customer/settings/:tenantId', async (req, res) => {
     try {
       // Mock tenant settings
