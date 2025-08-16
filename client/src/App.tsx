@@ -148,11 +148,27 @@ function App() {
                 </CustomerThemeProvider>
               </Route>
               
-              {/* Admin Pages with Sidebar */}
-              <Route>
-                <ResponsiveLayout>
-                  <Router />
-                </ResponsiveLayout>
+              {/* Admin Pages with Sidebar - ONLY for admin routes */}
+              <Route path="/(:path*)?" nest>
+                {(params) => {
+                  const path = params.path || '';
+                  // Only render admin layout for admin paths
+                  const isAdminPath = [
+                    '', 'dashboard', 'data-collection', 'newsletter-admin', 'email-management', 
+                    'knowledge-base', 'analytics', 'regulatory-updates', 'rechtsprechung', 
+                    'zulassungen', 'sync-manager', 'global-sources', 'newsletter-manager', 
+                    'historical-data', 'admin-customers', 'user-management', 'administration', 
+                    'audit-logs', 'ai-content-analysis', 'ki-insights', 'grip-integration'
+                  ].some(adminPath => path.startsWith(adminPath));
+                  
+                  return isAdminPath ? (
+                    <ResponsiveLayout>
+                      <Router />
+                    </ResponsiveLayout>
+                  ) : (
+                    <NotFound />
+                  );
+                }}
               </Route>
             </Switch>
           </TooltipProvider>
