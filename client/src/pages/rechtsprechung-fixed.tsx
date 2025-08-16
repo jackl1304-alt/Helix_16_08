@@ -77,7 +77,7 @@ export default function RechtsprechungFixed() {
       console.log("✅ ENHANCED SYNC SUCCESS:", data);
     },
     onError: (error: any) => {
-      console.log("❌ ENHANCED SYNC ERROR:", error);
+      console.error("Legal sync error:", error);
     },
   });
 

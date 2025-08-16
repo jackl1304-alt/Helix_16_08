@@ -580,7 +580,7 @@ EXPORT DETAILS:
                                         />
                                       </div>
                                       
-                                      {/* RAW DATA ANZEIGE FÜR DEBUGGING */}
+                                      {/* Raw Data View */}
                                       {update.raw_data && (
                                         <div className="mt-4">
                                           <h4 className="text-md font-semibold mb-2 flex items-center gap-2">
