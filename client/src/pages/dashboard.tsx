@@ -98,6 +98,7 @@ export default function Dashboard() {
 
   React.useEffect(() => {
     const loadNewsletterSources = async () => {
+      console.log('[NEWSLETTER] Starting useEffect...');
       try {
         setIsLoadingNewsletterSources(true);
         console.log('[NEWSLETTER] Loading sources...');
@@ -111,23 +112,29 @@ export default function Dashboard() {
           credentials: "include",
         });
         
+        console.log('[NEWSLETTER] Response status:', response.status);
+        
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('[NEWSLETTER] Loaded sources:', data);
+        console.log('[NEWSLETTER] Loaded sources:', data, 'Array:', Array.isArray(data), 'Length:', data?.length);
         setNewsletterSources(data || []);
       } catch (error) {
         console.error('[NEWSLETTER] Error loading sources:', error);
         setNewsletterSources([]);
       } finally {
+        console.log('[NEWSLETTER] Setting loading to false');
         setIsLoadingNewsletterSources(false);
       }
     };
 
+    console.log('[NEWSLETTER] useEffect triggered');
     loadNewsletterSources();
   }, []);
+
+  console.log('[NEWSLETTER] Render - sources:', newsletterSources?.length, 'loading:', isLoadingNewsletterSources);
 
 
   // Optimierte Dashboard-Cards mit konsistenten Deltaways-Farben
