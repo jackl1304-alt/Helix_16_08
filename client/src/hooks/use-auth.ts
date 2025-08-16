@@ -1,69 +1,42 @@
-import { useState, useEffect } from 'react';
-
-interface AuthState {
-  isAuthenticated: boolean;
-  userRole: string | null;
-  loginTime: string | null;
-}
-
-export function useAuth() {
-  const [authState, setAuthState] = useState<AuthState>({
-    isAuthenticated: false,
-    userRole: null,
-    loginTime: null
-  });
-
-  useEffect(() => {
-    // Check authentication status on mount
-    checkAuthStatus();
-  }, []);
-
-  const checkAuthStatus = () => {
-    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-    const userRole = localStorage.getItem('userRole');
-    const loginTime = localStorage.getItem('loginTime');
-    
-    setAuthState({
-      isAuthenticated,
-      userRole,
-      loginTime
-    });
-  };
-
-  const login = (username: string, password: string): boolean => {
+// Simplified JSON-based Auth - no complex state management
+export const jsonAuth = {
+  login: (username: string, password: string): boolean => {
     // Fixed credentials: admin / admin123
     if (username === 'admin' && password === 'admin123') {
       localStorage.setItem('isAuthenticated', 'true');
       localStorage.setItem('userRole', 'admin');
       localStorage.setItem('loginTime', new Date().toISOString());
-      
-      setAuthState({
-        isAuthenticated: true,
-        userRole: 'admin',
-        loginTime: new Date().toISOString()
-      });
-      
       return true;
     }
     return false;
-  };
+  },
 
-  const logout = () => {
+  logout: () => {
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userRole');
     localStorage.removeItem('loginTime');
-    
-    setAuthState({
-      isAuthenticated: false,
-      userRole: null,
-      loginTime: null
-    });
-  };
+  },
 
+  isAuthenticated: (): boolean => {
+    return localStorage.getItem('isAuthenticated') === 'true';
+  },
+
+  getUserData: () => {
+    return {
+      isAuthenticated: localStorage.getItem('isAuthenticated') === 'true',
+      userRole: localStorage.getItem('userRole'),
+      loginTime: localStorage.getItem('loginTime')
+    };
+  }
+};
+
+// Legacy hook for compatibility - simplified
+export function useAuth() {
+  const userData = jsonAuth.getUserData();
+  
   return {
-    ...authState,
-    login,
-    logout,
-    checkAuthStatus
+    ...userData,
+    login: jsonAuth.login,
+    logout: jsonAuth.logout
   };
 }
