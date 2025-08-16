@@ -129,7 +129,7 @@ class PerplexityService {
     citations: string[];
   }> {
     try {
-      logger.info('[PERPLEXITY] Analyzing legal case', { caseId: caseData.id });
+      console.log('[PERPLEXITY] Analyzing legal case', { caseId: caseData.id });
 
       const systemPrompt = `Du bist ein Rechtsexperte für Medizintechnik und regulatorische Compliance.
       Analysiere Rechtsfälle im Medizintechnik-Bereich und bewerte:
@@ -187,7 +187,7 @@ class PerplexityService {
       };
 
     } catch (error) {
-      logger.error('[PERPLEXITY] Legal analysis error', { error: error.message, caseId: caseData.id });
+      console.error('[PERPLEXITY] Legal analysis error', { error: error.message, caseId: caseData.id });
       throw new Error(`Legal case analysis failed: ${error.message}`);
     }
   }
@@ -203,7 +203,7 @@ class PerplexityService {
     suggestedTags: string[];
   }> {
     try {
-      logger.info('[PERPLEXITY] Evaluating content', { contentId: content.id });
+      console.log('[PERPLEXITY] Evaluating content', { contentId: content.id });
 
       const systemPrompt = `Du bist ein KI-Experte für Medizintechnik-Content-Bewertung.
       Bewerte Content-Qualität, Relevanz und regulatorische Compliance.
@@ -260,7 +260,7 @@ class PerplexityService {
       };
 
     } catch (error) {
-      logger.error('[PERPLEXITY] Content evaluation error', { error: error.message, contentId: content.id });
+      console.error('[PERPLEXITY] Content evaluation error', { error: error.message, contentId: content.id });
       throw new Error(`Content evaluation failed: ${error.message}`);
     }
   }
@@ -275,7 +275,7 @@ class PerplexityService {
     marketInsights: string[];
   }> {
     try {
-      logger.info('[PERPLEXITY] Analyzing regulatory trends', { timeframe });
+      console.log('[PERPLEXITY] Analyzing regulatory trends', { timeframe });
 
       const systemPrompt = `Du bist ein Marktanalyst für Medizintechnik-Regulierung.
       Identifiziere aktuelle Trends, Risiken und Chancen in der Medizintechnik-Branche.
@@ -325,7 +325,7 @@ class PerplexityService {
       return this.parseTrendAnalysis(analysis);
 
     } catch (error) {
-      logger.error('[PERPLEXITY] Trend analysis error', { error: error.message, timeframe });
+      console.error('[PERPLEXITY] Trend analysis error', { error: error.message, timeframe });
       throw new Error(`Trend analysis failed: ${error.message}`);
     }
   }
@@ -351,7 +351,7 @@ class PerplexityService {
 
       const data: PerplexityResponse = await response.json();
       
-      logger.info('[PERPLEXITY] API response received', {
+      console.log('[PERPLEXITY] API response received', {
         model: data.model,
         usage: data.usage,
         citations: data.citations?.length || 0
@@ -360,7 +360,7 @@ class PerplexityService {
       return data;
 
     } catch (error) {
-      logger.error('[PERPLEXITY] API request failed', { error: error.message });
+      console.error('[PERPLEXITY] API request failed', { error: error.message });
       throw error;
     }
   }

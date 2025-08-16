@@ -37,14 +37,36 @@ export function AISearchPanel() {
   // Search Mutation
   const searchMutation = useMutation({
     mutationFn: async (query: string) => {
-      return apiRequest('/api/ai/search/regulatory', {
+      console.log('[AI-SEARCH] Starting regulatory search:', query);
+      const response = await fetch('/api/ai/search/regulatory', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, domain: 'fda.gov' })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ 
+          query: query.trim(), 
+          domain: 'fda.gov',
+          searchType: 'regulatory'
+        })
       });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[AI-SEARCH] Response error:', response.status, errorText);
+        throw new Error(`Search failed: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('[AI-SEARCH] Search result received:', data);
+      return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('[AI-SEARCH] Search completed successfully');
       queryClient.invalidateQueries({ queryKey: ['/api/ai/search'] });
+    },
+    onError: (error) => {
+      console.error('[AI-SEARCH] Search failed:', error);
     }
   });
 
