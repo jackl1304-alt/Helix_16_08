@@ -3,8 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { NavigationHeader } from "@/components/ui/navigation-header";
 import { ResponsiveLayout } from "@/components/responsive-layout";
+// NavigationHeader nicht mehr benötigt - ResponsiveLayout provides navigation
 import { AISearchPanel } from "@/components/admin/ai-search-panel";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
@@ -188,7 +188,7 @@ export default function Dashboard() {
   return (
     <ResponsiveLayout>
       {/* Navigation Header */}
-      <NavigationHeader showTenantLinks={true} currentView="admin" />
+      {/* Navigation wird bereits durch ResponsiveLayout bereitgestellt */}
       
       {/* Content Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
