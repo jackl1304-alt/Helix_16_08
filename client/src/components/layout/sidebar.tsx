@@ -23,7 +23,8 @@ import {
   Mail,
   Bot,
   Sparkles,
-  Building
+  Building,
+  LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoPath from "@assets/ICON Helix_1753735921077.jpg";
@@ -283,6 +284,17 @@ export function Sidebar() {
             <span>{t('status.dataSources')}</span>
             <span className="text-blue-600 font-medium">{t('common.active')}</span>
           </div>
+        </div>
+        
+        {/* Logout Button */}
+        <div className="mt-3 pt-3 border-t border-gray-300">
+          <button
+            onClick={() => window.location.href = '/login'}
+            className="flex items-center w-full px-2 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            <span>Abmelden</span>
+          </button>
         </div>
       </div>
     </aside>
