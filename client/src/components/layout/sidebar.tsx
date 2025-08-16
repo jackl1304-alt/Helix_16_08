@@ -27,7 +27,7 @@ import {
   LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logoPath from "@assets/ICON Helix_1753735921077.jpg";
+// import logoPath from "@assets/ICON Helix_1753735921077.jpg"; // Logo temporär deaktiviert
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -63,8 +63,6 @@ const getNavigationStructure = (t: (key: string) => string): Record<string, Navi
     title: t('nav.sections.dataManagement'),
     items: [
       { name: t('nav.dataCollection'), href: "/data-collection", icon: Database },
-      { name: t('nav.newsletterAdmin'), href: "/newsletter-admin", icon: Mail },
-      { name: t('nav.emailManagement'), href: "/email-management", icon: Mail },
       { name: t('nav.knowledgeBase'), href: "/knowledge-base", icon: Book },
     ],
     defaultOpen: true
@@ -95,20 +93,12 @@ const getNavigationStructure = (t: (key: string) => string): Record<string, Navi
     title: t('nav.sections.advanced'),
     items: [
       { name: t('nav.syncManager'), href: "/sync-manager", icon: RefreshCw },
-      { name: t('nav.globalSources'), href: "/global-sources", icon: Globe },
       { name: t('nav.newsletterManager'), href: "/newsletter-manager", icon: Newspaper },
       { name: t('nav.historicalData'), href: "/historical-data", icon: Archive },
-      { name: t('nav.customerManagement'), href: "/admin-customers", icon: Building },
       { name: t('nav.userManagement'), href: "/user-management", icon: Users },
       { name: t('nav.systemAdmin'), href: "/administration", icon: Settings },
-      { name: t('nav.auditLogs'), href: "/audit-logs", icon: FileSearch },
     ],
-    defaultOpen: false,
-    hiddenItems: [
-      { name: "🧠", href: "/ai-content-analysis", icon: Brain },
-      { name: "🤖", href: "/ki-insights", icon: Bot },
-      { name: "✨", href: "/grip-integration", icon: Sparkles },
-    ]
+    defaultOpen: false
   }
 });
 
@@ -250,7 +240,7 @@ export function Sidebar() {
         <Link href="/">
           <div className="flex flex-col items-center cursor-pointer space-y-2">
             <img 
-              src={logoPath} 
+              src="/favicon.ico" 
               alt="Helix Logo" 
               className="h-32 w-32 object-cover rounded-lg ring-2 ring-[#b0d4f6]"
             />
