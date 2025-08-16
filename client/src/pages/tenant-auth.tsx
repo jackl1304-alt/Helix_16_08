@@ -82,8 +82,10 @@ export default function TenantAuth({
       // Store user session
       localStorage.setItem('tenant_user', JSON.stringify(userData));
       
-      // Redirect to tenant dashboard
-      setLocation('/tenant/dashboard');
+      // Small delay to ensure localStorage is set before navigation
+      setTimeout(() => {
+        setLocation('/tenant/dashboard');
+      }, 150);
       
     } catch (err: any) {
       console.error('Login error:', err);
