@@ -100,8 +100,8 @@ function App() {
           <Router>
             <Toaster />
             <Switch>
-              <Route path="/tenant/auth" component={TenantAuth} />
-              <Route path="/tenant/:tenantId" component={TenantAuth} />
+              <Route path="/tenant/auth" component={() => <TenantAuth />} />
+              <Route path="/tenant/:tenantId" component={() => <TenantAuth />} />
               <Route path="/" component={() => <Login onLogin={login} />} />
               <Route component={() => <Login onLogin={login} />} />
             </Switch>
