@@ -2590,51 +2590,134 @@ ${case_item.court}
         }
       }
 
-      // 2. KI-ERGÄNZUNG (KI-generierte Antworten hinzufügen)
-      const aiResults = [
-        {
-          id: `ai_1_${Date.now()}`,
-          title: `KI-Analyse zu "${query}"`,
-          content: `Basierend auf aktuellen regulatorischen Entwicklungen und Ihrer Anfrage "${query}" sind folgende Aspekte besonders relevant: Die neuesten FDA-Richtlinien betonen verstärkt die Bedeutung von Cybersecurity-Maßnahmen für vernetzte Medizinprodukte. Gleichzeitig harmonisieren sich die internationalen Standards zunehmend, was für Hersteller sowohl Chancen als auch Herausforderungen mit sich bringt.`,
-          excerpt: `KI-generierte Analyse zu "${query}" basierend auf aktuellen regulatorischen Trends und Best Practices...`,
-          type: 'regulatory',
-          source: 'KI-Regulatory-Assistant',
-          dataSource: 'ai',
-          relevance: 0.75,
-          date: new Date().toISOString(),
-          metadata: {
-            aiConfidence: 87,
-            region: 'Global',
-            category: 'AI-generated',
-            tags: ['KI-Analyse', 'Regulatory Intelligence', 'Compliance']
-          }
-        }
-      ];
+      // 2. PERPLEXITY KI-INTEGRATION - Echte KI-Antworten mit Perplexity API
+      let intelligentAnswer = null;
+      let aiResults = [];
+      
+      try {
+        console.log('[PERPLEXITY] Sending query to Perplexity API:', query);
+        
+        const perplexityResponse = await fetch('https://api.perplexity.ai/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'llama-3.1-sonar-small-128k-online',
+            messages: [
+              {
+                role: 'system',
+                content: 'Du bist ein Experte für Medizintechnik-Regulierung. Beantworte präzise und professionell auf Deutsch. Berücksichtige aktuelle FDA, EMA, BfArM und MDR Richtlinien. Biete praktische Empfehlungen.'
+              },
+              {
+                role: 'user',
+                content: `Beantworte diese medizintechnische/regulatorische Frage: "${query}". Gib eine präzise, professionelle Antwort mit aktuellen Richtlinien und praktischen Empfehlungen.`
+              }
+            ],
+            max_tokens: 800,
+            temperature: 0.2,
+            top_p: 0.9,
+            search_recency_filter: 'month',
+            return_images: false,
+            return_related_questions: false,
+            stream: false
+          })
+        });
 
-      // KI-Ergebnisse nur hinzufügen wenn wenige Datenbankresultate gefunden wurden
-      if (results.length < 5) {
+        if (perplexityResponse.ok) {
+          const perplexityData = await perplexityResponse.json();
+          const aiAnswer = perplexityData.choices[0]?.message?.content || '';
+          const citations = perplexityData.citations || [];
+          
+          console.log('[PERPLEXITY] API response received, answer length:', aiAnswer.length);
+          console.log('[PERPLEXITY] Citations:', citations.length);
+          
+          // Erstelle KI-Ergebnis basierend auf Perplexity Antwort
+          if (aiAnswer) {
+            aiResults.push({
+              id: `perplexity_${Date.now()}`,
+              title: `Perplexity KI-Analyse zu "${query}"`,
+              content: aiAnswer,
+              excerpt: aiAnswer.substring(0, 200) + '...',
+              type: 'regulatory',
+              source: 'Perplexity AI (Online-Suche)',
+              dataSource: 'ai',
+              relevance: 0.85,
+              date: new Date().toISOString(),
+              url: citations[0] || undefined,
+              metadata: {
+                aiConfidence: 95,
+                region: 'Global',
+                category: 'AI-generated',
+                tags: ['Perplexity-KI', 'Live-Daten', 'Online-Recherche'],
+                language: 'de'
+              }
+            });
+          }
+          
+          // Intelligente Antwort mit Perplexity Daten
+          intelligentAnswer = {
+            query: query,
+            answer: aiAnswer,
+            confidence: 95,
+            sources: [
+              ...new Set(results.map(r => r.source)),
+              'Perplexity AI (Live Web Search)',
+              ...(citations.slice(0, 3).map(url => {
+                try {
+                  return new URL(url).hostname;
+                } catch {
+                  return url;
+                }
+              }))
+            ],
+            recommendations: [
+              'Konsultieren Sie die zitierten Quellen für detaillierte Informationen',
+              'Überprüfen Sie aktuelle regulatorische Updates',
+              'Berücksichtigen Sie regionale Unterschiede in der Regulierung'
+            ],
+            relatedTopics: [
+              'FDA Guidelines',
+              'EU MDR Compliance', 
+              'BfArM Stellungnahmen',
+              'ISO 13485 Standards',
+              'Post-Market Surveillance'
+            ],
+            timestamp: new Date().toISOString()
+          };
+        } else {
+          console.error('[PERPLEXITY] API Error:', perplexityResponse.status, perplexityResponse.statusText);
+          throw new Error(`Perplexity API Error: ${perplexityResponse.status}`);
+        }
+      } catch (perplexityError) {
+        console.error('[PERPLEXITY] Error calling Perplexity API:', perplexityError);
+        
+        // Fallback zu lokaler KI-Antwort wenn Perplexity fehlschlägt
+        intelligentAnswer = {
+          query: query,
+          answer: `Zu Ihrer Anfrage "${query}" wurden ${results.filter(r => r.dataSource === 'database').length} relevante Einträge in unserer Datenbank gefunden. Die KI-Analyse ist temporär nicht verfügbar. Basierend auf den Datenbankresultaten können Sie aktuelle Entwicklungen in der regulatorischen Landschaft einsehen.`,
+          confidence: results.length > 3 ? 85 : 70,
+          sources: [...new Set(results.map(r => r.source))],
+          recommendations: [
+            'Überprüfen Sie die Datenbankresultate für aktuelle Informationen',
+            'Berücksichtigen Sie internationale Harmonisierungsbestrebungen', 
+            'Implementieren Sie robuste Compliance-Monitoring-Systeme'
+          ],
+          relatedTopics: [
+            'FDA Cybersecurity Guidelines',
+            'EU MDR Compliance',
+            'ISO 13485 Updates',
+            'Post-Market Surveillance'
+          ],
+          timestamp: new Date().toISOString()
+        };
+      }
+      
+      // KI-Ergebnisse hinzufügen wenn verfügbar
+      if (aiResults.length > 0) {
         results.push(...aiResults);
       }
-
-      // 3. INTELLIGENTE ANTWORT GENERIEREN
-      const intelligentAnswer = {
-        query: query,
-        answer: `Zu Ihrer Anfrage "${query}" wurden ${results.filter(r => r.dataSource === 'database').length} relevante Einträge in unserer Datenbank gefunden und ${results.filter(r => r.dataSource === 'ai').length} KI-generierte Analysen erstellt. Die Ergebnisse zeigen aktuelle Entwicklungen in der regulatorischen Landschaft und bieten praktische Einblicke für Compliance-Entscheidungen.`,
-        confidence: results.length > 3 ? 92 : 78,
-        sources: [...new Set(results.map(r => r.source))],
-        recommendations: [
-          'Überprüfen Sie die neuesten regulatorischen Updates in Ihrer Region',
-          'Berücksichtigen Sie internationale Harmonisierungsbestrebungen',
-          'Implementieren Sie robuste Compliance-Monitoring-Systeme'
-        ],
-        relatedTopics: [
-          'FDA Cybersecurity Guidelines',
-          'EU MDR Compliance',
-          'ISO 13485 Updates',
-          'Post-Market Surveillance'
-        ],
-        timestamp: new Date().toISOString()
-      };
 
       console.log(`[INTELLIGENT-SEARCH] Search completed: ${results.length} results (${results.filter(r => r.dataSource === 'database').length} from database, ${results.filter(r => r.dataSource === 'ai').length} from AI)`);
 
@@ -5767,40 +5850,6 @@ Für vollständige Details und weitere Analysen besuchen Sie die ursprüngliche 
     }
   });
 
-  // 🔴 MOCK DATA REPAIR - Intelligent Search API Route
-  app.post("/api/intelligent-search", async (req, res) => {
-    try {
-      const { query, filters = { type: "all", region: "all", timeframe: "all" } } = req.body;
-      
-      if (!query) {
-        return res.status(400).json({ error: 'Search query is required' });
-      }
-      
-      console.log(`[SEARCH] Processing intelligent search: "${query}"`);
-      
-      // Import and use the search service
-      const { intelligentSearchService } = await import('./services/intelligentSearchService');
-      const searchResults = await intelligentSearchService.search(query, filters);
-      
-      console.log(`[SEARCH] Found ${searchResults.results.length} results for "${query}"`);
-      
-      res.json({
-        success: true,
-        query,
-        results: searchResults.results,
-        answer: searchResults.answer,
-        totalResults: searchResults.totalResults,
-        timestamp: new Date().toISOString()
-      });
-    } catch (error: any) {
-      console.error('🔴 MOCK DATA - Intelligent search error:', error);
-      res.status(500).json({ 
-        error: 'Search failed', 
-        message: error.message,
-        success: false 
-      });
-    }
-  });
 
   // Mount GRIP routes
   app.use('/api/grip', gripRoutes);
