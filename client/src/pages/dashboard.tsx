@@ -104,13 +104,20 @@ export default function Dashboard() {
     data: newsletterSources,
     dataType: typeof newsletterSources,
     isArray: Array.isArray(newsletterSources),
-    length: newsletterSources?.length
+    length: newsletterSources?.length,
+    firstItem: newsletterSources?.[0]
   });
 
-  // Force invalidate newsletter sources cache on mount
+  // Force fresh data fetch
   React.useEffect(() => {
-    console.log('Invalidating newsletter sources cache...');
-    queryClient.invalidateQueries({ queryKey: ['/api/newsletter-sources'] });
+    console.log('Manual fetch test...');
+    fetch('/api/newsletter-sources')
+      .then(res => res.json())
+      .then(data => {
+        console.log('Manual fetch result:', data);
+        console.log('Manual fetch length:', data?.length);
+      })
+      .catch(err => console.error('Manual fetch error:', err));
   }, []);
 
   // Optimierte Dashboard-Cards mit konsistenten Deltaways-Farben
