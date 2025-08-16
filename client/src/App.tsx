@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { useLocation } from "wouter";
+import { ResponsiveLayout } from "@/components/responsive-layout";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import Login from "@/pages/login";
@@ -44,9 +45,13 @@ function renderCurrentPage(page: string, userData: any) {
     case '/dashboard':
       return <Dashboard />;
     
-    // Customer Area
+    // Customer Area - Multiple paths
     case '/customer-dashboard':
     case '/customer/dashboard':
+    case '/customer-area':
+    case '/tenant/dashboard':
+    case '/tenant/demo-medical':
+    case '/tenant/demo-medical/dashboard':
       return <CustomerDashboard />;
     
     // Admin Pages
@@ -185,7 +190,9 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <div className="min-h-screen bg-gray-50">
           <Toaster />
-          {renderCurrentPage(location, appState.userData)}
+          <ResponsiveLayout>
+            {renderCurrentPage(location, appState.userData)}
+          </ResponsiveLayout>
         </div>
       </QueryClientProvider>
     </LanguageProvider>
