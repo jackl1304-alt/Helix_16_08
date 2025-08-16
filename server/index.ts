@@ -83,6 +83,10 @@ registerRoutes(app);
 // Setup customer AI routes  
 setupCustomerAIRoutes(app);
 
+// Setup new clean JSON-based customer routes
+import { setupCustomerRoutes } from './api/customer-routes-new';
+setupCustomerRoutes(app);
+
 // Register tenant-specific routes - ONLY new real data API
 app.use('/api/tenant/auth', tenantAuthRoutes);
 app.use('/api/tenant', tenantApiRoutes);  // NEW real data API with database connections

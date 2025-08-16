@@ -726,84 +726,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get tenant data with permissions for customer dashboard
-  app.get('/api/customer/tenant/:tenantId', async (req, res) => {
-    try {
-      const { tenantId } = req.params;
-      console.log(`[CUSTOMER] Fetching tenant data for: ${tenantId}`);
-      
-      // Return customer permissions based on Basic/Professional plan configuration
-      // These permissions reflect what would be configured in admin customer management
-      const tenant = {
-        id: tenantId,
-        name: "Demo Medical Devices GmbH",
-        slug: "demo-medical",
-        subscriptionPlan: "professional",
-        subscriptionStatus: "active",
-        customerPermissions: {
-          // Basic permissions - always available
-          dashboard: true,
-          regulatoryUpdates: true,
-          legalCases: false,  // Restricted - not included in basic plan
-          knowledgeBase: true,
-          newsletters: true,
-          
-          // Advanced permissions - restricted for standard customers
-          analytics: false,           // Premium feature - not enabled
-          reports: false,             // Premium feature - not enabled  
-          dataCollection: false,      // Admin-only feature
-          globalSources: false,       // Admin-only feature
-          historicalData: false,      // Premium feature - not enabled
-          
-          // Administrative permissions - all disabled for customers
-          administration: false,
-          userManagement: false,
-          systemSettings: false,      // Customer can't access system settings
-          auditLogs: false,           // Admin-only feature
-          
-          // AI features - restricted based on subscription
-          aiInsights: false,          // Premium AI feature - not enabled
-          advancedAnalytics: false    // Premium feature - not enabled
-        }
-      };
-      
-      console.log('[CUSTOMER] Returning stable tenant data for:', tenantId);
-      res.json(tenant);
-      
-    } catch (error) {
-      console.error('[CUSTOMER] Error in tenant endpoint:', error);
-      
-      // Fallback response with same restricted permissions
-      res.json({
-        id: req.params.tenantId,
-        name: "Demo Medical Devices GmbH",
-        slug: "demo-medical",
-        subscriptionPlan: "professional",
-        subscriptionStatus: "active",
-        customerPermissions: {
-          // Basic permissions only - as configured in admin customer management
-          dashboard: true,
-          regulatoryUpdates: true,
-          legalCases: false,
-          knowledgeBase: true,
-          newsletters: true,
-          
-          // All advanced/premium features disabled
-          analytics: false,
-          reports: false,
-          dataCollection: false,
-          globalSources: false,
-          historicalData: false,
-          administration: false,
-          userManagement: false,
-          systemSettings: false,
-          auditLogs: false,
-          aiInsights: false,
-          advancedAnalytics: false
-        }
-      });
-    }
-  });
 
   // Customer Knowledge Articles - Tenant-specific with permission check
   app.get('/api/customer/knowledge-articles/:tenantId', async (req, res) => {
@@ -844,6 +766,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         message: 'Failed to get knowledge articles',
+        error: error.message
+      });
+    }
+  });
+
+  // NEW: Clean JSON-based Customer API Routes
+  // Get Tenant Data with Permissions - JSON Response
+  app.get('/api/customer/tenant-new/:tenantId', async (req, res) => {
+    try {
+      const { tenantId } = req.params;
+      console.log(`[CUSTOMER API NEW] Getting tenant data: ${tenantId}`);
+      
+      // JSON-based tenant configuration with CLEAN permissions
+      const tenantData = {
+        id: tenantId,
+        name: "Demo Medical Devices GmbH",
+        slug: "demo-medical",
+        plan: "Professional",
+        status: "active",
+        customerPermissions: {
+          // Basic permissions - always available for Professional plan
+          dashboard: true,
+          regulatoryUpdates: true,
+          legalCases: false,  // Not included in Professional
+          knowledgeBase: true,
+          newsletters: true,
+          
+          // Advanced permissions - restricted 
+          analytics: false,
+          reports: false,
+          dataCollection: false,
+          globalSources: false,
+          historicalData: false,
+          
+          // Admin permissions - disabled for customers
+          administration: false,
+          userManagement: false,
+          systemSettings: false,
+          auditLogs: false,
+          aiInsights: false,
+          advancedAnalytics: false
+        }
+      };
+      
+      console.log(`[CUSTOMER API NEW] Returning clean tenant data for: ${tenantId}`);
+      res.json(tenantData);
+      
+    } catch (error: any) {
+      console.error(`[CUSTOMER API NEW] Error getting tenant data: ${error.message}`);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get tenant data',
         error: error.message
       });
     }
