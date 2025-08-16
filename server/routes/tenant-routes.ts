@@ -7,7 +7,9 @@ const router = express.Router();
  * Tenant Dashboard Stats
  * Returns stats scoped to the current tenant only
  */
-router.get('/dashboard/stats', async (req, res) => {
+// REMOVED - This route conflicts with the new tenant-api.ts  
+// Use /api/tenant/dashboard/stats from tenant-api.ts instead
+router.get('/dashboard/stats-old', async (req, res) => {
   try {
     console.log('[TENANT] Dashboard stats request received');
     
@@ -35,7 +37,9 @@ router.get('/dashboard/stats', async (req, res) => {
  * Tenant Context
  * Returns current tenant information
  */
-router.get('/context', async (req, res) => {
+// REMOVED - This route conflicts with the new tenant-api.ts
+// Use /api/tenant/context from tenant-api.ts instead  
+router.get('/context-old', async (req, res) => {
   try {
     console.log('[TENANT] Context request received');
     
@@ -62,7 +66,9 @@ router.get('/context', async (req, res) => {
  * Tenant Regulatory Updates
  * Returns updates scoped to the current tenant
  */
-router.get('/regulatory-updates', async (req, res) => {
+// REMOVED - This route conflicts with the new tenant-api.ts
+// Use /api/tenant/regulatory-updates from tenant-api.ts instead
+router.get('/regulatory-updates-old', async (req, res) => {
   try {
     console.log('[TENANT] Regulatory updates request received');
     
