@@ -195,6 +195,11 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
     currentPermissions[item.permission]
   );
 
+  // Debug logging
+  console.log('[CUSTOMER NAV] Permissions:', currentPermissions);
+  console.log('[CUSTOMER NAV] Allowed items:', allowedItems.length);
+  console.log('[CUSTOMER NAV] Tenant name:', tenantName);
+
   const renderNavigationItem = (item: NavigationItem) => {
     const tenantUrl = buildTenantUrl(item.href);
     const isActive = location === tenantUrl || location === item.href;
@@ -231,7 +236,7 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
   };
 
   return (
-    <div className="fixed left-0 top-0 h-screen w-64 flex flex-col bg-white border-r border-gray-200 shadow-sm z-40">
+    <div className="fixed left-0 top-0 h-screen w-64 flex flex-col bg-white border-r border-gray-200 shadow-lg z-50">
       {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
