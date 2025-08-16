@@ -68,6 +68,7 @@ export default function CustomerDashboard() {
   const [selectedTimeRange, setSelectedTimeRange] = useState('30d');
   const params = useParams();
   const { logout } = useAuth();
+  const { t } = useLanguage();
   
   // Use tenant ID from URL if available, otherwise use mock ID
   const tenantId = params.tenantId || mockTenantId;
@@ -236,8 +237,6 @@ export default function CustomerDashboard() {
       </div>
     );
   }
-
-  const { t } = useLanguage();
   
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 relative">
