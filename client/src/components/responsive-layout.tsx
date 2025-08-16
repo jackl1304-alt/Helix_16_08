@@ -39,9 +39,9 @@ export function ResponsiveLayout({ children, showSidebar = true }: ResponsiveLay
       
       {/* Main Content */}
       <div className={cn(
-        "flex-1 transition-all duration-300",
-        showSidebar && "lg:ml-64", // Only apply left margin on large screens
-        "px-4 py-2 md:px-6 md:py-4 lg:px-8 lg:py-6" // Responsive padding
+        "transition-all duration-300",
+        showSidebar ? "ml-64" : "ml-0", // Sidebar width margin
+        "min-h-screen" // Full height
       )}>
         {children}
       </div>
