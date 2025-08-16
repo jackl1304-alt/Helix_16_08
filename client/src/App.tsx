@@ -48,20 +48,18 @@ function App() {
     <LanguageProvider>
       <QueryClientProvider client={queryClient}>
         <Router>
-          <ResponsiveLayout>
-            <Toaster />
-            <Switch>
-              <Route path="/" component={Dashboard} />
-              <Route path="/dashboard" component={Dashboard} />
-              <Route path="/regulatory-updates" component={RegulatoryUpdates} />
-              <Route path="/analytics" component={NotFound} />
-              <Route path="/data-collection" component={NotFound} />
-              <Route path="/knowledge-base" component={NotFound} />
-              <Route path="/user-management" component={NotFound} />
-              <Route path="/system-settings" component={NotFound} />
-              <Route component={NotFound} />
-            </Switch>
-          </ResponsiveLayout>
+          <Toaster />
+          <Switch>
+            <Route path="/" component={Dashboard} />
+            <Route path="/dashboard" component={Dashboard} />
+            <Route path="/regulatory-updates" component={RegulatoryUpdates} />
+            <Route path="/analytics">{() => <ResponsiveLayout><div className="p-6"><h1 className="text-2xl font-bold">Analytics</h1><p>Analytics wird hier implementiert.</p></div></ResponsiveLayout>}</Route>
+            <Route path="/data-collection">{() => <ResponsiveLayout><div className="p-6"><h1 className="text-2xl font-bold">Data Collection</h1><p>Data Collection wird hier implementiert.</p></div></ResponsiveLayout>}</Route>
+            <Route path="/knowledge-base">{() => <ResponsiveLayout><div className="p-6"><h1 className="text-2xl font-bold">Knowledge Base</h1><p>Knowledge Base wird hier implementiert.</p></div></ResponsiveLayout>}</Route>
+            <Route path="/user-management">{() => <ResponsiveLayout><div className="p-6"><h1 className="text-2xl font-bold">User Management</h1><p>User Management wird hier implementiert.</p></div></ResponsiveLayout>}</Route>
+            <Route path="/system-settings">{() => <ResponsiveLayout><div className="p-6"><h1 className="text-2xl font-bold">System Settings</h1><p>System Settings wird hier implementiert.</p></div></ResponsiveLayout>}</Route>
+            <Route component={NotFound} />
+          </Switch>
         </Router>
       </QueryClientProvider>
     </LanguageProvider>

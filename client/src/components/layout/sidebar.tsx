@@ -213,7 +213,7 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-white shadow-lg z-30 overflow-y-auto border-r border-gray-200">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-white shadow-lg z-40 overflow-y-auto border-r border-gray-200">
       {/* DELTA WAYS Logo Header */}
       <div className="p-6 border-b border-gray-200">
         <Link href="/">
