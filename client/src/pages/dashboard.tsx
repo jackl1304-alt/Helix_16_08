@@ -437,6 +437,18 @@ export default function Dashboard() {
                   <div className="text-xs text-gray-500">Compliance Trends</div>
                 </div>
               </Button>
+
+              <Button 
+                variant="outline" 
+                className="flex-col items-center gap-3 h-24 hover:border-green-400 transition-all"
+                onClick={() => setLocation('/chat-support')}
+              >
+                <MessageCircle className="h-6 w-6 text-green-600" />
+                <div className="text-center">
+                  <div className="font-semibold text-sm">Support Chat</div>
+                  <div className="text-xs text-gray-500">Direkte Administrator-Kommunikation</div>
+                </div>
+              </Button>
             </div>
           </CardContent>
         </Card>
