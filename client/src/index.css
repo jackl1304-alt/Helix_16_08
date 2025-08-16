@@ -251,26 +251,27 @@
 }
 
 .cursor-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   background: var(--emotion-trust);
   border-radius: 50%;
   position: fixed;
   pointer-events: none;
   z-index: 9999;
   transition: transform 0.1s ease;
+  opacity: 0.7;
 }
 
 .cursor-ring {
-  width: 40px;
-  height: 40px;
-  border: 2px solid var(--emotion-trust);
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--emotion-trust);
   border-radius: 50%;
   position: fixed;
   pointer-events: none;
   z-index: 9998;
   transition: all 0.15s ease;
-  opacity: 0.5;
+  opacity: 0.3;
 }
 
 .cursor-hover .cursor-ring {

@@ -25,24 +25,48 @@ router.post('/login', async (req, res) => {
       subscription_tier: 'professional'
     };
 
-    // Find user
-    const userResult = await sql`
-      SELECT id, email, name, role, created_at
-      FROM users 
-      WHERE email = ${email}
-    `;
+    // Demo mode - create demo user if needed
+    let user;
+    
+    // Check for demo credentials first
+    if (email === 'admin@demo-medical.local' && password === 'demo123') {
+      // Demo user - bypass database lookup
+      user = {
+        id: 'demo-user-001',
+        email: 'admin@demo-medical.local',
+        name: 'Demo Admin',
+        role: 'admin',
+        created_at: new Date()
+      };
+      console.log('[TENANT AUTH] Demo user authenticated');
+    } else {
+      // Find user in database
+      const userResult = await sql`
+        SELECT id, email, name, role, created_at
+        FROM users 
+        WHERE email = ${email}
+      `;
 
-    const user = userResult[0];
-    console.log('[TENANT AUTH] User found:', user ? 'Yes' : 'No');
+      user = userResult[0];
+      console.log('[TENANT AUTH] User found:', user ? 'Yes' : 'No');
 
-    if (!user) {
-      return res.status(401).json({ 
-        error: 'Ungültige Anmeldedaten' 
-      });
+      if (!user) {
+        return res.status(401).json({ 
+          error: 'Ungültige Anmeldedaten' 
+        });
+      }
     }
 
-    // Verify password (demo - accept 'demo123')
-    const validPassword = password === 'demo123';
+    // Verify password
+    let validPassword = false;
+    
+    if (email === 'admin@demo-medical.local') {
+      validPassword = password === 'demo123';
+    } else {
+      // For real users, check actual password (simplified for demo)
+      validPassword = password === 'demo123';
+    }
+    
     console.log('[TENANT AUTH] Password valid:', validPassword);
 
     if (!validPassword) {
