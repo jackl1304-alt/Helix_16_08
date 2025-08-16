@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
 import {
   LayoutDashboard,
   FileText,
@@ -153,6 +154,7 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
   const [location, setLocation] = useLocation();
   const params = useParams();
   const [currentPermissions, setCurrentPermissions] = useState(permissions);
+  const { logout } = useAuth();
   
   // Build tenant-specific URLs
   const buildTenantUrl = (path: string) => {
@@ -195,10 +197,6 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
     currentPermissions[item.permission]
   );
 
-  // Debug logging
-  console.log('[CUSTOMER NAV] Permissions:', currentPermissions);
-  console.log('[CUSTOMER NAV] Allowed items:', allowedItems.length);
-  console.log('[CUSTOMER NAV] Tenant name:', tenantName);
 
   const renderNavigationItem = (item: NavigationItem) => {
     const tenantUrl = buildTenantUrl(item.href);
@@ -281,7 +279,10 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
           variant="ghost" 
           size="sm" 
           className="w-full text-red-600 hover:text-red-700 hover:bg-red-50" 
-          onClick={() => window.location.href = '/login'}
+          onClick={() => {
+            logout();
+            window.location.reload();
+          }}
         >
           <LogOut className="w-4 h-4 mr-2" />
           Abmelden

@@ -4,6 +4,7 @@ import { useParams } from "wouter";
 import { useLiveTenantPermissions } from "@/hooks/use-live-tenant-permissions";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -66,6 +67,7 @@ const regionDistribution = [
 export default function CustomerDashboard() {
   const [selectedTimeRange, setSelectedTimeRange] = useState('30d');
   const params = useParams();
+  const { logout } = useAuth();
   
   // Use tenant ID from URL if available, otherwise use mock ID
   const tenantId = params.tenantId || mockTenantId;
@@ -300,7 +302,10 @@ export default function CustomerDashboard() {
             <Settings className="w-4 h-4 mr-2" />
             Einstellungen
           </Button>
-          <Button variant="outline" onClick={() => window.location.href = '/login'}>
+          <Button variant="outline" onClick={() => {
+            logout();
+            window.location.reload();
+          }}>
             <LogOut className="w-4 h-4 mr-2" />
             Abmelden
           </Button>
