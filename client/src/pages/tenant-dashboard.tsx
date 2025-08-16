@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Building2, Users, FileText, TrendingUp, Clock, Shield, Star, Zap, Crown, Lock } from "lucide-react";
 import { useLocation } from "wouter";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 interface TenantContext {
   id: string;
@@ -25,6 +27,7 @@ interface TenantStats {
   usageLimit: number;
 }
 
+// This will be converted to use translations in the component
 const subscriptionLimits = {
   basic: {
     name: 'Basic Plan',
@@ -32,7 +35,7 @@ const subscriptionLimits = {
     monthlyUpdates: 50,
     legalCases: 10,
     dataSources: 5,
-    features: ['Grundlegende Updates', 'Email-Benachrichtigungen', 'Standard-Support']
+    features: ['basic.updates', 'basic.notifications', 'basic.support']
   },
   professional: {
     name: 'Professional Plan', 
@@ -40,7 +43,7 @@ const subscriptionLimits = {
     monthlyUpdates: 200,
     legalCases: 50,
     dataSources: 20,
-    features: ['Erweiterte Analytics', 'Priority Support', 'Custom Reports', 'API Access']
+    features: ['professional.analytics', 'professional.support', 'professional.reports', 'professional.api']
   },
   enterprise: {
     name: 'Enterprise Plan',
@@ -54,6 +57,7 @@ const subscriptionLimits = {
 
 export default function TenantDashboard() {
   const [, setLocation] = useLocation();
+  const { t } = useLanguage();
 
   const { data: tenantContext, isLoading: contextLoading, error: contextError } = useQuery({
     queryKey: ['/api/tenant/context'],
@@ -131,9 +135,14 @@ export default function TenantDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative">
+      {/* Language Selector - Top Right */}
+      <div className="fixed top-4 right-4 z-50">
+        <LanguageSelector />
+      </div>
+      
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-lg border-b border-white/20 sticky top-0 z-50">
+      <header className="bg-white/80 backdrop-blur-lg border-b border-white/20 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">

@@ -119,7 +119,95 @@ const translations = {
     'newsletter.subtitle': 'Verwalten Sie authentische Newsletter-Quellen',
     'newsletter.addSource': 'Neue Quelle hinzufügen',
     'newsletter.configuredSources': 'Konfigurierte Newsletter-Quellen',
-    'newsletter.authenticSources': 'Authentische Newsletter-Quellen'
+    'newsletter.authenticSources': 'Authentische Newsletter-Quellen',
+    
+    // Data Collection
+    'dataCollection.title': 'Datensammlung',
+    'dataCollection.subtitle': 'Zentrale Verwaltung aller Datenquellen und Sync-Prozesse',
+    'dataCollection.activeSources': 'Aktive Quellen',
+    'dataCollection.syncStatus': 'Sync-Status',
+    'dataCollection.lastSync': 'Letzter Sync',
+    'dataCollection.syncNow': 'Jetzt synchronisieren',
+    'dataCollection.manageSource': 'Quelle verwalten',
+    'dataCollection.newsletterSources': 'Newsletter-Quellen',
+    'dataCollection.runningSyncs': 'Laufende Syncs',
+    'dataCollection.pendingSyncs': 'Ausstehende Syncs',
+    'dataCollection.recentSyncs': 'Kürzliche Syncs',
+    
+    // Regulatory Updates
+    'regulatory.title': 'Regulatorische Updates',
+    'regulatory.subtitle': 'Aktuelle Vorschriften und Richtlinien für Medizinprodukte',
+    'regulatory.region': 'Region',
+    'regulatory.authority': 'Behörde',
+    'regulatory.deviceClass': 'Geräteklasse',
+    'regulatory.published': 'Veröffentlicht',
+    'regulatory.viewDetails': 'Details anzeigen',
+    'regulatory.searchUpdates': 'Updates durchsuchen...',
+    'regulatory.allRegions': 'Alle Regionen',
+    'regulatory.allAuthorities': 'Alle Behörden',
+    'regulatory.allCategories': 'Alle Kategorien',
+    
+    // Legal Cases
+    'legal.title': 'Rechtsprechung',
+    'legal.subtitle': 'Medizinrechtliche Fälle und Entscheidungen',
+    'legal.court': 'Gericht',
+    'legal.jurisdiction': 'Zuständigkeit',
+    'legal.caseType': 'Falltyp',
+    'legal.decision': 'Entscheidung',
+    'legal.searchCases': 'Fälle durchsuchen...',
+    'legal.viewCase': 'Fall anzeigen',
+    
+    // Buttons and Actions
+    'action.viewAll': 'Alle anzeigen',
+    'action.refresh': 'Aktualisieren',
+    'action.configure': 'Konfigurieren',
+    'action.test': 'Testen',
+    'action.sync': 'Synchronisieren',
+    'action.details': 'Details',
+    'action.manage': 'Verwalten',
+    'action.add': 'Hinzufügen',
+    'action.remove': 'Entfernen',
+    'action.update': 'Aktualisieren',
+    'action.export': 'Export',
+    
+    // Knowledge Base specific
+    'knowledge.noSummary': 'Keine Zusammenfassung verfügbar',
+    'knowledge.fullContent': 'Vollständiger Inhalt',
+    'knowledge.exportGenerated': 'Export generiert am',
+    'search.summary': 'Zusammenfassung',
+    
+    // Time and Date
+    'time.today': 'Heute',
+    'time.yesterday': 'Gestern',
+    'time.thisWeek': 'Diese Woche',
+    'time.thisMonth': 'Dieser Monat',
+    'time.lastMonth': 'Letzter Monat',
+    'time.lastSync': 'Letzter Sync',
+    'time.noSync': 'Noch kein Sync',
+    
+    // Metrics and Statistics
+    'metrics.total': 'Gesamt',
+    'metrics.active': 'Aktiv',
+    'metrics.pending': 'Ausstehend',
+    'metrics.completed': 'Abgeschlossen',
+    'metrics.failed': 'Fehlgeschlagen',
+    'metrics.success': 'Erfolgreich',
+    'metrics.trend': 'Trend',
+    'metrics.increase': 'Anstieg',
+    'metrics.decrease': 'Rückgang',
+    'metrics.stable': 'Stabil',
+    
+    // Subscription Plans
+    'basic.updates': 'Grundlegende Updates',
+    'basic.notifications': 'Email-Benachrichtigungen',
+    'basic.support': 'Standard-Support',
+    'professional.analytics': 'Erweiterte Analytics',
+    'professional.support': 'Priority Support',
+    'professional.reports': 'Custom Reports',
+    'professional.api': 'API Access',
+    'enterprise.unlimited': 'Unbegrenzte Zugriffe',
+    'enterprise.dedicated': 'Dedicated Account Manager',
+    'enterprise.custom': 'Custom Integrations'
   },
   en: {
     // Navigation
@@ -229,7 +317,95 @@ const translations = {
     'newsletter.subtitle': 'Manage authentic newsletter sources',
     'newsletter.addSource': 'Add New Source',
     'newsletter.configuredSources': 'Configured Newsletter Sources',
-    'newsletter.authenticSources': 'Authentic Newsletter Sources'
+    'newsletter.authenticSources': 'Authentic Newsletter Sources',
+    
+    // Data Collection
+    'dataCollection.title': 'Data Collection',
+    'dataCollection.subtitle': 'Central management of all data sources and sync processes',
+    'dataCollection.activeSources': 'Active Sources',
+    'dataCollection.syncStatus': 'Sync Status',
+    'dataCollection.lastSync': 'Last Sync',
+    'dataCollection.syncNow': 'Sync Now',
+    'dataCollection.manageSource': 'Manage Source',
+    'dataCollection.newsletterSources': 'Newsletter Sources',
+    'dataCollection.runningSyncs': 'Running Syncs',
+    'dataCollection.pendingSyncs': 'Pending Syncs',
+    'dataCollection.recentSyncs': 'Recent Syncs',
+    
+    // Regulatory Updates
+    'regulatory.title': 'Regulatory Updates',
+    'regulatory.subtitle': 'Current regulations and guidelines for medical devices',
+    'regulatory.region': 'Region',
+    'regulatory.authority': 'Authority',
+    'regulatory.deviceClass': 'Device Class',
+    'regulatory.published': 'Published',
+    'regulatory.viewDetails': 'View Details',
+    'regulatory.searchUpdates': 'Search updates...',
+    'regulatory.allRegions': 'All Regions',
+    'regulatory.allAuthorities': 'All Authorities',
+    'regulatory.allCategories': 'All Categories',
+    
+    // Legal Cases
+    'legal.title': 'Legal Cases',
+    'legal.subtitle': 'Medical law cases and decisions',
+    'legal.court': 'Court',
+    'legal.jurisdiction': 'Jurisdiction',
+    'legal.caseType': 'Case Type',
+    'legal.decision': 'Decision',
+    'legal.searchCases': 'Search cases...',
+    'legal.viewCase': 'View Case',
+    
+    // Buttons and Actions
+    'action.viewAll': 'View All',
+    'action.refresh': 'Refresh',
+    'action.configure': 'Configure',
+    'action.test': 'Test',
+    'action.sync': 'Sync',
+    'action.details': 'Details',
+    'action.manage': 'Manage',
+    'action.add': 'Add',
+    'action.remove': 'Remove',
+    'action.update': 'Update',
+    'action.export': 'Export',
+    
+    // Knowledge Base specific
+    'knowledge.noSummary': 'No summary available',
+    'knowledge.fullContent': 'Full Content',
+    'knowledge.exportGenerated': 'Export generated on',
+    'search.summary': 'Summary',
+    
+    // Time and Date
+    'time.today': 'Today',
+    'time.yesterday': 'Yesterday',
+    'time.thisWeek': 'This Week',
+    'time.thisMonth': 'This Month',
+    'time.lastMonth': 'Last Month',
+    'time.lastSync': 'Last Sync',
+    'time.noSync': 'No Sync Yet',
+    
+    // Metrics and Statistics
+    'metrics.total': 'Total',
+    'metrics.active': 'Active',
+    'metrics.pending': 'Pending',
+    'metrics.completed': 'Completed',
+    'metrics.failed': 'Failed',
+    'metrics.success': 'Successful',
+    'metrics.trend': 'Trend',
+    'metrics.increase': 'Increase',
+    'metrics.decrease': 'Decrease',
+    'metrics.stable': 'Stable',
+    
+    // Subscription Plans
+    'basic.updates': 'Basic Updates',
+    'basic.notifications': 'Email Notifications',
+    'basic.support': 'Standard Support',
+    'professional.analytics': 'Advanced Analytics',
+    'professional.support': 'Priority Support',
+    'professional.reports': 'Custom Reports',
+    'professional.api': 'API Access',
+    'enterprise.unlimited': 'Unlimited Access',
+    'enterprise.dedicated': 'Dedicated Account Manager',
+    'enterprise.custom': 'Custom Integrations'
   }
 };
 

@@ -39,6 +39,7 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { t } = useLanguage();
   
   const { data: stats, isLoading, error: statsError } = useQuery({
     queryKey: ['/api/dashboard/stats'],
@@ -111,40 +112,40 @@ export default function Dashboard() {
   // Optimierte Dashboard-Cards mit konsistenten Deltaways-Farben
   const dashboardCards = [
     {
-      title: "Regulatory Updates",
+      title: t('dashboard.totalUpdates'),
       value: stats?.totalUpdates || 24,
       icon: FileText,
       color: "text-blue-600",
-      description: "Aktuelle regulatorische Änderungen",
-      quality: "100% Qualität"
+      description: t('regulatory.subtitle'),
+      quality: t('metrics.success')
     },
     {
-      title: "Legal Cases",
+      title: t('dashboard.legalCases'),
       value: stats?.totalLegalCases || 65,
       icon: Shield,
       color: "text-purple-600",
-      description: "Rechtsfälle und Präzedenzfälle"
+      description: t('legal.subtitle')
     },
     {
-      title: "Data Sources",
+      title: t('dashboard.activeDataSources'),
       value: stats?.activeDataSources || 70,
       icon: Database,
       color: "text-green-600",
-      description: "Aktive Datenquellen global"
+      description: t('dataCollection.activeSources')
     },
     {
-      title: "Newsletter",
+      title: t('newsletter.title'),
       value: stats?.totalSubscribers || 7,
       icon: Mail,
       color: "text-orange-600",
-      description: "Newsletter-Abonnenten"
+      description: t('newsletter.subtitle')
     },
     {
-      title: "Knowledge Base",
+      title: t('dashboard.knowledgeArticles'),
       value: stats?.totalArticles || 89,
       icon: BookOpen,
       color: "text-teal-600",
-      description: "Artikel und Erkenntnisse"
+      description: t('knowledge.subtitle')
     },
     {
       title: "AI Analysis",
