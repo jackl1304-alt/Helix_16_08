@@ -17,6 +17,18 @@ import RegulatoryUpdates from "@/pages/regulatory-updates-fixed-complete";
 import Administration from "@/pages/administration";
 import UserManagement from "@/pages/user-management";
 import KnowledgeBase from "@/pages/knowledge-base";
+import NewsletterAdmin from "@/pages/newsletter-admin";
+import EmailManagement from "@/pages/email-management-new";
+import ZulassungenGlobal from "@/pages/zulassungen-global";
+import LaufendeZulassungen from "@/pages/laufende-zulassungen";
+import Rechtsprechung from "@/pages/rechtsprechung-fixed";
+import SyncManager from "@/pages/sync-manager-new";
+import AIInsights from "@/pages/ai-insights";
+import HistoricalData from "@/pages/historical-data-simple";
+import AdminCustomers from "@/pages/admin-customers";
+import AuditLogs from "@/pages/audit-logs";
+import SystemSettings from "@/pages/system-settings";
+import IntelligentSearch from "@/pages/intelligent-search";
 
 // JSON-based Navigation State
 interface AppState {
@@ -52,6 +64,39 @@ function renderCurrentPage(page: string, userData: any) {
       return <UserManagement />;
     case '/knowledge-base':
       return <KnowledgeBase />;
+    
+    // Data Management
+    case '/newsletter-admin':
+      return <NewsletterAdmin />;
+    case '/email-management':
+      return <EmailManagement />;
+    
+    // Compliance & Regulation
+    case '/rechtsprechung':
+      return <Rechtsprechung />;
+    
+    // Approvals & Registration
+    case '/zulassungen/global':
+      return <ZulassungenGlobal />;
+    case '/zulassungen/laufende':
+      return <LaufendeZulassungen />;
+    
+    // Advanced Features
+    case '/sync-manager':
+      return <SyncManager />;
+    case '/ai-insights':
+    case '/ki-insights':
+      return <AIInsights />;
+    case '/historical-data':
+      return <HistoricalData />;
+    case '/admin-customers':
+      return <AdminCustomers />;
+    case '/audit-logs':
+      return <AuditLogs />;
+    case '/system-settings':
+      return <SystemSettings />;
+    case '/intelligent-search':
+      return <IntelligentSearch />;
     
     case '/404':
       return <NotFound />;
