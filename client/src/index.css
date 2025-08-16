@@ -90,7 +90,7 @@
 }
 
 :root {
-  /* DELTA WAYS Primary Brand Colors */
+  /* 2025 EMOTIONAL DESIGN - Enhanced Brand Colors */
   --deltaways-navy: hsl(220, 100%, 15%); /* Primary Navy */
   --deltaways-active: #0b3761; /* Active Navigation Elements */
   --deltaways-ring: #b0d4f6; /* Logo Ring Color */
@@ -98,7 +98,20 @@
   --deltaways-gray: hsl(210, 15%, 92%); /* Secondary Gray */
   --deltaways-dark: hsl(220, 50%, 8%); /* Deep Navy */
   
-  /* Helix Platform adapted to DELTA WAYS Brand */
+  /* 2025 TREND: Emotional Color Palette */
+  --emotion-trust: hsl(203, 89%, 53%); /* Trust Blue */
+  --emotion-success: hsl(142, 76%, 36%); /* Success Green */
+  --emotion-energy: hsl(26, 100%, 55%); /* Energy Orange */
+  --emotion-calm: hsl(197, 71%, 73%); /* Calm Light Blue */
+  --emotion-premium: hsl(272, 51%, 54%); /* Premium Purple */
+  
+  /* 2025 TREND: Glassmorphism Variables */
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+  --glass-backdrop: blur(8px);
+  
+  /* Enhanced Platform Colors with Emotional Design */
   --background: hsl(0, 0%, 98%);
   --foreground: var(--deltaways-navy);
   --muted: var(--deltaways-gray);
@@ -113,16 +126,212 @@
   --primary-foreground: hsl(210, 40%, 98%);
   --secondary: var(--deltaways-gray);
   --secondary-foreground: var(--deltaways-navy);
-  --accent: var(--deltaways-gold);
+  --accent: var(--emotion-trust);
   --accent-foreground: hsl(210, 40%, 98%);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
-  --ring: var(--deltaways-gold);
+  --ring: var(--emotion-trust);
   --radius: 0.75rem; /* Premium rounded corners */
   
   /* Custom Helix colors matching design */
   --helix-blue-50: hsl(214, 100%, 97%);
   --helix-blue-100: hsl(214, 95%, 93%);
+}
+
+/* 2025 TREND: Dark Mode with Emotional Design */
+.dark {
+  --background: hsl(220, 50%, 8%);
+  --foreground: hsl(210, 40%, 98%);
+  --muted: hsl(220, 30%, 15%);
+  --muted-foreground: hsl(220, 20%, 65%);
+  --popover: hsl(220, 30%, 10%);
+  --popover-foreground: hsl(210, 40%, 98%);
+  --card: hsl(220, 30%, 12%);
+  --card-foreground: hsl(210, 40%, 98%);
+  --border: hsl(220, 30%, 18%);
+  --input: hsl(220, 30%, 18%);
+  --primary: var(--emotion-trust);
+  --primary-foreground: hsl(220, 50%, 8%);
+  --secondary: hsl(220, 30%, 15%);
+  --secondary-foreground: hsl(210, 40%, 98%);
+  --accent: var(--emotion-premium);
+  --accent-foreground: hsl(210, 40%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  --ring: var(--emotion-premium);
+  
+  /* Dark Mode Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+}
+
+/* 2025 TREND: Glassmorphism Components */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-backdrop);
+  -webkit-backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius);
+}
+
+.glass-nav {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 2025 TREND: Emotional Micro-Animations */
+@keyframes emotionalPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+@keyframes emotionalFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes emotionalGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--emotion-trust);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--emotion-trust), 0 0 30px var(--emotion-trust);
+  }
+}
+
+.emotional-pulse {
+  animation: emotionalPulse 2s infinite;
+}
+
+.emotional-float {
+  animation: emotionalFloat 3s ease-in-out infinite;
+}
+
+.emotional-glow {
+  animation: emotionalGlow 2s ease-in-out infinite;
+}
+
+/* 2025 TREND: Large Headlines Typography */
+.headline-hero {
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--emotion-trust), var(--emotion-premium));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 40px rgba(67, 56, 202, 0.3);
+}
+
+.headline-section {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+/* 2025 TREND: Custom Interactive Cursor */
+.custom-cursor {
+  cursor: none;
+}
+
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--emotion-trust);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  transition: transform 0.1s ease;
+}
+
+.cursor-ring {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--emotion-trust);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9998;
+  transition: all 0.15s ease;
+  opacity: 0.5;
+}
+
+.cursor-hover .cursor-ring {
+  transform: scale(1.5);
+  opacity: 1;
+  border-color: var(--emotion-energy);
+}
+
+/* 2025 TREND: Functional Minimalism Utilities */
+.minimal-focus {
+  transition: all 0.2s ease;
+}
+
+.minimal-focus:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.minimal-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.minimal-card:hover {
+  border-color: var(--emotion-trust);
+  box-shadow: 0 8px 25px rgba(67, 56, 202, 0.15);
+}
+
+/* 2025 TREND: Hero Background Animations */
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Custom Helix colors continued */
+.dark {
   --helix-blue-500: hsl(207, 90%, 54%);
   --helix-blue-600: hsl(207, 90%, 54%);
   --helix-blue-700: hsl(207, 90%, 54%);

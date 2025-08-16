@@ -2,6 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { CustomCursor } from "@/components/ui/custom-cursor";
+import { DarkModeToggle } from "@/components/ui/dark-mode-toggle";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { 
@@ -21,7 +23,10 @@ import {
   Settings,
   Zap,
   Globe,
-  Activity
+  Activity,
+  Sparkles,
+  Heart,
+  Award
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -233,11 +238,65 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
-        <div className="flex items-start gap-4">
-          <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-indigo-500 via-blue-600 to-purple-700 rounded-2xl shadow-lg">
+    <div className="custom-cursor min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-950">
+      <CustomCursor />
+      
+      {/* 2025 TREND: Hero Header with Large Typography */}
+      <div className="glass-nav sticky top-0 z-50 px-6 py-4">
+        <div className="flex justify-between items-center max-w-7xl mx-auto">
+          <div className="flex items-center gap-4">
+            <div className="emotional-float w-12 h-12 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-600 rounded-xl shadow-lg flex items-center justify-center">
+              <Sparkles className="h-6 w-6 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Helix Intelligence
+            </h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <Badge variant="secondary" className="emotional-pulse">
+              <Activity className="h-3 w-3 mr-1" />
+              Live System
+            </Badge>
+            <DarkModeToggle />
+          </div>
+        </div>
+      </div>
+
+      <div className="px-6 pb-6 space-y-8">
+        {/* 2025 TREND: Modern Hero Section */}
+        <div className="relative overflow-hidden rounded-3xl mb-12">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+            <div className="absolute top-0 right-1/4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+            <div className="absolute -bottom-8 left-1/3 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+          </div>
+
+          <div className="relative z-10 text-center py-16 px-8 bg-gradient-to-br from-white/80 to-blue-50/80 dark:from-slate-900/80 dark:to-blue-950/80 backdrop-blur-sm">
+            <h1 className="headline-hero mb-6">
+              Regulatory Intelligence Dashboard
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              Überwachen Sie globale Medizintechnik-Regulierungen mit 
+              <span className="text-blue-600 font-semibold"> KI-gestützter Analyse</span> und 
+              <span className="text-purple-600 font-semibold"> Echtzeit-Updates</span>
+            </p>
+            <div className="flex justify-center gap-4 mt-8">
+              <Badge variant="outline" className="emotional-glow px-6 py-3 text-base">
+                <Heart className="h-5 w-5 mr-2 text-red-500" />
+                24 Active Updates
+              </Badge>
+              <Badge variant="outline" className="emotional-pulse px-6 py-3 text-base">
+                <Award className="h-5 w-5 mr-2 text-yellow-500" />
+                100% Datenqualität
+              </Badge>
+            </div>
+          </div>
+        </div>
+
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+          <div className="flex items-start gap-4">
             <TrendingUp className="w-8 h-8 text-white" />
           </div>
           <div>
@@ -297,27 +356,34 @@ export default function Dashboard() {
         </Badge>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* 2025 TREND: Glassmorphism Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {dashboardCards.map((card, index) => {
-          const Icon = card.icon;
+          const IconComponent = card.icon;
           return (
-            <Card key={index} className="hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
+            <Card key={index} className="glass-card minimal-focus cursor-hover group">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
                   {card.title}
                 </CardTitle>
-                <Icon className={`h-4 w-4 ${card.color}`} />
+                <div className="emotional-float p-2 rounded-lg bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950">
+                  <IconComponent className={`h-5 w-5 ${card.color} group-hover:scale-110 transition-transform`} />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                <div className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent mb-2">
                   {Number(card.value).toLocaleString()}
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-muted-foreground">
                   {card.description}
                 </p>
                 {card.quality && (
-                  <p className="text-xs text-green-600 mt-1">{card.quality}</p>
+                  <div className="mt-3">
+                    <Badge variant="secondary" className="text-xs emotional-pulse">
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      {card.quality}
+                    </Badge>
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -328,15 +394,18 @@ export default function Dashboard() {
       {/* Main Content Area */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        {/* Recent Regulatory Updates */}
-        <Card>
+        {/* 2025 TREND: Recent Regulatory Updates with Glassmorphism */}
+        <Card className="glass-card minimal-focus">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-600" />
-              Aktuelle Regulatory Updates
+            <CardTitle className="headline-section text-2xl flex items-center gap-3">
+              <div className="emotional-float p-2 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 text-white">
+                <FileText className="h-6 w-6" />
+              </div>
+              Regulatory Updates
             </CardTitle>
-            <CardDescription>
-              Automatische Synchronisation aus 46 globalen Behörden (FDA, EMA, BfArM, MHRA, Swissmedic) + KI-gestützte Inhaltsanalyse
+            <CardDescription className="text-base">
+              KI-gestützte Analyse aus <span className="font-semibold text-blue-600">46 globalen Behörden</span> 
+              (FDA, EMA, BfArM, MHRA, Swissmedic)
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -376,15 +445,18 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Active Newsletter Sources */}
-        <Card>
+        {/* 2025 TREND: Newsletter Sources with Emotional Design */}
+        <Card className="glass-card minimal-focus">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Mail className="h-5 w-5 text-green-600" />
-              Aktive Newsletter-Quellen
+            <CardTitle className="headline-section text-2xl flex items-center gap-3">
+              <div className="emotional-pulse p-2 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 text-white">
+                <Mail className="h-6 w-6" />
+              </div>
+              Newsletter Sources
             </CardTitle>
-            <CardDescription>
-              Authentische MedTech-Newsletter für automatische Inhaltsextraktion aus führenden Branchenquellen
+            <CardDescription className="text-base">
+              <span className="font-semibold text-green-600">Authentische MedTech-Newsletter</span> für 
+              automatische Inhaltsextraktion aus führenden Branchenquellen
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -459,78 +531,94 @@ export default function Dashboard() {
 
       </div>
 
-      {/* Quick Actions */}
-      <Card>
+      {/* 2025 TREND: Quick Actions with Modern Design */}
+      <Card className="glass-card">
         <CardHeader>
-          <CardTitle>Schnelle Aktionen</CardTitle>
-          <CardDescription>
-            Häufig verwendete Helix-Funktionen
+          <CardTitle className="headline-section text-2xl flex items-center gap-3">
+            <div className="emotional-glow p-2 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 text-white">
+              <Zap className="h-6 w-6" />
+            </div>
+            Schnelle Aktionen
+          </CardTitle>
+          <CardDescription className="text-base">
+            Häufig verwendete <span className="font-semibold text-orange-600">Helix-Funktionen</span> 
+            für effizientes Arbeiten
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             <Button 
               variant="outline" 
-              className="flex items-center gap-2 h-20 hover:bg-orange-50 hover:border-orange-200 transition-colors"
+              className="minimal-card cursor-hover flex-col items-center gap-3 h-24 hover:border-orange-400 transition-all group"
               onClick={handleDataSourcesSync}
             >
-              <Database className="h-5 w-5 text-[#d95d2c]" />
-              <div className="text-left">
-                <div className="font-medium">Datenquellen sync</div>
-                <div className="text-xs text-gray-500">FDA, EMA, BfArM Updates</div>
+              <div className="emotional-float p-2 rounded-lg bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-900 dark:to-red-900 group-hover:scale-110 transition-transform">
+                <Database className="h-6 w-6 text-orange-600" />
+              </div>
+              <div className="text-center">
+                <div className="font-semibold text-sm">Datenquellen Sync</div>
+                <div className="text-xs text-muted-foreground">FDA, EMA, BfArM</div>
               </div>
             </Button>
             
             <Button 
               variant="outline" 
-              className="flex items-center gap-2 h-20 hover:bg-blue-50 hover:border-blue-200 transition-colors"
+              className="minimal-card cursor-hover flex-col items-center gap-3 h-24 hover:border-blue-400 transition-all group"
               onClick={handleNewsletterSync}
               disabled={newsletterSyncMutation.isPending}
             >
-              {newsletterSyncMutation.isPending ? (
-                <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
-              ) : (
-                <FolderSync className="h-5 w-5 text-blue-600" />
-              )}
-              <div className="text-left">
-                <div className="font-medium">Newsletter Sync</div>
-                <div className="text-xs text-gray-500">MedTech Newsletter</div>
+              <div className="emotional-pulse p-2 rounded-lg bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900 group-hover:scale-110 transition-transform">
+                {newsletterSyncMutation.isPending ? (
+                  <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
+                ) : (
+                  <FolderSync className="h-6 w-6 text-blue-600" />
+                )}
+              </div>
+              <div className="text-center">
+                <div className="font-semibold text-sm">Newsletter Sync</div>
+                <div className="text-xs text-muted-foreground">MedTech Sources</div>
               </div>
             </Button>
             
             <Button 
               variant="outline" 
-              className="flex items-center gap-2 h-20 hover:bg-orange-50 hover:border-orange-200 transition-colors"
+              className="minimal-card cursor-hover flex-col items-center gap-3 h-24 hover:border-green-400 transition-all group"
               onClick={handleKnowledgeBase}
             >
-              <BookOpen className="h-5 w-5 text-[#d95d2c]" />
-              <div className="text-left">
-                <div className="font-medium">Knowledge Base</div>
-                <div className="text-xs text-gray-500">Artikel durchsuchen</div>
+              <div className="emotional-float p-2 rounded-lg bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900 group-hover:scale-110 transition-transform">
+                <BookOpen className="h-6 w-6 text-green-600" />
+              </div>
+              <div className="text-center">
+                <div className="font-semibold text-sm">Knowledge Base</div>
+                <div className="text-xs text-muted-foreground">Artikel durchsuchen</div>
               </div>
             </Button>
 
             <Button 
               variant="outline" 
-              className="flex items-center gap-2 h-20 hover:bg-purple-50 hover:border-purple-200 transition-colors"
+              className="minimal-card cursor-hover flex-col items-center gap-3 h-24 hover:border-purple-400 transition-all group"
               onClick={handleNewsletter}
             >
-              <Mail className="h-5 w-5 text-purple-600" />
-              <div className="text-left">
-                <div className="font-medium">Newsletter</div>
-                <div className="text-xs text-gray-500">Neue Ausgabe erstellen</div>
+              <div className="emotional-pulse p-2 rounded-lg bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900 group-hover:scale-110 transition-transform">
+                <Mail className="h-6 w-6 text-purple-600" />
+              </div>
+              <div className="text-center">
+                <div className="font-semibold text-sm">Newsletter</div>
+                <div className="text-xs text-muted-foreground">Neue Ausgabe erstellen</div>
               </div>
             </Button>
 
             <Button 
               variant="outline" 
-              className="flex items-center gap-2 h-20 hover:bg-orange-50 hover:border-orange-200 transition-colors"
+              className="minimal-card cursor-hover flex-col items-center gap-3 h-24 hover:border-orange-400 transition-all group"
               onClick={handleAnalytics}
             >
-              <TrendingUp className="h-5 w-5 text-orange-600" />
-              <div className="text-left">
-                <div className="font-medium">Analytics</div>
-                <div className="text-xs text-gray-500">Compliance Trends</div>
+              <div className="emotional-glow p-2 rounded-lg bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-900 dark:to-red-900 group-hover:scale-110 transition-transform">
+                <TrendingUp className="h-6 w-6 text-orange-600" />
+              </div>
+              <div className="text-center">
+                <div className="font-semibold text-sm">Analytics</div>
+                <div className="text-xs text-muted-foreground">Compliance Trends</div>
               </div>
             </Button>
           </div>
