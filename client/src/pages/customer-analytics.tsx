@@ -21,7 +21,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import CustomerNavigation, { type CustomerPermissions } from '@/components/customer/customer-navigation';
+// import CustomerNavigation, { type CustomerPermissions } from '@/components/customer/customer-navigation'; // Disabled temporarily
+import { ResponsiveLayout } from "@/components/responsive-layout";
+
+// Customer permissions type
+export interface CustomerPermissions {
+  dashboard: boolean;
+  regulatoryUpdates: boolean;
+  legalCases: boolean;
+  knowledgeBase: boolean;
+  newsletters: boolean;
+  analytics: boolean;
+  reports: boolean;
+  dataCollection: boolean;
+  globalSources: boolean;
+  historicalData: boolean;
+  administration: boolean;
+  userManagement: boolean;
+  systemSettings: boolean;
+  auditLogs: boolean;
+  aiInsights: boolean;
+  advancedAnalytics: boolean;
+}
 import { useLiveTenantPermissions } from '@/hooks/use-live-tenant-permissions';
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from '@/components/LanguageSelector';
@@ -131,10 +152,7 @@ export default function CustomerAnalytics() {
           <LanguageSelector />
         </div>
         
-        <CustomerNavigation 
-          permissions={permissions} 
-          tenantName={liveTenantName || "Customer Portal"} 
-        />
+        {/* CustomerNavigation replaced with ResponsiveLayout */}
         
         <main className="ml-64 flex-1 flex items-center justify-center">
           <Card className="max-w-md">
@@ -157,16 +175,13 @@ export default function CustomerAnalytics() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+    <ResponsiveLayout>
       {/* Language Selector - Top Right */}
       <div className="fixed top-4 right-4 z-50">
         <LanguageSelector />
       </div>
       
-      <CustomerNavigation 
-        permissions={permissions} 
-        tenantName={liveTenantName || "Customer Portal"} 
-      />
+      {/* CustomerNavigation replaced with ResponsiveLayout wrapper */}
       
       <main className="ml-64 flex-1 p-8 overflow-y-auto">
         <div className="max-w-7xl mx-auto">
@@ -398,6 +413,6 @@ export default function CustomerAnalytics() {
           )}
         </div>
       </main>
-    </div>
+    </ResponsiveLayout>
   );
 }
