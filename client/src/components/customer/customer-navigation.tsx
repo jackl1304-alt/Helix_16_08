@@ -166,11 +166,11 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
     return path.startsWith('/') ? path : `/${path}`;
   };
 
-  // Polling für Live-Updates der Berechtigungen
+  // Load permissions only once - no aggressive polling
   useEffect(() => {
     if (!params.tenantId) return;
     
-    const pollPermissions = async () => {
+    const loadPermissions = async () => {
       try {
         const response = await fetch(`/api/customer/tenant/${params.tenantId}`);
         if (response.ok) {
@@ -179,19 +179,18 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
             setCurrentPermissions(tenantData.customerPermissions);
             onPermissionsUpdate?.(tenantData.customerPermissions);
           }
+        } else {
+          console.warn(`[CUSTOMER] Tenant API response not ok: ${response.status}`);
         }
       } catch (error) {
-        console.error('Fehler beim Abrufen der aktuellen Berechtigungen:', error);
+        console.error('[CUSTOMER] Fehler beim Abrufen der aktuellen Berechtigungen:', error);
+        // Use fallback permissions if API fails
+        console.log('[CUSTOMER] Using fallback permissions');
       }
     };
 
-    // Initial load
-    pollPermissions();
-    
-    // Poll alle 5 Sekunden für Live-Updates
-    const interval = setInterval(pollPermissions, 5000);
-    
-    return () => clearInterval(interval);
+    // Load only once on mount
+    loadPermissions();
   }, [params.tenantId, onPermissionsUpdate]);
 
   // Filter navigation items based on current permissions
