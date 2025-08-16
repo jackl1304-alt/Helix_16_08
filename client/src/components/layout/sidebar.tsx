@@ -1,5 +1,5 @@
+import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { useState } from "react";
 import { 
   BarChart3, 
   Database, 
@@ -28,6 +28,8 @@ import {
 import { cn } from "@/lib/utils";
 import logoPath from "@assets/ICON Helix_1753735921077.jpg";
 import { Input } from "@/components/ui/input";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 // Verbesserte thematische Sidebar-Struktur basierend auf Benutzeranalyse
 interface NavigationItem {
@@ -43,61 +45,61 @@ interface NavigationSection {
   hiddenItems?: NavigationItem[];
 }
 
-const navigationStructure: Record<string, NavigationSection> = {
-  // 1. ÜBERSICHT & STEUERUNG
+const getNavigationStructure = (t: (key: string) => string): Record<string, NavigationSection> => ({
+  // 1. OVERVIEW & CONTROL
   overview: {
-    title: "ÜBERSICHT & STEUERUNG",
+    title: t('nav.sections.overview'),
     items: [
-      { name: "Dashboard", href: "/", icon: BarChart3 },
-      { name: "Berichte & Analysen", href: "/analytics", icon: TrendingUp },
+      { name: t('nav.dashboard'), href: "/", icon: BarChart3 },
+      { name: t('nav.analytics'), href: "/analytics", icon: TrendingUp },
     ],
     defaultOpen: true
   },
 
-  // 2. DATENMANAGEMENT 
+  // 2. DATA MANAGEMENT 
   dataManagement: {
-    title: "DATENMANAGEMENT",
+    title: t('nav.sections.dataManagement'),
     items: [
-      { name: "Datensammlung", href: "/data-collection", icon: Database },
-      { name: "Newsletter-Verwaltung", href: "/newsletter-admin", icon: Mail },
-      { name: "Email-Verwaltung", href: "/email-management", icon: Mail },
-      { name: "Wissensdatenbank", href: "/knowledge-base", icon: Book },
+      { name: t('nav.dataCollection'), href: "/data-collection", icon: Database },
+      { name: t('nav.newsletterAdmin'), href: "/newsletter-admin", icon: Mail },
+      { name: t('nav.emailManagement'), href: "/email-management", icon: Mail },
+      { name: t('nav.knowledgeBase'), href: "/knowledge-base", icon: Book },
     ],
     defaultOpen: true
   },
 
-  // 3. COMPLIANCE & REGULIERUNG
+  // 3. COMPLIANCE & REGULATION
   compliance: {
-    title: "COMPLIANCE & REGULIERUNG",
+    title: t('nav.sections.compliance'),
     items: [
-      { name: "Regulatorische Updates", href: "/regulatory-updates", icon: FileText },
-      { name: "Rechtsprechung", href: "/rechtsprechung", icon: Scale },
+      { name: t('nav.regulatoryUpdates'), href: "/regulatory-updates", icon: FileText },
+      { name: t('nav.legalCases'), href: "/rechtsprechung", icon: Scale },
     ],
     defaultOpen: true
   },
 
-  // 4. ZULASSUNGEN & REGISTRIERUNG
+  // 4. APPROVALS & REGISTRATION
   approvals: {
-    title: "ZULASSUNGEN & REGISTRIERUNG",
+    title: t('nav.sections.approvals'),
     items: [
-      { name: "Globale Zulassungen", href: "/zulassungen/global", icon: Globe },
-      { name: "Laufende Zulassungen", href: "/zulassungen/laufende", icon: CheckCircle },
+      { name: t('nav.globalApprovals'), href: "/zulassungen/global", icon: Globe },
+      { name: t('nav.ongoingApprovals'), href: "/zulassungen/laufende", icon: CheckCircle },
     ],
     defaultOpen: true
   },
 
-  // 5. ERWEITERT (kollabierbar)
+  // 5. ADVANCED (collapsible)
   advanced: {
-    title: "ERWEITERT",
+    title: t('nav.sections.advanced'),
     items: [
-      { name: "Sync-Verwaltung", href: "/sync-manager", icon: RefreshCw },
-      { name: "Globale Quellen", href: "/global-sources", icon: Globe },
-      { name: "Newsletter Manager", href: "/newsletter-manager", icon: Newspaper },
-      { name: "Historische Daten", href: "/historical-data", icon: Archive },
-      { name: "Kunden-Management", href: "/admin-customers", icon: Building },
-      { name: "Benutzerverwaltung", href: "/user-management", icon: Users },
-      { name: "System-Verwaltung", href: "/administration", icon: Settings },
-      { name: "Audit-Protokolle", href: "/audit-logs", icon: FileSearch },
+      { name: t('nav.syncManager'), href: "/sync-manager", icon: RefreshCw },
+      { name: t('nav.globalSources'), href: "/global-sources", icon: Globe },
+      { name: t('nav.newsletterManager'), href: "/newsletter-manager", icon: Newspaper },
+      { name: t('nav.historicalData'), href: "/historical-data", icon: Archive },
+      { name: t('nav.customerManagement'), href: "/admin-customers", icon: Building },
+      { name: t('nav.userManagement'), href: "/user-management", icon: Users },
+      { name: t('nav.systemAdmin'), href: "/administration", icon: Settings },
+      { name: t('nav.auditLogs'), href: "/audit-logs", icon: FileSearch },
     ],
     defaultOpen: false,
     hiddenItems: [
@@ -106,10 +108,11 @@ const navigationStructure: Record<string, NavigationSection> = {
       { name: "✨", href: "/grip-integration", icon: Sparkles },
     ]
   }
-};
+});
 
 // Sidebar Search Field Component
 function SidebarSearchField() {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [, setLocation] = useLocation();
 
@@ -133,7 +136,7 @@ function SidebarSearchField() {
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#07233e]" />
         <Input
           type="text"
-          placeholder="Frage stellen..."
+          placeholder={t('search.askQuestion')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyPress={handleKeyPress}
@@ -146,7 +149,9 @@ function SidebarSearchField() {
 }
 
 export function Sidebar() {
+  const { t } = useLanguage();
   const [location] = useLocation();
+  const navigationStructure = getNavigationStructure(t);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
     // Initialize with default open states
     const initial: Record<string, boolean> = {};
@@ -250,6 +255,11 @@ export function Sidebar() {
             <p className="text-xs font-medium text-gray-600">Powered by DELTA WAYS</p>
           </div>
         </Link>
+        
+        {/* Language Selector in Header */}
+        <div className="mt-2">
+          <LanguageSelector />
+        </div>
       </div>
       
       {/* Funktionsfähiger Suchbereich */}
@@ -270,12 +280,12 @@ export function Sidebar() {
       <div className="border-t border-gray-200 p-4 bg-gray-50">
         <div className="text-xs text-gray-500">
           <div className="flex items-center justify-between">
-            <span>Status:</span>
-            <span className="text-green-600 font-medium">Online</span>
+            <span>{t('status.label')}:</span>
+            <span className="text-green-600 font-medium">{t('status.online')}</span>
           </div>
           <div className="flex items-center justify-between mt-1">
-            <span>46 Datenquellen</span>
-            <span className="text-blue-600 font-medium">Aktiv</span>
+            <span>{t('status.dataSources')}</span>
+            <span className="text-blue-600 font-medium">{t('common.active')}</span>
           </div>
         </div>
       </div>

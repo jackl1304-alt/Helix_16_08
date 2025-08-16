@@ -8,6 +8,7 @@ import { ResponsiveLayout } from "@/components/responsive-layout";
 import { performanceMonitor, preloadCriticalResources } from "@/utils/performance";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { CustomerThemeProvider } from "@/contexts/customer-theme-context";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 // Initialize performance monitoring and preload resources
 if (typeof window !== 'undefined') {
@@ -145,9 +146,10 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
+      <LanguageProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
           <Switch>
             {/* Pages without Sidebar */}
             <Route path="/landing" component={Landing} />
@@ -235,8 +237,9 @@ function App() {
               </ResponsiveLayout>
             </Route>
           </Switch>
-        </TooltipProvider>
-      </QueryClientProvider>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </LanguageProvider>
     </ErrorBoundary>
   );
 }
