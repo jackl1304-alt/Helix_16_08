@@ -127,6 +127,8 @@ app.post("/api/ai", async (req: Request, res: Response) => {
   }
 });
 
+// ALLE API-ROUTEN MÜSSEN VOR VITE KOMMEN!
+
 // Apply selective caching to API routes FIRST
 import { cacheMiddleware, CACHE_CONFIG } from './middleware/query-cache';
 app.use('/api/dashboard', cacheMiddleware(CACHE_CONFIG.DASHBOARD));
@@ -152,87 +154,83 @@ setupAdminRoutes(app);
 // Register tenant-specific routes - ONLY new real data API
 app.use('/api/tenant/auth', tenantAuthRoutes);
 app.use('/api/tenant', tenantApiRoutes);  // NEW real data API with database connections
-// OLD tenant routes REMOVED to prevent conflicts
 
 // Register AI-powered search and analysis routes (Admin only)
 app.use('/api/ai', aiSearchRoutes);
 
-// Weitere Routen
+// Weitere API-Routen
 app.post("/api/webhook", (req: Request, res: Response) => {
   console.log("Webhook empfangen:", req.body);
   res.json({ received: true });
 });
 
-// 404-Handler nur für API (must be AFTER all other API routes, BEFORE Vite setup)
+// 404-Handler ONLY für API - muss VOR Vite kommen
 app.use("/api/*", (req, res) => {
+  console.log(`[404-API] Route nicht gefunden: ${req.path}`);
   res.status(404).json({ error: `API nicht gefunden: ${req.path}` });
 });
 
-// Performance: Add security and optimization middleware
+console.log('[MIDDLEWARE-ORDER] Alle API-Routen registriert, Vite Setup folgt...');
+
+// Security middleware - NACH API-Routen, VOR Vite
 app.use((req, res, next) => {
-  // Security headers (Replit-friendly - Firefox embedding optimiert)
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  // X-Frame-Options entfernt für besseres Firefox-Embedding in Replit
-  // res.setHeader('X-Frame-Options', 'SAMEORIGIN'); // Deaktiviert für Firefox-Kompatibilität
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  
-  // Performance headers
-  if (req.url.includes('/api/')) {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-  } else {
-    res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year for static assets
+  // Nur für statische Assets, nicht für API
+  if (!req.url.startsWith('/api/')) {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   }
-  
   next();
 });
 
-// Entwicklungs- vs. Produktionsmodus
-const isProd = process.env.NODE_ENV === "production" || app.get("env") !== "development";
-if (!isProd) {
-  // DEV SETUP: Serve compiled frontend from dist/public
-  const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
-  console.log(`[DEV-FRONTEND] Serving compiled assets from: ${distPath}`);
-  
-  app.use(express.static(distPath, {
-    maxAge: 0, // No caching in dev
-    etag: false
-  }));
-  
-  // SPA routing for all non-API routes
-  app.get('*', (req, res) => {
-    // Skip API routes
-    if (req.url.startsWith('/api/')) return;
-    
-    const htmlPath = path.resolve(distPath, "index.html");
-    console.log(`[SPA-ROUTE] Serving ${htmlPath} for ${req.url}`);
-    res.sendFile(htmlPath);
-  });
-} else {
-  // Optimized static file serving
-  const distPath = path.resolve(import.meta.url.replace("file://", ""), "../public");
-  if (fs.existsSync(distPath)) {
-    app.use(express.static(distPath, {
-      maxAge: '1y', // 1 year cache for static assets
-      etag: true,
-      lastModified: true
-    }));
-    app.get("*", (_req, res) => {
-      res.sendFile(path.resolve(distPath, "index.html"));
-    });
+// FIXED: Serve compiled frontend directly mit korrekten MIME-Types
+const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
+console.log(`[FRONTEND-SERVING] Serving compiled assets from: ${distPath}`);
+
+// FIXED: Express Static mit expliziten MIME-Types
+app.use(express.static(distPath, {
+  maxAge: 0,
+  etag: false,
+  setHeaders: (res, filePath) => {
+    console.log(`[MIME-FIX] Serving file: ${filePath}`);
+    if (filePath.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+      console.log('[MIME-FIX] Set Content-Type: application/javascript for JS file');
+    }
+    if (filePath.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css; charset=utf-8');
+    }
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    }
+    // CORS-Headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
   }
-}
+}));
+
+// SPA fallback for non-API routes
+app.get("*", (req, res) => {
+  if (req.url.startsWith('/api/')) {
+    return; // API routes already handled above
+  }
+  
+  console.log(`[SPA-FALLBACK] Serving index.html for: ${req.url}`);
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.sendFile(path.resolve(distPath, "index.html"));
+});
 
 // Globaler Error-Handler (MUST be AFTER Vite setup for proper SPA routing)
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   res.status(err.status || 500).json({ error: err.message || "Internal Server Error" });
 });
 
-// Server starten
+// Server starten - FIXED Port 5000
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const port = parseInt(process.env.PORT || "5174", 10);
+  const port = parseInt(process.env.PORT || "5000", 10); // FIXED: Standard Port 5000
   server.listen(port, '0.0.0.0', () => {
     console.log(`[SERVER] ✅ Server läuft auf Port ${port}`);
     console.log(`[SERVER] 🌐 Frontend: http://localhost:${port}`);
     console.log(`[SERVER] 🔧 Admin Login: admin / admin123`);
+    console.log(`[FRONTEND-FIX] MIME-Types konfiguriert, Service Worker deaktiviert`);
   });
 }
