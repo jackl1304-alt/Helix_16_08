@@ -81,7 +81,7 @@ class PerplexityService {
       Antworte auf Deutsch und strukturiert.`;
 
       const request: PerplexityRequest = {
-        model: 'llama-3.1-sonar-large-128k-online',
+        model: 'sonar',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: query }
@@ -151,7 +151,7 @@ class PerplexityService {
       Führe eine umfassende rechtliche Analyse durch.`;
 
       const request: PerplexityRequest = {
-        model: 'llama-3.1-sonar-large-128k-online',
+        model: 'sonar',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
@@ -226,7 +226,7 @@ class PerplexityService {
       Führe eine umfassende Qualitätsbewertung durch.`;
 
       const request: PerplexityRequest = {
-        model: 'llama-3.1-sonar-small-128k-online',
+        model: 'sonar',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
@@ -299,7 +299,7 @@ class PerplexityService {
       Strukturiere die Antwort nach diesen Kategorien.`;
 
       const request: PerplexityRequest = {
-        model: 'llama-3.1-sonar-large-128k-online',
+        model: 'sonar',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
