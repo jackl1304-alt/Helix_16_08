@@ -1,3 +1,8 @@
+// Performance: Fix memory leaks and event listener issues - VERY FIRST
+import { EventEmitter } from "events";
+EventEmitter.defaultMaxListeners = 0; // Unlimited to prevent warnings
+process.setMaxListeners(0); // Unlimited for process listeners
+
 import express, { type Request, type Response, type NextFunction } from "express";
 import { createServer } from "http";
 import cors from "cors";
@@ -13,11 +18,10 @@ import fs from "fs";
 import path from "path";
 import { Logger } from "./services/logger.service";
 import fetch from "node-fetch";
-import { EventEmitter } from "events";
 
-// Performance: Fix memory leaks and event listener issues
-EventEmitter.defaultMaxListeners = 0; // Unlimited to prevent warnings
-process.setMaxListeners(0); // Unlimited for process listeners
+// Express-App initialisieren
+export const app = express();
+const server = createServer(app);
 
 // Clean up event listeners on exit to prevent memory leaks
 process.on('SIGTERM', () => {
@@ -35,10 +39,6 @@ process.on('SIGINT', () => {
     process.exit(0);
   });
 });
-
-// Express-App initialisieren
-export const app = express();
-const server = createServer(app);
 
 // Optimized CORS with caching
 app.use(cors({ 
