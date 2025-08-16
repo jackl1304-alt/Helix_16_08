@@ -8,7 +8,11 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Shield, Lock, User, AlertCircle } from "lucide-react";
 // Logo wird inline als gradient ersetzt für bessere Kompatibilität
 
-export default function Login() {
+interface LoginProps {
+  onLogin?: () => void;
+}
+
+export default function Login({ onLogin }: LoginProps) {
   const [, setLocation] = useLocation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -28,6 +32,7 @@ export default function Login() {
       localStorage.setItem("loginTime", new Date().toISOString());
       
       setTimeout(() => {
+        onLogin?.();
         setLocation("/");
       }, 500);
     } else {
