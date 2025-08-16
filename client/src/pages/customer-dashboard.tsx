@@ -78,8 +78,8 @@ export default function CustomerDashboard() {
     tenantName: liveTenantName, 
     isLoading: isTenantLoading 
   } = useLiveTenantPermissions({ 
-    tenantId,
-    pollInterval: 3000 // Poll alle 3 Sekunden für schnelle Updates
+    tenantId
+    // No pollInterval to prevent aggressive polling and get correct permissions
   });
   
   // Use live permissions with fallback
