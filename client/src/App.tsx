@@ -30,6 +30,22 @@ const UserManagement = lazy(() => import("@/pages/user-management"));
 const RegulatoryUpdates = lazy(() => import("@/pages/regulatory-updates-fixed-complete"));
 const KnowledgeBase = lazy(() => import("@/pages/knowledge-base"));
 
+// Additional Admin Pages
+const NewsletterAdmin = lazy(() => import("@/pages/newsletter-admin"));
+const EmailManagement = lazy(() => import("@/pages/email-management"));
+const Rechtsprechung = lazy(() => import("@/pages/rechtsprechung-fixed"));
+const ZulassungenGlobal = lazy(() => import("@/pages/zulassungen-global"));
+const LaufendeZulassungen = lazy(() => import("@/pages/laufende-zulassungen"));
+const SyncManager = lazy(() => import("@/pages/sync-manager"));
+const GlobalSources = lazy(() => import("@/pages/global-sources"));
+const NewsletterManager = lazy(() => import("@/pages/newsletter-manager"));
+const HistoricalData = lazy(() => import("@/pages/historical-data"));
+const AdminCustomers = lazy(() => import("@/pages/admin-customers"));
+const AuditLogs = lazy(() => import("@/pages/audit-logs"));
+const AIContentAnalysis = lazy(() => import("@/pages/ai-content-analysis"));
+const AIInsights = lazy(() => import("@/pages/ai-insights"));
+const GripIntegration = lazy(() => import("@/pages/grip-integration"));
+
 // Loading fallback component
 const LoadingFallback = () => (
   <div className="flex items-center justify-center min-h-screen">
@@ -45,13 +61,37 @@ function Router() {
         <Route path="/" component={Dashboard} />
         <Route path="/dashboard" component={Dashboard} />
         
-        {/* Admin Pages */}
+        {/* Data Management */}
         <Route path="/data-collection" component={DataCollection} />
-        <Route path="/analytics" component={Analytics} />
-        <Route path="/regulatory-updates" component={RegulatoryUpdates} />
+        <Route path="/newsletter-admin" component={NewsletterAdmin} />
+        <Route path="/email-management" component={EmailManagement} />
         <Route path="/knowledge-base" component={KnowledgeBase} />
-        <Route path="/administration" component={Administration} />
+        
+        {/* Analytics & Reporting */}
+        <Route path="/analytics" component={Analytics} />
+        
+        {/* Compliance & Regulation */}
+        <Route path="/regulatory-updates" component={RegulatoryUpdates} />
+        <Route path="/rechtsprechung" component={Rechtsprechung} />
+        
+        {/* Approvals & Registration */}
+        <Route path="/zulassungen/global" component={ZulassungenGlobal} />
+        <Route path="/zulassungen/laufende" component={LaufendeZulassungen} />
+        
+        {/* Advanced Features */}
+        <Route path="/sync-manager" component={SyncManager} />
+        <Route path="/global-sources" component={GlobalSources} />
+        <Route path="/newsletter-manager" component={NewsletterManager} />
+        <Route path="/historical-data" component={HistoricalData} />
+        <Route path="/admin-customers" component={AdminCustomers} />
         <Route path="/user-management" component={UserManagement} />
+        <Route path="/administration" component={Administration} />
+        <Route path="/audit-logs" component={AuditLogs} />
+        
+        {/* AI Features */}
+        <Route path="/ai-content-analysis" component={AIContentAnalysis} />
+        <Route path="/ki-insights" component={AIInsights} />
+        <Route path="/grip-integration" component={GripIntegration} />
         
         {/* Fallback */}
         <Route component={NotFound} />
