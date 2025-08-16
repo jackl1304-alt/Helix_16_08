@@ -17,9 +17,40 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <!-- Service Worker DEAKTIVIERT für bessere Kompatibilität -->
+    <!-- Service Worker für Cache-Busting -->
     <script>
-      console.log('[DEBUG] Service Worker deaktiviert - Development Mode');
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('[SW] Registration successful:', registration.scope);
+              
+              // Prüfe auf Updates
+              registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    // Neue Version verfügbar - force refresh
+                    if (confirm('Neue Version verfügbar! Jetzt aktualisieren?')) {
+                      newWorker.postMessage({ type: 'FORCE_UPDATE' });
+                      window.location.reload();
+                    }
+                  }
+                });
+              });
+            })
+            .catch((error) => {
+              console.log('[SW] Registration failed:', error);
+            });
+        });
+        
+        // Höre auf Service Worker Messages
+        navigator.serviceWorker.addEventListener('message', (event) => {
+          if (event.data.type === 'CACHE_CLEARED') {
+            window.location.reload();
+          }
+        });
+      }
     </script>
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
     <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>

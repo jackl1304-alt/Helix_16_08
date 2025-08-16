@@ -50,31 +50,38 @@ export default function CustomerKnowledgeBase() {
     isLoading: isTenantLoading 
   } = useLiveTenantPermissions({ 
     tenantId,
-    // No pollInterval to prevent aggressive API calls
+    pollInterval: 3000
   });
 
-  // Use live permissions from server - NO FALLBACK overrides
-  const permissions = livePermissions;
-  
-  console.log('[CUSTOMER KB] Live permissions from server:', livePermissions);
-  console.log('[CUSTOMER KB] Tenant ID:', tenantId);
-  console.log('[CUSTOMER KB] Knowledge Base access:', permissions?.knowledgeBase);
+  // Use live permissions with fallback
+  const permissions = livePermissions || {
+    dashboard: true,
+    regulatoryUpdates: true,
+    legalCases: true,
+    knowledgeBase: true,
+    newsletters: false,
+    analytics: false,
+    reports: false,
+    dataCollection: false,
+    globalSources: false,
+    historicalData: false,
+    administration: false,
+    userManagement: false,
+    systemSettings: false,
+    auditLogs: false,
+    aiInsights: false,
+    advancedAnalytics: false
+  };
 
-  // Fetch knowledge articles - only if user has permission AND tenant permissions loaded
+  // Fetch knowledge articles - only if user has permission
   const { data: articlesData, isLoading: articlesLoading, error } = useQuery({
     queryKey: ['/api/knowledge-articles', tenantId],
     queryFn: async () => {
-      console.log('[CUSTOMER KB] Fetching articles for tenant:', tenantId);
-      const response = await fetch(`/api/customer/knowledge-articles/${tenantId}`);
-      if (!response.ok) {
-        console.error('[CUSTOMER KB] Failed to fetch articles:', response.status);
-        throw new Error('Failed to fetch knowledge articles');
-      }
-      const data = await response.json();
-      console.log('[CUSTOMER KB] Articles received:', data?.length || 'unknown length');
-      return data;
+      const response = await fetch('/api/knowledge-articles');
+      if (!response.ok) throw new Error('Failed to fetch knowledge articles');
+      return await response.json();
     },
-    enabled: Boolean(permissions?.knowledgeBase && !isTenantLoading && tenantId),
+    enabled: Boolean(permissions?.knowledgeBase),
     staleTime: 300000, // 5 minutes
   });
 
@@ -103,8 +110,7 @@ export default function CustomerKnowledgeBase() {
   }
 
   // Check permission
-  if (!permissions?.knowledgeBase && !isTenantLoading) {
-    console.log('[CUSTOMER KB] Access denied - permissions:', permissions);
+  if (!permissions?.knowledgeBase) {
     return (
       <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Language Selector - Top Right */}
@@ -113,7 +119,7 @@ export default function CustomerKnowledgeBase() {
         </div>
         
         <CustomerNavigation 
-          permissions={permissions || { dashboard: true, regulatoryUpdates: false, knowledgeBase: false, newsletters: false, analytics: false, reports: false, dataCollection: false, globalSources: false, historicalData: false, administration: false, userManagement: false, systemSettings: false, auditLogs: false, aiInsights: false, advancedAnalytics: false }} 
+          permissions={permissions} 
           tenantName={liveTenantName || "Customer Portal"} 
         />
         
@@ -122,16 +128,13 @@ export default function CustomerKnowledgeBase() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5" />
-                Zugriff eingeschränkt
+                {t('access.restricted')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
                 Sie haben keine Berechtigung für den Zugriff auf die Wissensdatenbank. 
                 Kontaktieren Sie Ihren Administrator für weitere Informationen.
-              </p>
-              <p className="text-xs text-gray-400 mt-2">
-                Tenant: {tenantId} | Berechtigungen geladen: {permissions ? 'ja' : 'nein'}
               </p>
             </CardContent>
           </Card>

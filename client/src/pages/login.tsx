@@ -32,10 +32,9 @@ export default function Login({ onLogin }: LoginProps) {
       localStorage.setItem("loginTime", new Date().toISOString());
       
       setTimeout(() => {
-        setIsLoading(false);
         onLogin?.();
         setLocation("/");
-      }, 200); // Reduziert von 500ms auf 200ms für schnelleres Login
+      }, 500);
     } else {
       setError("Ungültige Zugangsdaten. Bitte versuchen Sie es erneut.");
       setIsLoading(false);

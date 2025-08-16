@@ -32,18 +32,17 @@ export function useLiveTenantPermissions({
   const [permissions, setPermissions] = useState<CustomerPermissions | null>(null);
   const [tenantName, setTenantName] = useState<string>('');
 
-  // Fetch tenant data ONCE - no polling to prevent spam
+  // Fetch tenant data with automatic polling
   const { data: tenantData, isLoading, error } = useQuery({
-    queryKey: ['/api/customer/tenant-new', tenantId],
+    queryKey: ['/api/customer/tenant', tenantId],
     queryFn: async () => {
-      const response = await fetch(`/api/customer/tenant-new/${tenantId}`);
+      const response = await fetch(`/api/customer/tenant/${tenantId}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch tenant data: ${response.status}`);
       }
       return await response.json();
     },
-    // REMOVED: refetchInterval to stop constant polling
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchInterval: pollInterval,
     enabled: !!tenantId,
   });
 

@@ -59,84 +59,84 @@ interface NavigationItem {
 const ALL_NAVIGATION_ITEMS: NavigationItem[] = [
   {
     name: "Dashboard",
-    href: "dashboard",
+    href: "/dashboard",
     icon: LayoutDashboard,
     permission: "dashboard",
     description: "Übersicht und aktuelle Statistiken"
   },
   {
     name: "Regulatorische Updates",
-    href: "regulatory-updates",
+    href: "/regulatory-updates",
     icon: FileText,
     permission: "regulatoryUpdates",
     description: "Aktuelle regulatorische Änderungen"
   },
   {
     name: "Rechtsprechung",
-    href: "legal-cases",
+    href: "/legal-cases",
     icon: Scale,
     permission: "legalCases",
     description: "Rechtsprechung und Präzedenzfälle"
   },
   {
     name: "Wissensdatenbank",
-    href: "knowledge-base",
+    href: "/knowledge-base",
     icon: BookOpen,
     permission: "knowledgeBase",
     description: "Wissensdatenbank und Artikel"
   },
   {
     name: "Newsletter",
-    href: "newsletters",
+    href: "/newsletters",
     icon: Mail,
     permission: "newsletters",
     description: "Newsletter-Verwaltung"
   },
   {
     name: "Analytics",
-    href: "analytics",
+    href: "/analytics",
     icon: BarChart3,
     permission: "analytics",
     description: "Datenanalyse und Berichte"
   },
   {
     name: "Erweiterte Analytics", 
-    href: "advanced-analytics",
+    href: "/advanced-analytics",
     icon: Activity,
     permission: "advancedAnalytics",
     description: "Erweiterte Analysetools"
   },
   {
     name: "KI-Erkenntnisse",
-    href: "ai-insights",
+    href: "/ai-insights",
     icon: Brain,
     permission: "aiInsights",
     description: "KI-gestützte Erkenntnisse"
   },
   {
     name: "Globale Datenquellen",
-    href: "global-sources",
+    href: "/global-sources",
     icon: Globe,
     permission: "globalSources",
     description: "Globale Datenquellen"
   },
   {
     name: "Datensammlung",
-    href: "data-collection", 
+    href: "/data-collection", 
     icon: Database,
     permission: "dataCollection",
     description: "Datensammlung und -verwaltung"
   },
   {
     name: "Historische Daten",
-    href: "historical-data",
+    href: "/historical-data",
     icon: Clipboard,
     permission: "historicalData",
     description: "Historische Datenanalyse"
   },
   {
     name: "Einstellungen",
-    href: "settings",
+    href: "/settings",
     icon: Settings,
     permission: "systemSettings",
     description: "Kundeneinstellungen"
@@ -158,31 +158,39 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
   
   // Build tenant-specific URLs
   const buildTenantUrl = (path: string) => {
-    // Use mockTenantId as fallback if params.tenantId not available
-    const mockTenantId = '030d3e01-32c4-4f95-8d54-98be948e8d4b';
-    const tenantId = params.tenantId || mockTenantId;
-    
-    if (tenantId) {
-      // Ensure path starts with slash for proper URL construction
-      const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-      const finalUrl = `/tenant/${tenantId}${normalizedPath}`;
-      console.log('[CUSTOMER NAV] buildTenantUrl:', {
-        inputPath: path,
-        tenantId,
-        normalizedPath,
-        finalUrl
-      });
-      return finalUrl;
+    if (params.tenantId) {
+      return `/tenant/${params.tenantId}${path}`;
     }
-    // Fallback to regular path
-    return path.startsWith('/') ? path : `/${path}`;
+    return path;
   };
 
-  // Use provided permissions directly - no additional API calls
+  // Polling für Live-Updates der Berechtigungen
   useEffect(() => {
-    // Simply use the permissions passed as props
-    setCurrentPermissions(permissions);
-  }, [permissions]);
+    if (!params.tenantId) return;
+    
+    const pollPermissions = async () => {
+      try {
+        const response = await fetch(`/api/customer/tenant/${params.tenantId}`);
+        if (response.ok) {
+          const tenantData = await response.json();
+          if (tenantData.customerPermissions) {
+            setCurrentPermissions(tenantData.customerPermissions);
+            onPermissionsUpdate?.(tenantData.customerPermissions);
+          }
+        }
+      } catch (error) {
+        console.error('Fehler beim Abrufen der aktuellen Berechtigungen:', error);
+      }
+    };
+
+    // Initial load
+    pollPermissions();
+    
+    // Poll alle 5 Sekunden für Live-Updates
+    const interval = setInterval(pollPermissions, 5000);
+    
+    return () => clearInterval(interval);
+  }, [params.tenantId, onPermissionsUpdate]);
 
   // Filter navigation items based on current permissions
   const allowedItems = ALL_NAVIGATION_ITEMS.filter(item => 
@@ -196,36 +204,37 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
     const IconComponent = item.icon;
     
     return (
-      <Button 
+      <button
         key={item.href}
-        variant="outline" 
-        size="sm" 
+        onClick={() => setLocation(tenantUrl)}
         className={cn(
-          "w-full justify-start mb-2 h-auto py-3",
+          "w-full flex items-center justify-start px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer group",
           isActive
-            ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
-            : "hover:bg-blue-50 hover:text-blue-700"
+            ? "bg-blue-600 text-white shadow-md"
+            : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
         )}
-        onClick={() => {
-          console.log('[CUSTOMER NAV] Navigating to:', tenantUrl);
-          setLocation(tenantUrl);
-        }}
       >
-        <IconComponent className="w-4 h-4 mr-3 flex-shrink-0" />
-        <div className="flex flex-col items-start text-left">
-          <span className="font-medium">{item.name}</span>
+        <IconComponent className={cn(
+          "mr-3 h-5 w-5 flex-shrink-0 transition-colors",
+          isActive ? "text-white" : "text-gray-500 group-hover:text-blue-600"
+        )} />
+        <div className="flex flex-col">
+          <span className="text-left font-medium">{item.name}</span>
           {item.description && (
-            <span className="text-xs opacity-75 mt-0.5">
+            <span className={cn(
+              "text-xs text-left mt-0.5",
+              isActive ? "text-blue-100" : "text-gray-500"
+            )}>
               {item.description}
             </span>
           )}
         </div>
-      </Button>
+      </button>
     );
   };
 
   return (
-    <div className="fixed left-0 top-0 h-screen w-64 flex flex-col bg-white border-r border-gray-200 shadow-lg z-40">
+    <div className="fixed left-0 top-0 h-screen w-64 flex flex-col bg-white border-r border-gray-200 shadow-lg z-50">
       {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
@@ -244,48 +253,12 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
       {/* Navigation */}
       <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
         {allowedItems.length > 0 ? (
-          <div className="space-y-2">
-            {allowedItems.map((item, index) => {
-              const tenantUrl = buildTenantUrl(item.href);
-              const isActive = location === tenantUrl || location.includes(item.href);
-              
-              return (
-                <Button 
-                  key={`nav-${index}-${item.href}`}
-                  variant={isActive ? "default" : "outline"}
-                  size="sm" 
-                  className={cn(
-                    "w-full justify-start mb-2 h-auto py-3 transition-all duration-200",
-                    isActive 
-                      ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700" 
-                      : "hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300"
-                  )}
-                  onClick={() => {
-                    console.log(`[CUSTOMER NAV] Navigating to: ${item.name} -> ${tenantUrl}`);
-                    setLocation(tenantUrl);
-                  }}
-                >
-                  <item.icon className="w-4 h-4 mr-3 flex-shrink-0" />
-                  <div className="flex flex-col items-start text-left">
-                    <span className="font-medium">{item.name}</span>
-                    {item.description && (
-                      <span className="text-xs opacity-75 mt-0.5">
-                        {item.description}
-                      </span>
-                    )}
-                  </div>
-                </Button>
-              );
-            })}
-          </div>
+          allowedItems.map(renderNavigationItem)
         ) : (
           <div className="text-center py-8">
             <Shield className="w-12 h-12 mx-auto text-gray-400 mb-3" />
             <p className="text-sm text-gray-500">
-              Keine Navigation verfügbar
-            </p>
-            <p className="text-xs text-gray-400 mt-2">
-              Berechtigung wird geladen...
+              Keine Berechtigung für Navigation
             </p>
           </div>
         )}
@@ -297,10 +270,7 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
           variant="outline" 
           size="sm" 
           className="w-full" 
-          onClick={() => {
-            const chatUrl = params.tenantId ? `/tenant/${params.tenantId}/chat-support` : '/customer/chat-support';
-            setLocation(chatUrl);
-          }}
+          onClick={() => window.open('/chat-support', '_blank')}
         >
           <MessageCircle className="w-4 h-4 mr-2" />
           Support Chat

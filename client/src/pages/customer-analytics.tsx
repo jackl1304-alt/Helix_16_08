@@ -74,7 +74,7 @@ export default function CustomerAnalytics() {
     isLoading: isTenantLoading 
   } = useLiveTenantPermissions({ 
     tenantId,
-    // No pollInterval to prevent aggressive API calls
+    pollInterval: 3000
   });
 
   // Use live permissions with fallback
