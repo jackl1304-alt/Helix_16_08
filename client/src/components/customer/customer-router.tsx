@@ -6,6 +6,13 @@ const CustomerDashboard = lazy(() => import("@/pages/customer-dashboard"));
 const CustomerSettings = lazy(() => import("@/pages/customer-settings"));
 const CustomerAIInsightsClean = lazy(() => import("@/pages/customer-ai-insights-clean"));
 const CustomerRegulatoryUpdates = lazy(() => import("@/pages/customer-regulatory-updates"));
+const CustomerLegalCases = lazy(() => import("@/pages/customer-legal-cases"));
+const CustomerKnowledgeBase = lazy(() => import("@/pages/customer-knowledge-base"));
+const CustomerNewsletters = lazy(() => import("@/pages/customer-newsletters"));
+const CustomerAnalytics = lazy(() => import("@/pages/customer-analytics"));
+const CustomerGlobalSources = lazy(() => import("@/pages/customer-global-sources"));
+const CustomerDataCollection = lazy(() => import("@/pages/customer-data-collection"));
+const CustomerHistoricalData = lazy(() => import("@/pages/customer-historical-data"));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center min-h-screen">
@@ -41,21 +48,21 @@ export default function CustomerRouter() {
         case "customer-settings":
           return <CustomerSettings />;
         case "legal-cases":
-          return <CustomerDashboard />; // Placeholder
+          return <CustomerLegalCases />;
         case "knowledge-base":
-          return <CustomerDashboard />; // Placeholder
+          return <CustomerKnowledgeBase />;
         case "newsletters":
-          return <CustomerDashboard />; // Placeholder
+          return <CustomerNewsletters />;
         case "analytics":
-          return <CustomerDashboard />; // Placeholder
+          return <CustomerAnalytics />;
         case "advanced-analytics":
-          return <CustomerDashboard />; // Placeholder
+          return <CustomerAnalytics />;
         case "global-sources":
-          return <CustomerDashboard />; // Placeholder
+          return <CustomerGlobalSources />;
         case "data-collection":
-          return <CustomerDashboard />; // Placeholder
+          return <CustomerDataCollection />;
         case "historical-data":
-          return <CustomerDashboard />; // Placeholder
+          return <CustomerHistoricalData />;
         default:
           return <CustomerDashboard />;
       }
@@ -72,21 +79,21 @@ export default function CustomerRouter() {
       case "/customer/regulatory-updates":
         return <CustomerRegulatoryUpdates />;
       case "/customer/legal-cases":
-        return <CustomerDashboard />; // Placeholder
+        return <CustomerLegalCases />;
       case "/customer/knowledge-base":
-        return <CustomerDashboard />; // Placeholder
+        return <CustomerKnowledgeBase />;
       case "/customer/newsletters":
-        return <CustomerDashboard />; // Placeholder
+        return <CustomerNewsletters />;
       case "/customer/analytics":
-        return <CustomerDashboard />; // Placeholder
+        return <CustomerAnalytics />;
       case "/customer/advanced-analytics":
-        return <CustomerDashboard />; // Placeholder
+        return <CustomerAnalytics />;
       case "/customer/global-sources":
-        return <CustomerDashboard />; // Placeholder
+        return <CustomerGlobalSources />;
       case "/customer/data-collection":
-        return <CustomerDashboard />; // Placeholder
+        return <CustomerDataCollection />;
       case "/customer/historical-data":
-        return <CustomerDashboard />; // Placeholder
+        return <CustomerHistoricalData />;
       default:
         return <CustomerDashboard />;
     }
