@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { useDevice, getDeviceClasses } from "@/hooks/use-device";
-import { Sidebar } from "@/components/layout/sidebar";
+import { AdminSidebarNew } from "@/components/layout/sidebar-new";
 import { MobileSidebar } from "@/components/layout/mobile-sidebar";
 import { cn } from "@/lib/utils";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -22,7 +22,7 @@ export function ResponsiveLayout({ children, showSidebar = true }: ResponsiveLay
         <>
           {/* Desktop Sidebar - only show on screens larger than 1024px */}
           <div className="hidden lg:block">
-            <Sidebar />
+            <AdminSidebarNew />
           </div>
           
           {/* Mobile/Tablet Sidebar - show on screens smaller than 1024px */}
