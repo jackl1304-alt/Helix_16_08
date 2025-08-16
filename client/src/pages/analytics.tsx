@@ -31,6 +31,7 @@ import {
   Filter,
   Download
 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AnalyticsData {
   regionDistribution: Array<{ region: string; count: number; percentage: number }>;
@@ -54,6 +55,7 @@ const COLORS = {
 export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState("30d");
   const [selectedMetric, setSelectedMetric] = useState("all");
+  const { t } = useLanguage();
 
   // Fetch real analytics data from dashboard stats
   const { data: statsData, isLoading } = useQuery({
@@ -75,16 +77,15 @@ export default function AnalyticsPage() {
   // Convert dashboard stats to analytics format
   const analyticsData: AnalyticsData = statsData ? {
     regionDistribution: [
-      { region: "Europa", count: Math.floor((stats.totalUpdates || 0) * 0.35), percentage: 35 },
-      { region: "Nordamerika", count: Math.floor((stats.totalUpdates || 0) * 0.28), percentage: 28 },
-      { region: "Asien-Pazifik", count: Math.floor((stats.totalUpdates || 0) * 0.22), percentage: 22 },
-      { region: "Deutschland", count: Math.floor((stats.totalUpdates || 0) * 0.15), percentage: 15 }
+      { region: "Europe", count: Math.floor((stats.totalUpdates || 0) * 0.35), percentage: 35 },
+      { region: "North America", count: Math.floor((stats.totalUpdates || 0) * 0.28), percentage: 28 },
+      { region: "Asia-Pacific", count: Math.floor((stats.totalUpdates || 0) * 0.22), percentage: 22 },
+      { region: "Germany", count: Math.floor((stats.totalUpdates || 0) * 0.15), percentage: 15 }
     ],
     categoryBreakdown: [
-      { category: "Regulatorische Updates", count: stats.totalUpdates || 0, color: COLORS.primary },
-      { category: "Rechtsfälle", count: stats.totalLegalCases || 0, color: COLORS.secondary },
-
-      { category: "Knowledge Articles", count: stats.totalArticles || 0, color: COLORS.warning }
+      { category: t('regulatory.title'), count: stats.totalUpdates || 0, color: COLORS.primary },
+      { category: t('legal.title'), count: stats.totalLegalCases || 0, color: COLORS.secondary },
+      { category: t('knowledge.title'), count: stats.totalArticles || 0, color: COLORS.warning }
     ],
     timelineData: Array.from({ length: 30 }, (_, i) => ({
       date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0] || '',
@@ -92,9 +93,9 @@ export default function AnalyticsPage() {
       approvals: Math.floor(Math.random() * 15) + 2
     })),
     priorityStats: [
-      { priority: "Hoch", count: Math.floor((stats.totalUpdates || 0) * 0.15), color: COLORS.danger },
-      { priority: "Mittel", count: Math.floor((stats.totalUpdates || 0) * 0.65), color: COLORS.warning },
-      { priority: "Niedrig", count: Math.floor((stats.totalUpdates || 0) * 0.20), color: COLORS.success }
+      { priority: "High", count: Math.floor((stats.totalUpdates || 0) * 0.15), color: COLORS.danger },
+      { priority: "Medium", count: Math.floor((stats.totalUpdates || 0) * 0.65), color: COLORS.warning },
+      { priority: "Low", count: Math.floor((stats.totalUpdates || 0) * 0.20), color: COLORS.success }
     ],
     sourcePerformance: [
       { source: "FDA", updates: Math.floor((stats.totalUpdates || 0) * 0.3), lastSync: "2025-07-31T10:00:00Z", status: "active" },
@@ -104,7 +105,7 @@ export default function AnalyticsPage() {
       { source: "Swissmedic", updates: Math.floor((stats.totalUpdates || 0) * 0.1), lastSync: "2025-07-31T08:00:00Z", status: "active" }
     ],
     languageDistribution: [
-      { language: "Deutsch", count: Math.floor((stats.totalUpdates || 0) * 0.4) },
+      { language: "German", count: Math.floor((stats.totalUpdates || 0) * 0.4) },
       { language: "English", count: Math.floor((stats.totalUpdates || 0) * 0.6) }
     ],
     monthlyTrends: Array.from({ length: 12 }, (_, i) => ({

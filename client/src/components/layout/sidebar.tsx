@@ -256,10 +256,6 @@ export function Sidebar() {
           </div>
         </Link>
         
-        {/* Language Selector in Header */}
-        <div className="mt-2">
-          <LanguageSelector />
-        </div>
       </div>
       
       {/* Funktionsfähiger Suchbereich */}

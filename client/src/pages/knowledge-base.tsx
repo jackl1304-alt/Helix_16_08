@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { BookOpen, Database, Globe, FileText, Filter, Search, Download, ExternalLink, RefreshCw, Play, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { PDFDownloadButton } from "@/components/ui/pdf-download-button";
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface KnowledgeArticle {
   id: string;
@@ -39,6 +40,7 @@ function KnowledgeBasePage() {
   const [selectedSource, setSelectedSource] = useState('all');
   
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   // Fetch knowledge articles - ECHTE NEWSLETTER-DATEN
   const { data: realArticlesData, isLoading: articlesLoading, error } = useQuery({
@@ -78,31 +80,31 @@ function KnowledgeBasePage() {
   };
 
   const downloadArticle = (article: KnowledgeArticle) => {
-    const content = `KNOWLEDGE BASE ARTIKEL - VOLLSTÄNDIGER EXPORT
+    const content = `${t('knowledge.title').toUpperCase()} ${t('action.export').toUpperCase()}
 ========================================
 
-Titel: ${article.title}
-Autor/Quelle: ${article.authority}
-Region: ${article.region}
-Kategorie: ${article.category}
-Priorität: ${article.priority}
-Sprache: ${article.language}
-Veröffentlicht: ${new Date(article.published_at).toLocaleDateString('de-DE')}
+${t('knowledge.title')}: ${article.title}
+${t('common.source')}: ${article.authority}
+${t('common.region')}: ${article.region}
+${t('common.category')}: ${article.category}
+${t('common.priority')}: ${article.priority}
+${t('common.language')}: ${article.language}
+${t('regulatory.published')}: ${new Date(article.published_at).toLocaleDateString()}
 
-ZUSAMMENFASSUNG:
-${article.summary || 'Keine Zusammenfassung verfügbar'}
+${t('search.summary').toUpperCase()}:
+${article.summary || t('knowledge.noSummary')}
 
-VOLLSTÄNDIGER INHALT:
+${t('knowledge.fullContent').toUpperCase()}:
 ${article.content}
 
 TAGS:
 ${article.tags.join(', ')}
 
-QUELLE:
+${t('common.source').toUpperCase()}:
 ${article.source}
 
 ========================================
-Export generiert am: ${new Date().toLocaleString('de-DE')}
+${t('knowledge.exportGenerated')}: ${new Date().toLocaleString()}
 Helix Regulatory Intelligence Platform
 `;
 
