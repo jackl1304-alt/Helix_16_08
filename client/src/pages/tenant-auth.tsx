@@ -239,6 +239,17 @@ export default function TenantAuth({
             Administratoren haben keinen Zugriff auf Tenant-Bereiche
           </p>
         </div>
+
+        {/* Dezente Admin-Verlinkung */}
+        <div className="text-center mt-6">
+          <button
+            onClick={() => setLocation('/')}
+            className="text-xs text-gray-400 hover:text-gray-600 transition-colors duration-200 underline-offset-4 hover:underline"
+            data-testid="link-admin-access"
+          >
+            Admin-Zugang
+          </button>
+        </div>
       </div>
     </div>
   );
