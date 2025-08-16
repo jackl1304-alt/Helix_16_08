@@ -64,9 +64,29 @@ export default function Dashboard() {
   });
 
   const { data: recentUpdates, error: updatesError } = useQuery({
-    queryKey: ['/api/regulatory-updates/recent'],
+    queryKey: ['/api/regulatory-updates'],
+    queryFn: async () => {
+      console.log('[ADMIN] Fetching regulatory updates...');
+      const response = await fetch('/api/regulatory-updates', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        console.error('[ADMIN] Updates response not ok:', response.status);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('[ADMIN] Updates received:', data?.length || 0);
+      return data;
+    },
     staleTime: 30000,
     gcTime: 60000,
+    retry: 2,
   });
 
   const { data: newsletterSources } = useQuery({
