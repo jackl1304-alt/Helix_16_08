@@ -92,31 +92,42 @@ export default function Dashboard() {
     retry: 2,
   });
 
-  const { data: newsletterSources, isLoading: isLoadingNewsletterSources } = useQuery({
-    queryKey: ['newsletter-sources'],
-    queryFn: async () => {
-      console.log('[NEWSLETTER] Direct fetch starting...');
-      const response = await fetch('/api/newsletter-sources', {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        credentials: "include",
-      });
-      
-      if (!response.ok) {
-        console.error('[NEWSLETTER] Response not OK:', response.status);
-        throw new Error(`HTTP ${response.status}`);
+  // Simple state-based newsletter sources loading
+  const [newsletterSources, setNewsletterSources] = React.useState<any[]>([]);
+  const [isLoadingNewsletterSources, setIsLoadingNewsletterSources] = React.useState(true);
+
+  React.useEffect(() => {
+    const loadNewsletterSources = async () => {
+      try {
+        setIsLoadingNewsletterSources(true);
+        console.log('[NEWSLETTER] Loading sources...');
+        
+        const response = await fetch('/api/newsletter-sources', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          credentials: "include",
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('[NEWSLETTER] Loaded sources:', data);
+        setNewsletterSources(data || []);
+      } catch (error) {
+        console.error('[NEWSLETTER] Error loading sources:', error);
+        setNewsletterSources([]);
+      } finally {
+        setIsLoadingNewsletterSources(false);
       }
-      
-      const data = await response.json();
-      console.log('[NEWSLETTER] Direct fetch success:', data);
-      return data;
-    },
-    staleTime: 0,
-    gcTime: 0,
-  });
+    };
+
+    loadNewsletterSources();
+  }, []);
 
 
   // Optimierte Dashboard-Cards mit konsistenten Deltaways-Farben
