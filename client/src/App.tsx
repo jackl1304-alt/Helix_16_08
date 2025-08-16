@@ -158,54 +158,74 @@ function App() {
             {/* Multi-Tenant Customer Portal - Each customer gets their own portal */}
             <Route path="/tenant/:tenantId/*">
               <CustomerThemeProvider>
-                <CustomerRouter />
+                <Suspense fallback={<LoadingFallback />}>
+                  <CustomerRouter />
+                </Suspense>
               </CustomerThemeProvider>
             </Route>
             
             {/* Legacy customer routes - redirect to tenant-specific URLs */}
             <Route path="/customer-dashboard">
               <CustomerThemeProvider>
-                <CustomerRouter />
+                <Suspense fallback={<LoadingFallback />}>
+                  <CustomerRouter />
+                </Suspense>
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer-settings">
               <CustomerThemeProvider>
-                <CustomerRouter />
+                <Suspense fallback={<LoadingFallback />}>
+                  <CustomerRouter />
+                </Suspense>
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer-ai-insights">
               <CustomerThemeProvider>
-                <CustomerRouter />
+                <Suspense fallback={<LoadingFallback />}>
+                  <CustomerRouter />
+                </Suspense>
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer/regulatory-updates">
               <CustomerThemeProvider>
-                <CustomerRouter />
+                <Suspense fallback={<LoadingFallback />}>
+                  <CustomerRouter />
+                </Suspense>
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer/legal-cases">
               <CustomerThemeProvider>
-                <CustomerRouter />
+                <Suspense fallback={<LoadingFallback />}>
+                  <CustomerRouter />
+                </Suspense>
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer/knowledge-base">
               <CustomerThemeProvider>
-                <CustomerRouter />
+                <Suspense fallback={<LoadingFallback />}>
+                  <CustomerRouter />
+                </Suspense>
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer/newsletters">
               <CustomerThemeProvider>
-                <CustomerRouter />
+                <Suspense fallback={<LoadingFallback />}>
+                  <CustomerRouter />
+                </Suspense>
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer/analytics">
               <CustomerThemeProvider>
-                <CustomerRouter />
+                <Suspense fallback={<LoadingFallback />}>
+                  <CustomerRouter />
+                </Suspense>
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer/advanced-analytics">
               <CustomerThemeProvider>
-                <CustomerRouter />
+                <Suspense fallback={<LoadingFallback />}>
+                  <CustomerRouter />
+                </Suspense>
               </CustomerThemeProvider>
             </Route>
             <Route path="/customer/global-sources">
