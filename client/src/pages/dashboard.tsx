@@ -93,32 +93,31 @@ export default function Dashboard() {
   });
 
   const { data: newsletterSources, isLoading: isLoadingNewsletterSources } = useQuery({
-    queryKey: ['/api/newsletter-sources'],
+    queryKey: ['newsletter-sources'],
+    queryFn: async () => {
+      console.log('[NEWSLETTER] Direct fetch starting...');
+      const response = await fetch('/api/newsletter-sources', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        console.error('[NEWSLETTER] Response not OK:', response.status);
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('[NEWSLETTER] Direct fetch success:', data);
+      return data;
+    },
     staleTime: 0,
     gcTime: 0,
   });
 
-  // Debug Newsletter Sources
-  console.log('Newsletter Sources Debug:', {
-    isLoading: isLoadingNewsletterSources,
-    data: newsletterSources,
-    dataType: typeof newsletterSources,
-    isArray: Array.isArray(newsletterSources),
-    length: newsletterSources?.length,
-    firstItem: newsletterSources?.[0]
-  });
-
-  // Force fresh data fetch
-  React.useEffect(() => {
-    console.log('Manual fetch test...');
-    fetch('/api/newsletter-sources')
-      .then(res => res.json())
-      .then(data => {
-        console.log('Manual fetch result:', data);
-        console.log('Manual fetch length:', data?.length);
-      })
-      .catch(err => console.error('Manual fetch error:', err));
-  }, []);
 
   // Optimierte Dashboard-Cards mit konsistenten Deltaways-Farben
   const dashboardCards = [
