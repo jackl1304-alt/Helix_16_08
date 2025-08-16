@@ -127,6 +127,14 @@ app.post("/api/ai", async (req: Request, res: Response) => {
   }
 });
 
+// Apply selective caching to API routes FIRST
+import { cacheMiddleware, CACHE_CONFIG } from './middleware/query-cache';
+app.use('/api/dashboard', cacheMiddleware(CACHE_CONFIG.DASHBOARD));
+app.use('/api/regulatory-updates', cacheMiddleware(CACHE_CONFIG.REGULATORY));
+app.use('/api/knowledge-articles', cacheMiddleware(CACHE_CONFIG.ARTICLES));
+app.use('/api/admin/permissions', cacheMiddleware(CACHE_CONFIG.MEDIUM));
+app.use('/api/admin/navigation', cacheMiddleware(CACHE_CONFIG.LONG));
+
 // Register main routes
 registerRoutes(app);
 
@@ -139,15 +147,6 @@ setupCustomerRoutes(app);
 
 // Setup new clean JSON-based admin routes  
 import { setupAdminRoutes } from './api/admin-routes-new';
-import { cacheMiddleware, CACHE_CONFIG } from './middleware/query-cache';
-
-// Apply selective caching to API routes
-app.use('/api/dashboard', cacheMiddleware(CACHE_CONFIG.DASHBOARD));
-app.use('/api/regulatory-updates', cacheMiddleware(CACHE_CONFIG.REGULATORY));
-app.use('/api/knowledge-articles', cacheMiddleware(CACHE_CONFIG.ARTICLES));
-app.use('/api/admin/permissions', cacheMiddleware(CACHE_CONFIG.MEDIUM));
-app.use('/api/admin/navigation', cacheMiddleware(CACHE_CONFIG.LONG));
-
 setupAdminRoutes(app);
 
 // Register tenant-specific routes - ONLY new real data API
@@ -164,14 +163,9 @@ app.post("/api/webhook", (req: Request, res: Response) => {
   res.json({ received: true });
 });
 
-// 404-Handler nur für API (must be AFTER all other routes)
+// 404-Handler nur für API (must be AFTER all other API routes, BEFORE Vite setup)
 app.use("/api/*", (req, res) => {
   res.status(404).json({ error: `API nicht gefunden: ${req.path}` });
-});
-
-// Globaler Error-Handler
-app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  res.status(err.status || 500).json({ error: err.message || "Internal Server Error" });
 });
 
 // Performance: Add security and optimization middleware
@@ -197,6 +191,22 @@ const isProd = process.env.NODE_ENV === "production" || app.get("env") !== "deve
 if (!isProd) {
   // Vite Dev-Server im Dev-Modus
   setupVite(app, server).catch(console.error);
+  
+  // Serve static assets from client directory
+  app.use(express.static(path.resolve(import.meta.dirname, "..", "client")));
+  
+  // FALLBACK: Frontend routing für Customer-Dashboard und andere SPA-Routen
+  app.get([
+    "/customer-dashboard",
+    "/customer/*", 
+    "/tenant/*",
+    "/login",
+    "/not-found"
+  ], (_req, res) => {
+    const clientHtmlPath = path.resolve(import.meta.dirname, "..", "client", "index.html");
+    console.log(`[FRONTEND-SPA] Serving ${clientHtmlPath} for SPA route`);
+    res.sendFile(clientHtmlPath);
+  });
 } else {
   // Optimized static file serving
   const distPath = path.resolve(import.meta.url.replace("file://", ""), "../public");
@@ -211,6 +221,11 @@ if (!isProd) {
     });
   }
 }
+
+// Globaler Error-Handler (MUST be AFTER Vite setup for proper SPA routing)
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  res.status(err.status || 500).json({ error: err.message || "Internal Server Error" });
+});
 
 // Server starten
 if (import.meta.url === `file://${process.argv[1]}`) {
