@@ -3,13 +3,12 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { ResponsiveLayout } from "@/components/responsive-layout";
 import { performanceMonitor, preloadCriticalResources } from "@/utils/performance";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { CustomerThemeProvider } from "@/contexts/customer-theme-context";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-import { useAuth } from "@/hooks/use-auth";
 import Login from "@/pages/login";
 
 // Initialize performance monitoring and preload resources
@@ -145,10 +144,34 @@ function Router() {
   );
 }
 
-function App() {
-  const { isAuthenticated } = useAuth();
+// Simple Auth Check Hook
+function useSimpleAuth() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
-  // Show login screen if not authenticated
+  useEffect(() => {
+    const authStatus = localStorage.getItem('isAuthenticated') === 'true';
+    setIsAuthenticated(authStatus);
+  }, []);
+
+  return { isAuthenticated, setIsAuthenticated };
+}
+
+function App() {
+  const { isAuthenticated, setIsAuthenticated } = useSimpleAuth();
+
+  // Loading state
+  if (isAuthenticated === null) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Helix wird geladen...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login if not authenticated
   if (!isAuthenticated) {
     return (
       <ErrorBoundary>
@@ -156,7 +179,7 @@ function App() {
           <QueryClientProvider client={queryClient}>
             <TooltipProvider>
               <Toaster />
-              <Login />
+              <Login onLogin={() => setIsAuthenticated(true)} />
             </TooltipProvider>
           </QueryClientProvider>
         </LanguageProvider>
