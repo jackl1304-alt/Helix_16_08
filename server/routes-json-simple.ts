@@ -41,7 +41,8 @@ export function registerRoutes(app: Express): void {
     }
   });
 
-  // Dashboard Data API - Real data from database
+  // DOPPELTER ENDPOINT DEAKTIVIERT - HAUPTENDPOINT ist in routes.ts
+  /*
   app.get('/api/dashboard/stats', async (req, res) => {
     try {
       // Get real data from database
@@ -72,6 +73,7 @@ export function registerRoutes(app: Express): void {
       });
     }
   });
+  */
 
   // Customer Tenant API
   app.get('/api/customer/tenant/:tenantId', async (req, res) => {

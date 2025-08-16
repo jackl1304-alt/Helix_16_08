@@ -106,12 +106,12 @@ export default function DataCollection() {
     }
   ];
 
-  // Dashboard Stats für Live-Sync-Tracking
-  const { data: dashboardStats } = useQuery({
-    queryKey: ['/api/dashboard/stats'],
-    refetchInterval: 30000, // Alle 30 Sekunden aktualisieren
-    staleTime: 15000, // 15 Sekunden
-  });
+  // REMOVED: Doppelter API call entfernt - verwende DashboardProvider stattdessen
+  // const { data: dashboardStats } = useQuery({
+  //   queryKey: ['/api/dashboard/stats'],
+  //   refetchInterval: 30000, // Alle 30 Sekunden aktualisieren
+  //   staleTime: 15000, // 15 Sekunden
+  // });
 
 
 
