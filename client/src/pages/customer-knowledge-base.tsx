@@ -53,35 +53,28 @@ export default function CustomerKnowledgeBase() {
     // No pollInterval to prevent aggressive API calls
   });
 
-  // Use live permissions with fallback
-  const permissions = livePermissions || {
-    dashboard: true,
-    regulatoryUpdates: true,
-    legalCases: true,
-    knowledgeBase: true,
-    newsletters: false,
-    analytics: false,
-    reports: false,
-    dataCollection: false,
-    globalSources: false,
-    historicalData: false,
-    administration: false,
-    userManagement: false,
-    systemSettings: false,
-    auditLogs: false,
-    aiInsights: false,
-    advancedAnalytics: false
-  };
+  // Use live permissions from server - NO FALLBACK overrides
+  const permissions = livePermissions;
+  
+  console.log('[CUSTOMER KB] Live permissions from server:', livePermissions);
+  console.log('[CUSTOMER KB] Tenant ID:', tenantId);
+  console.log('[CUSTOMER KB] Knowledge Base access:', permissions?.knowledgeBase);
 
-  // Fetch knowledge articles - only if user has permission
+  // Fetch knowledge articles - only if user has permission AND tenant permissions loaded
   const { data: articlesData, isLoading: articlesLoading, error } = useQuery({
     queryKey: ['/api/knowledge-articles', tenantId],
     queryFn: async () => {
-      const response = await fetch('/api/knowledge-articles');
-      if (!response.ok) throw new Error('Failed to fetch knowledge articles');
-      return await response.json();
+      console.log('[CUSTOMER KB] Fetching articles for tenant:', tenantId);
+      const response = await fetch(`/api/customer/knowledge-articles/${tenantId}`);
+      if (!response.ok) {
+        console.error('[CUSTOMER KB] Failed to fetch articles:', response.status);
+        throw new Error('Failed to fetch knowledge articles');
+      }
+      const data = await response.json();
+      console.log('[CUSTOMER KB] Articles received:', data?.length || 'unknown length');
+      return data;
     },
-    enabled: Boolean(permissions?.knowledgeBase),
+    enabled: Boolean(permissions?.knowledgeBase && !isTenantLoading && tenantId),
     staleTime: 300000, // 5 minutes
   });
 
@@ -110,7 +103,8 @@ export default function CustomerKnowledgeBase() {
   }
 
   // Check permission
-  if (!permissions?.knowledgeBase) {
+  if (!permissions?.knowledgeBase && !isTenantLoading) {
+    console.log('[CUSTOMER KB] Access denied - permissions:', permissions);
     return (
       <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Language Selector - Top Right */}
@@ -119,7 +113,7 @@ export default function CustomerKnowledgeBase() {
         </div>
         
         <CustomerNavigation 
-          permissions={permissions} 
+          permissions={permissions || { dashboard: true, regulatoryUpdates: false, knowledgeBase: false, newsletters: false, analytics: false, reports: false, dataCollection: false, globalSources: false, historicalData: false, administration: false, userManagement: false, systemSettings: false, auditLogs: false, aiInsights: false, advancedAnalytics: false }} 
           tenantName={liveTenantName || "Customer Portal"} 
         />
         
@@ -128,13 +122,16 @@ export default function CustomerKnowledgeBase() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5" />
-                {t('access.restricted')}
+                Zugriff eingeschränkt
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
                 Sie haben keine Berechtigung für den Zugriff auf die Wissensdatenbank. 
                 Kontaktieren Sie Ihren Administrator für weitere Informationen.
+              </p>
+              <p className="text-xs text-gray-400 mt-2">
+                Tenant: {tenantId} | Berechtigungen geladen: {permissions ? 'ja' : 'nein'}
               </p>
             </CardContent>
           </Card>
