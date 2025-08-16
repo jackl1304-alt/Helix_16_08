@@ -242,14 +242,62 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto relative" style={{ zIndex: 10 }}>
+      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+        {/* Debug Test Button */}
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="w-full justify-start mb-4 bg-red-50 border-red-200"
+          onClick={() => {
+            console.log('[DEBUG] Test button clicked!');
+            alert('Test button works!');
+          }}
+        >
+          🔴 TEST BUTTON - Click me!
+        </Button>
+        
         {allowedItems.length > 0 ? (
-          allowedItems.map(renderNavigationItem)
+          <div className="space-y-2">
+            <p className="text-xs text-gray-500 mb-2">Debug: {allowedItems.length} Navigation items:</p>
+            {allowedItems.map((item, index) => {
+              console.log('[DEBUG] Rendering navigation item:', item.name);
+              return (
+                <Button 
+                  key={`nav-${index}-${item.href}`}
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full justify-start mb-2 h-auto py-3"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('[CUSTOMER NAV] Button clicked:', item.name, item.href);
+                    alert(`Navigation clicked: ${item.name}`);
+                    const tenantUrl = buildTenantUrl(item.href);
+                    console.log('[CUSTOMER NAV] Navigating to:', tenantUrl);
+                    setLocation(tenantUrl);
+                  }}
+                >
+                  <item.icon className="w-4 h-4 mr-3 flex-shrink-0" />
+                  <div className="flex flex-col items-start text-left">
+                    <span className="font-medium">{item.name}</span>
+                    {item.description && (
+                      <span className="text-xs opacity-75 mt-0.5">
+                        {item.description}
+                      </span>
+                    )}
+                  </div>
+                </Button>
+              );
+            })}
+          </div>
         ) : (
           <div className="text-center py-8">
             <Shield className="w-12 h-12 mx-auto text-gray-400 mb-3" />
             <p className="text-sm text-gray-500">
               Keine Berechtigung für Navigation
+            </p>
+            <p className="text-xs text-gray-400 mt-2">
+              Debug: currentPermissions = {JSON.stringify(currentPermissions)}
             </p>
           </div>
         )}
