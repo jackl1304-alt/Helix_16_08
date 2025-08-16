@@ -59,84 +59,84 @@ interface NavigationItem {
 const ALL_NAVIGATION_ITEMS: NavigationItem[] = [
   {
     name: "Dashboard",
-    href: "/dashboard",
+    href: "dashboard",
     icon: LayoutDashboard,
     permission: "dashboard",
     description: "Übersicht und aktuelle Statistiken"
   },
   {
     name: "Regulatorische Updates",
-    href: "/regulatory-updates",
+    href: "regulatory-updates",
     icon: FileText,
     permission: "regulatoryUpdates",
     description: "Aktuelle regulatorische Änderungen"
   },
   {
     name: "Rechtsprechung",
-    href: "/legal-cases",
+    href: "legal-cases",
     icon: Scale,
     permission: "legalCases",
     description: "Rechtsprechung und Präzedenzfälle"
   },
   {
     name: "Wissensdatenbank",
-    href: "/knowledge-base",
+    href: "knowledge-base",
     icon: BookOpen,
     permission: "knowledgeBase",
     description: "Wissensdatenbank und Artikel"
   },
   {
     name: "Newsletter",
-    href: "/newsletters",
+    href: "newsletters",
     icon: Mail,
     permission: "newsletters",
     description: "Newsletter-Verwaltung"
   },
   {
     name: "Analytics",
-    href: "/analytics",
+    href: "analytics",
     icon: BarChart3,
     permission: "analytics",
     description: "Datenanalyse und Berichte"
   },
   {
     name: "Erweiterte Analytics", 
-    href: "/advanced-analytics",
+    href: "advanced-analytics",
     icon: Activity,
     permission: "advancedAnalytics",
     description: "Erweiterte Analysetools"
   },
   {
     name: "KI-Erkenntnisse",
-    href: "/ai-insights",
+    href: "ai-insights",
     icon: Brain,
     permission: "aiInsights",
     description: "KI-gestützte Erkenntnisse"
   },
   {
     name: "Globale Datenquellen",
-    href: "/global-sources",
+    href: "global-sources",
     icon: Globe,
     permission: "globalSources",
     description: "Globale Datenquellen"
   },
   {
     name: "Datensammlung",
-    href: "/data-collection", 
+    href: "data-collection", 
     icon: Database,
     permission: "dataCollection",
     description: "Datensammlung und -verwaltung"
   },
   {
     name: "Historische Daten",
-    href: "/historical-data",
+    href: "historical-data",
     icon: Clipboard,
     permission: "historicalData",
     description: "Historische Datenanalyse"
   },
   {
     name: "Einstellungen",
-    href: "/settings",
+    href: "settings",
     icon: Settings,
     permission: "systemSettings",
     description: "Kundeneinstellungen"
@@ -159,9 +159,11 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
   // Build tenant-specific URLs
   const buildTenantUrl = (path: string) => {
     if (params.tenantId) {
-      return `/tenant/${params.tenantId}${path}`;
+      // Ensure path starts with slash for proper URL construction
+      const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+      return `/tenant/${params.tenantId}${normalizedPath}`;
     }
-    return path;
+    return path.startsWith('/') ? path : `/${path}`;
   };
 
   // Polling für Live-Updates der Berechtigungen
