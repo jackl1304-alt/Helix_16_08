@@ -7,7 +7,6 @@ import tenantRoutes from "./routes/tenant-routes";
 import tenantAuthRoutes from "./routes/tenant-auth-simple";
 import tenantApiRoutes from "./routes/tenant-api";
 import aiSearchRoutes from "./routes/ai-search-routes";
-import apiRoutes from "./routes/api";
 import { tenantIsolationMiddleware } from "./middleware/tenant-isolation";
 import { setupVite, log } from "./vite";
 import fs from "fs";
@@ -91,9 +90,6 @@ app.use('/api/tenant', tenantApiRoutes);  // NEW real data API with database con
 
 // Register AI-powered search and analysis routes (Admin only)
 app.use('/api/ai', aiSearchRoutes);
-
-// Register new JSON API routes
-app.use('/api', apiRoutes);
 
 // Weitere Routen
 app.post("/api/webhook", (req: Request, res: Response) => {
