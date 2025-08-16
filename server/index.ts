@@ -168,9 +168,10 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 
 // Performance: Add security and optimization middleware
 app.use((req, res, next) => {
-  // Security headers (Replit-friendly)
+  // Security headers (Replit-friendly - Firefox embedding optimiert)
   res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'SAMEORIGIN'); // Allow embedding in Replit
+  // X-Frame-Options entfernt für besseres Firefox-Embedding in Replit
+  // res.setHeader('X-Frame-Options', 'SAMEORIGIN'); // Deaktiviert für Firefox-Kompatibilität
   res.setHeader('X-XSS-Protection', '1; mode=block');
   
   // Performance headers
