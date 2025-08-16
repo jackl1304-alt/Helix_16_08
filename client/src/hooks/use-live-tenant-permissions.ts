@@ -32,7 +32,7 @@ export function useLiveTenantPermissions({
   const [permissions, setPermissions] = useState<CustomerPermissions | null>(null);
   const [tenantName, setTenantName] = useState<string>('');
 
-  // Fetch tenant data with automatic polling
+  // Fetch tenant data ONCE - no polling to prevent spam
   const { data: tenantData, isLoading, error } = useQuery({
     queryKey: ['/api/customer/tenant', tenantId],
     queryFn: async () => {
@@ -42,7 +42,8 @@ export function useLiveTenantPermissions({
       }
       return await response.json();
     },
-    refetchInterval: pollInterval,
+    // REMOVED: refetchInterval to stop constant polling
+    staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: !!tenantId,
   });
 
