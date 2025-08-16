@@ -91,7 +91,7 @@ export default function Dashboard() {
     retry: 2,
   });
 
-  const { data: newsletterSources } = useQuery({
+  const { data: newsletterSources, isLoading: isLoadingNewsletterSources } = useQuery({
     queryKey: ['/api/newsletter-sources'],
   });
 
@@ -311,7 +311,12 @@ export default function Dashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {newsletterSources && Array.isArray(newsletterSources) ? (
+              {isLoadingNewsletterSources ? (
+                <div className="text-center py-8">
+                  <Mail className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-500">Newsletter-Quellen werden geladen...</p>
+                </div>
+              ) : newsletterSources && Array.isArray(newsletterSources) && newsletterSources.length > 0 ? (
                 <>
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
@@ -336,7 +341,7 @@ export default function Dashboard() {
                             {source.name}
                           </p>
                           <p className="text-xs text-gray-500 truncate">
-                            {source.description || source.endpoint}
+                            {source.description || source.sourceUrl}
                           </p>
                         </div>
                         <Badge variant="default" className="text-xs">
@@ -349,7 +354,7 @@ export default function Dashboard() {
               ) : (
                 <div className="text-center py-8">
                   <Mail className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">Newsletter-Quellen werden geladen...</p>
+                  <p className="text-gray-500">Keine Newsletter-Quellen verfügbar</p>
                 </div>
               )}
             </CardContent>
