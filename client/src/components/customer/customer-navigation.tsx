@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useParams } from "wouter";
 import { cn } from "@/lib/utils";
 import { useCustomerTheme } from "@/contexts/customer-theme-context";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import {
   LayoutDashboard,
   FileText,
