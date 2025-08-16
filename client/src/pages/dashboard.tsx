@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CustomCursor } from "@/components/ui/custom-cursor";
 import { DarkModeToggle } from "@/components/ui/dark-mode-toggle";
+import { AISearchPanel } from "@/components/admin/ai-search-panel";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { 
@@ -529,6 +530,11 @@ export default function Dashboard() {
         </Card>
 
 
+      </div>
+
+      {/* KI-Intelligence Panel */}
+      <div className="mb-8">
+        <AISearchPanel />
       </div>
 
       {/* 2025 TREND: Quick Actions with Modern Design */}
