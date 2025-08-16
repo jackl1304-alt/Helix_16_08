@@ -212,8 +212,59 @@ export const monitorMemoryUsage = () => {
 // Global Performance Monitor Instance
 export const performanceMonitor = new PerformanceMonitor();
 
+// Advanced Performance Utilities
+export const measureComponentRender = (componentName: string) => {
+  const start = performance.now();
+  return () => {
+    const end = performance.now();
+    console.log(`⚡ ${componentName} render: ${(end - start).toFixed(2)}ms`);
+  };
+};
+
+export const debounce = <T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): ((...args: Parameters<T>) => void) => {
+  let timeout: NodeJS.Timeout;
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+};
+
+export const throttle = <T extends (...args: any[]) => any>(
+  func: T,
+  limit: number
+): ((...args: Parameters<T>) => void) => {
+  let inThrottle: boolean;
+  return (...args: Parameters<T>) => {
+    if (!inThrottle) {
+      func(...args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+};
+
+// Intersection Observer for lazy loading optimization
+export const createIntersectionObserver = (
+  callback: IntersectionObserverCallback,
+  options?: IntersectionObserverInit
+) => {
+  if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+    return null;
+  }
+  
+  return new IntersectionObserver(callback, {
+    root: null,
+    rootMargin: '50px',
+    threshold: 0.1,
+    ...options
+  });
+};
+
 // Development-only Performance Logging
-if (import.meta.env.DEV) {
+if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
   window.addEventListener('load', () => {
     setTimeout(() => {
       performanceMonitor.logPerformanceReport();

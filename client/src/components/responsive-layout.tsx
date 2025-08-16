@@ -1,9 +1,11 @@
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import { useDevice, getDeviceClasses } from "@/hooks/use-device";
 import { AdminSidebarNew } from "@/components/layout/sidebar-new";
 import { MobileSidebar } from "@/components/layout/mobile-sidebar";
 import { cn } from "@/lib/utils";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { SidebarSkeleton } from "@/components/ui/skeleton";
+import { useRenderPerformance } from "@/hooks/use-performance";
 
 interface ResponsiveLayoutProps {
   children: ReactNode;
@@ -12,22 +14,27 @@ interface ResponsiveLayoutProps {
 
 export function ResponsiveLayout({ children, showSidebar = true }: ResponsiveLayoutProps) {
   const device = useDevice();
+  useRenderPerformance('ResponsiveLayout');
 
   return (
     <div className={cn(
-      "min-h-screen bg-gray-50 dark:bg-gray-900",
+      "min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200",
       getDeviceClasses(device)
     )}>
       {showSidebar && (
         <>
           {/* Desktop Sidebar - only show on screens larger than 1024px */}
           <div className="hidden lg:block">
-            <AdminSidebarNew />
+            <Suspense fallback={<SidebarSkeleton />}>
+              <AdminSidebarNew />
+            </Suspense>
           </div>
           
           {/* Mobile/Tablet Sidebar - show on screens smaller than 1024px */}
           <div className="lg:hidden">
-            <MobileSidebar />
+            <Suspense fallback={<div className="h-16 bg-background border-b animate-pulse" />}>
+              <MobileSidebar />
+            </Suspense>
           </div>
         </>
       )}
@@ -38,13 +45,16 @@ export function ResponsiveLayout({ children, showSidebar = true }: ResponsiveLay
       </div>
       
       {/* Main Content */}
-      <div className={cn(
-        "flex-1 transition-all duration-300",
+      <main className={cn(
+        "flex-1 transition-all duration-300 animate-fade-in-up",
         showSidebar && "lg:ml-64", // Only apply left margin on large screens
-        "px-4 py-2 md:px-6 md:py-4 lg:px-8 lg:py-6" // Responsive padding
+        "px-4 py-2 md:px-6 md:py-4 lg:px-8 lg:py-6", // Responsive padding
+        "min-h-screen overflow-hidden" // Performance: Enable GPU acceleration
       )}>
-        {children}
-      </div>
+        <div className="contain-layout">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }
