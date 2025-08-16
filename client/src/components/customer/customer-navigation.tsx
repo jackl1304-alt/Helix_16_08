@@ -211,11 +211,13 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
         key={item.href}
         onClick={handleClick}
         className={cn(
-          "w-full flex items-center justify-start px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer group",
+          "w-full flex items-center justify-start px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer group relative",
+          "pointer-events-auto hover:shadow-sm active:scale-95",
           isActive
             ? "bg-blue-600 text-white shadow-md"
             : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
         )}
+        style={{ zIndex: 10 }}
       >
         <IconComponent className={cn(
           "mr-3 h-5 w-5 flex-shrink-0 transition-colors",
@@ -237,7 +239,7 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
   };
 
   return (
-    <div className="fixed left-0 top-0 h-screen w-64 flex flex-col bg-white border-r border-gray-200 shadow-lg z-50">
+    <div className="fixed left-0 top-0 h-screen w-64 flex flex-col bg-white border-r border-gray-200 shadow-lg z-40">
       {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
@@ -254,7 +256,7 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto relative" style={{ zIndex: 10 }}>
         {allowedItems.length > 0 ? (
           allowedItems.map(renderNavigationItem)
         ) : (
