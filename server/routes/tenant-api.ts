@@ -101,9 +101,9 @@ router.get('/regulatory-updates', async (req, res) => {
     let updates;
     try {
       const allUpdates = await sql`
-        SELECT id, title, source, date_published, region, category, content, url, summary
+        SELECT id, title, description, source_id, source_url, region, update_type, published_at, categories
         FROM regulatory_updates
-        ORDER BY date_published DESC
+        ORDER BY published_at DESC
         LIMIT 50
       `;
 
@@ -112,14 +112,14 @@ router.get('/regulatory-updates', async (req, res) => {
         updates = allUpdates.slice(0, 20).map(update => ({
           id: update.id,
           title: update.title,
-          agency: update.source,
+          agency: update.source_id,
           region: update.region,
-          date: update.date_published,
-          type: update.category?.toLowerCase() || 'regulatory',
-          summary: update.summary || (update.content ? update.content.substring(0, 150) + '...' : 'No summary available'),
-          impact: getImpactLevel(update.category),
-          category: update.category,
-          url: update.url
+          date: update.published_at,
+          type: update.update_type?.toLowerCase() || 'regulatory',
+          summary: update.description || 'No summary available',
+          impact: getImpactLevel(update.update_type),
+          category: update.update_type,
+          url: update.source_url
         }));
         
         console.log('[TENANT] Returning real database updates:', updates.length);
