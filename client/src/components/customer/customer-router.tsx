@@ -84,6 +84,8 @@ export default function CustomerRouter() {
         case "knowledge-base":
           return <CustomerKnowledgeBase />;
         case "newsletters":
+        case "newsletter-verwaltung":
+        case "newsletter-management":
           return <CustomerNewsletters />;
         case "analytics":
           return <CustomerAnalytics />;
@@ -117,6 +119,8 @@ export default function CustomerRouter() {
       case "/customer/knowledge-base":
         return <CustomerKnowledgeBase />;
       case "/customer/newsletters":
+      case "/customer/newsletter-verwaltung":
+      case "/customer/newsletter-management":
         return <CustomerNewsletters />;
       case "/customer/analytics":
         return <CustomerAnalytics />;
