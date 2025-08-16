@@ -9,6 +9,7 @@ import { performanceMonitor, preloadCriticalResources } from "@/utils/performanc
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { CustomerThemeProvider } from "@/contexts/customer-theme-context";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { DashboardProvider } from "@/contexts/DashboardContext";
 import { useAuth } from "@/hooks/use-auth";
 import Login from "@/pages/login";
 
@@ -108,10 +109,12 @@ function App() {
       <ErrorBoundary>
         <LanguageProvider>
           <QueryClientProvider client={queryClient}>
-            <TooltipProvider>
-              <Toaster />
-              <Login />
-            </TooltipProvider>
+            <DashboardProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Login />
+              </TooltipProvider>
+            </DashboardProvider>
           </QueryClientProvider>
         </LanguageProvider>
       </ErrorBoundary>
@@ -122,8 +125,9 @@ function App() {
     <ErrorBoundary>
       <LanguageProvider>
         <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Toaster />
+          <DashboardProvider>
+            <TooltipProvider>
+              <Toaster />
             <Switch>
               {/* Customer Portal - Multi-Tenant */}
               <Route path="/customer-dashboard">
@@ -172,6 +176,7 @@ function App() {
               </Route>
             </Switch>
           </TooltipProvider>
+          </DashboardProvider>
         </QueryClientProvider>
       </LanguageProvider>
     </ErrorBoundary>

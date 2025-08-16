@@ -6,7 +6,8 @@ import { Progress } from "@/components/ui/progress";
 import { NavigationHeader } from "@/components/ui/navigation-header";
 import { ResponsiveLayout } from "@/components/responsive-layout";
 import { AISearchPanel } from "@/components/admin/ai-search-panel";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useDashboardStats } from "@/contexts/DashboardContext";
 import { useLocation } from "wouter";
 import { 
   FileText, 
@@ -41,33 +42,8 @@ export default function Dashboard() {
   const { toast } = useToast();
   const { t } = useLanguage();
   
-  const { data: stats, isLoading, error: statsError } = useQuery({
-    queryKey: ['/api/dashboard/stats'],
-    queryFn: async () => {
-      console.log('[QUERY] Fetching dashboard stats...');
-      const response = await fetch('/api/dashboard/stats', {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        console.error('[QUERY] Response not ok:', response.status, response.statusText);
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      console.log('[QUERY] Stats received:', data);
-      return data;
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes - drastically reduced calls
-    gcTime: 10 * 60 * 1000, // 10 minutes cache
-    refetchOnMount: false, // Don't refetch on every mount
-    refetchOnWindowFocus: false, // Don't refetch on focus
-    retry: 1, // Reduce retries
-  });
+  // FIXED: Zentrale State Management - KEINE DOPPELTEN API CALLS
+  const { stats, isLoading, error: statsError } = useDashboardStats();
 
   const { data: recentUpdates, error: updatesError } = useQuery({
     queryKey: ['/api/regulatory-updates'],
