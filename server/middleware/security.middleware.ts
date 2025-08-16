@@ -63,7 +63,7 @@ export const rateLimiter = (maxRequests = 100, windowMs = 15 * 60 * 1000) => {
 export const securityHeaders = (req: Request, res: Response, next: NextFunction) => {
   res.set({
     'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
+    // 'X-Frame-Options': 'DENY', // Entfernt für Firefox-Embedding in Replit
     'X-XSS-Protection': '1; mode=block',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
