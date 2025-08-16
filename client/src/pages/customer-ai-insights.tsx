@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useParams } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import CustomerNavigation from "@/components/customer/customer-navigation";
-import { useCustomerTheme } from "@/contexts/customer-theme-context";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { useLiveTenantPermissions } from "@/hooks/use-live-tenant-permissions";
 import { 
   Brain,
   TrendingUp,

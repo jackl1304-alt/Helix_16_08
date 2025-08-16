@@ -214,7 +214,18 @@ const translations = {
     'auth.login': 'Anmelden',
     'auth.email': 'E-Mail',
     'auth.password': 'Passwort',
-    'auth.demo': 'Demo-Zugang'
+    'auth.demo': 'Demo-Zugang',
+    
+    // Access Control
+    'access.restricted': 'Zugriff beschränkt',
+    'access.noPermission': 'Keine Berechtigung',
+    'access.contactAdmin': 'Kontaktieren Sie Ihren Administrator',
+    
+    // Customer Portal
+    'customer.dashboard': 'Kunden-Dashboard',
+    'customer.portal': 'Kundenportal',
+    'customer.logout': 'Abmelden',
+    'customer.chat': 'Support Chat'
   },
   en: {
     // Navigation
@@ -419,7 +430,18 @@ const translations = {
     'auth.login': 'Login',
     'auth.email': 'Email',
     'auth.password': 'Password',
-    'auth.demo': 'Demo Access'
+    'auth.demo': 'Demo Access',
+    
+    // Access Control
+    'access.restricted': 'Access Restricted',
+    'access.noPermission': 'No Permission',
+    'access.contactAdmin': 'Contact your administrator',
+    
+    // Customer Portal
+    'customer.dashboard': 'Customer Dashboard',
+    'customer.portal': 'Customer Portal',
+    'customer.logout': 'Logout',
+    'customer.chat': 'Support Chat'
   }
 };
 

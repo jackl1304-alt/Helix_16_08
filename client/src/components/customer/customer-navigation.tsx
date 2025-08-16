@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useParams } from "wouter";
 import { cn } from "@/lib/utils";
-import { useCustomerTheme } from "@/contexts/customer-theme-context";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
   FileText,
@@ -20,7 +20,9 @@ import {
   Shield,
   Clipboard,
   Search,
-  Brain
+  Brain,
+  LogOut,
+  MessageCircle
 } from "lucide-react";
 
 // Customer permissions interface
@@ -52,7 +54,7 @@ interface NavigationItem {
   description?: string;
 }
 
-// All possible navigation items
+// All possible navigation items with German names
 const ALL_NAVIGATION_ITEMS: NavigationItem[] = [
   {
     name: "Dashboard",
@@ -62,21 +64,21 @@ const ALL_NAVIGATION_ITEMS: NavigationItem[] = [
     description: "Übersicht und aktuelle Statistiken"
   },
   {
-    name: "Regulatory Updates",
+    name: "Regulatorische Updates",
     href: "/regulatory-updates",
     icon: FileText,
     permission: "regulatoryUpdates",
     description: "Aktuelle regulatorische Änderungen"
   },
   {
-    name: "Legal Cases",
+    name: "Rechtsprechung",
     href: "/legal-cases",
     icon: Scale,
     permission: "legalCases",
     description: "Rechtsprechung und Präzedenzfälle"
   },
   {
-    name: "Knowledge Base",
+    name: "Wissensdatenbank",
     href: "/knowledge-base",
     icon: BookOpen,
     permission: "knowledgeBase",
@@ -97,42 +99,42 @@ const ALL_NAVIGATION_ITEMS: NavigationItem[] = [
     description: "Datenanalyse und Berichte"
   },
   {
-    name: "Advanced Analytics", 
+    name: "Erweiterte Analytics", 
     href: "/advanced-analytics",
     icon: Activity,
     permission: "advancedAnalytics",
     description: "Erweiterte Analysetools"
   },
   {
-    name: "AI Insights",
+    name: "KI-Erkenntnisse",
     href: "/ai-insights",
     icon: Brain,
     permission: "aiInsights",
     description: "KI-gestützte Erkenntnisse"
   },
   {
-    name: "Global Sources",
+    name: "Globale Datenquellen",
     href: "/global-sources",
     icon: Globe,
     permission: "globalSources",
     description: "Globale Datenquellen"
   },
   {
-    name: "Data Collection",
+    name: "Datensammlung",
     href: "/data-collection", 
     icon: Database,
     permission: "dataCollection",
     description: "Datensammlung und -verwaltung"
   },
   {
-    name: "Historical Data",
+    name: "Historische Daten",
     href: "/historical-data",
     icon: Clipboard,
     permission: "historicalData",
     description: "Historische Datenanalyse"
   },
   {
-    name: "Settings",
+    name: "Einstellungen",
     href: "/settings",
     icon: Settings,
     permission: "systemSettings",
@@ -259,9 +261,27 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
         )}
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-gray-200 bg-gray-50">
-        <p className="text-xs text-gray-500 text-center">
+      {/* Footer with Logout and Chat */}
+      <div className="p-4 border-t border-gray-200 bg-gray-50 space-y-2">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="w-full" 
+          onClick={() => window.open('/chat-support', '_blank')}
+        >
+          <MessageCircle className="w-4 h-4 mr-2" />
+          Support Chat
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="w-full text-red-600 hover:text-red-700 hover:bg-red-50" 
+          onClick={() => window.location.href = '/login'}
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Abmelden
+        </Button>
+        <p className="text-xs text-gray-500 text-center mt-2">
           Powered by Helix Platform
         </p>
       </div>

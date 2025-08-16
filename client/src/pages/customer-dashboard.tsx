@@ -31,7 +31,9 @@ import {
   Target,
   ArrowUp,
   ArrowDown,
-  Minus
+  Minus,
+  LogOut,
+  MessageCircle
 } from "lucide-react";
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -255,7 +257,7 @@ export default function CustomerDashboard() {
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            Customer Dashboard
+            Kunden-Dashboard
           </h1>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
@@ -287,12 +289,20 @@ export default function CustomerDashboard() {
             </SelectContent>
           </Select>
           <Button variant="outline">
+            <MessageCircle className="w-4 h-4 mr-2" />
+            Support Chat
+          </Button>
+          <Button variant="outline">
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
           <Button>
             <Settings className="w-4 h-4 mr-2" />
             Einstellungen
+          </Button>
+          <Button variant="outline" onClick={() => window.location.href = '/login'}>
+            <LogOut className="w-4 h-4 mr-2" />
+            Abmelden
           </Button>
         </div>
       </div>
