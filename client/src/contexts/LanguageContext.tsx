@@ -207,7 +207,14 @@ const translations = {
     'professional.api': 'API Access',
     'enterprise.unlimited': 'Unbegrenzte Zugriffe',
     'enterprise.dedicated': 'Dedicated Account Manager',
-    'enterprise.custom': 'Custom Integrations'
+    'enterprise.custom': 'Custom Integrations',
+    
+    // Authentication
+    'auth.loginFailed': 'Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.',
+    'auth.login': 'Anmelden',
+    'auth.email': 'E-Mail',
+    'auth.password': 'Passwort',
+    'auth.demo': 'Demo-Zugang'
   },
   en: {
     // Navigation
@@ -405,7 +412,14 @@ const translations = {
     'professional.api': 'API Access',
     'enterprise.unlimited': 'Unlimited Access',
     'enterprise.dedicated': 'Dedicated Account Manager',
-    'enterprise.custom': 'Custom Integrations'
+    'enterprise.custom': 'Custom Integrations',
+    
+    // Authentication
+    'auth.loginFailed': 'Login failed. Please try again.',
+    'auth.login': 'Login',
+    'auth.email': 'Email',
+    'auth.password': 'Password',
+    'auth.demo': 'Demo Access'
   }
 };
 
