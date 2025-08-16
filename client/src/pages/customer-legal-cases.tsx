@@ -53,7 +53,7 @@ export default function CustomerLegalCases() {
     isLoading: isTenantLoading 
   } = useLiveTenantPermissions({ 
     tenantId,
-    pollInterval: 3000
+    // No pollInterval to prevent aggressive API calls
   });
 
   // Use live permissions with fallback
