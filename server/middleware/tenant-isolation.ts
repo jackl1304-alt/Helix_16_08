@@ -1,6 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
 import { neon } from "@neondatabase/serverless";
 
+// Extend Express session interface
+declare module 'express-session' {
+  interface SessionData {
+    user?: {
+      id: string;
+      tenantId: string;
+      email: string;
+      name: string;
+      role: 'tenant_admin' | 'tenant_user' | 'super_admin';
+    };
+  }
+}
+
 const sql = neon(process.env.DATABASE_URL!);
 
 // Extended Request interface for tenant context
@@ -113,7 +126,7 @@ export class TenantAwareStorage {
 
   async query(queryTemplate: any, params: any[] = []) {
     // Add tenant filter to all queries
-    return sql.query(queryTemplate, [this.tenantId, ...params]);
+    return sql(queryTemplate, [this.tenantId, ...params]);
   }
 
   async getDashboardStats() {
