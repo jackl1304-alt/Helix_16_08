@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
+import { Router, Route, Switch } from "wouter";
+import { ResponsiveLayout } from "@/components/responsive-layout";
+import { useAuth } from "@/hooks/use-auth";
 import Login from "@/pages/login";
 
 // Direct imports - no lazy loading to eliminate Suspense issues
@@ -9,75 +12,12 @@ import Dashboard from "@/pages/dashboard";
 import RegulatoryUpdates from "@/pages/regulatory-updates";
 import NotFound from "@/pages/not-found";
 
-// JSON-based Navigation State
-interface AppState {
-  currentPage: string;
-  userData: any;
-  isLoading: boolean;
-}
-
-// Simple page renderer without complex routing
-function renderCurrentPage(page: string, userData: any) {
-  switch (page) {
-    case '/':
-    case '/dashboard':
-      return <Dashboard />;
-    case '/regulatory-updates':
-      return <RegulatoryUpdates />;
-    case '/404':
-    default:
-      return <NotFound />;
-  }
-}
-
-// JSON-based Simple App without React Suspense issues
+// Hauptkomponente mit wouter-Routing
 function App() {
-  const [appState, setAppState] = useState<AppState>({
-    currentPage: window.location.pathname,
-    userData: null,
-    isLoading: true
-  });
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
-  // Initialize app with JSON data
-  useEffect(() => {
-    const initializeApp = async () => {
-      try {
-        // Check authentication
-        const authStatus = localStorage.getItem('isAuthenticated') === 'true';
-        setIsAuthenticated(authStatus);
-        
-        // Load user data from JSON endpoint if authenticated
-        if (authStatus) {
-          const userData = await fetch('/api/user/profile')
-            .then(res => res.ok ? res.json() : null)
-            .catch(() => null);
-          
-          setAppState(prev => ({
-            ...prev,
-            userData,
-            isLoading: false
-          }));
-        } else {
-          setAppState(prev => ({ ...prev, isLoading: false }));
-        }
-      } catch (error) {
-        console.error('App initialization error:', error);
-        setAppState(prev => ({ ...prev, isLoading: false }));
-      }
-    };
-
-    initializeApp();
-  }, []);
-
-  // Handle navigation via JSON state
-  const handleNavigation = (page: string) => {
-    setAppState(prev => ({ ...prev, currentPage: page }));
-    window.history.pushState({}, '', page);
-  };
+  const { isAuthenticated, isLoading, login } = useAuth();
 
   // Loading state
-  if (appState.isLoading || isAuthenticated === null) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
@@ -94,48 +34,33 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <div className="min-h-screen bg-gray-50">
           <Toaster />
-          <Login onLogin={() => setIsAuthenticated(true)} />
+          <Login onLogin={login} />
         </div>
       </QueryClientProvider>
     );
   }
 
-  // Main app with JSON-based navigation
+  // Main app with proper wouter routing
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-gray-50">
-        <Toaster />
-        {renderCurrentPage(appState.currentPage, appState.userData)}
-      </div>
+      <Router>
+        <ResponsiveLayout>
+          <Toaster />
+          <Switch>
+            <Route path="/" component={Dashboard} />
+            <Route path="/dashboard" component={Dashboard} />
+            <Route path="/regulatory-updates" component={RegulatoryUpdates} />
+            <Route path="/analytics" component={NotFound} />
+            <Route path="/data-collection" component={NotFound} />
+            <Route path="/knowledge-base" component={NotFound} />
+            <Route path="/user-management" component={NotFound} />
+            <Route path="/system-settings" component={NotFound} />
+            <Route component={NotFound} />
+          </Switch>
+        </ResponsiveLayout>
+      </Router>
     </QueryClientProvider>
   );
 }
 
 export default App;
-
-// JSON API helper functions
-export const jsonApi = {
-  get: async (endpoint: string) => {
-    try {
-      const response = await fetch(endpoint);
-      return response.ok ? await response.json() : null;
-    } catch (error) {
-      console.error('JSON API GET error:', error);
-      return null;
-    }
-  },
-  
-  post: async (endpoint: string, data: any) => {
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      return response.ok ? await response.json() : null;
-    } catch (error) {
-      console.error('JSON API POST error:', error);
-      return null;
-    }
-  }
-};
