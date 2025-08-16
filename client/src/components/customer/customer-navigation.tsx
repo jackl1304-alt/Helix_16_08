@@ -195,46 +195,32 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
     const isActive = location === tenantUrl || location === item.href;
     const IconComponent = item.icon;
     
-    // Debug logging for navigation
-    const handleClick = () => {
-      console.log('[CUSTOMER NAV] Clicking navigation item:', {
-        itemHref: item.href,
-        tenantUrl,
-        tenantId: params.tenantId,
-        currentLocation: location
-      });
-      setLocation(tenantUrl);
-    };
-    
     return (
-      <button
+      <Button 
         key={item.href}
-        onClick={handleClick}
+        variant="outline" 
+        size="sm" 
         className={cn(
-          "w-full flex items-center justify-start px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer group relative",
-          "pointer-events-auto hover:shadow-sm active:scale-95",
+          "w-full justify-start mb-2 h-auto py-3",
           isActive
-            ? "bg-blue-600 text-white shadow-md"
-            : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+            ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
+            : "hover:bg-blue-50 hover:text-blue-700"
         )}
-        style={{ zIndex: 10 }}
+        onClick={() => {
+          console.log('[CUSTOMER NAV] Navigating to:', tenantUrl);
+          setLocation(tenantUrl);
+        }}
       >
-        <IconComponent className={cn(
-          "mr-3 h-5 w-5 flex-shrink-0 transition-colors",
-          isActive ? "text-white" : "text-gray-500 group-hover:text-blue-600"
-        )} />
-        <div className="flex flex-col">
-          <span className="text-left font-medium">{item.name}</span>
+        <IconComponent className="w-4 h-4 mr-3 flex-shrink-0" />
+        <div className="flex flex-col items-start text-left">
+          <span className="font-medium">{item.name}</span>
           {item.description && (
-            <span className={cn(
-              "text-xs text-left mt-0.5",
-              isActive ? "text-blue-100" : "text-gray-500"
-            )}>
+            <span className="text-xs opacity-75 mt-0.5">
               {item.description}
             </span>
           )}
         </div>
-      </button>
+      </Button>
     );
   };
 
