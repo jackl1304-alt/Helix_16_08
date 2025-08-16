@@ -20,14 +20,14 @@ export default function CustomerRegulatoryUpdates() {
   // Use tenant ID from URL if available, otherwise use mock ID
   const tenantId = params.tenantId || mockTenantId;
 
-  // Use live tenant permissions hook WITHOUT aggressive polling
+  // Use live tenant permissions hook for real-time updates
   const { 
     permissions: livePermissions, 
     tenantName, 
     isLoading: isTenantLoading 
   } = useLiveTenantPermissions({ 
-    tenantId
-    // No pollInterval to prevent constant API calls
+    tenantId,
+    pollInterval: 3000 // Poll alle 3 Sekunden für schnelle Updates
   });
 
   // Use live permissions with fallback

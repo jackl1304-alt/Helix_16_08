@@ -6,8 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { NavigationHeader } from "@/components/ui/navigation-header";
 import { ResponsiveLayout } from "@/components/responsive-layout";
 import { AISearchPanel } from "@/components/admin/ai-search-panel";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useDashboardStats } from "@/contexts/DashboardContext";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { 
   FileText, 
@@ -42,8 +41,32 @@ export default function Dashboard() {
   const { toast } = useToast();
   const { t } = useLanguage();
   
-  // FIXED: Zentrale State Management - KEINE DOPPELTEN API CALLS
-  const { stats, isLoading, error: statsError } = useDashboardStats();
+  const { data: stats, isLoading, error: statsError } = useQuery({
+    queryKey: ['/api/dashboard/stats'],
+    queryFn: async () => {
+      console.log('[QUERY] Fetching dashboard stats...');
+      const response = await fetch('/api/dashboard/stats', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        console.error('[QUERY] Response not ok:', response.status, response.statusText);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('[QUERY] Stats received:', data);
+      return data;
+    },
+    staleTime: 10000,
+    gcTime: 30000,
+    refetchOnMount: true,
+    retry: 2,
+  });
 
   const { data: recentUpdates, error: updatesError } = useQuery({
     queryKey: ['/api/regulatory-updates'],
@@ -66,11 +89,9 @@ export default function Dashboard() {
       console.log('[ADMIN] Updates received:', data?.length || 0);
       return data;
     },
-    staleTime: 10 * 60 * 1000, // 10 minutes - much longer
-    gcTime: 20 * 60 * 1000, // 20 minutes cache
-    refetchOnMount: false, // Don't refetch on mount
-    refetchOnWindowFocus: false, // Don't refetch on focus
-    retry: 1, // Reduce retries
+    staleTime: 30000,
+    gcTime: 60000,
+    retry: 2,
   });
 
   // Hard-coded newsletter sources for testing - bypassing all fetching issues

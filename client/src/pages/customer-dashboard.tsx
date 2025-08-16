@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams, useLocation } from "wouter";
+import { useParams } from "wouter";
 import { useLiveTenantPermissions } from "@/hooks/use-live-tenant-permissions";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -67,9 +67,7 @@ const regionDistribution = [
 export default function CustomerDashboard() {
   const [selectedTimeRange, setSelectedTimeRange] = useState('30d');
   const params = useParams();
-  const [location, setLocation] = useLocation();
   const { logout } = useAuth();
-  const { t } = useLanguage();
   
   // Use tenant ID from URL if available, otherwise use mock ID
   const tenantId = params.tenantId || mockTenantId;
@@ -80,8 +78,8 @@ export default function CustomerDashboard() {
     tenantName: liveTenantName, 
     isLoading: isTenantLoading 
   } = useLiveTenantPermissions({ 
-    tenantId
-    // No pollInterval to prevent aggressive polling and get correct permissions
+    tenantId,
+    pollInterval: 3000 // Poll alle 3 Sekunden für schnelle Updates
   });
   
   // Use live permissions with fallback
@@ -238,6 +236,8 @@ export default function CustomerDashboard() {
       </div>
     );
   }
+
+  const { t } = useLanguage();
   
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 relative">
@@ -278,7 +278,7 @@ export default function CustomerDashboard() {
             </Badge>
           </div>
         </div>
-        <div className="flex gap-3 items-center" style={{ zIndex: 50, position: 'relative' }}>
+        <div className="flex gap-3">
           <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
             <SelectTrigger className="w-32">
               <SelectValue />
@@ -290,68 +290,22 @@ export default function CustomerDashboard() {
               <SelectItem value="12m">12 Monate</SelectItem>
             </SelectContent>
           </Select>
-          <Button 
-            variant="outline"
-            className="relative z-50"
-            style={{ pointerEvents: 'all' }}
-            onClick={(e) => {
-              e.stopPropagation();
-              const tenantId = params.tenantId || '030d3e01-32c4-4f95-8d54-98be948e8d4b';
-              const chatUrl = `/tenant/${tenantId}/chat-support`;
-              setLocation(chatUrl);
-            }}
-            data-testid="button-customer-chat"
-          >
+          <Button variant="outline">
             <MessageCircle className="w-4 h-4 mr-2" />
             Support Chat
           </Button>
-          <Button 
-            variant="outline"
-            className="relative z-50"
-            style={{ pointerEvents: 'all' }}
-            onClick={(e) => {
-              e.stopPropagation();
-              // Export dashboard data as PDF
-              const exportData = {
-                tenant: liveTenantName || 'MedTech Solutions GmbH',
-                date: new Date().toLocaleDateString('de-DE'),
-                usage: dashboardData?.usage,
-                compliance: dashboardData?.dashboard?.compliance
-              };
-              console.log('Exporting dashboard data:', exportData);
-              // TODO: Implement PDF export functionality
-              alert('Export-Funktion wird implementiert...');
-            }}
-            data-testid="button-customer-export"
-          >
+          <Button variant="outline">
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
-          <Button
-            className="relative z-50"
-            style={{ pointerEvents: 'all' }}
-            onClick={(e) => {
-              e.stopPropagation();
-              const tenantId = params.tenantId || '030d3e01-32c4-4f95-8d54-98be948e8d4b';
-              const settingsUrl = `/tenant/${tenantId}/settings`;
-              setLocation(settingsUrl);
-            }}
-            data-testid="button-customer-settings"
-          >
+          <Button>
             <Settings className="w-4 h-4 mr-2" />
             Einstellungen
           </Button>
-          <Button 
-            variant="outline" 
-            className="relative z-50"
-            style={{ pointerEvents: 'all' }}
-            onClick={(e) => {
-              e.stopPropagation();
-              logout();
-              setLocation('/login');
-            }}
-            data-testid="button-customer-logout"
-          >
+          <Button variant="outline" onClick={() => {
+            logout();
+            window.location.reload();
+          }}>
             <LogOut className="w-4 h-4 mr-2" />
             Abmelden
           </Button>
