@@ -66,6 +66,10 @@ const TerminologyGlossary = lazy(() => import("@/pages/terminology-glossary"));
 const AdminGlossary = lazy(() => import("@/pages/admin-glossary"));
 const GRIPIntegration = lazy(() => import("@/pages/grip-integration"));
 
+// Multi-Tenant Components
+const TenantDashboard = lazy(() => import("@/pages/tenant-dashboard"));
+const TenantAuth = lazy(() => import("@/pages/tenant-auth"));
+
 // Loading fallback component
 const LoadingFallback = () => (
   <div className="flex items-center justify-center min-h-screen">
@@ -121,6 +125,11 @@ function Router() {
         <Route path="/tenant-onboarding" component={TenantOnboarding} />
         <Route path="/email-management" component={EmailManagement} />
         <Route path="/documents/:sourceType/:documentId" component={DocumentViewer} />
+        
+        {/* Tenant Routes - Isolated Dashboard Access */}
+        <Route path="/tenant/auth" component={TenantAuth} />
+        <Route path="/tenant/dashboard" component={TenantDashboard} />
+        <Route path="/tenant/*" component={TenantDashboard} />
         
         {/* Fallback to 404 */}
         <Route component={NotFound} />

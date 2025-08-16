@@ -3,6 +3,9 @@ import { createServer } from "http";
 import cors from "cors";
 import { registerRoutes } from "./routes";
 import { setupCustomerAIRoutes } from "./temp-ai-routes";
+import tenantRoutes from "./routes/tenant-routes";
+import authRoutes from "./routes/auth-routes";
+import { tenantIsolationMiddleware } from "./middleware/tenant-isolation";
 import { setupVite, log } from "./vite";
 import fs from "fs";
 import path from "path";
@@ -24,6 +27,10 @@ app.use(cors({ origin: "*" }));
 // Body-Parser
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: false, limit: "50mb" }));
+
+// Multi-Tenant Isolation Middleware
+app.use('/api/tenant', tenantIsolationMiddleware);
+app.use('/tenant', tenantIsolationMiddleware);
 
 // Simple Perplexity-Client
 async function perplexityChat(prompt: string, model = "sonar"): Promise<string> {
@@ -69,6 +76,10 @@ registerRoutes(app);
 
 // Setup customer AI routes  
 setupCustomerAIRoutes(app);
+
+// Register tenant-specific routes
+app.use('/api/tenant', tenantRoutes);
+app.use('/api/tenant/auth', authRoutes);
 
 // Weitere Routen
 app.post("/api/webhook", (req: Request, res: Response) => {

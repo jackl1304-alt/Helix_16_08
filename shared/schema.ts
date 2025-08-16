@@ -17,12 +17,34 @@ import { z } from "zod";
 export const statusEnum = pgEnum("status", ["active", "inactive", "pending", "archived"]);
 export const updateTypeEnum = pgEnum("update_type", ["regulation", "guidance", "standard", "approval", "alert"]);
 
-// Users table for authentication and management
+// Tenants table for multi-tenant isolation
+export const tenants = pgTable("tenants", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  subdomain: varchar("subdomain").unique().notNull(),
+  customDomain: varchar("custom_domain"),
+  logo: varchar("logo"),
+  colorScheme: varchar("color_scheme").default("blue"), // blue, purple, green
+  settings: jsonb("settings"),
+  subscriptionTier: varchar("subscription_tier").default("standard"), // standard, premium, enterprise
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_tenants_subdomain").on(table.subdomain),
+  index("idx_tenants_active").on(table.isActive),
+]);
+
+// User roles enum with strict tenant isolation
+export const userRoleEnum = pgEnum("user_role", ["tenant_admin", "tenant_user", "super_admin"]);
+
+// Users table for authentication and management with tenant isolation
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: varchar("email").unique().notNull(),
+  tenantId: varchar("tenant_id").references(() => tenants.id, { onDelete: "cascade" }),
+  email: varchar("email").notNull(),
   name: varchar("name"),
-  role: varchar("role").default("user"),
+  role: userRoleEnum("role").default("tenant_user"),
   passwordHash: varchar("password_hash"),
   isActive: boolean("is_active").default(true),
   lastLogin: timestamp("last_login"),
@@ -30,7 +52,8 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
-  index("idx_users_email").on(table.email),
+  index("idx_users_email_tenant").on(table.email, table.tenantId),
+  index("idx_users_tenant").on(table.tenantId),
 ]);
 
 // Sessions table for authentication
@@ -69,9 +92,10 @@ export const dataSources = pgTable("data_sources", {
   index("idx_data_sources_active").on(table.isActive),
 ]);
 
-// Regulatory updates table
+// Regulatory updates table with tenant isolation
 export const regulatoryUpdates = pgTable("regulatory_updates", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").references(() => tenants.id, { onDelete: "cascade" }),
   sourceId: varchar("source_id").references(() => dataSources.id),
   title: text("title").notNull(),
   description: text("description"),
@@ -95,15 +119,17 @@ export const regulatoryUpdates = pgTable("regulatory_updates", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
+  index("idx_regulatory_updates_tenant").on(table.tenantId),
   index("idx_regulatory_updates_source").on(table.sourceId),
   index("idx_regulatory_updates_type").on(table.type),
   index("idx_regulatory_updates_published").on(table.publishedDate),
   index("idx_regulatory_updates_priority").on(table.priority),
 ]);
 
-// Legal cases table - FIXED: Match actual database structure
+// Legal cases table with tenant isolation
 export const legalCases = pgTable("legal_cases", {
   id: text("id").primaryKey(),
+  tenantId: varchar("tenant_id").references(() => tenants.id, { onDelete: "cascade" }),
   caseNumber: text("case_number"),
   title: text("title").notNull(),
   court: text("court").notNull(),
@@ -119,6 +145,7 @@ export const legalCases = pgTable("legal_cases", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
+  index("idx_legal_cases_tenant").on(table.tenantId),
   index("idx_legal_cases_jurisdiction").on(table.jurisdiction),
   index("idx_legal_cases_court").on(table.court),
   index("idx_legal_cases_decision").on(table.decisionDate),
@@ -239,46 +266,14 @@ export const insertUserSchema = createInsertSchema(users).omit({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
-// Multi-Tenant SaaS Schema
-export const tenants = pgTable("tenants", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  name: varchar("name", { length: 255 }).notNull(),
-  slug: varchar("slug", { length: 100 }).unique().notNull(),
-  subscriptionPlan: varchar("subscription_plan", { 
-    length: 50 
-  }).$type<'starter' | 'professional' | 'enterprise'>().notNull().default('starter'),
-  subscriptionStatus: varchar("subscription_status", {
-    length: 50
-  }).$type<'active' | 'suspended' | 'cancelled' | 'trial'>().notNull().default('trial'),
-  settings: jsonb("settings").default(sql`'{}'`),
-  billingEmail: varchar("billing_email", { length: 255 }),
-  maxUsers: integer("max_users").default(5),
-  maxDataSources: integer("max_data_sources").default(10),
-  apiAccessEnabled: boolean("api_access_enabled").default(false),
-  customBrandingEnabled: boolean("custom_branding_enabled").default(false),
-  // Customer Dashboard Permissions - Admin configurable
-  customerPermissions: jsonb("customer_permissions").default({
-    dashboard: true,
-    regulatoryUpdates: true,
-    legalCases: true,
-    knowledgeBase: true,
-    newsletters: true,
-    analytics: false,
-    reports: false,
-    dataCollection: false,
-    globalSources: false,
-    historicalData: false,
-    administration: false,
-    userManagement: false,
-    systemSettings: false,
-    auditLogs: false,
-    aiInsights: false,
-    advancedAnalytics: false
-  }),
-  trialEndsAt: timestamp("trial_ends_at"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+// Create tenant insert and select schemas
+export const insertTenantSchema = createInsertSchema(tenants).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
+export type InsertTenant = z.infer<typeof insertTenantSchema>;
+export type SelectTenant = typeof tenants.$inferSelect;
 
 export const tenantUsers = pgTable("tenant_users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
