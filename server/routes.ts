@@ -161,6 +161,60 @@ const piecesApiService = await import('./services/piecesApiService.js').then(m =
 // MEDITECH Integration Service
 console.log('[MEDITECH] Initializing MEDITECH FHIR API integration...');
 
+// AI Search Mock Service for demonstration
+async function performAISearch(query: string, domain: string = 'fda.gov', searchType: string = 'regulatory') {
+  console.log('[AI-SEARCH] Performing search:', { query, domain, searchType });
+  
+  // Simulate realistic AI search results based on query
+  const results = {
+    content: `Basierend auf Ihrer Suchanfrage "${query}" wurden folgende relevante regulatorische Informationen gefunden:
+
+**FDA Cybersecurity-Richtlinien für Medizingeräte (2024 Update):**
+Die FDA hat neue Cybersecurity-Anforderungen für Medizingerätehersteller eingeführt. Diese umfassen:
+• Mandatory submission of cybersecurity plans for Class II/III devices
+• Implementation of secure software development practices
+• Post-market surveillance for cybersecurity vulnerabilities
+• Regular security updates and patch management
+
+**EU MDR Compliance Updates:**
+Die europäischen Behörden haben zusätzliche Guidance zur MDR-Umsetzung veröffentlicht, insbesondere für:
+• Software as Medical Device (SaMD) Klassifizierung
+• AI/ML basierte Medizinprodukte
+• Post-market clinical follow-up (PMCF) Anforderungen
+
+**Aktuelle Trends:**
+• Verstärkte Fokus auf Cybersecurity in der Medizintechnik
+• Harmonisierung zwischen FDA und EU-Regulierungen
+• Erhöhte Anforderungen an klinische Evidenz für Software-Medizinprodukte`,
+    
+    citations: [
+      'https://www.fda.gov/medical-devices/digital-health-center-excellence/cybersecurity-medical-devices',
+      'https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cybersecurity-medical-devices',
+      'https://ec.europa.eu/health/md_newregulation/overview_en',
+      'https://www.medtech-europe.org/resource-library/mdr-guidance'
+    ],
+    
+    relatedQuestions: [
+      'Neue FDA 510(k) Anforderungen für 2024',
+      'EU MDR Software Klassifizierung',
+      'Cybersecurity Testing für Medizingeräte',
+      'AI/ML Validierung in der Medizintechnik',
+      'Post-Market Surveillance Best Practices'
+    ]
+  };
+  
+  return {
+    result: results,
+    metadata: {
+      searchTime: Math.random() * 2000 + 500, // 500-2500ms
+      resultsCount: results.citations.length,
+      confidence: 0.92,
+      searchType,
+      domain
+    }
+  };
+}
+
 // Generate full legal decision content for realistic court cases
 function generateFullLegalDecision(legalCase: LegalCaseData): string {
   const jurisdiction = legalCase.jurisdiction || 'USA';
@@ -2324,6 +2378,82 @@ ${case_item.court}
     } catch (error) {
       console.error("Error fetching subscribers:", error);
       res.status(500).json({ message: "Failed to fetch subscribers" });
+    }
+  });
+
+  // AI Search routes - Intelligente Regulatory Suche
+  app.post('/api/ai/search/regulatory', async (req, res) => {
+    try {
+      const { query, domain = 'fda.gov', searchType = 'regulatory' } = req.body;
+      
+      console.log('[AI-SEARCH] Received search request:', { query, domain, searchType });
+      
+      if (!query || typeof query !== 'string' || query.trim().length === 0) {
+        return res.status(400).json({ 
+          error: 'Search query is required',
+          message: 'Bitte geben Sie eine Suchanfrage ein.'
+        });
+      }
+      
+      // Perform AI search using our mock service
+      const searchResults = await performAISearch(query.trim(), domain, searchType);
+      
+      console.log('[AI-SEARCH] Search completed successfully');
+      res.json(searchResults);
+      
+    } catch (error) {
+      console.error('[AI-SEARCH] Search failed:', error);
+      res.status(500).json({ 
+        error: 'AI search failed',
+        message: 'Die KI-Suche konnte nicht ausgeführt werden. Bitte versuchen Sie es erneut.',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // AI Trends endpoint for trend analysis
+  app.get('/api/ai/trends', async (req, res) => {
+    try {
+      const { timeframe = 'month' } = req.query;
+      
+      console.log('[AI-TRENDS] Generating trend analysis for timeframe:', timeframe);
+      
+      // Mock trend analysis data
+      const trends = {
+        emergingTopics: [
+          'AI/ML in Medical Devices',
+          'Cybersecurity Standards',
+          'Digital Health Regulation',
+          'Software as Medical Device (SaMD)',
+          'Post-Market Surveillance'
+        ],
+        riskAlerts: [
+          'Neue FDA Cybersecurity-Anforderungen ab 2024',
+          'EU MDR Übergangsfristen für Klasse III Geräte',
+          'AI-basierte Diagnostik Validierungsstandards'
+        ],
+        complianceUpdates: [
+          'FDA 510(k) Modernization Initiative',
+          'EU EUDAMED Vollimplementierung',
+          'ISO 14155:2020 Klinische Prüfungen Update',
+          'IVDR Übergangsfristen Verlängerung'
+        ],
+        marketInsights: [
+          'Wachstum im Digital Health Sektor (+23%)',
+          'Verstärkte Regulierung von KI-Medizinprodukten',
+          'Harmonisierung globaler Standards',
+          'Post-Brexit UK Regulatory Landscape'
+        ]
+      };
+      
+      res.json({ trends, timeframe, generatedAt: new Date().toISOString() });
+      
+    } catch (error) {
+      console.error('[AI-TRENDS] Trend analysis failed:', error);
+      res.status(500).json({ 
+        error: 'Trend analysis failed',
+        message: 'Die Trend-Analyse konnte nicht ausgeführt werden.'
+      });
     }
   });
 
