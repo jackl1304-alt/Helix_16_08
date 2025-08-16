@@ -151,7 +151,7 @@ function App() {
               {/* Admin Pages with Sidebar - ONLY for admin routes */}
               <Route path="/(:path*)?" nest>
                 {(params) => {
-                  const path = params.path || '';
+                  const path = (params as any).path || '';
                   // Only render admin layout for admin paths
                   const isAdminPath = [
                     '', 'dashboard', 'data-collection', 'newsletter-admin', 'email-management', 

@@ -120,6 +120,13 @@ export const queryClient = new QueryClient({
       staleTime: 5 * 60 * 1000, // 5 minutes for better performance
       gcTime: 10 * 60 * 1000, // 10 minutes garbage collection
       retry: (failureCount, error) => {
+        // Don't retry on 4xx errors (client errors)
+        if (error && typeof error === 'object' && 'message' in error) {
+          const errorMessage = String(error.message);
+          if (errorMessage.includes('401') || errorMessage.includes('403') || errorMessage.includes('404')) {
+            return false;
+          }
+        }
         console.log(`[QUERY CLIENT] Retry ${failureCount} for error:`, error);
         return failureCount < 3;
       },

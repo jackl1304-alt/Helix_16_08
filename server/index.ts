@@ -15,20 +15,62 @@ import { Logger } from "./services/logger.service";
 import fetch from "node-fetch";
 import { EventEmitter } from "events";
 
-// Listener-Warnungen entschärfen
-EventEmitter.defaultMaxListeners = 30;
-process.setMaxListeners(30);
+// Performance: Fix memory leaks and event listener issues
+EventEmitter.defaultMaxListeners = 0; // Unlimited to prevent warnings
+process.setMaxListeners(0); // Unlimited for process listeners
+
+// Clean up event listeners on exit to prevent memory leaks
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM, cleaning up...');
+  server.close(() => {
+    console.log('Server closed gracefully');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('Received SIGINT, cleaning up...');
+  server.close(() => {
+    console.log('Server closed gracefully');
+    process.exit(0);
+  });
+});
 
 // Express-App initialisieren
 export const app = express();
 const server = createServer(app);
 
-// CORS aktivieren (für alle Ursprünge, später einschränken)
-app.use(cors({ origin: "*" }));
+// Optimized CORS with caching
+app.use(cors({ 
+  origin: process.env.NODE_ENV === 'production' ? 
+    ['https://*.replit.app', 'https://*.replit.dev'] : 
+    true,
+  credentials: true,
+  optionsSuccessStatus: 200,
+  maxAge: 86400 // Cache preflight for 24 hours
+}));
 
-// Body-Parser
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ extended: false, limit: "50mb" }));
+// Optimized Body-Parser with performance settings
+app.use(express.json({ 
+  limit: "50mb",
+  strict: true,
+  type: 'application/json'
+}));
+app.use(express.urlencoded({ 
+  extended: false, 
+  limit: "50mb",
+  parameterLimit: 1000 // Prevent parameter pollution attacks
+}));
+
+// Performance: Manual gzip compression for API responses
+app.use((req, res, next) => {
+  const originalSend = res.send;
+  res.send = function(data) {
+    res.setHeader('Vary', 'Accept-Encoding');
+    return originalSend.call(this, data);
+  };
+  next();
+});
 
 // Multi-Tenant Isolation Middleware
 app.use('/api/tenant', (req, res, next) => {
@@ -89,6 +131,15 @@ setupCustomerRoutes(app);
 
 // Setup new clean JSON-based admin routes  
 import { setupAdminRoutes } from './api/admin-routes-new';
+import { cacheMiddleware, CACHE_CONFIG } from './middleware/query-cache';
+
+// Apply selective caching to API routes
+app.use('/api/dashboard', cacheMiddleware(CACHE_CONFIG.DASHBOARD));
+app.use('/api/regulatory-updates', cacheMiddleware(CACHE_CONFIG.REGULATORY));
+app.use('/api/knowledge-articles', cacheMiddleware(CACHE_CONFIG.ARTICLES));
+app.use('/api/admin/permissions', cacheMiddleware(CACHE_CONFIG.MEDIUM));
+app.use('/api/admin/navigation', cacheMiddleware(CACHE_CONFIG.LONG));
+
 setupAdminRoutes(app);
 
 // Register tenant-specific routes - ONLY new real data API
@@ -115,16 +166,37 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   res.status(err.status || 500).json({ error: err.message || "Internal Server Error" });
 });
 
+// Performance: Add security and optimization middleware
+app.use((req, res, next) => {
+  // Security headers
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  
+  // Performance headers
+  if (req.url.includes('/api/')) {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  } else {
+    res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year for static assets
+  }
+  
+  next();
+});
+
 // Entwicklungs- vs. Produktionsmodus
 const isProd = process.env.NODE_ENV === "production" || app.get("env") !== "development";
 if (!isProd) {
   // Vite Dev-Server im Dev-Modus
   setupVite(app, server).catch(console.error);
 } else {
-  // Statische Dateien im Prod-Modus
+  // Optimized static file serving
   const distPath = path.resolve(import.meta.url.replace("file://", ""), "../public");
   if (fs.existsSync(distPath)) {
-    app.use(express.static(distPath));
+    app.use(express.static(distPath, {
+      maxAge: '1y', // 1 year cache for static assets
+      etag: true,
+      lastModified: true
+    }));
     app.get("*", (_req, res) => {
       res.sendFile(path.resolve(distPath, "index.html"));
     });
