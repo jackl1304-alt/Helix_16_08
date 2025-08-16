@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import Login from "@/pages/login";
 
@@ -86,19 +88,23 @@ function App() {
   // Show login if not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Toaster />
-        <Login onLogin={() => setIsAuthenticated(true)} />
-      </div>
+      <QueryClientProvider client={queryClient}>
+        <div className="min-h-screen bg-gray-50">
+          <Toaster />
+          <Login onLogin={() => setIsAuthenticated(true)} />
+        </div>
+      </QueryClientProvider>
     );
   }
 
   // Main app with JSON-based navigation
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Toaster />
-      {renderCurrentPage(appState.currentPage, appState.userData)}
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <div className="min-h-screen bg-gray-50">
+        <Toaster />
+        {renderCurrentPage(appState.currentPage, appState.userData)}
+      </div>
+    </QueryClientProvider>
   );
 }
 
