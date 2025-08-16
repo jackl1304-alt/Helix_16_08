@@ -12,6 +12,8 @@ import CustomerNavigation, { type CustomerPermissions } from "@/components/custo
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLiveTenantPermissions } from "@/hooks/use-live-tenant-permissions";
+import { useCustomerTheme } from "@/contexts/customer-theme-context";
+import ThemeCustomizer from "@/components/customer/theme-customizer";
 import { 
   Settings,
   User,

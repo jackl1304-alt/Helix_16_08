@@ -8,6 +8,7 @@ import CustomerNavigation from "@/components/customer/customer-navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLiveTenantPermissions } from "@/hooks/use-live-tenant-permissions";
+import { useCustomerTheme } from "@/contexts/customer-theme-context";
 import { 
   Brain,
   TrendingUp,
@@ -209,7 +210,7 @@ export default function CustomerAIInsights() {
           {/* Insights Grid */}
           {!isInsightsLoading && !insightsError && (insights || mockInsights) && (
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {(insights || mockInsights).map((insight) => (
+              {(insights || mockInsights).map((insight: AIInsight) => (
               <Card key={insight.id} className={`${colors.cardBg} hover:shadow-lg transition-shadow`}>
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between">
@@ -239,7 +240,7 @@ export default function CustomerAIInsights() {
                   </p>
                   
                   <div className="flex flex-wrap gap-2">
-                    {insight.tags.map((tag) => (
+                    {insight.tags.map((tag: string) => (
                       <Badge key={tag} variant="outline" className="text-xs">
                         {tag}
                       </Badge>
