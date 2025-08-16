@@ -53,6 +53,7 @@ const GripData = lazy(() => import("@/pages/grip-data"));
 const NewsletterAdmin = lazy(() => import("@/pages/newsletter-admin"));
 const AdvancedAnalytics = lazy(() => import("@/pages/advanced-analytics"));
 const CustomerDashboard = lazy(() => import("@/pages/customer-dashboard"));
+const ChatSupport = lazy(() => import("@/pages/chat-support"));
 const CustomerSettings = lazy(() => import("@/pages/customer-settings"));
 const CustomerAIInsightsClean = lazy(() => import("@/pages/customer-ai-insights-clean"));
 const CustomerRegulatoryUpdates = lazy(() => import("@/pages/customer-regulatory-updates"));
@@ -125,6 +126,9 @@ function Router() {
         <Route path="/tenant-onboarding" component={TenantOnboarding} />
         <Route path="/email-management" component={EmailManagement} />
         <Route path="/documents/:sourceType/:documentId" component={DocumentViewer} />
+        
+        {/* Chat Support für Tenant-Administrator-Kommunikation */}
+        <Route path="/chat-support" component={ChatSupport} />
         
         {/* Tenant Routes - Isolated Dashboard Access */}
         <Route path="/tenant/auth" component={TenantAuth} />

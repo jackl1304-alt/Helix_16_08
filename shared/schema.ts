@@ -16,6 +16,8 @@ import { z } from "zod";
 // Enums for Helix Regulatory Intelligence system
 export const statusEnum = pgEnum("status", ["active", "inactive", "pending", "archived"]);
 export const updateTypeEnum = pgEnum("update_type", ["regulation", "guidance", "standard", "approval", "alert"]);
+export const chatMessageTypeEnum = pgEnum("chat_message_type", ["message", "feature_request", "bug_report", "question", "feedback"]);
+export const chatMessageStatusEnum = pgEnum("chat_message_status", ["unread", "read", "resolved", "in_progress"]);
 
 // Tenants table for multi-tenant isolation
 export const tenants = pgTable("tenants", {
@@ -227,6 +229,51 @@ export const approvals = pgTable("approvals", {
   index("idx_approvals_requested").on(table.requestedAt),
 ]);
 
+// Chat Board für Tenant-Administrator-Kommunikation (Testphase)
+export const chatMessages = pgTable("chat_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").references(() => tenants.id, { onDelete: "cascade" }).notNull(),
+  senderId: varchar("sender_id").references(() => users.id),
+  senderType: varchar("sender_type").notNull(), // "tenant", "admin"
+  senderName: varchar("sender_name").notNull(),
+  senderEmail: varchar("sender_email").notNull(),
+  messageType: chatMessageTypeEnum("message_type").default("message"),
+  subject: varchar("subject"),
+  message: text("message").notNull(),
+  status: chatMessageStatusEnum("status").default("unread"),
+  priority: varchar("priority").default("normal"), // low, normal, high, urgent
+  attachments: jsonb("attachments"), // URLs zu Anhängen
+  metadata: jsonb("metadata"),
+  readAt: timestamp("read_at"),
+  resolvedAt: timestamp("resolved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_chat_messages_tenant").on(table.tenantId),
+  index("idx_chat_messages_status").on(table.status),
+  index("idx_chat_messages_type").on(table.messageType),
+  index("idx_chat_messages_created").on(table.createdAt),
+]);
+
+// Chat Conversations für Thread-basierte Kommunikation
+export const chatConversations = pgTable("chat_conversations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").references(() => tenants.id, { onDelete: "cascade" }).notNull(),
+  subject: varchar("subject").notNull(),
+  status: varchar("status").default("open"), // open, closed, resolved
+  priority: varchar("priority").default("normal"),
+  lastMessageAt: timestamp("last_message_at").defaultNow(),
+  messageCount: integer("message_count").default(0),
+  participantIds: text("participant_ids").array(), // User IDs beteiligt
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_chat_conversations_tenant").on(table.tenantId),
+  index("idx_chat_conversations_status").on(table.status),
+  index("idx_chat_conversations_last_message").on(table.lastMessageAt),
+]);
+
 // Relations
 export const dataSourcesRelations = relations(dataSources, ({ many }) => ({
   regulatoryUpdates: many(regulatoryUpdates),
@@ -256,6 +303,28 @@ export const approvalsRelations = relations(approvals, ({ one }) => ({
     relationName: "reviewedApprovals",
   }),
 }));
+
+// Chat relations
+export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
+  tenant: one(tenants, {
+    fields: [chatMessages.tenantId],
+    references: [tenants.id],
+  }),
+  sender: one(users, {
+    fields: [chatMessages.senderId],
+    references: [users.id],
+  }),
+}));
+
+export const chatConversationsRelations = relations(chatConversations, ({ one, many }) => ({
+  tenant: one(tenants, {
+    fields: [chatConversations.tenantId],
+    references: [tenants.id],
+  }),
+  messages: many(chatMessages),
+}));
+
+// Removed duplicate tenantsRelations - already defined above
 
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users).omit({
@@ -335,6 +404,9 @@ export const tenantsRelations = relations(tenants, ({ many }) => ({
   dataAccess: many(tenantDataAccess),
   dashboards: many(tenantDashboards),
   invitations: many(tenantInvitations),
+  users: many(users),
+  chatMessages: many(chatMessages),
+  chatConversations: many(chatConversations),
 }));
 
 export const tenantUsersRelations = relations(tenantUsers, ({ one }) => ({
@@ -420,3 +492,21 @@ export const insertApprovalSchema = createInsertSchema(approvals).omit({
 });
 export type InsertApproval = z.infer<typeof insertApprovalSchema>;
 export type Approval = typeof approvals.$inferSelect;
+
+// Chat message schemas
+export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+export type ChatMessage = typeof chatMessages.$inferSelect;
+
+// Chat conversation schemas
+export const insertChatConversationSchema = createInsertSchema(chatConversations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertChatConversation = z.infer<typeof insertChatConversationSchema>;
+export type ChatConversation = typeof chatConversations.$inferSelect;

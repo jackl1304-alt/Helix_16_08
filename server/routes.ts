@@ -6488,6 +6488,10 @@ Für vollständige Details und weitere Analysen besuchen Sie die ursprüngliche 
     }
   });
 
+  // Chat Board Routes für Tenant-Administrator-Kommunikation
+  const chatRoutes = await import('./routes/chat');
+  app.use('/api/chat', chatRoutes.default);
+
   const httpServer = createServer(app);
   return httpServer;
 }
