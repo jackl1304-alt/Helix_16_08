@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "wouter";
+import { useParams, useLocation } from "wouter";
 import { useLiveTenantPermissions } from "@/hooks/use-live-tenant-permissions";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -67,6 +67,7 @@ const regionDistribution = [
 export default function CustomerDashboard() {
   const [selectedTimeRange, setSelectedTimeRange] = useState('30d');
   const params = useParams();
+  const [location, setLocation] = useLocation();
   const { logout } = useAuth();
   const { t } = useLanguage();
   
@@ -295,12 +296,9 @@ export default function CustomerDashboard() {
             style={{ pointerEvents: 'all' }}
             onClick={(e) => {
               e.stopPropagation();
-              console.log('[CUSTOMER DASH] Chat button clicked - FIXED VERSION');
-              alert('Chat button clicked - FIXED VERSION!');
               const tenantId = params.tenantId || '030d3e01-32c4-4f95-8d54-98be948e8d4b';
               const chatUrl = `/tenant/${tenantId}/chat-support`;
-              console.log('[CUSTOMER DASH] Navigating to chat:', chatUrl);
-              // setLocation(chatUrl); // TODO: Implement navigation
+              setLocation(chatUrl);
             }}
             data-testid="button-customer-chat"
           >
@@ -313,8 +311,16 @@ export default function CustomerDashboard() {
             style={{ pointerEvents: 'all' }}
             onClick={(e) => {
               e.stopPropagation();
-              console.log('[CUSTOMER DASH] Export button clicked - FIXED VERSION');
-              alert('Export functionality - FIXED VERSION!');
+              // Export dashboard data as PDF
+              const exportData = {
+                tenant: liveTenantName || 'MedTech Solutions GmbH',
+                date: new Date().toLocaleDateString('de-DE'),
+                usage: dashboardData?.usage,
+                compliance: dashboardData?.dashboard?.compliance
+              };
+              console.log('Exporting dashboard data:', exportData);
+              // TODO: Implement PDF export functionality
+              alert('Export-Funktion wird implementiert...');
             }}
             data-testid="button-customer-export"
           >
@@ -326,8 +332,9 @@ export default function CustomerDashboard() {
             style={{ pointerEvents: 'all' }}
             onClick={(e) => {
               e.stopPropagation();
-              console.log('[CUSTOMER DASH] Settings button clicked - FIXED VERSION');
-              alert('Settings functionality - FIXED VERSION!');
+              const tenantId = params.tenantId || '030d3e01-32c4-4f95-8d54-98be948e8d4b';
+              const settingsUrl = `/tenant/${tenantId}/settings`;
+              setLocation(settingsUrl);
             }}
             data-testid="button-customer-settings"
           >
@@ -340,9 +347,8 @@ export default function CustomerDashboard() {
             style={{ pointerEvents: 'all' }}
             onClick={(e) => {
               e.stopPropagation();
-              console.log('[CUSTOMER DASH] Logout button clicked - FIXED VERSION');
               logout();
-              window.location.reload();
+              setLocation('/login');
             }}
             data-testid="button-customer-logout"
           >
