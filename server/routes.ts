@@ -355,16 +355,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Error monitoring routes
   app.use('/api/errors', errorRoutes);
   
-  // Dashboard API routes
-  app.get("/api/dashboard/stats", async (req, res) => {
-    try {
-      const stats = await storage.getDashboardStats();
-      res.json(stats);
-    } catch (error) {
-      console.error("Error fetching dashboard stats:", error);
-      res.status(500).json({ message: "Failed to fetch dashboard stats" });
-    }
-  });
+  // Dashboard API routes - DOPPELTER ENDPOINT ENTFERNT (siehe Zeile 968)
 
   // Data sources routes
   app.get("/api/data-sources", async (req, res) => {
@@ -964,10 +955,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Dashboard statistics endpoint - uses real database queries
+  // Dashboard statistics endpoint - EINZIGER ENDPOINT (doppelte entfernt)
   app.get("/api/dashboard/stats", async (req, res) => {
     try {
-      // Use the optimized dashboard stats method from storage
+      console.log('[API] EINZIGER dashboard/stats endpoint - No duplicates');
       const stats = await storage.getDashboardStats();
       
       console.log('[DB] Bereinigte Dashboard-Statistiken:', stats);
