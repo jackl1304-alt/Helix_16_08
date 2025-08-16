@@ -24,7 +24,16 @@ import {
   Bot,
   Sparkles,
   Building,
-  LogOut
+  LogOut,
+  History,
+  BookOpen,
+  MessageSquare,
+  ClipboardCheck,
+  Workflow,
+  FileCheck,
+  AlertTriangle,
+  Gavel,
+  PenTool
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 // Logo wird als Gradient-Element erstellt
@@ -47,7 +56,7 @@ interface NavigationSection {
   hiddenItems?: NavigationItem[];
 }
 
-// Vereinfachte Navigation - nur existierende Seiten
+// Vollständige Navigation - alle verfügbaren Seiten
 const getNavigationStructure = (): Record<string, NavigationSection> => ({
   // Hauptmodule
   main: {
@@ -56,6 +65,7 @@ const getNavigationStructure = (): Record<string, NavigationSection> => ({
       { name: "Dashboard", href: "/", icon: BarChart3 },
       { name: "Regulatory Updates", href: "/regulatory-updates", icon: FileText },
       { name: "Analytics", href: "/analytics", icon: TrendingUp },
+      { name: "Intelligent Search", href: "/intelligent-search", icon: Search },
     ],
     defaultOpen: true
   },
@@ -66,8 +76,55 @@ const getNavigationStructure = (): Record<string, NavigationSection> => ({
     items: [
       { name: "Data Collection", href: "/data-collection", icon: Database },
       { name: "Knowledge Base", href: "/knowledge-base", icon: Book },
+      { name: "Global Sources", href: "/global-sources", icon: Globe },
+      { name: "Historical Data", href: "/historical-data", icon: History },
+      { name: "GRIP Integration", href: "/grip-integration", icon: RefreshCw },
     ],
     defaultOpen: true
+  },
+
+  // KI & Analyse
+  ai: {
+    title: "KI & Analyse",
+    items: [
+      { name: "AI Insights", href: "/ai-insights", icon: Brain },
+      { name: "AI Analysis", href: "/ai-analysis-combined", icon: Sparkles },
+      { name: "Advanced Analytics", href: "/advanced-analytics", icon: TrendingUp },
+    ],
+    defaultOpen: false
+  },
+
+  // Rechtliche Module
+  legal: {
+    title: "Rechtliche Module",
+    items: [
+      { name: "Legal Cases", href: "/customer-legal-cases", icon: Gavel },
+      { name: "Rechtsprechung", href: "/rechtsprechung-kompakt", icon: Scale },
+      { name: "Approval Workflow", href: "/approval-workflow", icon: CheckCircle },
+      { name: "Laufende Zulassungen", href: "/laufende-zulassungen", icon: Workflow },
+    ],
+    defaultOpen: false
+  },
+
+  // Kommunikation
+  communication: {
+    title: "Kommunikation",
+    items: [
+      { name: "Newsletter Management", href: "/newsletter-manager", icon: Mail },
+      { name: "Email Management", href: "/email-management", icon: Newspaper },
+      { name: "Chat Support", href: "/chat-support", icon: MessageSquare },
+    ],
+    defaultOpen: false
+  },
+
+  // Wissensmanagement
+  knowledge: {
+    title: "Wissensmanagement",
+    items: [
+      { name: "Terminology Glossary", href: "/terminology-glossary", icon: BookOpen },
+      { name: "Document Viewer", href: "/document-viewer", icon: FileText },
+    ],
+    defaultOpen: false
   },
 
   // Administration
@@ -76,6 +133,7 @@ const getNavigationStructure = (): Record<string, NavigationSection> => ({
     items: [
       { name: "User Management", href: "/user-management", icon: Users },
       { name: "System Settings", href: "/system-settings", icon: Settings },
+      { name: "Audit Logs", href: "/audit-logs", icon: Shield },
     ],
     defaultOpen: false
   }
@@ -218,8 +276,21 @@ export function Sidebar() {
       <div className="p-6 border-b border-gray-200">
         <Link href="/">
           <div className="flex flex-col items-center cursor-pointer space-y-2">
-            <div className="h-32 w-32 bg-gradient-to-br from-blue-600 to-purple-700 rounded-lg ring-2 ring-[#b0d4f6] flex items-center justify-center text-white font-bold text-6xl">
-              H
+            <div className="relative h-32 w-32 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-lg ring-2 ring-[#b0d4f6] shadow-lg flex items-center justify-center text-white">
+              {/* Helix DNA Struktur als Logo */}
+              <div className="flex flex-col items-center">
+                <div className="text-4xl font-black tracking-tight mb-1">H</div>
+                <div className="flex space-x-1">
+                  <div className="w-1 h-1 bg-white rounded-full opacity-80"></div>
+                  <div className="w-1 h-1 bg-white rounded-full opacity-60"></div>
+                  <div className="w-1 h-1 bg-white rounded-full opacity-80"></div>
+                </div>
+                <div className="flex space-x-1 mt-1">
+                  <div className="w-1 h-1 bg-white rounded-full opacity-60"></div>
+                  <div className="w-1 h-1 bg-white rounded-full opacity-80"></div>
+                  <div className="w-1 h-1 bg-white rounded-full opacity-60"></div>
+                </div>
+              </div>
             </div>
             <span className="text-lg deltaways-brand-text text-[#07233e]">HELIX</span>
             <p className="text-xs font-medium text-gray-600">Powered by DELTA WAYS</p>
