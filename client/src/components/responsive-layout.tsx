@@ -2,15 +2,24 @@ import { ReactNode } from "react";
 import { useDevice, getDeviceClasses } from "@/hooks/use-device";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileSidebar } from "@/components/layout/mobile-sidebar";
+import { CustomerSidebar } from "@/components/customer-sidebar";
 import { cn } from "@/lib/utils";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { type CustomerPermissions } from "@/components/customer-navigation";
 
 interface ResponsiveLayoutProps {
   children: ReactNode;
   showSidebar?: boolean;
+  isCustomer?: boolean;
+  customerPermissions?: CustomerPermissions;
 }
 
-export function ResponsiveLayout({ children, showSidebar = true }: ResponsiveLayoutProps) {
+export function ResponsiveLayout({ 
+  children, 
+  showSidebar = true, 
+  isCustomer = false, 
+  customerPermissions 
+}: ResponsiveLayoutProps) {
   const device = useDevice();
 
   if (device.isMobile || device.isTablet) {
@@ -41,7 +50,13 @@ export function ResponsiveLayout({ children, showSidebar = true }: ResponsiveLay
       "min-h-screen bg-gray-50 dark:bg-gray-900",
       getDeviceClasses(device)
     )}>
-      {showSidebar && <Sidebar />}
+      {showSidebar && (
+        isCustomer && customerPermissions ? (
+          <CustomerSidebar permissions={customerPermissions} />
+        ) : (
+          <Sidebar />
+        )
+      )}
       
       {/* Language Selector - Top Right */}
       <div className="fixed top-4 right-4 z-50">
