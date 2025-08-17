@@ -17,7 +17,9 @@ import {
   Search,
   MessageSquare,
   Globe,
-  Mail
+  Mail,
+  ArrowUpRight,
+  Zap
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -27,7 +29,7 @@ export default function Dashboard() {
       <div className="deltaways-dashboard-card bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 rounded-xl p-8 text-white shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <h1 className="text-4xl font-bold mb-3 flex items-center gap-3 deltaways-brand-text">
+            <h1 className="text-4xl font-bold mb-3 flex items-center gap-3 deltaways-brand-text deltaways-text-animate">
               <Activity className="h-10 w-10" />
               Regulatory Intelligence Dashboard
             </h1>
@@ -35,13 +37,14 @@ export default function Dashboard() {
               KI-gestützte Analyse • Echtzeit-Updates • 100% Datenqualität
             </p>
             <div className="flex items-center space-x-6">
-              <div className="flex items-center gap-2 bg-white/10 rounded-lg px-4 py-2">
-                <Activity className="h-5 w-5" />
+              <div className="flex items-center gap-2 bg-white/10 rounded-lg px-4 py-2 deltaways-focus hover:bg-white/20 transition-all duration-300">
+                <Zap className="h-5 w-5 animate-pulse" />
                 <span className="font-medium">Live System</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/10 rounded-lg px-4 py-2">
+              <div className="flex items-center gap-2 bg-white/10 rounded-lg px-4 py-2 deltaways-focus hover:bg-white/20 transition-all duration-300">
                 <CheckCircle className="h-5 w-5" />
                 <span className="font-medium">70 Quellen aktiv</span>
+                <ArrowUpRight className="h-4 w-4 opacity-70" />
               </div>
             </div>
           </div>

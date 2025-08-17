@@ -5,31 +5,48 @@
 @tailwind components;
 @tailwind utilities;
 
-/* DELTAWAYS PRIMARY COLOR SYSTEM - From Brand Guidelines */
+/* DELTAWAYS 2025 EMOTIONAL DESIGN SYSTEM - Trend-Optimized */
 :root {
-  /* Primary Brand Colors */
+  /* Primary Brand Colors - Enhanced for Emotional Impact */
   --deltaways-primary: #1E40AF;
   --deltaways-primary-dark: #1E3A8A;
   --deltaways-primary-light: #3B82F6;
   --deltaways-secondary: #8B5CF6;
   --deltaways-accent: #10B981;
   
-  /* Gradient System - Based on Screenshots */
-  --deltaways-gradient: linear-gradient(135deg, #1E40AF 0%, #8B5CF6 100%);
+  /* 2025 Trend: Dynamic Gradients & Glassmorphism */
+  --deltaways-gradient: linear-gradient(135deg, #1E40AF 0%, #8B5CF6 50%, #3B82F6 100%);
   --deltaways-card-gradient: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+  --deltaways-glass-gradient: linear-gradient(135deg, rgba(30, 64, 175, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+  --deltaways-hover-gradient: linear-gradient(135deg, #2563EB 0%, #9333EA 100%);
   
-  /* UI Colors - Deltaways Compliant */
-  --deltaways-bg: #F8FAFC;
+  /* 2025 Trend: Emotional Color Psychology */
+  --deltaways-trust: #1E40AF;      /* Deep trust and reliability */
+  --deltaways-innovation: #8B5CF6; /* Creative innovation */
+  --deltaways-growth: #10B981;     /* Positive growth */
+  --deltaways-energy: #F59E0B;     /* Dynamic energy */
+  --deltaways-calm: #64748B;       /* Calm professionalism */
+  
+  /* UI Colors - Emotional Design Enhanced */
+  --deltaways-bg: #FAFBFC;
   --deltaways-surface: #FFFFFF;
+  --deltaways-surface-elevated: rgba(255, 255, 255, 0.95);
   --deltaways-border: #E2E8F0;
-  --deltaways-text: #1E293B;
-  --deltaways-text-muted: #64748B;
+  --deltaways-border-subtle: #F1F5F9;
+  --deltaways-text: #0F172A;
+  --deltaways-text-muted: #475569;
+  --deltaways-text-subtle: #64748B;
   
-  /* Status Colors */
-  --deltaways-success: #10B981;
-  --deltaways-warning: #F59E0B;
-  --deltaways-danger: #EF4444;
-  --deltaways-info: #3B82F6;
+  /* 2025 Trend: Micro-Interaction Colors */
+  --deltaways-hover-bg: rgba(30, 64, 175, 0.05);
+  --deltaways-active-bg: rgba(30, 64, 175, 0.1);
+  --deltaways-focus-ring: rgba(59, 130, 246, 0.3);
+  
+  /* Status Colors - Emotional Enhancement */
+  --deltaways-success: #059669;
+  --deltaways-warning: #D97706;
+  --deltaways-danger: #DC2626;
+  --deltaways-info: #0284C7;
 }
 
 /* DELTAWAYS BRANDING COMPONENTS */
@@ -51,46 +68,225 @@
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
+/* 2025 TREND: Emotional Dashboard Card with Glassmorphism */
 .deltaways-dashboard-card {
   background: var(--deltaways-gradient);
   color: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 
+    0 8px 32px rgba(30, 64, 175, 0.3),
+    0 4px 16px rgba(139, 92, 246, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
 }
 
+.deltaways-dashboard-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+/* 2025 TREND: Emotional Micro-Interactions for Cards */
 .deltaways-card {
-  background-color: var(--deltaways-surface);
-  border: 1px solid var(--deltaways-border);
-  border-radius: 8px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  background: var(--deltaways-surface-elevated);
+  border: 1px solid var(--deltaways-border-subtle);
+  border-radius: 16px;
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.05),
+    0 1px 2px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.deltaways-card:hover {
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.12);
+  border-color: var(--deltaways-border);
+}
+
+/* 2025 TREND: Emotional Button with Haptic Feedback */
 .deltaways-button-primary {
-  background: var(--deltaways-primary);
+  background: var(--deltaways-gradient);
   color: white;
-  border-radius: 6px;
-  font-weight: 500;
-  transition: all 0.2s ease-in-out;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 12px 20px;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.deltaways-button-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
 .deltaways-button-primary:hover {
-  background: var(--deltaways-primary-dark);
-  transform: translateY(-1px);
+  background: var(--deltaways-hover-gradient);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(30, 64, 175, 0.4);
+}
+
+.deltaways-button-primary:hover::before {
+  left: 100%;
+}
+
+.deltaways-button-primary:active {
+  transform: translateY(0);
   box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
 }
 
+/* 2025 TREND: Emotional Stats Cards with Depth */
 .deltaways-stats-card {
-  background-color: var(--deltaways-surface);
-  border: 1px solid var(--deltaways-border);
-  border-radius: 12px;
-  padding: 20px;
-  transition: all 0.2s ease-in-out;
+  background: var(--deltaways-surface);
+  border: 1px solid var(--deltaways-border-subtle);
+  border-radius: 20px;
+  padding: 24px;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.deltaways-stats-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--deltaways-glass-gradient);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
 }
 
 .deltaways-stats-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.1),
+    0 8px 16px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(30, 64, 175, 0.1);
+  border-color: var(--deltaways-primary-light);
+}
+
+.deltaways-stats-card:hover::before {
+  opacity: 1;
+}
+
+.deltaways-stats-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* 2025 TREND: Cursor Interactions & Custom Mouse Effects */
+.deltaways-interactive {
+  cursor: none;
+}
+
+.deltaways-custom-cursor {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  background: var(--deltaways-gradient);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transition: all 0.1s ease-out;
+  mix-blend-mode: multiply;
+}
+
+.deltaways-custom-cursor.hover {
+  transform: scale(1.5);
+  background: var(--deltaways-secondary);
+  mix-blend-mode: difference;
+}
+
+/* 2025 TREND: Large Headlines Typography */
+.deltaways-headline-large {
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  background: var(--deltaways-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+  animation: headline-glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes headline-glow {
+  0% { filter: brightness(1); }
+  100% { filter: brightness(1.1) drop-shadow(0 0 20px rgba(30, 64, 175, 0.3)); }
+}
+
+/* 2025 TREND: Animated Text Effects */
+.deltaways-text-animate {
+  overflow: hidden;
+  position: relative;
+}
+
+.deltaways-text-animate::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: text-shimmer 2s infinite;
+}
+
+@keyframes text-shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* 2025 TREND: Enhanced Accessibility & Focus States */
+.deltaways-focus:focus-visible {
+  outline: 2px solid var(--deltaways-primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--deltaways-focus-ring);
+  border-radius: 8px;
+}
+
+/* 2025 TREND: Sustainable Dark Mode Ready */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --deltaways-bg: #0F172A;
+    --deltaways-surface: #1E293B;
+    --deltaways-surface-elevated: rgba(30, 41, 59, 0.95);
+    --deltaways-border: #334155;
+    --deltaways-border-subtle: #475569;
+    --deltaways-text: #F8FAFC;
+    --deltaways-text-muted: #CBD5E1;
+    --deltaways-text-subtle: #94A3B8;
+  }
+  
+  .deltaways-dashboard-card {
+    background: linear-gradient(135deg, #1E40AF 0%, #7C3AED 50%, #3B82F6 100%);
+    box-shadow: 
+      0 8px 32px rgba(30, 64, 175, 0.4),
+      0 4px 16px rgba(139, 92, 246, 0.3);
+  }
 }
 
 /* Performance Optimizations */
