@@ -1,6 +1,6 @@
 import React from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "./lib/queryClient";
+import { queryClient } from "./lib/queryClient-clean";
 import { Toaster } from "@/components/ui/toaster";
 import { Router, Route, Switch } from "wouter";
 import { ResponsiveLayout } from "@/components/responsive-layout";
@@ -29,7 +29,7 @@ import AiAnalysisCombined from "@/pages/ai-analysis-combined";
 import ApprovalWorkflow from "@/pages/approval-workflow";
 import LaufendeZulassungen from "@/pages/laufende-zulassungen";
 import CustomerLegalCases from "@/pages/customer-legal-cases";
-import RechtsprechungKompakt from "@/pages/rechtsprechung-kompakt";
+import RechtsprechungKompaktClean from "@/pages/rechtsprechung-kompakt-clean";
 import NewsletterManager from "@/pages/newsletter-manager";
 import EmailManagement from "@/pages/email-management";
 import ChatSupport from "@/pages/chat-support";
@@ -158,7 +158,7 @@ function App() {
               {/* Legal & Compliance */}
               <Route path="/approval-workflow" component={ApprovalWorkflow} />
               <Route path="/laufende-zulassungen" component={LaufendeZulassungen} />
-              <Route path="/rechtsprechung-kompakt" component={RechtsprechungKompakt} />
+              <Route path="/rechtsprechung-kompakt" component={RechtsprechungKompaktClean} />
               
               {/* Communication */}
               <Route path="/newsletter-manager" component={NewsletterManager} />
