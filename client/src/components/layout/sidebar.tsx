@@ -18,7 +18,7 @@ export function Sidebar() {
           </div>
           <div>
             <h1 className="text-lg font-bold text-gray-900 dark:text-white">HELIX</h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Admin Portal</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Powered by DELTA WAYS</p>
           </div>
         </div>
       </div>
