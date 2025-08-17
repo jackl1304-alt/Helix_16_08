@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { NavigationSidebar, NavigationToggle } from "@/components/navigation-sidebar";
+import { ResponsiveLayout } from "@/components/responsive-layout";
 import { AISearchPanel } from "@/components/admin/ai-search-panel";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
@@ -39,7 +39,6 @@ export default function Dashboard() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { t } = useLanguage();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   
   const { data: stats, isLoading, error: statsError } = useQuery({
     queryKey: ['/api/dashboard/stats'],
@@ -190,23 +189,8 @@ export default function Dashboard() {
   const handleSystemSettings = () => setLocation('/system-settings');
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Sidebar */}
-      <NavigationSidebar 
-        isOpen={sidebarOpen} 
-        onToggle={() => setSidebarOpen(!sidebarOpen)} 
-      />
-      
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Bar */}
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 lg:hidden">
-          <NavigationToggle onToggle={() => setSidebarOpen(!sidebarOpen)} />
-        </div>
-        
-        {/* Content Container */}
-        <div className="flex-1 overflow-auto">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+    <ResponsiveLayout>
+      <div className="space-y-8">
         
         {/* Hero Section - kompakt mit Deltaways-Branding */}
         <div className="bg-gradient-to-br from-blue-600 to-purple-700 rounded-xl p-8 text-white shadow-lg">
@@ -495,9 +479,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-          </div>
-        </div>
       </div>
-    </div>
+    </ResponsiveLayout>
   );
 }

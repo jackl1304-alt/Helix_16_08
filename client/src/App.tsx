@@ -40,6 +40,16 @@ function renderCurrentPage(page: string, userData: any) {
       return <HistoricalData />;
     case '/system-settings':
       return <SystemSettings />;
+    case '/data-collection':
+      return <GlobalSources />; // Reuse for now
+    case '/newsletter-manager':
+      return <GlobalSources />; // Reuse for now
+    case '/legal-cases':
+      return <HistoricalData />; // Reuse for now
+    case '/user-management':
+      return <SystemSettings />; // Reuse for now
+    case '/audit-logs':
+      return <SystemSettings />; // Reuse for now
     case '/404':
     default:
       return <NotFound />;
