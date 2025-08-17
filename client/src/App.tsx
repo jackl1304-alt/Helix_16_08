@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ResponsiveLayout } from "@/components/responsive-layout";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 // Pages
 import Dashboard from "@/pages/dashboard";
@@ -55,33 +56,37 @@ function App() {
   if (!isAuthenticated) {
     return (
       <ErrorBoundary>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Toaster />
-            <Login onLogin={login} />
-          </TooltipProvider>
-        </QueryClientProvider>
+        <LanguageProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <Toaster />
+              <Login onLogin={login} />
+            </TooltipProvider>
+          </QueryClientProvider>
+        </LanguageProvider>
       </ErrorBoundary>
     );
   }
 
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <ResponsiveLayout>
-            <Switch>
-              <Route path="/" component={Dashboard} />
-              <Route path="/dashboard" component={Dashboard} />
-              <Route path="/system-settings" component={SystemSettings} />
-              <Route path="/analytics" component={Analytics} />
-              <Route path="/regulatory-updates" component={RegulatoryUpdates} />
-              <Route component={NotFound} />
-            </Switch>
-          </ResponsiveLayout>
-        </TooltipProvider>
-      </QueryClientProvider>
+      <LanguageProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <ResponsiveLayout>
+              <Switch>
+                <Route path="/" component={Dashboard} />
+                <Route path="/dashboard" component={Dashboard} />
+                <Route path="/system-settings" component={SystemSettings} />
+                <Route path="/analytics" component={Analytics} />
+                <Route path="/regulatory-updates" component={RegulatoryUpdates} />
+                <Route component={NotFound} />
+              </Switch>
+            </ResponsiveLayout>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </LanguageProvider>
     </ErrorBoundary>
   );
 }

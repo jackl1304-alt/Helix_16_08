@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   BarChart3, 
   Database, 
@@ -98,6 +99,7 @@ export function MobileSidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [location] = useLocation();
+  const { t } = useLanguage();
 
   const renderNavItem = (item: any, isActive: boolean, onClose?: () => void) => (
     <Link key={item.name} href={item.href}>
