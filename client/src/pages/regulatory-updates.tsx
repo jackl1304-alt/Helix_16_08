@@ -1,130 +1,166 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { useQuery } from '@tanstack/react-query';
-import { useLocation } from 'wouter';
-import { ArrowLeft, FileText, Calendar, Globe, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { FileText, Calendar, Globe, Activity, Filter } from "lucide-react";
 
 export default function RegulatoryUpdates() {
-  const [, setLocation] = useLocation();
-  const { t } = useLanguage();
-
-  const { data: updates, isLoading } = useQuery({
-    queryKey: ['/api/regulatory-updates'],
-    queryFn: async () => {
-      const response = await fetch('/api/regulatory-updates');
-      if (!response.ok) throw new Error('Failed to fetch updates');
-      return response.json();
-    },
-  });
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low': return 'bg-green-100 text-green-800 border-green-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'active': return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case 'pending': return <Clock className="h-4 w-4 text-yellow-600" />;
-      case 'draft': return <AlertTriangle className="h-4 w-4 text-gray-600" />;
-      default: return <FileText className="h-4 w-4 text-blue-600" />;
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button 
-                variant="ghost" 
-                onClick={() => setLocation('/dashboard')}
-                className="flex items-center space-x-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                <span>Zurück zum Dashboard</span>
-              </Button>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                  Regulatory Updates
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Aktuelle regulatorische Änderungen aus globalen Behörden
-                </p>
-              </div>
-            </div>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Regulatory Updates</h1>
+          <p className="text-muted-foreground">
+            Latest regulatory changes and compliance updates
+          </p>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button variant="outline" size="sm">
+            <Filter className="h-4 w-4 mr-2" />
+            Filter
+          </Button>
+          <Badge variant="outline" className="text-green-600 border-green-600">
+            <Activity className="h-3 w-3 mr-1" />
+            Live Updates
+          </Badge>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {isLoading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Updates werden geladen...</p>
-          </div>
-        ) : updates && updates.length > 0 ? (
-          <div className="space-y-6">
-            {updates.map((update: any) => (
-              <Card key={update.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-xl text-blue-600 hover:text-blue-800">
-                        {update.title}
-                      </CardTitle>
-                      <CardDescription className="mt-2">
-                        {update.summary}
-                      </CardDescription>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      {getStatusIcon(update.status)}
-                      <Badge className={getPriorityColor(update.priority)}>
-                        {update.priority}
-                      </Badge>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between text-sm text-gray-600">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="h-4 w-4" />
-                        <span>{new Date(update.date).toLocaleDateString('de-DE')}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Globe className="h-4 w-4" />
-                        <span>{update.region}</span>
-                      </div>
-                      <Badge variant="outline">{update.category}</Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Keine Updates verfügbar
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Regulatory Updates werden automatisch synchronisiert
-            </p>
-          </div>
-        )}
+      {/* Summary Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Updates</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">1,247</div>
+            <p className="text-xs text-muted-foreground">+23 this week</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">This Month</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">89</div>
+            <p className="text-xs text-muted-foreground">+12% from last month</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Jurisdictions</CardTitle>
+            <Globe className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">15</div>
+            <p className="text-xs text-muted-foreground">Global coverage</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Critical</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">7</div>
+            <p className="text-xs text-muted-foreground">Require immediate attention</p>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Recent Updates */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Regulatory Updates</CardTitle>
+          <CardDescription>
+            Latest updates from regulatory authorities worldwide
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-start space-x-4 p-4 border rounded-lg">
+              <div className="w-2 h-2 rounded-full bg-red-500 mt-2"></div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium">FDA Medical Device Safety Communication</h4>
+                  <Badge variant="destructive" size="sm">Critical</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  New safety requirements for implantable cardiac devices
+                </p>
+                <div className="flex items-center mt-2 text-xs text-muted-foreground">
+                  <Calendar className="h-3 w-3 mr-1" />
+                  2 hours ago
+                  <Globe className="h-3 w-3 ml-4 mr-1" />
+                  United States
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-4 p-4 border rounded-lg">
+              <div className="w-2 h-2 rounded-full bg-yellow-500 mt-2"></div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium">EU MDR Implementation Update</h4>
+                  <Badge variant="secondary" size="sm">Important</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Extended deadlines for legacy device transition
+                </p>
+                <div className="flex items-center mt-2 text-xs text-muted-foreground">
+                  <Calendar className="h-3 w-3 mr-1" />
+                  4 hours ago
+                  <Globe className="h-3 w-3 ml-4 mr-1" />
+                  European Union
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-4 p-4 border rounded-lg">
+              <div className="w-2 h-2 rounded-full bg-blue-500 mt-2"></div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium">Health Canada Guidance Document</h4>
+                  <Badge variant="outline" size="sm">Standard</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Updated quality system requirements for medical devices
+                </p>
+                <div className="flex items-center mt-2 text-xs text-muted-foreground">
+                  <Calendar className="h-3 w-3 mr-1" />
+                  6 hours ago
+                  <Globe className="h-3 w-3 ml-4 mr-1" />
+                  Canada
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-4 p-4 border rounded-lg">
+              <div className="w-2 h-2 rounded-full bg-green-500 mt-2"></div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium">TGA Consultation Paper</h4>
+                  <Badge variant="outline" size="sm">Info</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Proposed changes to therapeutic goods regulations
+                </p>
+                <div className="flex items-center mt-2 text-xs text-muted-foreground">
+                  <Calendar className="h-3 w-3 mr-1" />
+                  8 hours ago
+                  <Globe className="h-3 w-3 ml-4 mr-1" />
+                  Australia
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
