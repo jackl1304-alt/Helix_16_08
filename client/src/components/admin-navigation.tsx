@@ -70,65 +70,47 @@ export function AdminNavigation() {
 
   const navigationStructure: NavSection[] = [
     {
-      title: "Hauptmodule",
+      title: "ÜBERSICHT & STEUERUNG",
       defaultOpen: true,
       items: [
-        { name: "Dashboard", href: "/", icon: Home, description: "Übersicht & Analytics" },
-        { name: "Regulatory Updates", href: "/regulatory-updates", icon: FileText, badge: "2,847", description: "Aktuelle Vorschriften" },
-        { name: "Advanced Analytics", href: "/advanced-analytics", icon: TrendingUp, description: "Detaillierte Analysen" },
-        { name: "Intelligent Search", href: "/intelligent-search", icon: Search, description: "KI-gestützte Suche" }
+        { name: "Dashboard", href: "/", icon: Home },
+        { name: "Berichte & Analysen", href: "/analytics", icon: BarChart3 }
       ]
     },
     {
-      title: "Datenmanagement",
+      title: "DATENMANAGEMENT", 
       defaultOpen: true,
       items: [
-        { name: "Data Collection", href: "/data-collection", icon: Database, description: "Datensammlung & -quellen" },
-        { name: "Global Sources", href: "/global-sources", icon: Globe, badge: "70", description: "Weltweite Datenquellen" },
-        { name: "Historical Data", href: "/historical-data", icon: Archive, description: "Historische Daten" },
-        { name: "Sync Manager", href: "/sync-manager", icon: RefreshCw, description: "Synchronisation" }
+        { name: "Datensammlung", href: "/data-collection", icon: Database },
+        { name: "Newsletter-Verwaltung", href: "/newsletter-manager", icon: Newspaper },
+        { name: "Email-Verwaltung", href: "/email-management", icon: Mail },
+        { name: "Wissensartikel", href: "/knowledge-base", icon: BookOpen }
       ]
     },
     {
-      title: "KI & Analyse",
+      title: "COMPLIANCE & REGULIERUNG",
+      defaultOpen: true,
       items: [
-        { name: "AI Insights", href: "/ai-insights", icon: Brain, badge: "24", description: "KI-gestützte Erkenntnisse" },
-        { name: "AI Analysis", href: "/ai-analysis-combined", icon: Sparkles, description: "Umfassende KI-Analyse" },
-        { name: "Knowledge Base", href: "/knowledge-base", icon: Book, badge: "89", description: "Wissensdatenbank" }
+        { name: "Regulatorische Updates", href: "/regulatory-updates", icon: FileText },
+        { name: "Rechtsprechung", href: "/rechtsprechung-kompakt", icon: Scale },
+        { name: "Laufende Zulassungen", href: "/laufende-zulassungen", icon: CheckCircle }
       ]
     },
     {
-      title: "Rechtsprechung & Compliance",
+      title: "ZULASSUNGEN & REGISTRIERUNG",
+      defaultOpen: false,
       items: [
-        { name: "Rechtsfälle", href: "/customer-legal-cases", icon: Gavel, badge: "65", description: "Aktuelle Rechtsprechung" },
-        { name: "Rechtsprechung Kompakt", href: "/rechtsprechung-kompakt", icon: Scale, description: "Kompakte Übersicht" },
-        { name: "Laufende Zulassungen", href: "/laufende-zulassungen", icon: ClipboardCheck, description: "Aktuelle Zulassungsverfahren" }
+        { name: "Globale Zulassungen", href: "/global-sources", icon: Globe },
+        { name: "Laufende Zulassungen", href: "/laufende-zulassungen", icon: Activity }
       ]
     },
     {
-      title: "Workflow & Kommunikation",
+      title: "ERWEITERT",
+      defaultOpen: false,
       items: [
-        { name: "Approval Workflow", href: "/approval-workflow", icon: CheckCircle, description: "Genehmigungsprozess" },
-        { name: "Newsletter Manager", href: "/newsletter-manager", icon: Mail, description: "Newsletter-Verwaltung" },
-        { name: "Email Management", href: "/email-management", icon: Newspaper, description: "E-Mail-Verwaltung" },
-        { name: "Chat Support", href: "/chat-support", icon: MessageSquare, description: "Chat & Support" }
-      ]
-    },
-    {
-      title: "Integration & Tools",
-      items: [
-        { name: "GRIP Integration", href: "/grip-integration", icon: Shield, description: "GRIP-Plattform-Integration" },
-        { name: "Terminology Glossary", href: "/terminology-glossary", icon: BookOpen, description: "Fachbegriffe" },
-        { name: "Document Viewer", href: "/document-viewer", icon: FileSearch, description: "Dokumentenbetrachter" }
-      ]
-    },
-    {
-      title: "Administration",
-      items: [
-        { name: "User Management", href: "/user-management", icon: Users, description: "Benutzerverwaltung" },
-        { name: "Administration", href: "/administration", icon: Building, description: "Systemverwaltung" },
-        { name: "System Settings", href: "/system-settings", icon: Settings, description: "Systemkonfiguration" },
-        { name: "Audit Logs", href: "/audit-logs", icon: Activity, description: "Systemprotokolle" }
+        { name: "AI-Datenquellen", href: "/ai-insights", icon: Brain },
+        { name: "Globale Quellen", href: "/global-sources", icon: Globe },
+        { name: "Administration", href: "/administration", icon: Settings }
       ]
     }
   ];
