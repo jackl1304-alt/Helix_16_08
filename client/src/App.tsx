@@ -63,8 +63,6 @@ function renderCurrentPage(page: string, userData: any) {
       return <GlobalSources />; // Reuse for now
     case '/sync-manager':
       return <SystemSettings />; // Reuse for now
-    case '/newsletter-manager':
-      return <GlobalSources />; // Reuse for now
     case '/admin-customers':
       return <SystemSettings />; // Reuse for now
     case '/administration':
