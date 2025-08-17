@@ -5,15 +5,92 @@
 @tailwind components;
 @tailwind utilities;
 
-/* DELTAWAYS Branding */
+/* DELTAWAYS PRIMARY COLOR SYSTEM - From Brand Guidelines */
+:root {
+  /* Primary Brand Colors */
+  --deltaways-primary: #1E40AF;
+  --deltaways-primary-dark: #1E3A8A;
+  --deltaways-primary-light: #3B82F6;
+  --deltaways-secondary: #8B5CF6;
+  --deltaways-accent: #10B981;
+  
+  /* Gradient System - Based on Screenshots */
+  --deltaways-gradient: linear-gradient(135deg, #1E40AF 0%, #8B5CF6 100%);
+  --deltaways-card-gradient: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+  
+  /* UI Colors - Deltaways Compliant */
+  --deltaways-bg: #F8FAFC;
+  --deltaways-surface: #FFFFFF;
+  --deltaways-border: #E2E8F0;
+  --deltaways-text: #1E293B;
+  --deltaways-text-muted: #64748B;
+  
+  /* Status Colors */
+  --deltaways-success: #10B981;
+  --deltaways-warning: #F59E0B;
+  --deltaways-danger: #EF4444;
+  --deltaways-info: #3B82F6;
+}
+
+/* DELTAWAYS BRANDING COMPONENTS */
 .deltaways-nav {
-  @apply bg-white border-r border-gray-200;
+  background-color: var(--deltaways-surface);
+  border-right: 1px solid var(--deltaways-border);
 }
 
 .deltaways-brand-text {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 700;
   letter-spacing: -0.02em;
+  color: var(--deltaways-text);
+}
+
+.deltaways-header {
+  background-color: var(--deltaways-surface);
+  border-bottom: 1px solid var(--deltaways-border);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.deltaways-dashboard-card {
+  background: var(--deltaways-gradient);
+  color: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.deltaways-card {
+  background-color: var(--deltaways-surface);
+  border: 1px solid var(--deltaways-border);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.deltaways-button-primary {
+  background: var(--deltaways-primary);
+  color: white;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.deltaways-button-primary:hover {
+  background: var(--deltaways-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+}
+
+.deltaways-stats-card {
+  background-color: var(--deltaways-surface);
+  border: 1px solid var(--deltaways-border);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.2s ease-in-out;
+}
+
+.deltaways-stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 /* Performance Optimizations */
