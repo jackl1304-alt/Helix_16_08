@@ -1,115 +1,35 @@
-import { Link } from "wouter";
-import logoPath from "@assets/ICON Helix_1753735921077.jpg";
-import { cn } from "@/lib/utils";
+import React from 'react';
+// import helixLogo from '@assets/ICON Helix_1753735753843.jpg';
 
 interface LogoProps {
-  size?: "small" | "medium" | "large";
-  showText?: boolean;
-  showSubtext?: boolean;
   className?: string;
-  linkTo?: string;
+  showText?: boolean;
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export function Logo({ 
-  size = "medium", 
-  showText = false, 
-  showSubtext = false, 
-  className,
-  linkTo = "/" 
-}: LogoProps) {
+export function Logo({ className = '', showText = true, size = 'md' }: LogoProps) {
   const sizeClasses = {
-    small: "h-10 w-10",
-    medium: "h-14 w-14", 
-    large: "h-18 w-18"
+    sm: 'h-8 w-8',
+    md: 'h-10 w-10', 
+    lg: 'h-12 w-12'
   };
 
-  const textSizeClasses = {
-    small: "text-sm",
-    medium: "text-lg",
-    large: "text-xl"
-  };
-
-  const content = (
-    <div className={cn("flex items-center", className)}>
-      <img 
-        src={logoPath} 
-        alt="Helix Logo" 
-        className={cn(
-          sizeClasses[size],
-          "object-cover rounded-lg"
-        )}
-      />
+  return (
+    <div className={`flex items-center space-x-3 ${className}`}>
+      <div className="relative">
+        <div className={`${sizeClasses[size]} bg-gradient-to-br from-blue-600 via-purple-600 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg`}>
+          <span className="text-white font-bold text-xl">H</span>
+        </div>
+      </div>
       {showText && (
-        <div>
-          <h1 className={cn(
-            "font-bold text-gray-900 dark:text-gray-100",
-            textSizeClasses[size]
-          )}>
-            Helix
-          </h1>
-          {showSubtext && (
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              MedTech Intelligence
-            </p>
-          )}
+        <div className="flex flex-col">
+          <span className="text-lg font-bold text-white tracking-wide">HELIX</span>
+          <span className="text-xs text-blue-100 font-medium">Powered by DELTAWAYS</span>
         </div>
       )}
     </div>
   );
-
-  if (linkTo) {
-    return (
-      <Link href={linkTo}>
-        <div className="cursor-pointer hover:opacity-80 transition-opacity">
-          {content}
-        </div>
-      </Link>
-    );
-  }
-
-  return content;
 }
 
-// Preset logo components for common use cases
-export function HeaderLogo() {
-  return (
-    <Logo 
-      size="medium" 
-      showText={false} 
-      showSubtext={false}
-      className="hover:opacity-80 transition-opacity"
-    />
-  );
-}
-
-export function SidebarLogo() {
-  return (
-    <Logo 
-      size="medium" 
-      showText={false} 
-      showSubtext={false}
-      className="p-2"
-    />
-  );
-}
-
-export function CompactLogo() {
-  return (
-    <Logo 
-      size="small" 
-      showText={false} 
-      showSubtext={false}
-    />
-  );
-}
-
-export function FullLogo() {
-  return (
-    <Logo 
-      size="large" 
-      showText={false} 
-      showSubtext={false}
-      className="text-center"
-    />
-  );
-}
+export default Logo;
+export { Logo as CompactLogo };

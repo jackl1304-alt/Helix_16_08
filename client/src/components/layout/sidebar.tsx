@@ -28,7 +28,7 @@ import {
   Activity
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-// import logoPath from "@assets/ICON Helix_1753735753843.jpg";
+import { Logo } from "@/components/layout/logo";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -250,9 +250,7 @@ export function Sidebar() {
       <div className="p-6 border-b border-gray-200">
         <Link to="/">
           <div className="flex flex-col items-center cursor-pointer space-y-2">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 via-purple-600 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg">
-              <Activity className="h-8 w-8 text-white" />
-            </div>
+            <Logo size="lg" showText={false} />
             <span className="text-lg deltaways-brand-text text-[#07233e]">HELIX</span>
             <p className="text-xs font-medium text-gray-600">Powered by DELTA WAYS</p>
           </div>
@@ -260,7 +258,7 @@ export function Sidebar() {
         
         {/* Customer Area Button */}
         <div className="mt-4">
-          <Link to="/customer-area">
+          <Link to="/customer-dashboard">
             <button className="w-full flex items-center justify-center px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
               <Users className="h-4 w-4 mr-2" />
               Customer Area
