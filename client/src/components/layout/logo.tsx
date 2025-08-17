@@ -1,5 +1,5 @@
 import React from 'react';
-import helixLogo from '../../assets/helix-logo.jpg';
+import helixLogo from '@assets/ICON Helix_1753735753843.jpg';
 
 interface LogoProps {
   className?: string;
@@ -9,24 +9,24 @@ interface LogoProps {
 
 export function Logo({ className = '', showText = true, size = 'md' }: LogoProps) {
   const sizeClasses = {
-    sm: 'h-8 w-8',
-    md: 'h-10 w-10', 
-    lg: 'h-12 w-12'
+    sm: 'h-12 w-12',
+    md: 'h-16 w-16', 
+    lg: 'h-20 w-20'
   };
 
   return (
-    <div className={`flex items-center space-x-3 ${className}`}>
+    <div className={`flex flex-col items-center space-y-2 ${className}`}>
       <div className="relative">
         <img 
           src={helixLogo} 
           alt="Helix DNA Logo" 
-          className={`${sizeClasses[size]} rounded-lg object-cover shadow-sm`}
+          className={`${sizeClasses[size]} rounded-lg object-cover shadow-lg`}
         />
       </div>
       {showText && (
-        <div className="flex flex-col">
-          <span className="text-lg font-bold text-white tracking-wide">HELIX</span>
-          <span className="text-xs text-blue-100 font-medium">Powered by DELTAWAYS</span>
+        <div className="flex flex-col items-center">
+          <span className="text-xl font-bold text-[#07233e] tracking-wide">HELIX</span>
+          <span className="text-xs text-gray-600 font-medium">Powered by DELTAWAYS</span>
         </div>
       )}
     </div>
