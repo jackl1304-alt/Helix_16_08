@@ -145,11 +145,7 @@ export function MobileSidebar() {
             {/* Header */}
             <div className="p-4 border-b border-gray-200">
               <div className="flex flex-col items-center">
-                <img 
-                  src={logoPath} 
-                  alt="Helix Logo" 
-                  className="h-12 w-12 rounded-lg object-cover mb-2"
-                />
+                <Activity className="h-12 w-12 text-blue-600 mb-2" />
                 <div className="text-sm font-medium text-gray-700">MedTech Intelligence</div>
               </div>
             </div>
