@@ -1,5 +1,6 @@
 import React from 'react';
-import helixLogo from '@assets/ICON Helix_1753735753843.jpg';
+// Logo deaktiviert wegen Import-Fehlern
+// import helixLogo from '@assets/helix-logo.jpg';
 
 interface LogoProps {
   className?: string;
@@ -17,11 +18,9 @@ export function Logo({ className = '', showText = true, size = 'md' }: LogoProps
   return (
     <div className={`flex flex-col items-center space-y-2 ${className}`}>
       <div className="relative">
-        <img 
-          src={helixLogo} 
-          alt="Helix DNA Logo" 
-          className={`${sizeClasses[size]} rounded-lg object-cover shadow-lg`}
-        />
+        <div className={`${sizeClasses[size]} bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg`}>
+          <span className="text-white font-bold text-lg">H</span>
+        </div>
       </div>
       {showText && (
         <div className="flex flex-col items-center">
