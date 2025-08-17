@@ -8,31 +8,33 @@ import { ResponsiveLayout } from "@/components/responsive-layout";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 
-// Pages
-import Dashboard from "@/pages/dashboard";
+// Core Pages (eager loading)
 import Login from "@/pages/login";
 import NotFound from "@/pages/not-found";
-import SystemSettings from "@/pages/system-settings";
-import Analytics from "@/pages/analytics";
-import RegulatoryUpdates from "@/pages/regulatory-updates";
-import DataCollection from "@/pages/data-collection";
-import NewsletterAdmin from "@/pages/newsletter-admin";
-import EmailManagement from "@/pages/email-management";
-import KnowledgeBase from "@/pages/knowledge-base";
-import RechtsprechungFixed from "@/pages/rechtsprechung-fixed";
-import ZulassungenGlobal from "@/pages/zulassungen-global";
-import LaufendeZulassungen from "@/pages/laufende-zulassungen";
-import SyncManager from "@/pages/sync-manager";
-import GlobalSources from "@/pages/global-sources";
-import NewsletterManager from "@/pages/newsletter-manager";
-import HistoricalData from "@/pages/historical-data";
-import AdminCustomers from "@/pages/admin-customers";
-import UserManagement from "@/pages/user-management";
-import Administration from "@/pages/administration";
-import AuditLogs from "@/pages/audit-logs";
-import AiContentAnalysis from "@/pages/ai-content-analysis";
-import AiInsights from "@/pages/ai-insights";
-import GripIntegration from "@/pages/grip-integration";
+
+// Lazy loaded pages (code splitting!)
+const Dashboard = React.lazy(() => import("@/pages/dashboard"));
+const Analytics = React.lazy(() => import("@/pages/analytics"));
+const SystemSettings = React.lazy(() => import("@/pages/system-settings"));
+const RegulatoryUpdates = React.lazy(() => import("@/pages/regulatory-updates"));
+const DataCollection = React.lazy(() => import("@/pages/data-collection"));
+const NewsletterAdmin = React.lazy(() => import("@/pages/newsletter-admin"));
+const EmailManagement = React.lazy(() => import("@/pages/email-management"));
+const KnowledgeBase = React.lazy(() => import("@/pages/knowledge-base"));
+const RechtsprechungFixed = React.lazy(() => import("@/pages/rechtsprechung-fixed"));
+const ZulassungenGlobal = React.lazy(() => import("@/pages/zulassungen-global"));
+const LaufendeZulassungen = React.lazy(() => import("@/pages/laufende-zulassungen"));
+const SyncManager = React.lazy(() => import("@/pages/sync-manager"));
+const GlobalSources = React.lazy(() => import("@/pages/global-sources"));
+const NewsletterManager = React.lazy(() => import("@/pages/newsletter-manager"));
+const HistoricalData = React.lazy(() => import("@/pages/historical-data"));
+const AdminCustomers = React.lazy(() => import("@/pages/admin-customers"));
+const UserManagement = React.lazy(() => import("@/pages/user-management"));
+const Administration = React.lazy(() => import("@/pages/administration"));
+const AuditLogs = React.lazy(() => import("@/pages/audit-logs"));
+const AiContentAnalysis = React.lazy(() => import("@/pages/ai-content-analysis"));
+const AiInsights = React.lazy(() => import("@/pages/ai-insights"));
+const GripIntegration = React.lazy(() => import("@/pages/grip-integration"));
 
 // Simple Auth Hook
 function useSimpleAuth() {
@@ -93,41 +95,47 @@ function App() {
           <TooltipProvider>
             <Toaster />
             <ResponsiveLayout>
-              <Switch>
-                <Route path="/" component={Dashboard} />
-                <Route path="/dashboard" component={Dashboard} />
-                <Route path="/analytics" component={Analytics} />
-                <Route path="/system-settings" component={SystemSettings} />
-                
-                {/* Data Management */}
-                <Route path="/data-collection" component={DataCollection} />
-                <Route path="/newsletter-admin" component={NewsletterAdmin} />
-                <Route path="/email-management" component={EmailManagement} />
-                <Route path="/knowledge-base" component={KnowledgeBase} />
-                
-                {/* Compliance & Regulation */}
-                <Route path="/regulatory-updates" component={RegulatoryUpdates} />
-                <Route path="/rechtsprechung" component={RechtsprechungFixed} />
-                
-                {/* Approvals & Registration */}
-                <Route path="/zulassungen/global" component={ZulassungenGlobal} />
-                <Route path="/zulassungen/laufende" component={LaufendeZulassungen} />
-                
-                {/* Advanced */}
-                <Route path="/sync-manager" component={SyncManager} />
-                <Route path="/global-sources" component={GlobalSources} />
-                <Route path="/newsletter-manager" component={NewsletterManager} />
-                <Route path="/historical-data" component={HistoricalData} />
-                <Route path="/admin-customers" component={AdminCustomers} />
-                <Route path="/user-management" component={UserManagement} />
-                <Route path="/administration" component={Administration} />
-                <Route path="/audit-logs" component={AuditLogs} />
-                <Route path="/ai-content-analysis" component={AiContentAnalysis} />
-                <Route path="/ki-insights" component={AiInsights} />
-                <Route path="/grip-integration" component={GripIntegration} />
-                
-                <Route component={NotFound} />
-              </Switch>
+              <React.Suspense fallback={
+                <div className="flex items-center justify-center min-h-screen">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                </div>
+              }>
+                <Switch>
+                  <Route path="/" component={Dashboard} />
+                  <Route path="/dashboard" component={Dashboard} />
+                  <Route path="/analytics" component={Analytics} />
+                  <Route path="/system-settings" component={SystemSettings} />
+                  
+                  {/* Data Management */}
+                  <Route path="/data-collection" component={DataCollection} />
+                  <Route path="/newsletter-admin" component={NewsletterAdmin} />
+                  <Route path="/email-management" component={EmailManagement} />
+                  <Route path="/knowledge-base" component={KnowledgeBase} />
+                  
+                  {/* Compliance & Regulation */}
+                  <Route path="/regulatory-updates" component={RegulatoryUpdates} />
+                  <Route path="/rechtsprechung" component={RechtsprechungFixed} />
+                  
+                  {/* Approvals & Registration */}
+                  <Route path="/zulassungen/global" component={ZulassungenGlobal} />
+                  <Route path="/zulassungen/laufende" component={LaufendeZulassungen} />
+                  
+                  {/* Advanced */}
+                  <Route path="/sync-manager" component={SyncManager} />
+                  <Route path="/global-sources" component={GlobalSources} />
+                  <Route path="/newsletter-manager" component={NewsletterManager} />
+                  <Route path="/historical-data" component={HistoricalData} />
+                  <Route path="/admin-customers" component={AdminCustomers} />
+                  <Route path="/user-management" component={UserManagement} />
+                  <Route path="/administration" component={Administration} />
+                  <Route path="/audit-logs" component={AuditLogs} />
+                  <Route path="/ai-content-analysis" component={AiContentAnalysis} />
+                  <Route path="/ki-insights" component={AiInsights} />
+                  <Route path="/grip-integration" component={GripIntegration} />
+                  
+                  <Route component={NotFound} />
+                </Switch>
+              </React.Suspense>
             </ResponsiveLayout>
           </TooltipProvider>
         </QueryClientProvider>
