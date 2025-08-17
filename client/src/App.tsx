@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import Login from "@/pages/login";
 
 // Direct imports - no lazy loading to eliminate Suspense issues
@@ -89,10 +90,12 @@ function App() {
   if (!isAuthenticated) {
     return (
       <QueryClientProvider client={queryClient}>
-        <div className="min-h-screen bg-gray-50">
-          <Toaster />
-          <Login onLogin={() => setIsAuthenticated(true)} />
-        </div>
+        <LanguageProvider>
+          <div className="min-h-screen bg-gray-50">
+            <Toaster />
+            <Login onLogin={() => setIsAuthenticated(true)} />
+          </div>
+        </LanguageProvider>
       </QueryClientProvider>
     );
   }
@@ -100,10 +103,12 @@ function App() {
   // Main app with JSON-based navigation
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-gray-50">
-        <Toaster />
-        {renderCurrentPage(appState.currentPage, appState.userData)}
-      </div>
+      <LanguageProvider>
+        <div className="min-h-screen bg-gray-50">
+          <Toaster />
+          {renderCurrentPage(appState.currentPage, appState.userData)}
+        </div>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }
