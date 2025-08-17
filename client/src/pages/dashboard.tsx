@@ -23,105 +23,111 @@ import {
 export default function Dashboard() {
   return (
     <div className="space-y-6">
-      {/* Blue Gradient Header exactly like screenshot */}
-      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-purple-700 rounded-lg p-6 text-white">
+      {/* DELTAWAYS Dashboard Header - Exact Screenshot Recreation */}
+      <div className="deltaways-dashboard-card bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 rounded-xl p-8 text-white shadow-lg">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold mb-2">Regulatory Intelligence Dashboard</h1>
-            <p className="text-blue-100 mb-4">KI-gestützte Analyse • Echtzeit-Updates • 100% Datenqualität</p>
-            <div className="flex items-center space-x-4">
-              <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-                <Activity className="h-3 w-3 mr-1" />
-                Live System
-              </Badge>
-              <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-                70 Quellen aktiv
-              </Badge>
+          <div className="flex-1">
+            <h1 className="text-4xl font-bold mb-3 flex items-center gap-3 deltaways-brand-text">
+              <Activity className="h-10 w-10" />
+              Regulatory Intelligence Dashboard
+            </h1>
+            <p className="text-blue-100 mb-6 text-lg font-medium">
+              KI-gestützte Analyse • Echtzeit-Updates • 100% Datenqualität
+            </p>
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center gap-2 bg-white/10 rounded-lg px-4 py-2">
+                <Activity className="h-5 w-5" />
+                <span className="font-medium">Live System</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/10 rounded-lg px-4 py-2">
+                <CheckCircle className="h-5 w-5" />
+                <span className="font-medium">70 Quellen aktiv</span>
+              </div>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold">66</div>
-            <div className="text-sm text-blue-100">Updates</div>
-            <div className="text-3xl font-bold mt-2">100%</div>
-            <div className="text-sm text-blue-100">Qualität</div>
+            <div className="text-6xl font-bold mb-2 deltaways-brand-text">66</div>
+            <div className="text-blue-100 text-lg font-medium">Updates</div>
+            <div className="text-4xl font-bold mt-4 deltaways-brand-text">100%</div>
+            <div className="text-blue-100 text-lg font-medium">Qualität</div>
           </div>
         </div>
       </div>
 
       {/* Main Stats Cards exactly like screenshot */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-l-4 border-l-blue-500">
+        <Card className="deltaways-stats-card border-l-4 border-l-blue-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">
               Regulatory Updates
             </CardTitle>
-            <FileText className="h-5 w-5 text-blue-500" />
+            <FileText className="h-6 w-6 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">66</div>
-            <p className="text-xs text-green-600 font-medium mt-1">
+            <div className="text-4xl font-bold text-gray-900 deltaways-brand-text">66</div>
+            <p className="text-sm text-green-600 font-medium mt-2">
               Aktuelle regulatorische Änderungen
             </p>
-            <div className="flex items-center mt-2">
+            <div className="flex items-center mt-3">
               <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
-              <span className="text-xs text-gray-500">100% Qualität</span>
+              <span className="text-xs text-gray-500 font-medium">100% Qualität</span>
             </div>
           </CardContent>
         </Card>
         
-        <Card className="border-l-4 border-l-purple-500">
+        <Card className="deltaways-stats-card border-l-4 border-l-purple-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">
               Legal Cases
             </CardTitle>
-            <Scale className="h-5 w-5 text-purple-500" />
+            <Scale className="h-6 w-6 text-purple-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">65</div>
-            <p className="text-xs text-blue-600 font-medium mt-1">
+            <div className="text-4xl font-bold text-gray-900 deltaways-brand-text">65</div>
+            <p className="text-sm text-blue-600 font-medium mt-2">
               Rechtsprechung und Präzedenzfälle
             </p>
-            <div className="flex items-center mt-2">
+            <div className="flex items-center mt-3">
               <div className="h-2 w-2 rounded-full bg-blue-500 mr-2"></div>
-              <span className="text-xs text-gray-500">Vollständig analysiert</span>
+              <span className="text-xs text-gray-500 font-medium">Vollständig analysiert</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-green-500">
+        <Card className="deltaways-stats-card border-l-4 border-l-green-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">
               Data Sources
             </CardTitle>
-            <Database className="h-5 w-5 text-green-500" />
+            <Database className="h-6 w-6 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">70</div>
-            <p className="text-xs text-green-600 font-medium mt-1">
+            <div className="text-4xl font-bold text-gray-900 deltaways-brand-text">70</div>
+            <p className="text-sm text-green-600 font-medium mt-2">
               Aktive Datenquellen global
             </p>
-            <div className="flex items-center mt-2">
+            <div className="flex items-center mt-3">
               <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
-              <span className="text-xs text-gray-500">Live verbunden</span>
+              <span className="text-xs text-gray-500 font-medium">Live verbunden</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-orange-500">
+        <Card className="deltaways-stats-card border-l-4 border-l-orange-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">
-              Knowledge Base
+              AI Analysis
             </CardTitle>
-            <Lightbulb className="h-5 w-5 text-orange-500" />
+            <Lightbulb className="h-6 w-6 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">131</div>
-            <p className="text-xs text-orange-600 font-medium mt-1">
-              Artikel und Erkenntnisse
+            <div className="text-4xl font-bold text-gray-900 deltaways-brand-text">24</div>
+            <p className="text-sm text-orange-600 font-medium mt-2">
+              KI-gestützte Analysen
             </p>
-            <div className="flex items-center mt-2">
+            <div className="flex items-center mt-3">
               <div className="h-2 w-2 rounded-full bg-orange-500 mr-2"></div>
-              <span className="text-xs text-gray-500">KI-analysiert</span>
+              <span className="text-xs text-gray-500 font-medium">In Bearbeitung</span>
             </div>
           </CardContent>
         </Card>
