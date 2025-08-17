@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { Router, Route } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
+import { queryClient } from "@/lib/queryClient";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import Login from "@/pages/login";
 
@@ -15,151 +16,74 @@ import HistoricalData from "@/pages/historical-data";
 import SystemSettings from "@/pages/system-settings";
 import NotFound from "@/pages/not-found";
 
-// JSON-based Navigation State
-interface AppState {
-  currentPage: string;
-  userData: any;
-  isLoading: boolean;
-}
-
-// Simple page renderer without complex routing
-function renderCurrentPage(page: string, userData: any) {
-  switch (page) {
-    case '/':
-    case '/dashboard':
-      return <Dashboard />;
-    case '/regulatory-updates':
-      return <RegulatoryUpdates />;
-    case '/knowledge-base':
-      return <KnowledgeBase />;
-    case '/analytics':
-      return <Analytics />;
-    case '/global-sources':
-      return <GlobalSources />;
-    case '/historical-data':
-      return <HistoricalData />;
-    case '/system-settings':
-      return <SystemSettings />;
-    case '/data-collection':
-      return <GlobalSources />; // Reuse for now
-    case '/newsletter-manager':
-      return <GlobalSources />; // Reuse for now
-    case '/legal-cases':
-      return <HistoricalData />; // Reuse for now
-    case '/user-management':
-      return <SystemSettings />; // Reuse for now
-    case '/audit-logs':
-      return <SystemSettings />; // Reuse for now
-    // Additional navigation routes from original sidebar
-    case '/newsletter-admin':
-      return <GlobalSources />; // Reuse for now  
-    case '/email-management':
-      return <SystemSettings />; // Reuse for now
-    case '/rechtsprechung':
-      return <HistoricalData />; // Reuse for now
-    case '/zulassungen/global':
-      return <GlobalSources />; // Reuse for now
-    case '/zulassungen/laufende':
-      return <GlobalSources />; // Reuse for now
-    case '/sync-manager':
-      return <SystemSettings />; // Reuse for now
-    case '/admin-customers':
-      return <SystemSettings />; // Reuse for now
-    case '/administration':
-      return <SystemSettings />; // Reuse for now
-    case '/ai-content-analysis':
-      return <Analytics />; // Reuse for now
-    case '/ki-insights':
-      return <Analytics />; // Reuse for now
-    case '/grip-integration':
-      return <GlobalSources />; // Reuse for now
-    case '/intelligent-search':
-      return <GlobalSources />; // Reuse for now
-    case '/404':
-    default:
-      return <NotFound />;
-  }
-}
-
-// JSON-based Simple App without React Suspense issues
 function App() {
-  const [appState, setAppState] = useState<AppState>({
-    currentPage: window.location.pathname,
-    userData: null,
-    isLoading: true
-  });
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
-  // Initialize app with JSON data
+  // Initialize authentication
   useEffect(() => {
     const initializeApp = async () => {
       try {
         // Check authentication
         const authStatus = localStorage.getItem('isAuthenticated') === 'true';
         setIsAuthenticated(authStatus);
-        
-        // Load user data from JSON endpoint if authenticated
-        if (authStatus) {
-          const userData = await fetch('/api/user/profile')
-            .then(res => res.ok ? res.json() : null)
-            .catch(() => null);
-          
-          setAppState(prev => ({
-            ...prev,
-            userData,
-            isLoading: false
-          }));
-        } else {
-          setAppState(prev => ({ ...prev, isLoading: false }));
-        }
       } catch (error) {
         console.error('App initialization error:', error);
-        setAppState(prev => ({ ...prev, isLoading: false }));
+        setIsAuthenticated(false);
       }
     };
 
     initializeApp();
   }, []);
 
-  // Handle navigation via JSON state
-  const handleNavigation = (page: string) => {
-    setAppState(prev => ({ ...prev, currentPage: page }));
-    window.history.pushState({}, '', page);
-  };
-
-  // Loading state
-  if (appState.isLoading || isAuthenticated === null) {
+  // Show loading while checking auth
+  if (isAuthenticated === null) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Helix wird geladen...</p>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-gray-600">Loading Helix Platform...</p>
         </div>
       </div>
     );
   }
 
   // Show login if not authenticated
-  if (!isAuthenticated) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <LanguageProvider>
-          <div className="min-h-screen bg-gray-50">
-            <Toaster />
-            <Login onLogin={() => setIsAuthenticated(true)} />
-          </div>
-        </LanguageProvider>
-      </QueryClientProvider>
-    );
+  if (isAuthenticated === false) {
+    return <Login />;
   }
 
-  // Main app with JSON-based navigation
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <div className="min-h-screen bg-gray-50">
           <Toaster />
-          {renderCurrentPage(appState.currentPage, appState.userData)}
+          <Router>
+            <Route path="/" component={Dashboard} />
+            <Route path="/regulatory-updates" component={RegulatoryUpdates} />
+            <Route path="/knowledge-base" component={KnowledgeBase} />
+            <Route path="/analytics" component={Analytics} />
+            <Route path="/global-sources" component={GlobalSources} />
+            <Route path="/historical-data" component={HistoricalData} />
+            <Route path="/system-settings" component={SystemSettings} />
+            <Route path="/data-collection" component={GlobalSources} />
+            <Route path="/newsletter-manager" component={GlobalSources} />
+            <Route path="/legal-cases" component={HistoricalData} />
+            <Route path="/user-management" component={SystemSettings} />
+            <Route path="/audit-logs" component={SystemSettings} />
+            <Route path="/newsletter-admin" component={GlobalSources} />
+            <Route path="/email-management" component={SystemSettings} />
+            <Route path="/rechtsprechung" component={HistoricalData} />
+            <Route path="/zulassungen/global" component={GlobalSources} />
+            <Route path="/zulassungen/laufende" component={GlobalSources} />
+            <Route path="/sync-manager" component={SystemSettings} />
+            <Route path="/admin-customers" component={SystemSettings} />
+            <Route path="/administration" component={SystemSettings} />
+            <Route path="/ai-content-analysis" component={Analytics} />
+            <Route path="/ki-insights" component={Analytics} />
+            <Route path="/grip-integration" component={GlobalSources} />
+            <Route path="/intelligent-search" component={GlobalSources} />
+            <Route component={NotFound} />
+          </Router>
         </div>
       </LanguageProvider>
     </QueryClientProvider>
@@ -167,30 +91,3 @@ function App() {
 }
 
 export default App;
-
-// JSON API helper functions
-export const jsonApi = {
-  get: async (endpoint: string) => {
-    try {
-      const response = await fetch(endpoint);
-      return response.ok ? await response.json() : null;
-    } catch (error) {
-      console.error('JSON API GET error:', error);
-      return null;
-    }
-  },
-  
-  post: async (endpoint: string, data: any) => {
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      return response.ok ? await response.json() : null;
-    } catch (error) {
-      console.error('JSON API POST error:', error);
-      return null;
-    }
-  }
-};
