@@ -15,7 +15,7 @@ import TenantAuth from "@/pages/tenant-auth";
 // Admin Dashboard & Pages
 import Dashboard from "@/pages/dashboard";
 import Administration from "@/pages/administration";
-import RegulatoryUpdates from "@/pages/regulatory-updates";
+import RegulatoryUpdatesComplete from "@/pages/regulatory-updates-complete";
 import RegulatoryUpdateDetail from "@/pages/regulatory-update-detail";
 import Analytics from "@/pages/analytics";
 import AdvancedAnalytics from "@/pages/advanced-analytics";
@@ -30,6 +30,7 @@ import ApprovalWorkflow from "@/pages/approval-workflow";
 import LaufendeZulassungen from "@/pages/laufende-zulassungen";
 import CustomerLegalCases from "@/pages/customer-legal-cases";
 import RechtsprechungKompaktClean from "@/pages/rechtsprechung-kompakt-clean";
+import LegalIntelligenceCenter from "@/pages/legal-intelligence-center";
 import NewsletterManager from "@/pages/newsletter-manager";
 import EmailManagement from "@/pages/email-management";
 import ChatSupport from "@/pages/chat-support";
@@ -132,6 +133,7 @@ function App() {
               <Route path="/customer/knowledge-base" component={CustomerKnowledgeBase} />
               <Route path="/customer/newsletters" component={CustomerNewsletters} />
               <Route path="/customer/legal-cases" component={CustomerLegalCases} />
+              <Route path="/legal-intelligence" component={LegalIntelligenceCenter} />
               <Route path="/customer/settings" component={CustomerSettings} />
 
               {/* Admin Dashboard Routes - Main Navigation */}
@@ -140,7 +142,7 @@ function App() {
               <Route path="/administration" component={Administration} />
               
               {/* Regulatory & Data Management */}
-              <Route path="/regulatory-updates" component={RegulatoryUpdates} />
+              <Route path="/regulatory-updates" component={RegulatoryUpdatesComplete} />
               <Route path="/regulatory-updates/:id" component={RegulatoryUpdateDetail} />
               <Route path="/data-collection" component={DataCollection} />
               <Route path="/global-sources" component={GlobalSources} />

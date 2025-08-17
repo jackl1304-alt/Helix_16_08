@@ -92,7 +92,7 @@ export function AdminNavigation() {
       defaultOpen: true,
       items: [
         { name: "Regulatorische Updates", href: "/regulatory-updates", icon: FileText },
-        { name: "Rechtsprechung", href: "/rechtsprechung-kompakt", icon: Scale },
+        { name: "Rechtsprechung", href: "/legal-intelligence", icon: Scale },
         { name: "Laufende Zulassungen", href: "/laufende-zulassungen", icon: CheckCircle }
       ]
     },
