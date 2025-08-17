@@ -50,6 +50,33 @@ function renderCurrentPage(page: string, userData: any) {
       return <SystemSettings />; // Reuse for now
     case '/audit-logs':
       return <SystemSettings />; // Reuse for now
+    // Additional navigation routes from original sidebar
+    case '/newsletter-admin':
+      return <GlobalSources />; // Reuse for now  
+    case '/email-management':
+      return <SystemSettings />; // Reuse for now
+    case '/rechtsprechung':
+      return <HistoricalData />; // Reuse for now
+    case '/zulassungen/global':
+      return <GlobalSources />; // Reuse for now
+    case '/zulassungen/laufende':
+      return <GlobalSources />; // Reuse for now
+    case '/sync-manager':
+      return <SystemSettings />; // Reuse for now
+    case '/newsletter-manager':
+      return <GlobalSources />; // Reuse for now
+    case '/admin-customers':
+      return <SystemSettings />; // Reuse for now
+    case '/administration':
+      return <SystemSettings />; // Reuse for now
+    case '/ai-content-analysis':
+      return <Analytics />; // Reuse for now
+    case '/ki-insights':
+      return <Analytics />; // Reuse for now
+    case '/grip-integration':
+      return <GlobalSources />; // Reuse for now
+    case '/intelligent-search':
+      return <GlobalSources />; // Reuse for now
     case '/404':
     default:
       return <NotFound />;
