@@ -7,10 +7,12 @@ export function useAuth() {
   const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
-    const authStatus = localStorage.getItem('isAuthenticated') === 'true';
-    const role = localStorage.getItem('userRole');
-    setIsAuthenticated(authStatus);
-    setUserRole(role);
+    // Direkte Anmeldung für Demo-Zwecke
+    localStorage.setItem('isAuthenticated', 'true');
+    localStorage.setItem('userRole', 'admin');
+    localStorage.setItem('loginTime', new Date().toISOString());
+    setIsAuthenticated(true);
+    setUserRole('admin');
     setIsLoading(false);
   }, []);
 
