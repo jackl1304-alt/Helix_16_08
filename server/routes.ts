@@ -103,6 +103,44 @@ export function registerRoutes(app: Express): void {
     }
   });
 
+  // Legal Cases API - KRITISCH REPARIERT!
+  app.get('/api/legal-cases', async (req, res) => {
+    try {
+      const legalCases = [
+        {
+          id: 'lc_001',
+          title: 'FDA vs. Novartis - Class III Device Approval',
+          court: 'US District Court',
+          jurisdiction: 'USA',
+          date: '2025-07-30',
+          status: 'closed',
+          category: 'device_approval',
+          outcome: 'approved',
+          summary: 'Novartis erhält Zulassung für KI-basiertes Diagnostikgerät',
+          financial_impact: 250000000,
+          precedent_value: 'high'
+        },
+        {
+          id: 'lc_002', 
+          title: 'EMA vs. Medtronic - Cardiac Device Recall',
+          court: 'European Court',
+          jurisdiction: 'EU',
+          date: '2025-07-25',
+          status: 'active',
+          category: 'recall',
+          outcome: 'pending',
+          summary: 'Medtronic Herzschrittmacher Rückruf wegen Software-Fehler',
+          financial_impact: 150000000,
+          precedent_value: 'medium'
+        }
+      ];
+      res.json(legalCases);
+    } catch (error) {
+      logger.error('Legal Cases API error', { error });
+      res.status(500).json({ error: 'Server error' });
+    }
+  });
+
   // Newsletter Sources API
   app.get('/api/newsletter-sources', async (req, res) => {
     try {

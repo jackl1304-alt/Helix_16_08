@@ -113,7 +113,7 @@
   border-color: var(--deltaways-border);
 }
 
-/* 2025 TREND: Emotional Button with Haptic Feedback */
+/* 2025 TREND: Emotional Button with Haptic Feedback - PERFORMANCE OPTIMIERT */
 .deltaways-button-primary {
   background: var(--deltaways-gradient);
   color: white;
@@ -124,8 +124,9 @@
   border: none;
   position: relative;
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
+  will-change: transform;
 }
 
 .deltaways-button-primary::before {
@@ -238,7 +239,7 @@
   100% { filter: brightness(1.1) drop-shadow(0 0 20px rgba(30, 64, 175, 0.3)); }
 }
 
-/* 2025 TREND: Animated Text Effects */
+/* 2025 TREND: Animated Text Effects - PERFORMANCE OPTIMIERT */
 .deltaways-text-animate {
   overflow: hidden;
   position: relative;
@@ -252,12 +253,13 @@
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  animation: text-shimmer 2s infinite;
+  animation: text-shimmer 3s infinite;
+  will-change: transform;
 }
 
 @keyframes text-shimmer {
-  0% { left: -100%; }
-  100% { left: 100%; }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(200%); }
 }
 
 /* 2025 TREND: Enhanced Accessibility & Focus States */
@@ -268,26 +270,7 @@
   border-radius: 8px;
 }
 
-/* 2025 TREND: Sustainable Dark Mode Ready */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --deltaways-bg: #0F172A;
-    --deltaways-surface: #1E293B;
-    --deltaways-surface-elevated: rgba(30, 41, 59, 0.95);
-    --deltaways-border: #334155;
-    --deltaways-border-subtle: #475569;
-    --deltaways-text: #F8FAFC;
-    --deltaways-text-muted: #CBD5E1;
-    --deltaways-text-subtle: #94A3B8;
-  }
-  
-  .deltaways-dashboard-card {
-    background: linear-gradient(135deg, #1E40AF 0%, #7C3AED 50%, #3B82F6 100%);
-    box-shadow: 
-      0 8px 32px rgba(30, 64, 175, 0.4),
-      0 4px 16px rgba(139, 92, 246, 0.3);
-  }
-}
+/* NO DARK MODE - Exakte Screenshot Farben wie vom 16.08. 14:05 */
 
 /* Performance Optimizations */
 @layer utilities {
