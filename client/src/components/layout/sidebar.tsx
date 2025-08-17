@@ -183,8 +183,8 @@ export function Sidebar() {
         className={cn(
           "flex items-center justify-start px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer text-left",
           isActive
-            ? "bg-[#07233e] text-white shadow-md"
-            : "text-gray-700 hover:bg-[#f0f8ff] hover:text-[#07233e]"
+            ? "bg-white text-[#1e3a5f] shadow-md"
+            : "text-gray-300 hover:bg-[#2d4a70] hover:text-white"
         )}
       >
         <IconComponent className="mr-3 h-5 w-5 flex-shrink-0" />
@@ -228,7 +228,7 @@ export function Sidebar() {
       <div key={sectionKey} className="mb-3">
         <button
           onClick={() => toggleSection(sectionKey)}
-          className="flex items-center justify-between w-full px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-[#07233e] transition-colors duration-200 text-left"
+          className="flex items-center justify-between w-full px-4 py-2 text-xs font-semibold text-gray-300 uppercase tracking-wider hover:text-white transition-colors duration-200 text-left"
         >
           <span>{section.title}</span>
           <ChevronIcon className="h-4 w-4" />
@@ -245,14 +245,12 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 deltaways-nav shadow-lg z-50 overflow-y-auto">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-[#1e3a5f] shadow-lg z-50 overflow-y-auto">
       {/* DELTA WAYS Logo Header */}
-      <div className="p-6 border-b border-gray-200">
+      <div className="p-6 border-b border-gray-700">
         <Link to="/">
           <div className="flex flex-col items-center cursor-pointer space-y-2">
-            <Logo size="lg" showText={false} />
-            <span className="text-lg deltaways-brand-text text-[#07233e]">HELIX</span>
-            <p className="text-xs font-medium text-gray-600">Powered by DELTA WAYS</p>
+            <Logo size="lg" showText={true} />
           </div>
         </Link>
         
@@ -268,7 +266,7 @@ export function Sidebar() {
       </div>
       
       {/* Funktionsfähiger Suchbereich */}
-      <div className="p-4 border-b border-gray-100">
+      <div className="p-4 border-b border-gray-700">
         <SidebarSearchField />
       </div>
       
@@ -282,26 +280,26 @@ export function Sidebar() {
       </nav>
       
       {/* Status-Footer */}
-      <div className="border-t border-gray-200 p-4 bg-gray-50">
-        <div className="text-xs text-gray-500">
+      <div className="border-t border-gray-700 p-4 bg-[#0f1f35]">
+        <div className="text-xs text-gray-300">
           <div className="flex items-center justify-between">
             <span>{t('status.label')}:</span>
-            <span className="text-green-600 font-medium">{t('status.online')}</span>
+            <span className="text-green-400 font-medium">{t('status.online')}</span>
           </div>
           <div className="flex items-center justify-between mt-1">
             <span>{t('status.dataSources')}</span>
-            <span className="text-blue-600 font-medium">{t('common.active')}</span>
+            <span className="text-blue-400 font-medium">{t('common.active')}</span>
           </div>
         </div>
         
         {/* Logout Button */}
-        <div className="mt-3 pt-3 border-t border-gray-300">
+        <div className="mt-3 pt-3 border-t border-gray-600">
           <button
             onClick={() => {
               logout();
               window.location.reload();
             }}
-            className="flex items-center w-full px-2 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+            className="flex items-center w-full px-2 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded-md transition-colors"
           >
             <LogOut className="h-4 w-4 mr-2" />
             <span>Tenant Logout</span>
