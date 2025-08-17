@@ -1,7 +1,7 @@
 import express, { type Request, type Response, type NextFunction } from "express";
 import { createServer } from "http";
 import cors from "cors";
-import { registerRoutes } from "./routes";
+import { registerCleanRoutes } from "./routes-clean";
 import { setupVite } from "./vite";
 import path from "path";
 import { Logger } from "./services/logger.service";
@@ -22,8 +22,8 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// Register Simple JSON-API Routes  
-registerRoutes(app);
+// Register Clean JSON-API Routes  
+registerCleanRoutes(app);
 
 // Setup Vite in development
 if (process.env.NODE_ENV !== "production") {
