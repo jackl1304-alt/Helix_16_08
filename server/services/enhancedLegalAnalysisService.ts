@@ -1,5 +1,5 @@
 import { storage } from '../storage';
-import type { LegalCase } from '@shared/schema';
+import type { LegalCase } from '../../shared/schema';
 
 interface LegalTheme {
   id: string;

@@ -23,7 +23,7 @@
       "@utils/*": ["server/utils/*"]
     },
     "outDir": "dist",
-    "rootDir": "server",
+    "rootDir": ".",
     "sourceMap": true,
     "inlineSources": true,
     "removeComments": true

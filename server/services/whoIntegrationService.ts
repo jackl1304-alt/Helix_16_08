@@ -1,5 +1,5 @@
 import { storage } from "../storage";
-import type { DataSource, RegulatoryUpdate } from "@shared/schema";
+import type { DataSource, RegulatoryUpdate } from "../../shared/schema";
 
 interface WHOGlobalModelData {
   id: string;

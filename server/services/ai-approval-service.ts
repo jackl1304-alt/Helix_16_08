@@ -1,6 +1,6 @@
 import { storage } from "../storage";
 import { aiService } from "./aiService";
-import type { RegulatoryUpdate, LegalCase } from "@shared/schema";
+import type { RegulatoryUpdate, LegalCase } from "../../shared/schema";
 
 interface ApprovalDecision {
   approved: boolean;
