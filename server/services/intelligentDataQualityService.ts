@@ -1,6 +1,6 @@
 import { storage } from '../storage';
 import { nlpService } from './nlpService';
-import type { RegulatoryUpdate, LegalCase } from '../../shared/schema';
+import type { RegulatoryUpdate, LegalCase } from '@shared/schema';
 
 interface QualityMetrics {
   completeness: number; // 0-1

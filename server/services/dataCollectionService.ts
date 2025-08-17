@@ -2,7 +2,7 @@ import { storage } from "../storage";
 import { fdaOpenApiService } from "./fdaOpenApiService";
 import { aiService } from "./aiService";
 import { gripService } from "./gripService";
-import type { InsertRegulatoryUpdate } from "../../shared/schema";
+import type { InsertRegulatoryUpdate } from "@shared/schema";
 
 // Dynamic import to avoid module resolution issues during compilation
 async function getNlpService() {

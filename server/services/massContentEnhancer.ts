@@ -1,5 +1,5 @@
 import { storage } from "../storage";
-import type { RegulatoryUpdate } from "../../shared/schema";
+import type { RegulatoryUpdate } from "@shared/schema";
 
 export class MassContentEnhancer {
   

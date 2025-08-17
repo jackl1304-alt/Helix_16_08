@@ -1,5 +1,5 @@
 import { storage } from "../storage";
-import type { RegulatoryUpdate, LegalCase } from "../../shared/schema";
+import type { RegulatoryUpdate, LegalCase } from "@shared/schema";
 
 interface HistoricalTrend {
   period: string;

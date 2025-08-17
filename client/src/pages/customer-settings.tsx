@@ -8,28 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-// import CustomerNavigation, { type CustomerPermissions } from "@/components/customer/customer-navigation"; // Disabled temporarily
-import { ResponsiveLayout } from "@/components/responsive-layout";
-
-// Customer permissions type
-export interface CustomerPermissions {
-  dashboard: boolean;
-  regulatoryUpdates: boolean;
-  legalCases: boolean;
-  knowledgeBase: boolean;
-  newsletters: boolean;
-  analytics: boolean;
-  reports: boolean;
-  dataCollection: boolean;
-  globalSources: boolean;
-  historicalData: boolean;
-  administration: boolean;
-  userManagement: boolean;
-  systemSettings: boolean;
-  auditLogs: boolean;
-  aiInsights: boolean;
-  advancedAnalytics: boolean;
-}
+import CustomerNavigation, { type CustomerPermissions } from "@/components/customer/customer-navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLiveTenantPermissions } from "@/hooks/use-live-tenant-permissions";
@@ -134,9 +113,12 @@ export default function CustomerSettings() {
   }
 
   return (
-    <ResponsiveLayout>
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Navigation Sidebar */}
-      {/* CustomerNavigation replaced with ResponsiveLayout wrapper */}
+      <CustomerNavigation 
+        permissions={permissions}
+        tenantName={tenantData?.name}
+      />
       
       {/* Main Content */}
       <div className="flex-1 ml-64">
@@ -367,6 +349,6 @@ export default function CustomerSettings() {
           </Tabs>
         </div>
       </div>
-    </ResponsiveLayout>
+    </div>
   );
 }

@@ -2,60 +2,34 @@ import { ReactNode } from "react";
 import { useDevice, getDeviceClasses } from "@/hooks/use-device";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileSidebar } from "@/components/layout/mobile-sidebar";
-import { CustomerSidebar } from "@/components/customer-sidebar";
 import { cn } from "@/lib/utils";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { type CustomerPermissions } from "@/components/customer-navigation";
 
 interface ResponsiveLayoutProps {
   children: ReactNode;
   showSidebar?: boolean;
-  isCustomer?: boolean;
-  customerPermissions?: CustomerPermissions;
 }
 
-export function ResponsiveLayout({ 
-  children, 
-  showSidebar = true, 
-  isCustomer = false, 
-  customerPermissions 
-}: ResponsiveLayoutProps) {
+export function ResponsiveLayout({ children, showSidebar = true }: ResponsiveLayoutProps) {
   const device = useDevice();
 
-  if (device.isMobile || device.isTablet) {
-    // Mobile/Tablet Layout
-    return (
-      <div className={cn(
-        "min-h-screen bg-gray-50 dark:bg-gray-900",
-        getDeviceClasses(device)
-      )}>
-        {showSidebar && <MobileSidebar />}
-        
-        {/* Language Selector - Top Right */}
-        <div className="fixed top-4 right-4 z-50">
-          <LanguageSelector />
-        </div>
-        
-        {/* Main Content - Full Width on Mobile */}
-        <div className="min-h-screen">
-          {children}
-        </div>
-      </div>
-    );
-  }
-
-  // Desktop Layout
   return (
     <div className={cn(
       "min-h-screen bg-gray-50 dark:bg-gray-900",
       getDeviceClasses(device)
     )}>
       {showSidebar && (
-        isCustomer && customerPermissions ? (
-          <CustomerSidebar permissions={customerPermissions} />
-        ) : (
-          <Sidebar />
-        )
+        <>
+          {/* Desktop Sidebar - only show on screens larger than 1024px */}
+          <div className="hidden lg:block">
+            <Sidebar />
+          </div>
+          
+          {/* Mobile/Tablet Sidebar - show on screens smaller than 1024px */}
+          <div className="lg:hidden">
+            <MobileSidebar />
+          </div>
+        </>
       )}
       
       {/* Language Selector - Top Right */}
@@ -63,10 +37,11 @@ export function ResponsiveLayout({
         <LanguageSelector />
       </div>
       
-      {/* Main Content - With Sidebar Margin on Desktop */}
+      {/* Main Content */}
       <div className={cn(
-        "transition-all duration-300 min-h-screen",
-        showSidebar ? "ml-64" : "ml-0"
+        "flex-1 transition-all duration-300",
+        showSidebar && "lg:ml-64", // Only apply left margin on large screens
+        "px-4 py-2 md:px-6 md:py-4 lg:px-8 lg:py-6" // Responsive padding
       )}>
         {children}
       </div>

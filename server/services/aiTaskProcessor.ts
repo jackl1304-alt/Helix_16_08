@@ -1,6 +1,6 @@
 import { storage } from "../storage";
 import { aiService } from "./aiService";
-import type { AiTask } from "../../shared/schema";
+import type { AiTask } from "@shared/schema";
 
 export class AITaskProcessor {
   private isProcessing = false;
@@ -249,7 +249,7 @@ export class AITaskProcessor {
       };
 
       // Calculate stats by type
-      const typeStats: Record<string, { total: number; completed: number; failed: number }> = {};
+      const typeStats = {};
       let totalProcessingTime = 0;
       let completedCount = 0;
 

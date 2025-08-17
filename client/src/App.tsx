@@ -1,93 +1,85 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "./lib/queryClient-clean";
+import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
-import { Router, Route, Switch } from "wouter";
-import { ResponsiveLayout } from "@/components/responsive-layout";
-import { LanguageProvider } from "@/contexts/LanguageContext";
-import { CustomerThemeProvider } from "@/contexts/customer-theme-context";
-import { useAuth } from "@/hooks/use-auth";
-
-// Authentication Pages
 import Login from "@/pages/login";
-import TenantAuth from "@/pages/tenant-auth";
 
-// Admin Dashboard & Pages
+// Direct imports - no lazy loading to eliminate Suspense issues
 import Dashboard from "@/pages/dashboard";
-import Administration from "@/pages/administration";
-import RegulatoryUpdatesComplete from "@/pages/regulatory-updates-complete";
-import RegulatoryUpdateDetail from "@/pages/regulatory-update-detail";
-import Analytics from "@/pages/analytics";
-import AdvancedAnalytics from "@/pages/advanced-analytics";
-import DataCollection from "@/pages/data-collection";
-import GlobalSources from "@/pages/global-sources";
-import HistoricalData from "@/pages/historical-data";
-import KnowledgeBase from "@/pages/knowledge-base";
-import IntelligentSearch from "@/pages/intelligent-search";
-import AiInsights from "@/pages/ai-insights";
-import AiAnalysisCombined from "@/pages/ai-analysis-combined";
-import ApprovalWorkflow from "@/pages/approval-workflow";
-import LaufendeZulassungen from "@/pages/laufende-zulassungen";
-import CustomerLegalCases from "@/pages/customer-legal-cases";
-import RechtsprechungKompaktClean from "@/pages/rechtsprechung-kompakt-clean";
-import LegalIntelligenceCenter from "@/pages/legal-intelligence-center";
-import NewsletterManager from "@/pages/newsletter-manager";
-import EmailManagement from "@/pages/email-management";
-import ChatSupport from "@/pages/chat-support";
-import TerminologyGlossary from "@/pages/terminology-glossary";
-import DocumentViewer from "@/pages/document-viewer";
-import UserManagement from "@/pages/user-management";
-import SystemSettings from "@/pages/system-settings";
-import AuditLogs from "@/pages/audit-logs";
-import GripIntegration from "@/pages/grip-integration";
-import SyncManager from "@/pages/sync-manager";
-
-// Customer/Tenant Dashboard
-import TenantDashboard from "@/pages/tenant-dashboard";
-import CustomerDashboard from "@/pages/customer-dashboard";
-import CustomerRegulatoryUpdates from "@/pages/customer-regulatory-updates";
-import CustomerAiInsights from "@/pages/customer-ai-insights";
-import CustomerAnalytics from "@/pages/customer-analytics";
-import CustomerDataCollection from "@/pages/customer-data-collection";
-import CustomerGlobalSources from "@/pages/customer-global-sources";
-import CustomerHistoricalData from "@/pages/customer-historical-data";
-import CustomerKnowledgeBase from "@/pages/customer-knowledge-base";
-import CustomerNewsletters from "@/pages/customer-newsletters";
-import CustomerSettings from "@/pages/customer-settings";
-
-// Error Pages
 import NotFound from "@/pages/not-found";
 
-// Main App Component with Multi-Tenant Support
+// JSON-based Navigation State
+interface AppState {
+  currentPage: string;
+  userData: any;
+  isLoading: boolean;
+}
+
+// Simple page renderer without complex routing
+function renderCurrentPage(page: string, userData: any) {
+  switch (page) {
+    case '/':
+    case '/dashboard':
+      return <Dashboard />;
+    case '/404':
+    default:
+      return <NotFound />;
+  }
+}
+
+// JSON-based Simple App without React Suspense issues
 function App() {
-  const { isAuthenticated, isLoading, login, userRole } = useAuth();
+  const [appState, setAppState] = useState<AppState>({
+    currentPage: window.location.pathname,
+    userData: null,
+    isLoading: true
+  });
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  // Initialize app with JSON data
+  useEffect(() => {
+    const initializeApp = async () => {
+      try {
+        // Check authentication
+        const authStatus = localStorage.getItem('isAuthenticated') === 'true';
+        setIsAuthenticated(authStatus);
+        
+        // Load user data from JSON endpoint if authenticated
+        if (authStatus) {
+          const userData = await fetch('/api/user/profile')
+            .then(res => res.ok ? res.json() : null)
+            .catch(() => null);
+          
+          setAppState(prev => ({
+            ...prev,
+            userData,
+            isLoading: false
+          }));
+        } else {
+          setAppState(prev => ({ ...prev, isLoading: false }));
+        }
+      } catch (error) {
+        console.error('App initialization error:', error);
+        setAppState(prev => ({ ...prev, isLoading: false }));
+      }
+    };
+
+    initializeApp();
+  }, []);
+
+  // Handle navigation via JSON state
+  const handleNavigation = (page: string) => {
+    setAppState(prev => ({ ...prev, currentPage: page }));
+    window.history.pushState({}, '', page);
+  };
 
   // Loading state
-  if (isLoading) {
+  if (appState.isLoading || isAuthenticated === null) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <div className="relative">
-            {/* HELIX Logo */}
-            <div className="relative h-24 w-24 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-xl ring-2 ring-blue-200 shadow-lg flex items-center justify-center text-white mx-auto mb-6 animate-pulse">
-              <div className="flex flex-col items-center">
-                <div className="text-2xl font-black tracking-tight mb-1">H</div>
-                <div className="flex space-x-1">
-                  <div className="w-1 h-1 bg-white rounded-full opacity-80 animate-ping"></div>
-                  <div className="w-1 h-1 bg-white rounded-full opacity-60"></div>
-                  <div className="w-1 h-1 bg-white rounded-full opacity-80 animate-ping"></div>
-                </div>
-                <div className="flex space-x-1 mt-1">
-                  <div className="w-1 h-1 bg-white rounded-full opacity-60"></div>
-                  <div className="w-1 h-1 bg-white rounded-full opacity-80 animate-ping"></div>
-                  <div className="w-1 h-1 bg-white rounded-full opacity-60"></div>
-                </div>
-              </div>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">HELIX</h2>
-            <p className="text-gray-600 mb-4">Regulatory Intelligence Platform</p>
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          </div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Helix wird geladen...</p>
         </div>
       </div>
     );
@@ -96,95 +88,51 @@ function App() {
   // Show login if not authenticated
   if (!isAuthenticated) {
     return (
-      <LanguageProvider>
-        <QueryClientProvider client={queryClient}>
-          <Router>
-            <Toaster />
-            <Switch>
-              <Route path="/tenant/auth" component={() => <TenantAuth />} />
-              <Route path="/tenant/:tenantId" component={() => <TenantAuth />} />
-              <Route path="/" component={() => <Login onLogin={login} />} />
-              <Route component={() => <Login onLogin={login} />} />
-            </Switch>
-          </Router>
-        </QueryClientProvider>
-      </LanguageProvider>
+      <QueryClientProvider client={queryClient}>
+        <div className="min-h-screen bg-gray-50">
+          <Toaster />
+          <Login onLogin={() => setIsAuthenticated(true)} />
+        </div>
+      </QueryClientProvider>
     );
   }
 
-  // Main authenticated app with comprehensive routing
+  // Main app with JSON-based navigation
   return (
-    <LanguageProvider>
-      <CustomerThemeProvider>
-        <QueryClientProvider client={queryClient}>
-          <Router>
-            <Toaster />
-            <Switch>
-              {/* Tenant/Customer Dashboard Routes */}
-              <Route path="/tenant/dashboard" component={TenantDashboard} />
-              <Route path="/tenant/:tenantId/dashboard" component={CustomerDashboard} />
-              <Route path="/customer/dashboard" component={CustomerDashboard} />
-              <Route path="/customer/regulatory-updates" component={CustomerRegulatoryUpdates} />
-              <Route path="/customer/ai-insights" component={CustomerAiInsights} />
-              <Route path="/customer/analytics" component={CustomerAnalytics} />
-              <Route path="/customer/data-collection" component={CustomerDataCollection} />
-              <Route path="/customer/global-sources" component={CustomerGlobalSources} />
-              <Route path="/customer/historical-data" component={CustomerHistoricalData} />
-              <Route path="/customer/knowledge-base" component={CustomerKnowledgeBase} />
-              <Route path="/customer/newsletters" component={CustomerNewsletters} />
-              <Route path="/customer/legal-cases" component={CustomerLegalCases} />
-              <Route path="/legal-intelligence" component={LegalIntelligenceCenter} />
-              <Route path="/customer/settings" component={CustomerSettings} />
-
-              {/* Admin Dashboard Routes - Main Navigation */}
-              <Route path="/" component={Dashboard} />
-              <Route path="/dashboard" component={Dashboard} />
-              <Route path="/administration" component={Administration} />
-              
-              {/* Regulatory & Data Management */}
-              <Route path="/regulatory-updates" component={RegulatoryUpdatesComplete} />
-              <Route path="/regulatory-updates/:id" component={RegulatoryUpdateDetail} />
-              <Route path="/data-collection" component={DataCollection} />
-              <Route path="/global-sources" component={GlobalSources} />
-              <Route path="/historical-data" component={HistoricalData} />
-              <Route path="/grip-integration" component={GripIntegration} />
-              <Route path="/sync-manager" component={SyncManager} />
-              
-              {/* Analytics & AI */}
-              <Route path="/analytics" component={Analytics} />
-              <Route path="/advanced-analytics" component={AdvancedAnalytics} />
-              <Route path="/intelligent-search" component={IntelligentSearch} />
-              <Route path="/ai-insights" component={AiInsights} />
-              <Route path="/ai-analysis-combined" component={AiAnalysisCombined} />
-              
-              {/* Legal & Compliance */}
-              <Route path="/approval-workflow" component={ApprovalWorkflow} />
-              <Route path="/laufende-zulassungen" component={LaufendeZulassungen} />
-              <Route path="/rechtsprechung-kompakt" component={RechtsprechungKompaktClean} />
-              
-              {/* Communication */}
-              <Route path="/newsletter-manager" component={NewsletterManager} />
-              <Route path="/email-management" component={EmailManagement} />
-              <Route path="/chat-support" component={ChatSupport} />
-              
-              {/* Knowledge Management */}
-              <Route path="/knowledge-base" component={KnowledgeBase} />
-              <Route path="/terminology-glossary" component={TerminologyGlossary} />
-              <Route path="/document-viewer" component={DocumentViewer} />
-              
-              {/* Administration */}
-              <Route path="/user-management" component={UserManagement} />
-              <Route path="/system-settings" component={SystemSettings} />
-              <Route path="/audit-logs" component={AuditLogs} />
-              
-              {/* Fallback */}
-              <Route component={NotFound} />
-            </Switch>
-          </Router>
-        </QueryClientProvider>
-      </CustomerThemeProvider>
-    </LanguageProvider>
+    <QueryClientProvider client={queryClient}>
+      <div className="min-h-screen bg-gray-50">
+        <Toaster />
+        {renderCurrentPage(appState.currentPage, appState.userData)}
+      </div>
+    </QueryClientProvider>
   );
 }
 
 export default App;
+
+// JSON API helper functions
+export const jsonApi = {
+  get: async (endpoint: string) => {
+    try {
+      const response = await fetch(endpoint);
+      return response.ok ? await response.json() : null;
+    } catch (error) {
+      console.error('JSON API GET error:', error);
+      return null;
+    }
+  },
+  
+  post: async (endpoint: string, data: any) => {
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      return response.ok ? await response.json() : null;
+    } catch (error) {
+      console.error('JSON API POST error:', error);
+      return null;
+    }
+  }
+};

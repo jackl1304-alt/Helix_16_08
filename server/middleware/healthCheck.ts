@@ -182,7 +182,8 @@ class HealthCheckService {
     try {
       // Test FDA API availability
       const response = await fetch('https://api.fda.gov/device/recall.json?limit=1', {
-        method: 'GET'
+        method: 'GET',
+        timeout: 5000 as any
       });
       
       const responseTime = performance.now() - startTime;

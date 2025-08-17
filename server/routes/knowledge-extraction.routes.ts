@@ -4,7 +4,7 @@ import { KnowledgeExtractionService } from '../services/knowledge-extraction.ser
 import { storage } from '../storage';
 import { Logger } from '../services/logger.service';
 import { asyncHandler } from '../middleware/error.middleware';
-// Define createApiResponse locally since ../../shared/types doesn't exist
+// Define createApiResponse locally since @shared/types doesn't exist
 const createApiResponse = <T = any>(data: T, success: boolean = true, message?: string) => ({
   success,
   data,

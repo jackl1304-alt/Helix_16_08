@@ -1,6 +1,6 @@
 import { apiManagementService } from './apiManagementService';
 import { storage } from '../storage';
-import type { InsertRegulatoryUpdate } from '../../shared/schema';
+import type { InsertRegulatoryUpdate } from '@shared/schema';
 
 /**
  * Web Scraping Service für Regulierungsbehörden ohne offizielle APIs

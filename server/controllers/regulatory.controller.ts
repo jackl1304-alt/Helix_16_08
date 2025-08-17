@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '../services/logger.service';
-// Import from local files since ../../shared/types doesn't exist
+// Import from local files since @shared/types doesn't exist
 import { asyncHandler } from '../middleware/error.middleware';
 
 // Define types locally

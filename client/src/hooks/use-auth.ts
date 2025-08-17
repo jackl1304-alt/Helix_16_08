@@ -1,56 +1,42 @@
-import { useState, useEffect } from 'react';
-
-// React Hook für Authentifizierung
-export function useAuth() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [userRole, setUserRole] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Direkte Anmeldung für Demo-Zwecke
-    localStorage.setItem('isAuthenticated', 'true');
-    localStorage.setItem('userRole', 'admin');
-    localStorage.setItem('loginTime', new Date().toISOString());
-    setIsAuthenticated(true);
-    setUserRole('admin');
-    setIsLoading(false);
-  }, []);
-
-  const login = (username?: string, password?: string): boolean => {
-    // Demo credentials: admin / admin123
+// Simplified JSON-based Auth - no complex state management
+export const jsonAuth = {
+  login: (username: string, password: string): boolean => {
+    // Fixed credentials: admin / admin123
     if (username === 'admin' && password === 'admin123') {
       localStorage.setItem('isAuthenticated', 'true');
       localStorage.setItem('userRole', 'admin');
       localStorage.setItem('loginTime', new Date().toISOString());
-      setIsAuthenticated(true);
-      setUserRole('admin');
-      return true;
-    }
-    // Falls keine Credentials übergeben werden (für Demo)
-    if (!username && !password) {
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('userRole', 'demo');
-      localStorage.setItem('loginTime', new Date().toISOString());
-      setIsAuthenticated(true);
-      setUserRole('demo');
       return true;
     }
     return false;
-  };
+  },
 
-  const logout = () => {
+  logout: () => {
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userRole');
     localStorage.removeItem('loginTime');
-    setIsAuthenticated(false);
-    setUserRole(null);
-  };
+  },
 
+  isAuthenticated: (): boolean => {
+    return localStorage.getItem('isAuthenticated') === 'true';
+  },
+
+  getUserData: () => {
+    return {
+      isAuthenticated: localStorage.getItem('isAuthenticated') === 'true',
+      userRole: localStorage.getItem('userRole'),
+      loginTime: localStorage.getItem('loginTime')
+    };
+  }
+};
+
+// Legacy hook for compatibility - simplified
+export function useAuth() {
+  const userData = jsonAuth.getUserData();
+  
   return {
-    isAuthenticated,
-    isLoading,
-    userRole,
-    login,
-    logout
+    ...userData,
+    login: jsonAuth.login,
+    logout: jsonAuth.logout
   };
 }

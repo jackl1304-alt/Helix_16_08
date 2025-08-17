@@ -1,5 +1,5 @@
 import { logger } from './logger.service';
-import type { InsertRegulatoryUpdate } from '../../shared/schema';
+import type { InsertRegulatoryUpdate } from '@shared/schema';
 
 interface GripLoginResponse {
   success: boolean;
