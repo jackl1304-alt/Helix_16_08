@@ -7,6 +7,12 @@ import Login from "@/pages/login";
 
 // Direct imports - no lazy loading to eliminate Suspense issues
 import Dashboard from "@/pages/dashboard";
+import RegulatoryUpdates from "@/pages/regulatory-updates";
+import KnowledgeBase from "@/pages/knowledge-base";
+import Analytics from "@/pages/analytics";
+import GlobalSources from "@/pages/global-sources";
+import HistoricalData from "@/pages/historical-data";
+import SystemSettings from "@/pages/system-settings";
 import NotFound from "@/pages/not-found";
 
 // JSON-based Navigation State
@@ -22,6 +28,18 @@ function renderCurrentPage(page: string, userData: any) {
     case '/':
     case '/dashboard':
       return <Dashboard />;
+    case '/regulatory-updates':
+      return <RegulatoryUpdates />;
+    case '/knowledge-base':
+      return <KnowledgeBase />;
+    case '/analytics':
+      return <Analytics />;
+    case '/global-sources':
+      return <GlobalSources />;
+    case '/historical-data':
+      return <HistoricalData />;
+    case '/system-settings':
+      return <SystemSettings />;
     case '/404':
     default:
       return <NotFound />;

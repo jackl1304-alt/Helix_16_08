@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { NavigationHeader } from "@/components/ui/navigation-header";
-import { ResponsiveLayout } from "@/components/responsive-layout";
+import { NavigationSidebar, NavigationToggle } from "@/components/navigation-sidebar";
 import { AISearchPanel } from "@/components/admin/ai-search-panel";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
@@ -40,6 +39,7 @@ export default function Dashboard() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
   const { data: stats, isLoading, error: statsError } = useQuery({
     queryKey: ['/api/dashboard/stats'],
@@ -184,14 +184,29 @@ export default function Dashboard() {
   const handleKnowledgeBase = () => setLocation('/knowledge-base');
   const handleNewsletter = () => setLocation('/newsletter');
   const handleAnalytics = () => setLocation('/analytics');
+  const handleRegulatoryUpdates = () => setLocation('/regulatory-updates');
+  const handleGlobalSources = () => setLocation('/global-sources');
+  const handleHistoricalData = () => setLocation('/historical-data');
+  const handleSystemSettings = () => setLocation('/system-settings');
 
   return (
-    <ResponsiveLayout>
-      {/* Navigation Header */}
-      <NavigationHeader showTenantLinks={true} currentView="admin" />
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Sidebar */}
+      <NavigationSidebar 
+        isOpen={sidebarOpen} 
+        onToggle={() => setSidebarOpen(!sidebarOpen)} 
+      />
       
-      {/* Content Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Top Bar */}
+        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 lg:hidden">
+          <NavigationToggle onToggle={() => setSidebarOpen(!sidebarOpen)} />
+        </div>
+        
+        {/* Content Container */}
+        <div className="flex-1 overflow-auto">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
         
         {/* Hero Section - kompakt mit Deltaways-Branding */}
         <div className="bg-gradient-to-br from-blue-600 to-purple-700 rounded-xl p-8 text-white shadow-lg">
@@ -282,7 +297,7 @@ export default function Dashboard() {
                   <div 
                     key={index} 
                     className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
-                    onClick={() => setLocation(`/regulatory-updates/${update.id}`)}
+                    onClick={handleRegulatoryUpdates}
                   >
                     <div className="flex-1">
                       <p className="font-medium text-sm text-blue-600 hover:text-blue-800">{update.title}</p>
@@ -309,6 +324,13 @@ export default function Dashboard() {
                   <span className="text-green-600">Aktiv</span>
                 </div>
                 <Progress value={100} className="w-full" />
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-3"
+                  onClick={handleRegulatoryUpdates}
+                >
+                  Alle Updates anzeigen
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -473,7 +495,9 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
+          </div>
+        </div>
       </div>
-    </ResponsiveLayout>
+    </div>
   );
 }
