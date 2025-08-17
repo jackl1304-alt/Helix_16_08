@@ -1,6 +1,5 @@
 import React from 'react';
-// Fallback Logo für Development - wird durch echtes Logo ersetzt
-const helixLogo = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='15' fill='%23123456'/%3E%3Ctext x='50' y='35' font-family='Arial,sans-serif' font-size='24' font-weight='bold' text-anchor='middle' fill='white'%3EHelix%3C/text%3E%3Cpath d='M25 45 Q50 55 75 45 Q50 65 25 75 Q50 85 75 75' stroke='white' stroke-width='2' fill='none'/%3E%3C/svg%3E";
+import helixLogo from '../../assets/helix-logo.jpg';
 
 interface LogoProps {
   className?: string;

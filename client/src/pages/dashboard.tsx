@@ -1,485 +1,221 @@
-import React, { useState } from "react";
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { ResponsiveLayout } from "@/components/responsive-layout";
-import { AISearchPanel } from "@/components/admin/ai-search-panel";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLocation } from "wouter";
 import { 
-  FileText, 
-  Database, 
-  BookOpen, 
+  BarChart3, 
+  TrendingUp, 
   Users, 
-  AlertTriangle, 
-  CheckCircle, 
-  TrendingUp,
-  Mail,
-  FolderSync,
-  Loader2,
-  Shield,
-  Target,
-  BarChart3,
-  Settings,
-  Zap,
-  Globe,
+  FileText,
   Activity,
-  Sparkles,
-  Heart,
-  Award,
-  MessageCircle
+  AlertTriangle,
+  CheckCircle,
+  Clock
 } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Dashboard() {
-  const [, setLocation] = useLocation();
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-  const { t } = useLanguage();
-  
-  const { data: stats, isLoading, error: statsError } = useQuery({
-    queryKey: ['/api/dashboard/stats'],
-    queryFn: async () => {
-      console.log('[QUERY] Fetching dashboard stats...');
-      const response = await fetch('/api/dashboard/stats', {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        console.error('[QUERY] Response not ok:', response.status, response.statusText);
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      console.log('[QUERY] Stats received:', data);
-      return data;
-    },
-    staleTime: 10000,
-    gcTime: 30000,
-    refetchOnMount: true,
-    retry: 2,
-  });
-
-  const { data: recentUpdates, error: updatesError } = useQuery({
-    queryKey: ['/api/regulatory-updates'],
-    queryFn: async () => {
-      console.log('[ADMIN] Fetching regulatory updates...');
-      const response = await fetch('/api/regulatory-updates', {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        console.error('[ADMIN] Updates response not ok:', response.status);
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      console.log('[ADMIN] Updates received:', data?.length || 0);
-      return data;
-    },
-    staleTime: 30000,
-    gcTime: 60000,
-    retry: 2,
-  });
-
-  // Hard-coded newsletter sources for testing - bypassing all fetching issues
-  const newsletterSources = [
-    { id: "ns_1", name: "FDA News & Updates", description: "Offizielle FDA Updates", isActive: true },
-    { id: "ns_2", name: "EMA Newsletter", description: "Europäische Arzneimittel-Agentur", isActive: true },
-    { id: "ns_3", name: "MedTech Dive", description: "Medizintechnik-Industrie News", isActive: true },
-    { id: "ns_4", name: "RAPS Newsletter", description: "Regulatory Affairs Updates", isActive: true },
-    { id: "ns_5", name: "Medical Device Industry", description: "Technische Nachrichten", isActive: true },
-    { id: "ns_6", name: "BfArM Aktuell", description: "Deutsche Behörden-Updates", isActive: true },
-    { id: "ns_7", name: "MedTech Europe", description: "Policy und Markttrends", isActive: true }
-  ];
-  const isLoadingNewsletterSources = false;
-
-  console.log('✅ [NEWSLETTER] Using hard-coded sources:', newsletterSources.length);
-
-
-  // Optimierte Dashboard-Cards mit konsistenten Deltaways-Farben
-  const dashboardCards = [
-    {
-      title: t('dashboard.totalUpdates'),
-      value: stats?.totalUpdates || 24,
-      icon: FileText,
-      color: "text-blue-600",
-      description: t('regulatory.subtitle'),
-      quality: t('metrics.success')
-    },
-    {
-      title: t('dashboard.legalCases'),
-      value: stats?.totalLegalCases || 65,
-      icon: Shield,
-      color: "text-purple-600",
-      description: t('legal.subtitle')
-    },
-    {
-      title: t('dashboard.activeDataSources'),
-      value: stats?.activeDataSources || 70,
-      icon: Database,
-      color: "text-green-600",
-      description: t('dataCollection.activeSources')
-    },
-    {
-      title: t('newsletter.title'),
-      value: stats?.totalSubscribers || 7,
-      icon: Mail,
-      color: "text-orange-600",
-      description: t('newsletter.subtitle')
-    },
-    {
-      title: t('dashboard.knowledgeArticles'),
-      value: stats?.totalArticles || 89,
-      icon: BookOpen,
-      color: "text-teal-600",
-      description: t('knowledge.subtitle')
-    },
-    {
-      title: "AI Analysis",
-      value: 24,
-      icon: Sparkles,
-      color: "text-pink-600",
-      description: "KI-basierte Analysen"
-    }
-  ];
-
-  // Event handlers
-  const handleDataSourcesSync = () => {
-    toast({
-      title: "Synchronisation gestartet",
-      description: "Datenquellen werden aktualisiert...",
-    });
-  };
-
-  const newsletterSyncMutation = useMutation({
-    mutationFn: async () => {
-      return apiRequest('/api/sync/newsletter');
-    },
-    onSuccess: () => {
-      toast({
-        title: "Newsletter-Sync erfolgreich",
-        description: "Alle Newsletter-Quellen wurden aktualisiert",
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/newsletter-sources'] });
-    }
-  });
-
-  const handleNewsletterSync = () => {
-    newsletterSyncMutation.mutate();
-  };
-
-  const handleKnowledgeBase = () => setLocation('/knowledge-base');
-  const handleNewsletter = () => setLocation('/newsletter');
-  const handleAnalytics = () => setLocation('/analytics');
-  const handleRegulatoryUpdates = () => setLocation('/regulatory-updates');
-  const handleGlobalSources = () => setLocation('/global-sources');
-  const handleHistoricalData = () => setLocation('/historical-data');
-  const handleSystemSettings = () => setLocation('/system-settings');
-
   return (
-    <ResponsiveLayout>
-      <div className="space-y-8">
-        
-        {/* Hero Section - kompakt mit Deltaways-Branding */}
-        <div className="bg-gradient-to-br from-blue-600 to-purple-700 rounded-xl p-8 text-white shadow-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">
-                Regulatory Intelligence Dashboard
-              </h1>
-              <p className="text-blue-100 text-lg">
-                KI-gestützte Analyse • Echtzeit-Updates • 100% Datenqualität
-              </p>
-              <div className="flex items-center space-x-4 mt-4">
-                <Badge variant="secondary" className="bg-white/20 text-white">
-                  <Activity className="h-4 w-4 mr-2" />
-                  Live System
-                </Badge>
-                <Badge variant="secondary" className="bg-white/20 text-white">
-                  <Database className="h-4 w-4 mr-2" />
-                  70 Quellen aktiv
-                </Badge>
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-white">{stats?.totalUpdates || 24}</div>
-                <div className="text-blue-200 text-sm">Updates</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-white">100%</div>
-                <div className="text-blue-200 text-sm">Qualität</div>
-              </div>
-            </div>
-          </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Helix Dashboard</h1>
+          <p className="text-muted-foreground">
+            Regulatory Intelligence & Compliance Management
+          </p>
         </div>
+        <Badge variant="outline" className="text-green-600 border-green-600">
+          <Activity className="h-3 w-3 mr-1" />
+          System Online
+        </Badge>
+      </div>
 
-        {/* Stats Grid - konsistente Deltaways-Farben */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {dashboardCards.map((card, index) => {
-            const IconComponent = card.icon;
-            return (
-              <Card key={index} className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-blue-500">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                  <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    {card.title}
-                  </CardTitle>
-                  <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-                    <IconComponent className={`h-5 w-5 ${card.color}`} />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                    {Number(card.value).toLocaleString()}
-                  </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {card.description}
-                  </p>
-                  {card.quality && (
-                    <div className="mt-3">
-                      <Badge variant="secondary" className="text-xs bg-green-100 text-green-800">
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                        {card.quality}
-                      </Badge>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
-          {/* Recent Updates */}
-          <Card className="shadow-md">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2 text-xl">
-                <FileText className="h-6 w-6 text-blue-600" />
-                <span>Regulatory Updates</span>
-              </CardTitle>
-              <CardDescription>
-                Neueste regulatorische Änderungen aus globalen Behörden
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {recentUpdates && Array.isArray(recentUpdates) && recentUpdates.length > 0 ? (
-                recentUpdates.slice(0, 5).map((update: any, index: number) => (
-                  <div 
-                    key={index} 
-                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
-                    onClick={handleRegulatoryUpdates}
-                  >
-                    <div className="flex-1">
-                      <p className="font-medium text-sm text-blue-600 hover:text-blue-800">{update.title}</p>
-                      <p className="text-xs text-gray-500">
-                        {update.source_id || update.source || 'FDA'} • {update.category || update.type || 'Regulatory Update'}
-                      </p>
-                    </div>
-                    <Badge variant="outline">
-                      {new Date(update.published_at || update.publishedDate).toLocaleDateString('de-DE')}
-                    </Badge>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-8">
-                  <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">Keine neuen Updates</p>
-                  <p className="text-sm text-gray-400">Updates werden automatisch synchronisiert</p>
-                </div>
-              )}
-              
-              <div className="pt-4 border-t">
-                <div className="flex justify-between text-sm text-gray-600 mb-2">
-                  <span>Synchronisierung</span>
-                  <span className="text-green-600">Aktiv</span>
-                </div>
-                <Progress value={100} className="w-full" />
-                <Button 
-                  variant="outline" 
-                  className="w-full mt-3"
-                  onClick={handleRegulatoryUpdates}
-                >
-                  Alle Updates anzeigen
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Newsletter Sources */}
-          <Card className="shadow-md">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2 text-xl">
-                <Mail className="h-6 w-6 text-green-600" />
-                <span>Newsletter Sources</span>
-              </CardTitle>
-              <CardDescription>
-                Authentische MedTech-Newsletter für automatische Inhaltsextraktion
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {isLoadingNewsletterSources ? (
-                <div className="text-center py-8">
-                  <Mail className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">Newsletter-Quellen werden geladen...</p>
-                </div>
-              ) : newsletterSources && Array.isArray(newsletterSources) && newsletterSources.length > 0 ? (
-                <>
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                      <div className="text-2xl font-bold text-green-700 dark:text-green-400">
-                        {newsletterSources?.filter(s => s.isActive !== false).length || 0}
-                      </div>
-                      <div className="text-xs text-green-600 dark:text-green-400">Aktive Quellen</div>
-                    </div>
-                    <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                      <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">
-                        {newsletterSources?.length || 0}
-                      </div>
-                      <div className="text-xs text-blue-600 dark:text-blue-400">Konfiguriert</div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {newsletterSources?.filter((source: any) => source.isActive !== false).slice(0, 6).map((source: any, index: number) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm truncate">
-                            {source.name}
-                          </p>
-                          <p className="text-xs text-gray-500 truncate">
-                            {source.description || source.sourceUrl}
-                          </p>
-                        </div>
-                        <Badge variant="default" className="text-xs">
-                          Aktiv
-                        </Badge>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <div className="text-center py-8">
-                  <Mail className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">Keine Newsletter-Quellen verfügbar</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* KI-Intelligence Panel */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-          <AISearchPanel />
-        </div>
-
-        {/* Quick Actions */}
-        <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-xl">
-              <Zap className="h-6 w-6 text-orange-600" />
-              <span>Schnelle Aktionen</span>
+      {/* Quick Stats */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Updates
             </CardTitle>
-            <CardDescription>
-              Häufig verwendete Helix-Funktionen für effizientes Arbeiten
-            </CardDescription>
+            <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              <Button 
-                variant="outline" 
-                className="flex-col items-center gap-3 h-24 hover:border-orange-400 transition-all"
-                onClick={handleDataSourcesSync}
-              >
-                <Database className="h-6 w-6 text-orange-600" />
-                <div className="text-center">
-                  <div className="font-semibold text-sm">Datenquellen Sync</div>
-                  <div className="text-xs text-gray-500">FDA, EMA, BfArM</div>
-                </div>
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                className="flex-col items-center gap-3 h-24 hover:border-blue-400 transition-all"
-                onClick={handleNewsletterSync}
-                disabled={newsletterSyncMutation.isPending}
-              >
-                {newsletterSyncMutation.isPending ? (
-                  <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
-                ) : (
-                  <FolderSync className="h-6 w-6 text-blue-600" />
-                )}
-                <div className="text-center">
-                  <div className="font-semibold text-sm">Newsletter Sync</div>
-                  <div className="text-xs text-gray-500">MedTech Sources</div>
-                </div>
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                className="flex-col items-center gap-3 h-24 hover:border-green-400 transition-all"
-                onClick={handleKnowledgeBase}
-              >
-                <BookOpen className="h-6 w-6 text-green-600" />
-                <div className="text-center">
-                  <div className="font-semibold text-sm">Knowledge Base</div>
-                  <div className="text-xs text-gray-500">Artikel durchsuchen</div>
-                </div>
-              </Button>
+            <div className="text-2xl font-bold">1,247</div>
+            <p className="text-xs text-muted-foreground">
+              +12% from last month
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Active Sources
+            </CardTitle>
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">23</div>
+            <p className="text-xs text-muted-foreground">
+              +2 new this week
+            </p>
+          </CardContent>
+        </Card>
 
-              <Button 
-                variant="outline" 
-                className="flex-col items-center gap-3 h-24 hover:border-purple-400 transition-all"
-                onClick={handleNewsletter}
-              >
-                <Mail className="h-6 w-6 text-purple-600" />
-                <div className="text-center">
-                  <div className="font-semibold text-sm">Newsletter</div>
-                  <div className="text-xs text-gray-500">Neue Ausgabe erstellen</div>
-                </div>
-              </Button>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Processing Queue
+            </CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">45</div>
+            <p className="text-xs text-muted-foreground">
+              Average: 2.3 hours
+            </p>
+          </CardContent>
+        </Card>
 
-              <Button 
-                variant="outline" 
-                className="flex-col items-center gap-3 h-24 hover:border-orange-400 transition-all"
-                onClick={handleAnalytics}
-              >
-                <TrendingUp className="h-6 w-6 text-orange-600" />
-                <div className="text-center">
-                  <div className="font-semibold text-sm">Analytics</div>
-                  <div className="text-xs text-gray-500">Compliance Trends</div>
-                </div>
-              </Button>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Compliance Score
+            </CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">94%</div>
+            <p className="text-xs text-muted-foreground">
+              +1.2% improvement
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
-              <Button 
-                variant="outline" 
-                className="flex-col items-center gap-3 h-24 hover:border-green-400 transition-all"
-                onClick={() => setLocation('/chat-support')}
-              >
-                <MessageCircle className="h-6 w-6 text-green-600" />
-                <div className="text-center">
-                  <div className="font-semibold text-sm">Support Chat</div>
-                  <div className="text-xs text-gray-500">Direkte Administrator-Kommunikation</div>
-                </div>
-              </Button>
+      {/* Recent Activity */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="col-span-4">
+          <CardHeader>
+            <CardTitle>Recent Regulatory Updates</CardTitle>
+            <CardDescription>
+              Latest updates from regulatory authorities
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <div className="flex h-2 w-2 rounded-full bg-green-600" />
+              <div className="flex-1 space-y-1">
+                <p className="text-sm font-medium leading-none">
+                  FDA Medical Device Safety Update
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  New guidelines for Class II devices
+                </p>
+              </div>
+              <div className="text-sm text-muted-foreground">2h ago</div>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <div className="flex h-2 w-2 rounded-full bg-yellow-600" />
+              <div className="flex-1 space-y-1">
+                <p className="text-sm font-medium leading-none">
+                  EU MDR Compliance Changes
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Updated certification requirements
+                </p>
+              </div>
+              <div className="text-sm text-muted-foreground">4h ago</div>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <div className="flex h-2 w-2 rounded-full bg-blue-600" />
+              <div className="flex-1 space-y-1">
+                <p className="text-sm font-medium leading-none">
+                  Health Canada Notice
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Quality system regulation updates
+                </p>
+              </div>
+              <div className="text-sm text-muted-foreground">6h ago</div>
             </div>
           </CardContent>
         </Card>
 
+        <Card className="col-span-3">
+          <CardHeader>
+            <CardTitle>System Status</CardTitle>
+            <CardDescription>
+              Data collection and processing status
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <span className="text-sm">Data Collection</span>
+              </div>
+              <Badge variant="outline" className="text-green-600">Online</Badge>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <span className="text-sm">AI Processing</span>
+              </div>
+              <Badge variant="outline" className="text-green-600">Active</Badge>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                <span className="text-sm">Email Service</span>
+              </div>
+              <Badge variant="outline" className="text-yellow-600">Maintenance</Badge>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <span className="text-sm">Database</span>
+              </div>
+              <Badge variant="outline" className="text-green-600">Healthy</Badge>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </ResponsiveLayout>
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+          <CardDescription>
+            Common tasks and operations
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm">
+              <FileText className="h-4 w-4 mr-2" />
+              View Updates
+            </Button>
+            <Button variant="outline" size="sm">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Analytics
+            </Button>
+            <Button variant="outline" size="sm">
+              <Users className="h-4 w-4 mr-2" />
+              User Management
+            </Button>
+            <Button variant="outline" size="sm">
+              <TrendingUp className="h-4 w-4 mr-2" />
+              Reports
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
