@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-// import CustomerNavigation, { type CustomerPermissions } from "@/components/customer/customer-navigation";
 import { ResponsiveLayout } from "@/components/responsive-layout";
 
 // Customer permissions type
@@ -261,17 +260,11 @@ export default function CustomerDashboard() {
   const { t } = useLanguage();
   
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 relative">
-      {/* Language Selector - Top Right */}
-      <div className="fixed top-4 right-4 z-50">
-        <LanguageSelector />
-      </div>
-      
-      {/* Main Layout with Sidebar */}
-      
-      {/* Main Content */}
-      <div className="flex-1 ml-64">
-        <div className="container mx-auto p-6 space-y-8 max-w-7xl">
+    <ResponsiveLayout 
+      isCustomer={true} 
+      customerPermissions={permissions}
+    >
+      <div className="container mx-auto p-6 space-y-8 max-w-7xl">
       {/* Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div>
@@ -614,8 +607,7 @@ export default function CustomerDashboard() {
             </CardContent>
           </Card>
         )}
-        </div>
       </div>
-    </div>
+    </ResponsiveLayout>
   );
 }
