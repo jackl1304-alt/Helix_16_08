@@ -31,11 +31,6 @@ export function AISearchPanel() {
   // Trend Analysis Query
   const { data: trends, isLoading: trendsLoading } = useQuery({
     queryKey: ['/api/ai/trends', selectedTimeframe],
-    queryFn: async () => {
-      const response = await fetch(`/api/ai/trends?timeframe=${selectedTimeframe}`);
-      if (!response.ok) throw new Error('Failed to fetch trends');
-      return response.json();
-    },
     enabled: true
   });
 
@@ -263,7 +258,7 @@ export function AISearchPanel() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {(trends?.trends?.emergingTopics || ['AI in Medical Devices', 'Cybersecurity Updates', 'EU MDR Compliance']).map((topic: string, index: number) => (
+                    {trends.trends.emergingTopics.map((topic: string, index: number) => (
                       <Badge key={index} className="mr-2 mb-2 bg-green-100 text-green-900">
                         {topic}
                       </Badge>
@@ -281,7 +276,7 @@ export function AISearchPanel() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {(trends?.trends?.riskAlerts || ['Critical Device Recalls', 'FDA Safety Communications', 'Post-Market Surveillance']).map((alert: string, index: number) => (
+                    {trends.trends.riskAlerts.map((alert: string, index: number) => (
                       <div key={index} className="p-2 bg-red-100 rounded-lg text-red-900 text-sm">
                         {alert}
                       </div>
@@ -299,7 +294,7 @@ export function AISearchPanel() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {(trends?.trends?.complianceUpdates || ['New FDA Guidelines', 'ISO 13485:2016 Updates', 'CDRH Guidance Documents']).map((update: string, index: number) => (
+                    {trends.trends.complianceUpdates.map((update: string, index: number) => (
                       <div key={index} className="p-2 bg-blue-100 rounded-lg text-blue-900 text-sm">
                         {update}
                       </div>
@@ -317,7 +312,7 @@ export function AISearchPanel() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {(trends?.trends?.marketInsights || ['Digital Health Growth', 'Remote Monitoring Trends', 'AI Regulation Framework']).map((insight: string, index: number) => (
+                    {trends.trends.marketInsights.map((insight: string, index: number) => (
                       <div key={index} className="p-2 bg-purple-100 rounded-lg text-purple-900 text-sm">
                         {insight}
                       </div>

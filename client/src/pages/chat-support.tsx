@@ -113,10 +113,10 @@ export default function ChatSupportPage() {
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">Prioritäten:</h4>
                 <ul className="space-y-1 text-gray-600">
-                  <li>• <strong>Dringend:</strong> Kritische Probleme (&lt; 2h)</li>
-                  <li>• <strong>Hoch:</strong> Wichtige Probleme (&lt; 4h)</li>
-                  <li>• <strong>Normal:</strong> Allgemeine Anfragen (&lt; 24h)</li>
-                  <li>• <strong>Niedrig:</strong> Vorschläge (&lt; 48h)</li>
+                  <li>• <strong>Dringend:</strong> Kritische Probleme (< 2h)</li>
+                  <li>• <strong>Hoch:</strong> Wichtige Probleme (< 4h)</li>
+                  <li>• <strong>Normal:</strong> Allgemeine Anfragen (< 24h)</li>
+                  <li>• <strong>Niedrig:</strong> Vorschläge (< 48h)</li>
                 </ul>
               </div>
             </div>

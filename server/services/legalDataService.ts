@@ -1,4 +1,4 @@
-import { HistoricalDataRecord, ChangeDetection } from '../../shared/schema';
+import { HistoricalDataRecord, ChangeDetection } from '@shared/schema';
 
 // Legal and jurisprudence data sources for MedTech regulatory intelligence
 const legalDataSources = {

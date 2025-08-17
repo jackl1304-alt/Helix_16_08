@@ -149,7 +149,7 @@ ${template.marketImpact}
   }
 
   private getUniqueSellingPoint(template: UpdateTemplate): string {
-    const usp: Record<string, string> = {
+    const usp = {
       "InbellaMAX System": "patentierte Dual-Layer RF-Technologie",
       "MF SC GEN2": "SmartSkin Adaptive Algorithm",
       "Isolator Synergy": "360° EnCompass Design Innovation"
@@ -158,7 +158,7 @@ ${template.marketImpact}
   }
 
   private getPatentInfo(deviceType: string): string {
-    const patents: Record<string, string> = {
+    const patents = {
       "InbellaMAX System": "US Patent 11,234,567 - Radiofrequency Skin Treatment",
       "MF SC GEN2": "US Patent 11,345,678 - Microcurrent Facial Stimulation",
       "Isolator Synergy": "US Patent 11,456,789 - Surgical Clamp Mechanism"
@@ -180,9 +180,8 @@ ${template.marketImpact}
         // Generiere einzigartigen Inhalt für jedes Update
         const uniqueContent = await this.generateUniqueContent(update);
         
-        // Update in der Datenbank - verwende Drizzle ORM anstatt direktes SQL
-        // await storage.updateRegulatoryUpdate(update.id, { description: uniqueContent });
-        console.log(`Would update regulatory update ${update.id} with unique content`);
+        // Update in der Datenbank
+        await storage.sql`UPDATE regulatory_updates SET description = ${uniqueContent} WHERE id = ${update.id}`;
         
         processedCount++;
         console.log(`[ContentEnhancement] Enhanced update ${processedCount}/${allUpdates.length}: ${update.title?.substring(0, 50)}...`);

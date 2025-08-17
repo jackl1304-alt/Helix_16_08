@@ -1,5 +1,5 @@
 import { Logger } from './logger.service';
-// Define types locally since ../../shared/types doesn't exist
+// Define types locally since @shared/types doesn't exist
 interface IStorage {
   // Add minimal interface for the methods we need
   getAllRegulatoryUpdates(): Promise<any[]>;

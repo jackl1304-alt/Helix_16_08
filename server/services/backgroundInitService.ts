@@ -140,8 +140,7 @@ export class BackgroundInitService {
         const dataService = new DataCollectionService();
         
         // Perform limited initial collection to avoid overwhelming startup
-        // Initialize data collection with limited scope
-        await dataService.syncDataSourceOptimized('all', { optimized: true });
+        await dataService.performLimitedDataCollection(10);
         
         const updatedCount = await storage.getAllRegulatoryUpdates();
         logger.info(`Regulatory data collection completed: ${updatedCount.length} updates`);

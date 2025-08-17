@@ -3,8 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-// import CustomerNavigation from "@/components/customer/customer-navigation"; // Disabled temporarily
-import { ResponsiveLayout } from "@/components/responsive-layout";
+import CustomerNavigation from "@/components/customer/customer-navigation";
 import { useCustomerTheme } from "@/contexts/customer-theme-context";
 import { 
   Brain,
@@ -107,9 +106,12 @@ export default function CustomerAIInsights() {
   const displayInsights: AIInsight[] = insights || [];
 
   return (
-    <ResponsiveLayout>
+    <div className={`flex min-h-screen ${colors.background}`}>
       {/* Navigation Sidebar */}
-      {/* CustomerNavigation replaced with ResponsiveLayout wrapper */}
+      <CustomerNavigation 
+        permissions={permissions}
+        tenantName={tenantData?.name}
+      />
       
       {/* Main Content */}
       <div className="flex-1 ml-64">
@@ -294,6 +296,6 @@ export default function CustomerAIInsights() {
           </div>
         </div>
       </div>
-    </ResponsiveLayout>
+    </div>
   );
 }

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-// Define ConfigurationError locally since ../../shared/types doesn't exist
+// Define ConfigurationError locally since @shared/types doesn't exist
 class ConfigurationError extends Error {
   public readonly code: string;
   

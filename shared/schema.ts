@@ -341,7 +341,7 @@ export const insertTenantSchema = createInsertSchema(tenants).omit({
   createdAt: true,
   updatedAt: true,
 });
-export type InsertTenantFromSchema = z.infer<typeof insertTenantSchema>;
+export type InsertTenant = z.infer<typeof insertTenantSchema>;
 export type SelectTenant = typeof tenants.$inferSelect;
 
 export const tenantUsers = pgTable("tenant_users", {

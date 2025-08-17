@@ -10,7 +10,7 @@
  */
 
 import { db } from '../db';
-import { legalCases } from '../../shared/schema';
+import { legalCases } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 
 interface ComprehensiveLegalCase {

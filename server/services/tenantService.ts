@@ -1,7 +1,7 @@
 import { db } from "../db";
-import { tenants, tenantUsers, tenantDashboards, tenantDataAccess, tenantInvitations } from "../../shared/schema";
+import { tenants, tenantUsers, tenantDashboards, tenantDataAccess, tenantInvitations } from "@shared/schema";
 import { eq, desc, and } from "drizzle-orm";
-import { InsertTenant, Tenant, InsertTenantUser, TenantUser } from "../../shared/schema";
+import { InsertTenant, Tenant, InsertTenantUser, TenantUser } from "@shared/schema";
 
 export class TenantService {
   // Get all tenants with user counts
