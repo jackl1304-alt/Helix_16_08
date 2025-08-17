@@ -1,5 +1,5 @@
 import { storage } from '../storage';
-import type { InsertRegulatoryUpdate } from '@shared/schema';
+import type { InsertRegulatoryUpdate } from '../../shared/schema';
 
 /**
  * Zentrales API-Management-System für alle Datenquellen

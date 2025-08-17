@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import { Logger } from '../services/logger.service';
-// Define error types locally since @shared/types doesn't exist
+// Define error types locally since ../../shared/types doesn't exist
 class AppError extends Error {
   public readonly statusCode: number;
   public readonly isOperational: boolean;

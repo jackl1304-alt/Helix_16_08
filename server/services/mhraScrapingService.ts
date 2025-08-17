@@ -1,6 +1,6 @@
 import { storage } from '../storage';
 import { nlpService } from './nlpService';
-import type { InsertRegulatoryUpdate } from '@shared/schema';
+import type { InsertRegulatoryUpdate } from '../../shared/schema';
 
 interface MHRADevice {
   registrationNumber: string;

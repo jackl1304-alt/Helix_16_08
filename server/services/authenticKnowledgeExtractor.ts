@@ -135,7 +135,8 @@ export class AuthenticKnowledgeExtractor {
   private async extractFromAuthenticSource(source: AuthenticKnowledgeSource): Promise<any[]> {
     switch (source.extractorService) {
       case 'JAMANetworkScrapingService':
-        return await this.jamaService.scrapeJAMAArticles();
+        // JAMA service method updated for current implementation
+        return await this.jamaService.extractArticles();
       
       default:
         this.logger.warn(`No authentic extractor available for ${source.name}`);

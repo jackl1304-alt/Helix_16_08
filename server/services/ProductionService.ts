@@ -3,7 +3,7 @@ import { aiService } from "./aiService";
 import { dataCollectionService } from "./dataCollectionService";
 import { fdaOpenApiService } from "./fdaOpenApiService";
 import { legalAnalysisService } from "./legalAnalysisService";
-import type { RegulatoryUpdate, LegalCase } from "@shared/schema";
+import type { RegulatoryUpdate, LegalCase } from "../../shared/schema";
 
 /**
  * Production Service for comprehensive regulatory intelligence management

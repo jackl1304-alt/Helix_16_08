@@ -1,6 +1,6 @@
 import { storage } from "../storage";
 import { fdaOpenApiService } from "./fdaOpenApiService";
-import type { InsertRegulatoryUpdate } from "@shared/schema";
+import type { InsertRegulatoryUpdate } from "../../shared/schema";
 
 interface SyncMetrics {
   startTime: number;

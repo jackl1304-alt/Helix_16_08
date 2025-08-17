@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { logger } from '../services/logger.service';
-// Define ValidationError locally since @shared/types doesn't exist
+// Define ValidationError locally since ../../shared/types doesn't exist
 class ValidationError extends Error {
   public readonly field?: string;
   public readonly errors?: any;
