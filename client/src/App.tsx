@@ -82,6 +82,7 @@ function App() {
             <Route path="/ki-insights" component={Analytics} />
             <Route path="/grip-integration" component={GlobalSources} />
             <Route path="/intelligent-search" component={GlobalSources} />
+            <Route path="/customer-area" component={SystemSettings} />
             <Route component={NotFound} />
           </Router>
         </div>

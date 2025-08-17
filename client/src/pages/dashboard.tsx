@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Sidebar } from "@/components/layout/sidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -189,7 +190,9 @@ export default function Dashboard() {
   const handleSystemSettings = () => setLocation('/system-settings');
 
   return (
-    <ResponsiveLayout>
+    <>
+      <Sidebar />
+      <div className="ml-72 min-h-screen bg-gray-50">
       <div className="space-y-8">
         
         {/* Hero Section - kompakt mit Deltaways-Branding */}
@@ -480,6 +483,7 @@ export default function Dashboard() {
         </Card>
 
       </div>
-    </ResponsiveLayout>
+    </div>
+    </>
   );
 }
