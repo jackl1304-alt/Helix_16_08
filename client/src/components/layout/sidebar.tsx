@@ -179,7 +179,7 @@ export function Sidebar() {
     return (
       <Link
         key={item.href}
-        href={item.href}
+        to={item.href}
         className={cn(
           "flex items-center justify-start px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer text-left",
           isActive
@@ -203,7 +203,7 @@ export function Sidebar() {
           return (
             <Link
               key={item.href}
-              href={item.href}
+              to={item.href}
               className={cn(
                 "flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-300 cursor-pointer",
                 isActive
@@ -248,7 +248,7 @@ export function Sidebar() {
     <aside className="fixed left-0 top-0 h-screen w-64 deltaways-nav shadow-lg z-50 overflow-y-auto">
       {/* DELTA WAYS Logo Header */}
       <div className="p-6 border-b border-gray-200">
-        <Link href="/">
+        <Link to="/">
           <div className="flex flex-col items-center cursor-pointer space-y-2">
             <div className="w-16 h-16 bg-gradient-to-br from-blue-600 via-purple-600 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg">
               <Activity className="h-8 w-8 text-white" />
@@ -260,7 +260,7 @@ export function Sidebar() {
         
         {/* Customer Area Button */}
         <div className="mt-4">
-          <Link href="/customer-area">
+          <Link to="/customer-area">
             <button className="w-full flex items-center justify-center px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
               <Users className="h-4 w-4 mr-2" />
               Customer Area
