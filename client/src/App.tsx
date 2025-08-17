@@ -1,93 +1,179 @@
-import { useState, useEffect } from "react";
-import { Router, Route } from "wouter";
+import { Switch, Route } from "wouter";
+import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
-import { queryClient } from "@/lib/queryClient";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { lazy, Suspense } from "react";
+import { ResponsiveLayout } from "@/components/responsive-layout";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { CustomerThemeProvider } from "@/contexts/customer-theme-context";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+// import { DashboardProvider } from "@/contexts/DashboardContext";
+import { useAuth } from "@/hooks/use-auth";
 import Login from "@/pages/login";
 
-// Direct imports - no lazy loading to eliminate Suspense issues
+// Critical pages loaded immediately
 import Dashboard from "@/pages/dashboard";
-import RegulatoryUpdates from "@/pages/regulatory-updates";
-import KnowledgeBase from "@/pages/knowledge-base";
-import Analytics from "@/pages/analytics";
-import GlobalSources from "@/pages/global-sources";
-import HistoricalData from "@/pages/historical-data";
-import SystemSettings from "@/pages/system-settings";
 import NotFound from "@/pages/not-found";
 
+// Lazy load components for better performance
+const CustomerRouter = lazy(() => import("@/components/customer/customer-router"));
+const DataCollection = lazy(() => import("@/pages/data-collection"));
+const Analytics = lazy(() => import("@/pages/analytics"));
+const Administration = lazy(() => import("@/pages/administration"));
+const UserManagement = lazy(() => import("@/pages/user-management"));
+const RegulatoryUpdates = lazy(() => import("@/pages/regulatory-updates"));
+const KnowledgeBase = lazy(() => import("@/pages/knowledge-base"));
+const SystemSettings = lazy(() => import("@/pages/system-settings"));
+
+// Additional Admin Pages
+const NewsletterAdmin = lazy(() => import("@/pages/newsletter-admin"));
+const EmailManagement = lazy(() => import("@/pages/email-management"));
+// const Rechtsprechung = lazy(() => import("@/pages/rechtsprechung"));
+const ZulassungenGlobal = lazy(() => import("@/pages/zulassungen-global"));
+const LaufendeZulassungen = lazy(() => import("@/pages/laufende-zulassungen"));
+const SyncManager = lazy(() => import("@/pages/sync-manager"));
+const GlobalSources = lazy(() => import("@/pages/global-sources"));
+const NewsletterManager = lazy(() => import("@/pages/newsletter-manager"));
+const HistoricalData = lazy(() => import("@/pages/historical-data"));
+const AdminCustomers = lazy(() => import("@/pages/admin-customers"));
+const AuditLogs = lazy(() => import("@/pages/audit-logs"));
+const AIContentAnalysis = lazy(() => import("@/pages/ai-content-analysis"));
+const AIInsights = lazy(() => import("@/pages/ai-insights"));
+const GripIntegration = lazy(() => import("@/pages/grip-integration"));
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+  </div>
+);
+
+function Router() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <Switch>
+        {/* Admin Dashboard */}
+        <Route path="/" component={Dashboard} />
+        <Route path="/dashboard" component={Dashboard} />
+        
+        {/* Data Management */}
+        <Route path="/data-collection" component={DataCollection} />
+        <Route path="/newsletter-admin" component={NewsletterAdmin} />
+        <Route path="/email-management" component={EmailManagement} />
+        <Route path="/knowledge-base" component={KnowledgeBase} />
+        
+        {/* Analytics & Reporting */}
+        <Route path="/analytics" component={Analytics} />
+        
+        {/* Compliance & Regulation */}
+        <Route path="/regulatory-updates" component={RegulatoryUpdates} />
+        {/* <Route path="/rechtsprechung" component={Rechtsprechung} /> */}
+        
+        {/* System Settings */}
+        <Route path="/system-settings" component={SystemSettings} />
+        
+        {/* Approvals & Registration */}
+        <Route path="/zulassungen/global" component={ZulassungenGlobal} />
+        <Route path="/zulassungen/laufende" component={LaufendeZulassungen} />
+        
+        {/* Advanced Features */}
+        <Route path="/sync-manager" component={SyncManager} />
+        <Route path="/global-sources" component={GlobalSources} />
+        <Route path="/newsletter-manager" component={NewsletterManager} />
+        <Route path="/historical-data" component={HistoricalData} />
+        <Route path="/admin-customers" component={AdminCustomers} />
+        <Route path="/user-management" component={UserManagement} />
+        <Route path="/administration" component={Administration} />
+        <Route path="/audit-logs" component={AuditLogs} />
+        
+        {/* AI Features */}
+        <Route path="/ai-content-analysis" component={AIContentAnalysis} />
+        <Route path="/ki-insights" component={AIInsights} />
+        <Route path="/grip-integration" component={GripIntegration} />
+        
+        {/* Fallback */}
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
+  );
+}
+
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const { isAuthenticated } = useAuth();
 
-  // Initialize authentication
-  useEffect(() => {
-    const initializeApp = async () => {
-      try {
-        // Check authentication
-        const authStatus = localStorage.getItem('isAuthenticated') === 'true';
-        setIsAuthenticated(authStatus);
-      } catch (error) {
-        console.error('App initialization error:', error);
-        setIsAuthenticated(false);
-      }
-    };
-
-    initializeApp();
-  }, []);
-
-  // Show loading while checking auth
-  if (isAuthenticated === null) {
+  if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Loading Helix Platform...</p>
-        </div>
-      </div>
+      <ErrorBoundary>
+        <LanguageProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <Toaster />
+              <Login />
+            </TooltipProvider>
+          </QueryClientProvider>
+        </LanguageProvider>
+      </ErrorBoundary>
     );
   }
 
-  // Show login if not authenticated
-  if (isAuthenticated === false) {
-    return <Login />;
-  }
-
   return (
-    <QueryClientProvider client={queryClient}>
+    <ErrorBoundary>
       <LanguageProvider>
-        <div className="min-h-screen bg-gray-50">
-          <Toaster />
-          <Router>
-            <Route path="/" component={Dashboard} />
-            <Route path="/regulatory-updates" component={RegulatoryUpdates} />
-            <Route path="/knowledge-base" component={KnowledgeBase} />
-            <Route path="/analytics" component={Analytics} />
-            <Route path="/global-sources" component={GlobalSources} />
-            <Route path="/historical-data" component={HistoricalData} />
-            <Route path="/system-settings" component={SystemSettings} />
-            <Route path="/data-collection" component={GlobalSources} />
-            <Route path="/newsletter-manager" component={GlobalSources} />
-            <Route path="/legal-cases" component={HistoricalData} />
-            <Route path="/user-management" component={SystemSettings} />
-            <Route path="/audit-logs" component={SystemSettings} />
-            <Route path="/newsletter-admin" component={GlobalSources} />
-            <Route path="/email-management" component={SystemSettings} />
-            <Route path="/rechtsprechung" component={HistoricalData} />
-            <Route path="/zulassungen/global" component={GlobalSources} />
-            <Route path="/zulassungen/laufende" component={GlobalSources} />
-            <Route path="/sync-manager" component={SystemSettings} />
-            <Route path="/admin-customers" component={SystemSettings} />
-            <Route path="/administration" component={SystemSettings} />
-            <Route path="/ai-content-analysis" component={Analytics} />
-            <Route path="/ki-insights" component={Analytics} />
-            <Route path="/grip-integration" component={GlobalSources} />
-            <Route path="/intelligent-search" component={GlobalSources} />
-            <Route path="/customer-area" component={SystemSettings} />
-            <Route component={NotFound} />
-          </Router>
-        </div>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+              <Switch>
+                {/* Customer Portal - Multi-Tenant */}
+                <Route path="/customer-dashboard">
+                  <CustomerThemeProvider>
+                    <Suspense fallback={<LoadingFallback />}>
+                      <CustomerRouter />
+                    </Suspense>
+                  </CustomerThemeProvider>
+                </Route>
+                <Route path="/customer/*">
+                  <CustomerThemeProvider>
+                    <Suspense fallback={<LoadingFallback />}>
+                      <CustomerRouter />
+                    </Suspense>
+                  </CustomerThemeProvider>
+                </Route>
+                <Route path="/tenant/*">
+                  <CustomerThemeProvider>
+                    <Suspense fallback={<LoadingFallback />}>
+                      <CustomerRouter />
+                    </Suspense>
+                  </CustomerThemeProvider>
+                </Route>
+                
+                {/* Admin Pages with Sidebar - ONLY for admin routes */}
+                <Route path="/(:path*)?" nest>
+                  {(params) => {
+                    const path = (params as any).path || '';
+                    // Only render admin layout for admin paths
+                    const isAdminPath = [
+                      '', 'dashboard', 'data-collection', 'newsletter-admin', 'email-management', 
+                      'knowledge-base', 'analytics', 'regulatory-updates', 'rechtsprechung', 
+                      'system-settings', 'zulassungen', 'sync-manager', 'global-sources', 
+                      'newsletter-manager', 'historical-data', 'admin-customers', 'user-management', 
+                      'administration', 'audit-logs', 'ai-content-analysis', 'ki-insights', 'grip-integration'
+                    ].some(adminPath => path.startsWith(adminPath));
+                    
+                    return isAdminPath ? (
+                      <ResponsiveLayout>
+                        <Router />
+                      </ResponsiveLayout>
+                    ) : (
+                      <NotFound />
+                    );
+                  }}
+                </Route>
+              </Switch>
+          </TooltipProvider>
+        </QueryClientProvider>
       </LanguageProvider>
-    </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
