@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { ArrowLeft, FileText, Calendar, Globe, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { ResponsiveLayout } from '@/components/responsive-layout';
 
 export default function RegulatoryUpdates() {
   const [, setLocation] = useLocation();
@@ -39,7 +40,9 @@ export default function RegulatoryUpdates() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <ResponsiveLayout>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -125,6 +128,7 @@ export default function RegulatoryUpdates() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </ResponsiveLayout>
   );
 }
