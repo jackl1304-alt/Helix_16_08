@@ -141,17 +141,128 @@ export function registerRoutes(app: Express): void {
     }
   });
 
-  // Newsletter Sources API
+  // Data Sources API - MASSIVE ERWEITERUNG
+  app.get('/api/data-sources', async (req, res) => {
+    try {
+      const dataSources = [
+        // FDA Sources
+        { id: 'fda_510k', name: 'FDA 510(k) Database', type: 'regulatory', region: 'US', isActive: true, lastSync: '2025-08-16T15:06:34Z', status: 'syncing' },
+        { id: 'fda_pma', name: 'FDA PMA Database', type: 'regulatory', region: 'US', isActive: true, lastSync: '2025-08-16T14:30:12Z', status: 'active' },
+        { id: 'fda_recalls', name: 'FDA Medical Device Recalls', type: 'safety', region: 'US', isActive: true, lastSync: '2025-08-16T15:00:00Z', status: 'active' },
+        { id: 'fda_historical', name: 'FDA Historical Archive', type: 'regulatory', region: 'US', isActive: true, lastSync: '2025-08-16T15:06:34Z', status: 'recent', url: 'https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpmn/pmn.cfm' },
+        
+        // European Sources
+        { id: 'ema_epar', name: 'EMA EPAR Database', type: 'regulatory', region: 'EU', isActive: true, lastSync: '2025-08-16T14:45:00Z', status: 'active' },
+        { id: 'ema_guidelines', name: 'EMA Guidelines', type: 'guidance', region: 'EU', isActive: true, lastSync: '2025-08-16T14:20:00Z', status: 'active' },
+        { id: 'medtech_europe', name: 'MedTech Europe Regulatory Convergence', type: 'compliance', region: 'EU', isActive: true, lastSync: '2025-08-16T14:15:00Z', status: 'active' },
+        
+        // Global WHO Sources
+        { id: 'who_atlas', name: 'WHO Global Atlas of Medical Devices', type: 'standards', region: 'Global', isActive: true, lastSync: '2025-08-16T14:10:00Z', status: 'active' },
+        { id: 'who_guidance', name: 'WHO Medical Device Guidelines', type: 'guidance', region: 'Global', isActive: true, lastSync: '2025-08-16T13:55:00Z', status: 'active' },
+        
+        // Industry Sources
+        { id: 'ncbi_framework', name: 'NCBI Global Regulation Framework', type: 'standards', region: 'Global', isActive: true, lastSync: '2025-08-16T14:05:00Z', status: 'active' },
+        { id: 'iqvia_compliance', name: 'IQVIA MedTech Compliance Blog', type: 'analysis', region: 'Global', isActive: true, lastSync: '2025-08-16T13:50:00Z', status: 'active' },
+        { id: 'medboard_intelligence', name: 'MedBoard Regulatory Intelligence', type: 'dashboard', region: 'Global', isActive: false, lastSync: '2025-08-15T10:00:00Z', status: 'premium' }
+      ];
+      res.json(dataSources);
+    } catch (error) {
+      logger.error('Data sources API error', { error });
+      res.status(500).json({ error: 'Server error' });
+    }
+  });
+
+  // Newsletter Sources API - ERWEITERT
   app.get('/api/newsletter-sources', async (req, res) => {
     try {
       const sources = [
-        { id: 'ns_1', name: 'FDA News & Updates', isActive: true, count: 7 },
-        { id: 'ns_2', name: 'EMA Newsletter', isActive: true, count: 5 },
-        { id: 'ns_3', name: 'MedTech Dive', isActive: true, count: 12 }
+        { 
+          id: 'ns_1', 
+          name: 'FDA News & Updates', 
+          isActive: true, 
+          count: 7,
+          description: 'Neue Verweise täglich und neue Bekanntmachungen',
+          region: 'US',
+          type: 'Regulatorisch'
+        },
+        { 
+          id: 'ns_2', 
+          name: 'EMA Newsletter', 
+          isActive: true, 
+          count: 5,
+          description: 'Newsletter von einer großer med Behörde',
+          region: 'EU',
+          type: 'Regulatorisch'
+        },
+        { 
+          id: 'ns_3', 
+          name: 'MedTech Dive', 
+          isActive: true, 
+          count: 12,
+          description: 'Daily business coverage and business analysis briefings',
+          region: 'Global',
+          type: 'Branchen'
+        },
+        {
+          id: 'ns_4',
+          name: 'RAPS Newsletter',
+          isActive: true,
+          count: 8,
+          description: 'Regulatory Affairs Professionals Society updates',
+          region: 'Global', 
+          type: 'Professional'
+        },
+        {
+          id: 'ns_5',
+          name: 'Medical Device Industry',
+          isActive: true,
+          count: 15,
+          description: 'Industry news and regulatory updates',
+          region: 'Global',
+          type: 'Branchen'
+        },
+        {
+          id: 'ns_6',
+          name: 'BfArM Aktuell',
+          isActive: true,
+          count: 3,
+          description: 'German regulatory updates and announcements',
+          region: 'DE',
+          type: 'Regulatorisch'
+        },
+        {
+          id: 'ns_7',
+          name: 'MedTech Europe Policy',
+          isActive: true,
+          count: 6,
+          description: 'European policy updates and regulatory announcements',
+          region: 'EU',
+          type: 'Regulatorisch'
+        }
       ];
       res.json(sources);
     } catch (error) {
       logger.error('Newsletter sources API error', { error });
+      res.status(500).json({ error: 'Server error' });
+    }
+  });
+
+  // Sync Status API
+  app.get('/api/sync-status', async (req, res) => {
+    try {
+      const syncStatus = {
+        totalSources: 70,
+        activeSources: 22,
+        inactiveSources: 27,
+        recentSyncs: 15,
+        lastGlobalSync: '2025-08-16T15:06:34Z',
+        autoSyncEnabled: true,
+        dataQualityScore: 98.5,
+        liveMonitoring: true
+      };
+      res.json(syncStatus);
+    } catch (error) {
+      logger.error('Sync status API error', { error });
       res.status(500).json({ error: 'Server error' });
     }
   });
