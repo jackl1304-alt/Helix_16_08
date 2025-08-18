@@ -94,10 +94,18 @@ self.addEventListener('fetch', (event) => {
         }
         return response;
       })
-      .catch(() => {
+      .catch((error) => {
+        console.log('[SW] Fetch error:', error);
         return caches.match(event.request)
           .then((response) => {
             return response || caches.match('/');
+          })
+          .catch(() => {
+            // Return a basic response if all else fails
+            return new Response('Service Worker Error', { 
+              status: 503, 
+              statusText: 'Service Worker Error' 
+            });
           });
       })
   );
