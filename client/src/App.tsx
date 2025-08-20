@@ -35,6 +35,7 @@ const AuditLogs = React.lazy(() => import("@/pages/audit-logs"));
 const AiContentAnalysis = React.lazy(() => import("@/pages/ai-content-analysis"));
 const AiInsights = React.lazy(() => import("@/pages/ai-insights"));
 const GripIntegration = React.lazy(() => import("@/pages/grip-integration"));
+const CustomerDashboard = React.lazy(() => import("@/pages/customer-dashboard"));
 
 // Simple Auth Hook
 function useSimpleAuth() {
@@ -132,6 +133,9 @@ function App() {
                   <Route path="/ai-content-analysis" component={AiContentAnalysis} />
                   <Route path="/ki-insights" component={AiInsights} />
                   <Route path="/grip-integration" component={GripIntegration} />
+                  
+                  {/* Customer Area */}
+                  <Route path="/customer-dashboard" component={CustomerDashboard} />
                   
                   <Route component={NotFound} />
                 </Switch>
