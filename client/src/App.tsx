@@ -16,8 +16,6 @@ interface AppState {
   isLoading: boolean;
 }
 
-// Navigation via props instead of context to avoid provider issues
-
 // Simple page renderer with navigation prop
 function renderCurrentPage(page: string, userData: any, navigate: (page: string) => void) {
   switch (page) {
@@ -56,8 +54,6 @@ function App() {
     setAppState(prev => ({ ...prev, currentPage: page }));
     window.history.pushState({}, '', page);
   };
-
-  // Navigation function passed as prop
 
   // Initialize app with JSON data
   useEffect(() => {
