@@ -266,8 +266,8 @@ export default function LaufendeZulassungenNew() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      {/* EXAKTER HEADER WIE IM SCREENSHOT */}
-      <div className="bg-gradient-to-r from-green-600 via-green-700 to-emerald-800 text-white shadow-xl">
+      {/* INTENSIVER GRÜNER HEADER WIE IM SCREENSHOT */}
+      <div className="bg-gradient-to-r from-green-700 via-green-800 to-green-900 text-white shadow-xl">
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between">
             <div>
@@ -369,8 +369,21 @@ export default function LaufendeZulassungenNew() {
           </CardContent>
         </Card>
 
-        {/* PROJEKTE LISTE */}
-        <div className="space-y-6">
+        {/* EXAKTE 6-TAB-STRUKTUR WIE IM SCREENSHOT */}
+        <Tabs defaultValue="uebersicht" className="w-full">
+          <TabsList className="grid w-full grid-cols-6 mb-8">
+            <TabsTrigger value="uebersicht" className="text-sm font-semibold">Übersicht</TabsTrigger>
+            <TabsTrigger value="zusammenfassung" className="text-sm font-semibold">Zusammenfassung</TabsTrigger>
+            <TabsTrigger value="vollstaendiger-inhalt" className="text-sm font-semibold">Vollständiger Inhalt</TabsTrigger>
+            <TabsTrigger value="finanzanalyse" className="text-sm font-semibold">Finanzanalyse</TabsTrigger>
+            <TabsTrigger value="ki-analyse" className="text-sm font-semibold">KI-Analyse</TabsTrigger>
+            <TabsTrigger value="metadaten" className="text-sm font-semibold">Metadaten</TabsTrigger>
+          </TabsList>
+
+          {/* ÜBERSICHT TAB */}
+          <TabsContent value="uebersicht" className="space-y-6">
+            {/* PROJEKTE LISTE */}
+            <div className="space-y-6">
           {approvals.map((approval) => (
             <Card key={approval.id} className="border-green-200 hover:shadow-lg transition-shadow cursor-pointer"
                   onClick={() => setSelectedApproval(approval)}>
@@ -435,7 +448,222 @@ export default function LaufendeZulassungenNew() {
               </CardContent>
             </Card>
           ))}
-        </div>
+            </div>
+          </TabsContent>
+
+          {/* ZUSAMMENFASSUNG TAB */}
+          <TabsContent value="zusammenfassung" className="space-y-6">
+            <Card className="border-green-200">
+              <CardHeader>
+                <CardTitle className="text-2xl text-green-800">Laufende Zulassungen Zusammenfassung</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <p className="text-gray-700">
+                    Das System verwaltet {totalProjects} aktuelle Zulassungsprojekte mit {averageProgress}% 
+                    durchschnittlichem Fortschritt und €4.2M Gesamtinvestition bei 84% KI-Erfolgsvorhersage.
+                  </p>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="bg-green-50 p-4 rounded-lg">
+                      <h3 className="font-semibold text-green-800">Wichtige Kennzahlen</h3>
+                      <ul className="mt-2 space-y-1 text-sm">
+                        <li>• {totalProjects} aktuelle Projekte</li>
+                        <li>• {averageProgress}% durchschnittlicher Fortschritt</li>
+                        <li>• €4.2M Gesamtinvestition</li>
+                        <li>• 84% KI-Erfolgsvorhersage</li>
+                      </ul>
+                    </div>
+                    <div className="bg-green-50 p-4 rounded-lg">
+                      <h3 className="font-semibold text-green-800">Regionale Verteilung</h3>
+                      <ul className="mt-2 space-y-1 text-sm">
+                        <li>• EU: CE-Kennzeichnung Verfahren</li>
+                        <li>• USA: FDA 510(k) Submissions</li>
+                        <li>• Japan: PMDA Consultation</li>
+                        <li>• Canada: Health Canada MDL</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* VOLLSTÄNDIGER INHALT TAB */}
+          <TabsContent value="vollstaendiger-inhalt" className="space-y-6">
+            <Card className="border-green-200">
+              <CardHeader>
+                <CardTitle>Detaillierte Projektanalyse</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <section>
+                    <h3 className="text-lg font-semibold text-green-800 mb-3">EU CE-Kennzeichnung Projekte</h3>
+                    <p className="text-gray-700 mb-4">
+                      Mehrere kritische CE-Kennzeichnungsverfahren in der Endphase, 
+                      mit Schwerpunkt auf MDR-Compliance und Benannte Stellen Bewertungen.
+                    </p>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h4 className="font-medium mb-2">SmartHeart Monitor EU - 95% Fortschritt</h4>
+                      <p className="text-sm text-gray-600 mb-2">
+                        CE-Kennzeichnung fast abgeschlossen. Benannte Stelle TÜV SÜD finalisiert 
+                        letzte Dokumentenprüfung. Erwartete Genehmigung: 22. August 2025.
+                      </p>
+                      <div className="flex gap-2">
+                        <Badge className="bg-green-100 text-green-800">Kurz vor Genehmigung</Badge>
+                        <Badge className="bg-blue-100 text-blue-800">Class IIa</Badge>
+                      </div>
+                    </div>
+                  </section>
+                  <section>
+                    <h3 className="text-lg font-semibold text-green-800 mb-3">FDA 510(k) Submissions</h3>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h4 className="font-medium mb-2">NeuroStim Therapy Device - 65% Fortschritt</h4>
+                      <p className="text-sm text-gray-600 mb-2">
+                        FDA 510(k) Submission eingereicht. Erwarte Q3-Submission Meeting mit FDA.
+                        Predicate Device erfolgreich identifiziert.
+                      </p>
+                      <div className="flex gap-2">
+                        <Badge className="bg-yellow-100 text-yellow-800">In Prüfung</Badge>
+                        <Badge className="bg-purple-100 text-purple-800">Class II</Badge>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* FINANZANALYSE TAB */}
+          <TabsContent value="finanzanalyse" className="space-y-6">
+            <Card className="border-green-200">
+              <CardHeader>
+                <CardTitle>Finanzielle Auswirkungen der Laufenden Zulassungen</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 md:grid-cols-3 mb-6">
+                  <Card>
+                    <CardContent className="pt-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-600">€4.2M</div>
+                        <div className="text-sm text-gray-600">Gesamtinvestition Portfolio</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-600">€180M</div>
+                        <div className="text-sm text-gray-600">Erwarteter Marktwert</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-purple-600">43:1</div>
+                        <div className="text-sm text-gray-600">Erwartetes ROI-Verhältnis</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                <p className="text-gray-700">
+                  Die laufenden Zulassungsprojekte zeigen eine ausgezeichnete Kosten-Nutzen-Relation 
+                  mit einem erwarteten ROI von 43:1 bei erfolgreicher Markteinführung.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* KI-ANALYSE TAB */}
+          <TabsContent value="ki-analyse" className="space-y-6">
+            <Card className="border-green-200">
+              <CardHeader>
+                <CardTitle>KI-gestützte Zulassungsprognose</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-green-800">Erfolgswahrscheinlichkeiten</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span>SmartHeart Monitor EU:</span>
+                        <Badge className="bg-green-100 text-green-800">97%</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>NeuroStim FDA 510(k):</span>
+                        <Badge className="bg-blue-100 text-blue-800">78%</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>AiAssist Japan PMDA:</span>
+                        <Badge className="bg-yellow-100 text-yellow-800">91%</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>SmartPump Canada:</span>
+                        <Badge className="bg-green-100 text-green-800">83%</Badge>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-green-800">KI-Empfehlungen</h3>
+                    <div className="space-y-2 text-sm">
+                      <div className="bg-green-50 p-3 rounded">
+                        <strong>Priorität 1:</strong> SmartHeart EU - Finalisierung beschleunigen
+                      </div>
+                      <div className="bg-yellow-50 p-3 rounded">
+                        <strong>Priorität 2:</strong> NeuroStim FDA - Q3 Meeting vorbereiten
+                      </div>
+                      <div className="bg-blue-50 p-3 rounded">
+                        <strong>Priorität 3:</strong> SmartPump Canada - Cybersecurity nachbessern
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* METADATEN TAB */}
+          <TabsContent value="metadaten" className="space-y-6">
+            <Card className="border-green-200">
+              <CardHeader>
+                <CardTitle>Metadaten und Projektquellen</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <h3 className="font-semibold mb-2">Regulierungsbehörden</h3>
+                      <ul className="text-sm space-y-1">
+                        <li>• EU: Benannte Stellen (TÜV SÜD, BSI)</li>
+                        <li>• FDA: Center for Devices (CDRH)</li>
+                        <li>• PMDA: Japan Pharmaceutical Agency</li>
+                        <li>• Health Canada: Medical Device Bureau</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold mb-2">Projektzyklen</h3>
+                      <ul className="text-sm space-y-1">
+                        <li>• Status Updates: Wöchentlich</li>
+                        <li>• KI-Prognose: Täglich</li>
+                        <li>• Meilenstein-Tracking: Kontinuierlich</li>
+                        <li>• Risk Assessment: Monatlich</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-medium mb-2">Projektqualität & Vertrauenswürdigkeit</h4>
+                    <div className="text-sm space-y-1">
+                      <div>Letzte Aktualisierung: 20. August 2025</div>
+                      <div>Datenqualität: 99.1%</div>
+                      <div>KI-Prognose-Genauigkeit: 84%</div>
+                      <div>Projekte aktiv verfolgt: {totalProjects}/{totalProjects}</div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
         {/* DETAILANSICHT MODAL */}
         {selectedApproval && (
