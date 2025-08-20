@@ -705,6 +705,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
 <p><strong>Compliance-Deadline:</strong> {{complianceDeadline}}</p>
 </div>
 <a href="{{dashboardUrl}}" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;">Zum Dashboard</a>`,
+          htmlContent: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center;">
+<h1 style="margin: 0; font-size: 24px;">🚨 Kritisches Regulatory Update</h1>
+</div>
+<div style="padding: 30px; background: white;">
+<p style="font-size: 16px; color: #333;">Hallo <strong>{{customerName}}</strong>,</p>
+<p style="color: #666; line-height: 1.6;">Ein neues kritisches Regulatory Update wurde für <strong>{{deviceType}}</strong> veröffentlicht:</p>
+<div style="background: #f8f9fa; padding: 25px; margin: 25px 0; border-left: 5px solid #dc3545; border-radius: 5px;">
+<h3 style="margin: 0 0 15px 0; color: #dc3545;">{{updateTitle}}</h3>
+<table style="width: 100%; border-collapse: collapse;">
+<tr><td style="padding: 5px 0; font-weight: bold; color: #333;">Region:</td><td style="color: #666;">{{region}}</td></tr>
+<tr><td style="padding: 5px 0; font-weight: bold; color: #333;">Gültigkeitsdatum:</td><td style="color: #666;">{{effectiveDate}}</td></tr>
+<tr><td style="padding: 5px 0; font-weight: bold; color: #333;">Compliance-Deadline:</td><td style="color: #666;">{{complianceDeadline}}</td></tr>
+</table>
+</div>
+<div style="text-align: center; margin: 30px 0;">
+<a href="{{dashboardUrl}}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Zum Dashboard</a>
+</div>
+</div>
+</div>`,
           type: 'regulatory_alert',
           isActive: true,
           recipients: 342,
@@ -726,6 +746,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
 </ul>
 </div>
 <a href="{{dashboardUrl}}">Zum vollständigen Dashboard</a>`,
+          htmlContent: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+<div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 20px; text-align: center;">
+<h1 style="margin: 0; font-size: 24px;">📊 Wöchentlicher Digest</h1>
+<p style="margin: 10px 0 0 0; opacity: 0.9;">Ihre Regulatory Intelligence Zusammenfassung</p>
+</div>
+<div style="padding: 30px; background: white;">
+<p style="font-size: 16px; color: #333;">Hallo <strong>{{customerName}}</strong>,</p>
+<p style="color: #666; line-height: 1.6;">Hier ist Ihre Zusammenfassung der Regulatory Updates für die Woche <strong>{{weekOf}}</strong>:</p>
+<div style="background: linear-gradient(135deg, #f0f7ff 0%, #c7d2fe 100%); padding: 25px; margin: 25px 0; border-radius: 10px;">
+<h3 style="margin: 0 0 15px 0; color: #4f46e5;">📈 Diese Woche im Überblick</h3>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+<div style="text-align: center; background: white; padding: 15px; border-radius: 8px;">
+<div style="font-size: 24px; font-weight: bold; color: #059669;">{{newUpdatesCount}}</div>
+<div style="color: #666; font-size: 14px;">Neue Updates</div>
+</div>
+<div style="text-align: center; background: white; padding: 15px; border-radius: 8px;">
+<div style="font-size: 24px; font-weight: bold; color: #dc2626;">{{criticalAlertsCount}}</div>
+<div style="color: #666; font-size: 14px;">Kritische Alerts</div>
+</div>
+<div style="text-align: center; background: white; padding: 15px; border-radius: 8px;">
+<div style="font-size: 24px; font-weight: bold; color: #d97706;">{{complianceRemindersCount}}</div>
+<div style="color: #666; font-size: 14px;">Compliance-Erinnerungen</div>
+</div>
+</div>
+</div>
+<div style="text-align: center; margin: 30px 0;">
+<a href="{{dashboardUrl}}" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Vollständiges Dashboard öffnen</a>
+</div>
+</div>
+</div>`,
           type: 'weekly_digest',
           isActive: true,
           recipients: 892,
