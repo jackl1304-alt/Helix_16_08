@@ -158,10 +158,10 @@ export default function RechtsprechungFixed() {
         <div className="flex items-center gap-4">
           <Button 
             onClick={handleSync}
-            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+            className="bg-orange-500 hover:bg-orange-600 text-white flex items-center gap-2"
           >
             <RefreshCw className="h-4 w-4" />
-            Daten synchronisieren
+            🔄 Synchronisieren
           </Button>
         </div>
       </div>

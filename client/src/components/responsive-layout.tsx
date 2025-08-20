@@ -38,9 +38,7 @@ export function ResponsiveLayout({ children, showSidebar = true }: ResponsiveLay
         <a href="/customer-login" className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-medium inline-block no-underline">
           👤 Customer Area
         </a>
-        <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs font-medium">
-          🔐 Tenant Login
-        </button>
+
       </div>
       
       {/* Main Content */}
