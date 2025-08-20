@@ -16,30 +16,26 @@ interface AppState {
   isLoading: boolean;
 }
 
-// Navigation Context for sharing navigation function
-interface NavigationContextType {
-  navigate: (page: string) => void;
-  currentPage: string;
-}
+// Navigation via props instead of context to avoid provider issues
 
-const NavigationContext = React.createContext<NavigationContextType | null>(null);
-
-// Simple page renderer without complex routing
-function renderCurrentPage(page: string, userData: any) {
+// Simple page renderer with navigation prop
+function renderCurrentPage(page: string, userData: any, navigate: (page: string) => void) {
   switch (page) {
     case '/':
     case '/dashboard':
-      return <Dashboard />;
+      return <Dashboard navigate={navigate} />;
     case '/regulatory-updates':
-      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Regulatory Updates</h1><p>Regulatory Updates Seite wird geladen...</p></div>;
+      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Regulatory Updates</h1><p>Regulatory Updates Seite wird geladen...</p><button onClick={() => navigate('/dashboard')} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Zurück zum Dashboard</button></div>;
     case '/knowledge-base':
-      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Knowledge Base</h1><p>Knowledge Base Seite wird geladen...</p></div>;
+      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Knowledge Base</h1><p>Knowledge Base Seite wird geladen...</p><button onClick={() => navigate('/dashboard')} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Zurück zum Dashboard</button></div>;
     case '/analytics':
-      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Analytics</h1><p>Analytics Seite wird geladen...</p></div>;
+      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Analytics</h1><p>Analytics Seite wird geladen...</p><button onClick={() => navigate('/dashboard')} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Zurück zum Dashboard</button></div>;
     case '/data-collection':
-      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Data Collection</h1><p>Data Collection Seite wird geladen...</p></div>;
+      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Data Collection</h1><p>Data Collection Seite wird geladen...</p><button onClick={() => navigate('/dashboard')} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Zurück zum Dashboard</button></div>;
     case '/user-management':
-      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">User Management</h1><p>User Management Seite wird geladen...</p></div>;
+      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">User Management</h1><p>User Management Seite wird geladen...</p><button onClick={() => navigate('/dashboard')} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Zurück zum Dashboard</button></div>;
+    case '/chat-support':
+      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Support Chat</h1><p>Support Chat wird geladen...</p><button onClick={() => navigate('/dashboard')} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Zurück zum Dashboard</button></div>;
     case '/404':
     default:
       return <NotFound />;
@@ -61,11 +57,7 @@ function App() {
     window.history.pushState({}, '', page);
   };
 
-  // Navigation context value
-  const navigationValue = {
-    navigate: handleNavigation,
-    currentPage: appState.currentPage
-  };
+  // Navigation function passed as prop
 
   // Initialize app with JSON data
   useEffect(() => {
@@ -103,14 +95,12 @@ function App() {
     return (
       <QueryClientProvider client={queryClient}>
         <LanguageProvider>
-          <NavigationContext.Provider value={navigationValue}>
-            <div className="flex items-center justify-center min-h-screen bg-gray-50">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Helix wird geladen...</p>
-              </div>
+          <div className="flex items-center justify-center min-h-screen bg-gray-50">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Helix wird geladen...</p>
             </div>
-          </NavigationContext.Provider>
+          </div>
         </LanguageProvider>
       </QueryClientProvider>
     );
@@ -121,12 +111,10 @@ function App() {
     return (
       <QueryClientProvider client={queryClient}>
         <LanguageProvider>
-          <NavigationContext.Provider value={navigationValue}>
-            <div className="min-h-screen bg-gray-50">
-              <Toaster />
-              <Login onLogin={() => setIsAuthenticated(true)} />
-            </div>
-          </NavigationContext.Provider>
+          <div className="min-h-screen bg-gray-50">
+            <Toaster />
+            <Login onLogin={() => setIsAuthenticated(true)} />
+          </div>
         </LanguageProvider>
       </QueryClientProvider>
     );
@@ -136,24 +124,18 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
-        <NavigationContext.Provider value={navigationValue}>
-          <div className="min-h-screen bg-gray-50">
-            <Toaster />
-            {renderCurrentPage(appState.currentPage, appState.userData)}
-          </div>
-        </NavigationContext.Provider>
+        <div className="min-h-screen bg-gray-50">
+          <Toaster />
+          {renderCurrentPage(appState.currentPage, appState.userData, handleNavigation)}
+        </div>
       </LanguageProvider>
     </QueryClientProvider>
   );
 }
 
-// Hook für Navigation
-export function useNavigation() {
-  const context = React.useContext(NavigationContext);
-  if (!context) {
-    throw new Error('useNavigation must be used within NavigationProvider');
-  }
-  return context;
+// Simple navigation helper - no context needed
+export function createNavigation(navigate: (page: string) => void) {
+  return { navigate };
 }
 
 export default App;

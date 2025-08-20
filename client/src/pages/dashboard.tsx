@@ -33,10 +33,12 @@ import {
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useNavigation } from "@/App";
 
-export default function Dashboard() {
-  const { navigate } = useNavigation();
+interface DashboardProps {
+  navigate: (page: string) => void;
+}
+
+export default function Dashboard({ navigate }: DashboardProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { t } = useLanguage();
