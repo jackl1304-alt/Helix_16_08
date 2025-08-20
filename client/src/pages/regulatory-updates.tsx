@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -75,9 +76,12 @@ export default function RegulatoryUpdates() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [impactFilter, setImpactFilter] = useState('all');
 
-  // Lokale Daten verwenden
-  const regulatoryUpdates = regulatoryUpdatesData;
-  const isLoading = false;
+  // ECHTE API-DATEN VERWENDEN
+  const { data: regulatoryUpdates = [], isLoading } = useQuery<RegulatoryUpdate[]>({
+    queryKey: ['/api/regulatory-updates'],
+    staleTime: 300000, // 5 minutes
+    gcTime: 600000, // 10 minutes
+  });
 
   const handleSync = () => {
     console.log("✅ MOCK SYNC: Regulatory updates synchronized (local data)");
@@ -122,7 +126,7 @@ export default function RegulatoryUpdates() {
   const uniqueCategories = [...new Set(regulatoryUpdates.map(u => u.category))];
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="w-full max-w-none p-6 space-y-6">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
         <div>
           <h1 className="text-4xl font-bold mb-2 flex items-center gap-3 deltaways-brand-text">
@@ -267,8 +271,8 @@ export default function RegulatoryUpdates() {
         </CardContent>
       </Card>
 
-      {/* Regulatory Updates Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Regulatory Updates Grid - FULL WIDTH */}
+      <div className="grid grid-cols-1 gap-6">
         {filteredUpdates.map((update) => (
           <Card key={update.id} className="hover:shadow-lg transition-shadow deltaways-card-hover">
             <CardHeader>
