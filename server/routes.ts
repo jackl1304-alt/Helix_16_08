@@ -47,7 +47,10 @@ export function registerRoutes(app: Express): void {
         totalUpdates: 2847,
         activeAlerts: 12,
         compliance: 98.5,
-        lastSync: new Date().toISOString()
+        lastSync: new Date().toISOString(),
+        dataCollection: 89,
+        totalDocuments: 2345,
+        activeUsers: 23
       };
       res.json(stats);
     } catch (error) {
