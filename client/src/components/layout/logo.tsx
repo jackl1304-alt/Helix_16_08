@@ -1,37 +1,115 @@
-import React from 'react';
-import helixLogo from '@assets/ICON Helix_1753735753843.jpg';
+import { Link } from "wouter";
+import logoPath from "@assets/ICON Helix_1753735921077.jpg";
+import { cn } from "@/lib/utils";
 
 interface LogoProps {
-  className?: string;
+  size?: "small" | "medium" | "large";
   showText?: boolean;
-  size?: 'sm' | 'md' | 'lg';
+  showSubtext?: boolean;
+  className?: string;
+  linkTo?: string;
 }
 
-export function Logo({ className = '', showText = true, size = 'md' }: LogoProps) {
+export function Logo({ 
+  size = "medium", 
+  showText = false, 
+  showSubtext = false, 
+  className,
+  linkTo = "/" 
+}: LogoProps) {
   const sizeClasses = {
-    sm: 'h-12 w-12',
-    md: 'h-16 w-16', 
-    lg: 'h-20 w-20'
+    small: "h-10 w-10",
+    medium: "h-14 w-14", 
+    large: "h-18 w-18"
   };
 
-  return (
-    <div className={`flex flex-col items-center space-y-2 ${className}`}>
-      <div className="relative">
-        <img 
-          src={helixLogo} 
-          alt="Helix DNA Logo" 
-          className={`${sizeClasses[size]} rounded-lg object-cover shadow-lg`}
-        />
-      </div>
+  const textSizeClasses = {
+    small: "text-sm",
+    medium: "text-lg",
+    large: "text-xl"
+  };
+
+  const content = (
+    <div className={cn("flex items-center", className)}>
+      <img 
+        src={logoPath} 
+        alt="Helix Logo" 
+        className={cn(
+          sizeClasses[size],
+          "object-cover rounded-lg"
+        )}
+      />
       {showText && (
-        <div className="flex flex-col items-center">
-          <span className="text-xl font-bold text-[#07233e] tracking-wide">HELIX</span>
-          <span className="text-xs text-gray-600 font-medium">Powered by DELTAWAYS</span>
+        <div>
+          <h1 className={cn(
+            "font-bold text-gray-900 dark:text-gray-100",
+            textSizeClasses[size]
+          )}>
+            Helix
+          </h1>
+          {showSubtext && (
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              MedTech Intelligence
+            </p>
+          )}
         </div>
       )}
     </div>
   );
+
+  if (linkTo) {
+    return (
+      <Link href={linkTo}>
+        <div className="cursor-pointer hover:opacity-80 transition-opacity">
+          {content}
+        </div>
+      </Link>
+    );
+  }
+
+  return content;
 }
 
-export default Logo;
-export { Logo as CompactLogo };
+// Preset logo components for common use cases
+export function HeaderLogo() {
+  return (
+    <Logo 
+      size="medium" 
+      showText={false} 
+      showSubtext={false}
+      className="hover:opacity-80 transition-opacity"
+    />
+  );
+}
+
+export function SidebarLogo() {
+  return (
+    <Logo 
+      size="medium" 
+      showText={false} 
+      showSubtext={false}
+      className="p-2"
+    />
+  );
+}
+
+export function CompactLogo() {
+  return (
+    <Logo 
+      size="small" 
+      showText={false} 
+      showSubtext={false}
+    />
+  );
+}
+
+export function FullLogo() {
+  return (
+    <Logo 
+      size="large" 
+      showText={false} 
+      showSubtext={false}
+      className="text-center"
+    />
+  );
+}

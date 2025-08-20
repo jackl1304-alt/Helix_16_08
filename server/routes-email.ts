@@ -7,21 +7,15 @@ export function registerEmailRoutes(app: Express) {
     try {
       const gmailProvider = {
         id: 'gmail_deltaways',
-        name: 'Gmail (deltawaysnewsletter@gmail.com)',
+        name: 'Gmail (deltawayshelixinfo@gmail.com)',
         host: 'smtp.gmail.com',
         port: 587,
         secure: false,
-        user: 'deltawaysnewsletter@gmail.com',
-        auth: {
-          user: 'deltawaysnewsletter@gmail.com',
-          pass: '2021!Emil@Serpha'
-        },
+        user: 'deltawayshelixinfo@gmail.com',
         status: 'active', // Gmail mit App-Passwort verbunden
         dailyLimit: 500,
         usedToday: 0,
-        lastTest: new Date().toISOString(),
-        isConfigured: true,
-        description: 'Gmail SMTP mit Credentials konfiguriert'
+        lastTest: new Date().toISOString()
       };
       
       res.json([gmailProvider]);
@@ -128,8 +122,8 @@ export function registerEmailRoutes(app: Express) {
         success: false,
         connected: false,
         message: 'Gmail-Verbindung fehlgeschlagen',
-        details: (error as Error)?.message || 'Unbekannter Fehler bei der Verbindung',
-        provider: 'Gmail (deltawaysnewsletter@gmail.com)'
+        details: error.message || 'Unbekannter Fehler bei der Verbindung',
+        provider: 'Gmail (deltawayshelixinfo@gmail.com)'
       });
     }
   });

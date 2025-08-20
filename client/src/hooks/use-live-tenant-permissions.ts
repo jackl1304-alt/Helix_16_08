@@ -52,12 +52,8 @@ export function useLiveTenantPermissions({
       const newPermissions = tenantData.customerPermissions;
       const newName = tenantData.name;
       
-      // Performance-optimized: shallow comparison instead of JSON.stringify
-      const hasChanged = !newPermissions || !permissions || 
-        Object.keys(newPermissions).some(key => newPermissions[key] !== permissions[key]) ||
-        Object.keys(permissions).some(key => permissions[key] !== newPermissions[key]);
-        
-      if (hasChanged) {
+      // Only update if permissions actually changed
+      if (JSON.stringify(newPermissions) !== JSON.stringify(permissions)) {
         setPermissions(newPermissions);
         console.log('[LIVE PERMISSIONS] Updated for tenant:', tenantId, newPermissions);
       }
