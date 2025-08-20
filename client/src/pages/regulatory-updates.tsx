@@ -330,11 +330,17 @@ export default function RegulatoryUpdates() {
                   </p>
                   
                   <div className="flex flex-wrap gap-1">
-                    {update.tags.map((tag, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {tag}
+                    {update.tags && Array.isArray(update.tags) && update.tags.length > 0 ? (
+                      update.tags.map((tag, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {tag}
+                        </Badge>
+                      ))
+                    ) : (
+                      <Badge variant="outline" className="text-xs text-gray-500">
+                        Keine Tags verfügbar
                       </Badge>
-                    ))}
+                    )}
                   </div>
                 </TabsContent>
                 

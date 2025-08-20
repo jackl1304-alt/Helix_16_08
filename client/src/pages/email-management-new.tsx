@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Settings, Mail, Send, Key, Users, Clock, AlertTriangle, CheckCircle, Edit, Trash, Plus, Server } from 'lucide-react';
+import { Settings, Mail, Send, Key, Users, Clock, AlertTriangle, CheckCircle, Edit, Trash, Plus, Server, Eye, Zap, ExternalLink } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -33,9 +33,13 @@ interface GmailTemplate {
   name: string;
   subject: string;
   content: string;
+  htmlContent?: string;
   type: 'customer_onboarding' | 'customer_offboarding' | 'billing_reminder' | 'regulatory_alert' | 'weekly_digest' | 'trial_expiry';
   isActive: boolean;
   variables: string[];
+  description?: string;
+  recipients?: number;
+  lastSent?: string;
 }
 
 // Email Statistics Interface
@@ -333,17 +337,49 @@ export default function EmailManagementNew() {
                       ))}
                     </div>
 
-                    {/* HTML Template Preview */}
-                    <div className="mb-4 p-3 bg-gray-50 border rounded-lg">
-                      <h4 className="font-medium mb-2">Template-Vorschau:</h4>
-                      <div 
-                        className="text-sm prose prose-sm max-w-none border p-2 rounded bg-white"
-                        dangerouslySetInnerHTML={{ 
-                          __html: template.htmlContent ? 
-                            template.htmlContent.substring(0, 200) + '...' : 
-                            `<p><strong>E-Mail-Template: ${template.name}</strong></p><p>${template.description || 'Professionelle E-Mail-Vorlage'}</p>`
-                        }}
-                      />
+                    {/* HTML Template Preview - Vollständige Rendering-Vorschau */}
+                    <div className="mb-4 p-4 bg-gray-50 border rounded-lg">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium">Template-Vorschau:</h4>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            const newWindow = window.open('', '_blank');
+                            newWindow?.document.write(template.htmlContent || template.content || `<h2>${template.name}</h2><p>${template.subject}</p>`);
+                          }}
+                        >
+                          <Eye className="w-3 h-3 mr-1" />
+                          Vollansicht
+                        </Button>
+                      </div>
+                      
+                      <div className="border rounded bg-white">
+                        {/* Rendered HTML Preview */}
+                        <div className="p-3 border-b bg-gray-100 text-sm font-mono text-gray-600">
+                          {template.subject}
+                        </div>
+                        <div 
+                          className="p-4 prose prose-sm max-w-none"
+                          style={{ maxHeight: '200px', overflowY: 'auto' }}
+                          dangerouslySetInnerHTML={{ 
+                            __html: template.htmlContent || template.content || `
+                              <div style="font-family: Arial, sans-serif; padding: 20px;">
+                                <h2 style="color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px;">
+                                  ${template.name}
+                                </h2>
+                                <p style="color: #666; line-height: 1.6;">
+                                  ${template.subject}
+                                </p>
+                                <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #007bff; margin: 15px 0;">
+                                  <p><strong>Template-Typ:</strong> ${template.type}</p>
+                                  <p><strong>Status:</strong> ${template.isActive ? '✅ Aktiv' : '❌ Inaktiv'}</p>
+                                </div>
+                              </div>
+                            `
+                          }}
+                        />
+                      </div>
                     </div>
 
                     <div className="space-y-3">
