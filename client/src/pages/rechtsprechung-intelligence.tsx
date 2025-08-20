@@ -68,25 +68,39 @@ export default function RechtsprechungIntelligence() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* GRAUER HEADER OHNE FARBE */}
-      <div className="bg-white shadow-sm border-b">
+      {/* ROSA HEADER EXAKT WIE SCREENSHOT */}
+      <div className="bg-gradient-to-r from-pink-600 to-pink-700 text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="bg-gray-100 p-2 rounded-lg">
-                  <Scale className="w-6 h-6 text-gray-700" />
-                </div>
-                <h1 className="text-3xl font-bold text-gray-900">Rechtsprechung Intelligence</h1>
+            <div className="flex items-center gap-4">
+              <div className="bg-pink-500 p-2 rounded-lg">
+                <Scale className="w-6 h-6 text-white" />
               </div>
-              <p className="text-gray-600 mt-2">{totalCases} Gerichtsentscheidungen und juristische Präzedenzfälle</p>
+              <div>
+                <h1 className="text-3xl font-bold">Legal Intelligence Center</h1>
+                <div className="flex items-center gap-6 text-pink-100 mt-2">
+                  <div className="flex items-center gap-2">
+                    <Scale className="w-4 h-4" />
+                    <span className="text-sm">Rechtsfälle</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Gavel className="w-4 h-4" />
+                    <span className="text-sm">Gerichtsentscheidungen</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Brain className="w-4 h-4" />
+                    <span className="text-sm">Compliance</span>
+                  </div>
+                </div>
+                <p className="text-pink-100 mt-1">{totalCases} Gerichtsentscheidungen und juristische Präzedenzfälle mit Executive-Analysen</p>
+              </div>
             </div>
             <Button 
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
               onClick={handleSync}
             >
               <RefreshCw className="w-4 h-4 mr-2" />
-              Synchronisieren
+              Daten synchronisieren
             </Button>
           </div>
         </div>
