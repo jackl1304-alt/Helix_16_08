@@ -359,26 +359,43 @@ export default function EmailManagementNew() {
                         <div className="p-3 border-b bg-gray-100 text-sm font-mono text-gray-600">
                           {template.subject}
                         </div>
-                        <div 
-                          className="p-4 prose prose-sm max-w-none"
-                          style={{ maxHeight: '200px', overflowY: 'auto' }}
-                          dangerouslySetInnerHTML={{ 
-                            __html: template.htmlContent || template.content || `
-                              <div style="font-family: Arial, sans-serif; padding: 20px;">
-                                <h2 style="color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px;">
-                                  ${template.name}
-                                </h2>
-                                <p style="color: #666; line-height: 1.6;">
-                                  ${template.subject}
-                                </p>
-                                <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #007bff; margin: 15px 0;">
+                        <div className="p-4 max-w-none" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                          {/* RENDERED HTML PREVIEW - KEIN RAW HTML-CODE MEHR */}
+                          <iframe 
+                            srcDoc={template.htmlContent || `
+                              <!DOCTYPE html>
+                              <html>
+                              <head>
+                                <meta charset="UTF-8">
+                                <style>
+                                  body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: white; }
+                                  .header { color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px; margin-bottom: 15px; }
+                                  .content { color: #666; line-height: 1.6; margin-bottom: 15px; }
+                                  .info-box { background: #f8f9fa; padding: 15px; border-left: 4px solid #007bff; border-radius: 4px; }
+                                </style>
+                              </head>
+                              <body>
+                                <h2 class="header">${template.name}</h2>
+                                <p class="content"><strong>Betreff:</strong> ${template.subject}</p>
+                                <div class="info-box">
                                   <p><strong>Template-Typ:</strong> ${template.type}</p>
                                   <p><strong>Status:</strong> ${template.isActive ? '✅ Aktiv' : '❌ Inaktiv'}</p>
+                                  <p><strong>Empfänger:</strong> ${template.recipients || 0}</p>
                                 </div>
-                              </div>
-                            `
-                          }}
-                        />
+                              </body>
+                              </html>
+                            `}
+                            style={{ 
+                              width: '100%', 
+                              height: '150px', 
+                              border: '1px solid #e5e5e5', 
+                              borderRadius: '4px',
+                              background: 'white'
+                            }}
+                            sandbox="allow-same-origin"
+                            title={`Template-Vorschau: ${template.name}`}
+                          />
+                        </div>
                       </div>
                     </div>
 

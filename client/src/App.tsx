@@ -38,6 +38,8 @@ const AiInsights = React.lazy(() => import("@/pages/ai-insights"));
 const GripIntegration = React.lazy(() => import("@/pages/grip-integration"));
 const CustomerDashboard = React.lazy(() => import("@/pages/customer-dashboard"));
 const CustomerApp = React.lazy(() => import("@/pages/customer-app"));
+const TenantAuth = React.lazy(() => import("@/pages/tenant-auth"));
+const TenantDashboard = React.lazy(() => import("@/pages/tenant-dashboard"));
 
 // Simple Auth Hook
 function useSimpleAuth() {
@@ -95,6 +97,28 @@ function App() {
   const pathname = window.location.pathname;
   if (pathname.startsWith('/customer-login') || pathname.startsWith('/customer-area')) {
     return <CustomerApp />;
+  }
+
+  // TENANT LOGIN SYSTEM - WIEDERHERGESTELLT
+  if (pathname.startsWith('/tenant-login') || pathname.startsWith('/tenant/')) {
+    return (
+      <ErrorBoundary>
+        <LanguageProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <Toaster />
+              <React.Suspense fallback={
+                <div className="flex items-center justify-center min-h-screen">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                </div>
+              }>
+                {pathname === '/tenant-login' ? <TenantAuth /> : <TenantDashboard />}
+              </React.Suspense>
+            </TooltipProvider>
+          </QueryClientProvider>
+        </LanguageProvider>
+      </ErrorBoundary>
+    );
   }
 
   return (
