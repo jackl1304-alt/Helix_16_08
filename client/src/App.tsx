@@ -2,158 +2,158 @@ import React, { useState, useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import Login from "@/pages/login";
 
-// TypeScript Interface für Stats
-interface DashboardStats {
-  totalUpdates: number;
-  activeAlerts: number;
-  compliance: number;
-  lastSync: string;
-  dataCollection: number;
-  totalDocuments: number;
-  activeUsers: number;
+// Direct imports - no lazy loading to eliminate Suspense issues
+import Dashboard from "@/pages/dashboard";
+import NotFound from "@/pages/not-found";
+
+// JSON-based Navigation State
+interface AppState {
+  currentPage: string;
+  userData: any;
+  isLoading: boolean;
 }
 
-// Einfaches Dashboard
-function Dashboard() {
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
+// Simple page renderer with navigation prop
+function renderCurrentPage(page: string, userData: any, navigate: (page: string) => void) {
+  switch (page) {
+    case '/':
+    case '/dashboard':
+      return <Dashboard navigate={navigate} />;
+    case '/regulatory-updates':
+      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Regulatory Updates</h1><p>Regulatory Updates Seite wird geladen...</p><button onClick={() => navigate('/dashboard')} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Zurück zum Dashboard</button></div>;
+    case '/knowledge-base':
+      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Knowledge Base</h1><p>Knowledge Base Seite wird geladen...</p><button onClick={() => navigate('/dashboard')} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Zurück zum Dashboard</button></div>;
+    case '/analytics':
+      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Analytics</h1><p>Analytics Seite wird geladen...</p><button onClick={() => navigate('/dashboard')} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Zurück zum Dashboard</button></div>;
+    case '/data-collection':
+      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Data Collection</h1><p>Data Collection Seite wird geladen...</p><button onClick={() => navigate('/dashboard')} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Zurück zum Dashboard</button></div>;
+    case '/user-management':
+      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">User Management</h1><p>User Management Seite wird geladen...</p><button onClick={() => navigate('/dashboard')} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Zurück zum Dashboard</button></div>;
+    case '/chat-support':
+      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Support Chat</h1><p>Support Chat wird geladen...</p><button onClick={() => navigate('/dashboard')} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Zurück zum Dashboard</button></div>;
+    case '/404':
+    default:
+      return <NotFound />;
+  }
+}
 
+// JSON-based Simple App without React Suspense issues
+function App() {
+  const [appState, setAppState] = useState<AppState>({
+    currentPage: window.location.pathname,
+    userData: null,
+    isLoading: true
+  });
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  // Handle navigation via JSON state
+  const handleNavigation = (page: string) => {
+    setAppState(prev => ({ ...prev, currentPage: page }));
+    window.history.pushState({}, '', page);
+  };
+
+  // Initialize app with JSON data
   useEffect(() => {
-    const fetchStats = async () => {
+    const initializeApp = async () => {
       try {
-        const response = await fetch('/api/dashboard/stats');
-        const data = await response.json();
-        setStats(data);
+        // Check authentication
+        const authStatus = localStorage.getItem('isAuthenticated') === 'true';
+        setIsAuthenticated(authStatus);
+        
+        // Load user data from JSON endpoint if authenticated
+        if (authStatus) {
+          const userData = await fetch('/api/user/profile')
+            .then(res => res.ok ? res.json() : null)
+            .catch(() => null);
+          
+          setAppState(prev => ({
+            ...prev,
+            userData,
+            isLoading: false
+          }));
+        } else {
+          setAppState(prev => ({ ...prev, isLoading: false }));
+        }
       } catch (error) {
-        console.error('Fehler beim Laden der Stats:', error);
-      } finally {
-        setLoading(false);
+        console.error('App initialization error:', error);
+        setAppState(prev => ({ ...prev, isLoading: false }));
       }
     };
 
-    fetchStats();
+    initializeApp();
   }, []);
 
-  if (loading) {
+  // Loading state
+  if (appState.isLoading || isAuthenticated === null) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Lade Dashboard...</p>
-        </div>
-      </div>
+      <QueryClientProvider client={queryClient}>
+        <LanguageProvider>
+          <div className="flex items-center justify-center min-h-screen bg-gray-50">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Helix wird geladen...</p>
+            </div>
+          </div>
+        </LanguageProvider>
+      </QueryClientProvider>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Helix Regulatory Intelligence</h1>
-            <div className="text-sm text-gray-500">MedTech Platform</div>
+  // Show login if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <LanguageProvider>
+          <div className="min-h-screen bg-gray-50">
+            <Toaster />
+            <Login onLogin={() => setIsAuthenticated(true)} />
           </div>
-        </div>
-      </div>
+        </LanguageProvider>
+      </QueryClientProvider>
+    );
+  }
 
-      {/* Dashboard Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Regulatory Updates */}
-          <div className="bg-white p-6 rounded-lg shadow border">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-gray-500">Regulatory Updates</h3>
-              <div className="text-2xl">📋</div>
-            </div>
-            <div className="mt-2">
-              <div className="text-3xl font-bold text-gray-900">{stats?.totalUpdates || 0}</div>
-              <p className="text-sm text-green-600">Aktuelle Meldungen</p>
-            </div>
-          </div>
-
-          {/* Data Collection */}
-          <div className="bg-white p-6 rounded-lg shadow border">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-gray-500">Data Collection</h3>
-              <div className="text-2xl">🗃️</div>
-            </div>
-            <div className="mt-2">
-              <div className="text-3xl font-bold text-gray-900">{stats?.dataCollection || 0}%</div>
-              <p className="text-sm text-blue-600">Completion Rate</p>
-            </div>
-          </div>
-
-          {/* Documents */}
-          <div className="bg-white p-6 rounded-lg shadow border">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-gray-500">Documents</h3>
-              <div className="text-2xl">📊</div>
-            </div>
-            <div className="mt-2">
-              <div className="text-3xl font-bold text-gray-900">{stats?.totalDocuments || 0}</div>
-              <p className="text-sm text-purple-600">Total Documents</p>
-            </div>
-          </div>
-
-          {/* Active Users */}
-          <div className="bg-white p-6 rounded-lg shadow border">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-gray-500">Active Users</h3>
-              <div className="text-2xl">👥</div>
-            </div>
-            <div className="mt-2">
-              <div className="text-3xl font-bold text-gray-900">{stats?.activeUsers || 0}</div>
-              <p className="text-sm text-orange-600">Online now</p>
-            </div>
-          </div>
-        </div>
-
-        {/* System Status */}
-        <div className="bg-white rounded-lg shadow border p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">System Status</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-2xl mb-2">✅</div>
-              <div className="font-medium text-green-800">Backend</div>
-              <div className="text-sm text-green-600">Online</div>
-            </div>
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <div className="text-2xl mb-2">📊</div>
-              <div className="font-medium text-blue-800">API</div>
-              <div className="text-sm text-blue-600">Funktional</div>
-            </div>
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <div className="text-2xl mb-2">🔄</div>
-              <div className="font-medium text-purple-800">Sync</div>
-              <div className="text-sm text-purple-600">{stats?.compliance || 0}% Compliance</div>
-            </div>
-          </div>
-          
-          {stats && (
-            <div className="mt-4 p-3 bg-gray-50 rounded">
-              <div className="text-sm text-gray-600">
-                Letzter Sync: {new Date(stats.lastSync).toLocaleString()}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Haupt-App Komponente
-function App() {
+  // Main app with JSON-based navigation
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen">
-        <Toaster />
-        <Dashboard />
-      </div>
+      <LanguageProvider>
+        <div className="min-h-screen bg-gray-50">
+          <Toaster />
+          {renderCurrentPage(appState.currentPage, appState.userData, handleNavigation)}
+        </div>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }
 
 export default App;
+
+// JSON API helper functions
+export const jsonApi = {
+  get: async (endpoint: string) => {
+    try {
+      const response = await fetch(endpoint);
+      return response.ok ? await response.json() : null;
+    } catch (error) {
+      console.error('JSON API GET error:', error);
+      return null;
+    }
+  },
+  
+  post: async (endpoint: string, data: any) => {
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      return response.ok ? await response.json() : null;
+    } catch (error) {
+      console.error('JSON API POST error:', error);
+      return null;
+    }
+  }
+};
