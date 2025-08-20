@@ -188,18 +188,28 @@ export function DraggableDashboard() {
   // Drag Start
   const handleDragStart = (e: React.MouseEvent, widgetId: string) => {
     if (!isEditing) return;
+    e.preventDefault();
     
     const widget = widgets.find(w => w.id === widgetId);
     if (!widget) return;
     
+    const rect = e.currentTarget.getBoundingClientRect();
     setDragOffset({
-      x: e.clientX - widget.position.x,
-      y: e.clientY - widget.position.y
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
     });
     setIsDragging(widgetId);
     
-    document.addEventListener('mousemove', handleDragMove);
-    document.addEventListener('mouseup', handleDragEnd);
+    // Add event listeners to document for global mouse tracking
+    const handleMove = (e: MouseEvent) => handleDragMove(e);
+    const handleEnd = () => handleDragEnd();
+    
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleEnd);
+    
+    // Store references for cleanup
+    (e.currentTarget as any)._handleMove = handleMove;
+    (e.currentTarget as any)._handleEnd = handleEnd;
   };
 
   // Drag Move
@@ -207,8 +217,8 @@ export function DraggableDashboard() {
     if (!isDragging || !dashboardRef.current) return;
     
     const dashboardRect = dashboardRef.current.getBoundingClientRect();
-    const newX = Math.max(0, Math.min(e.clientX - dashboardRect.left - dragOffset.x, dashboardRect.width - 200));
-    const newY = Math.max(0, Math.min(e.clientY - dashboardRect.top - dragOffset.y, dashboardRect.height - 100));
+    const newX = Math.max(0, Math.min(e.clientX - dashboardRect.left - dragOffset.x, dashboardRect.width - 250));
+    const newY = Math.max(0, Math.min(e.clientY - dashboardRect.top - dragOffset.y, dashboardRect.height - 150));
     
     setWidgets(prev => prev.map(widget => 
       widget.id === isDragging 
@@ -299,61 +309,125 @@ export function DraggableDashboard() {
 
   // Render Widget Content
   const renderWidgetContent = (widget: DashboardWidget) => {
+    // Ensure content is properly structured
+    const safeContent = widget.content || {};
+    
     switch(widget.type) {
       case "stats":
         return (
           <div className="grid grid-cols-3 gap-4 p-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{widget.content.updates}</div>
+              <div className="text-2xl font-bold text-blue-600">{safeContent.updates || 0}</div>
               <div className="text-xs text-gray-600">Updates</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{widget.content.cases}</div>
+              <div className="text-2xl font-bold text-green-600">{safeContent.cases || 0}</div>
               <div className="text-xs text-gray-600">Cases</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">{widget.content.sources}</div>
+              <div className="text-2xl font-bold text-purple-600">{safeContent.sources || 0}</div>
               <div className="text-xs text-gray-600">Sources</div>
             </div>
           </div>
         );
       case "list":
+        const listItems = Array.isArray(safeContent) ? safeContent : [];
         return (
           <div className="p-4 space-y-2">
-            {widget.content.map((item: any, index: number) => (
+            {listItems.length > 0 ? listItems.map((item: any, index: number) => (
               <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                <span className="text-sm">{item.title}</span>
-                <span className="text-xs text-gray-500">{item.date}</span>
+                <span className="text-sm">{item.title || 'Kein Titel'}</span>
+                <span className="text-xs text-gray-500">{item.date || 'Kein Datum'}</span>
               </div>
-            ))}
+            )) : (
+              <div className="text-center text-gray-500 p-4">Keine Elemente</div>
+            )}
           </div>
         );
       case "activity":
+        const activityItems = Array.isArray(safeContent) ? safeContent : [];
         return (
           <div className="p-4 space-y-2">
-            {widget.content.map((item: any, index: number) => (
+            {activityItems.length > 0 ? activityItems.map((item: any, index: number) => (
               <div key={index} className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-sm">{item.action}</span>
-                <span className="text-xs text-gray-500 ml-auto">{item.time}</span>
+                <span className="text-sm">{item.action || 'Aktion'}</span>
+                <span className="text-xs text-gray-500 ml-auto">{item.time || 'Zeit'}</span>
               </div>
-            ))}
+            )) : (
+              <div className="text-center text-gray-500 p-4">Keine Aktivitäten</div>
+            )}
           </div>
         );
       case "actions":
+        const actionItems = Array.isArray(safeContent) ? safeContent : [];
         return (
           <div className="p-4 space-y-2">
-            {widget.content.map((action: any, index: number) => (
-              <Button 
-                key={index} 
-                variant="outline" 
-                size="sm" 
-                className="w-full justify-start"
-              >
-                <action.icon className="h-4 w-4 mr-2" />
-                {action.label}
-              </Button>
-            ))}
+            {actionItems.length > 0 ? actionItems.map((action: any, index: number) => {
+              const IconComponent = action.icon || Activity;
+              return (
+                <Button 
+                  key={index} 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full justify-start"
+                  onClick={() => console.log(`Action: ${action.action}`)}
+                >
+                  <IconComponent className="h-4 w-4 mr-2" />
+                  {action.label || 'Aktion'}
+                </Button>
+              );
+            }) : (
+              <div className="text-center text-gray-500 p-4">Keine Aktionen</div>
+            )}
+          </div>
+        );
+      case "calendar":
+        const calendarItems = Array.isArray(safeContent) ? safeContent : [];
+        return (
+          <div className="p-4 space-y-2">
+            {calendarItems.length > 0 ? calendarItems.map((event: any, index: number) => (
+              <div key={index} className="flex justify-between items-center p-2 border-l-4 border-blue-500 bg-blue-50 rounded">
+                <span className="text-sm font-medium">{event.event || 'Event'}</span>
+                <span className="text-xs text-gray-600">{event.date || 'Datum'}</span>
+              </div>
+            )) : (
+              <div className="text-center text-gray-500 p-4">Keine Termine</div>
+            )}
+          </div>
+        );
+      case "alerts":
+        const alertItems = Array.isArray(safeContent) ? safeContent : [];
+        return (
+          <div className="p-4 space-y-2">
+            {alertItems.length > 0 ? alertItems.map((alert: any, index: number) => (
+              <div key={index} className="flex items-start gap-2 p-2 bg-orange-50 border border-orange-200 rounded">
+                <AlertCircle className="h-4 w-4 text-orange-500 mt-0.5" />
+                <div className="flex-1">
+                  <div className="text-sm">{alert.message || 'Nachricht'}</div>
+                  <div className="text-xs text-gray-500">{alert.time || 'Zeit'}</div>
+                </div>
+              </div>
+            )) : (
+              <div className="text-center text-gray-500 p-4">Keine Benachrichtigungen</div>
+            )}
+          </div>
+        );
+      case "team":
+        const teamItems = Array.isArray(safeContent) ? safeContent : [];
+        return (
+          <div className="p-4 space-y-2">
+            {teamItems.length > 0 ? teamItems.map((member: any, index: number) => (
+              <div key={index} className="flex items-center gap-3 p-2 rounded">
+                <div className={`w-3 h-3 rounded-full ${member.status === 'online' ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                <div className="flex-1">
+                  <div className="text-sm font-medium">{member.name || 'Team Mitglied'}</div>
+                  <div className="text-xs text-gray-500">{member.role || 'Rolle'}</div>
+                </div>
+              </div>
+            )) : (
+              <div className="text-center text-gray-500 p-4">Keine Team-Mitglieder</div>
+            )}
           </div>
         );
       default:
@@ -452,7 +526,7 @@ export function DraggableDashboard() {
               width: widget.width,
               height: widget.height,
             }}
-            onMouseDown={(e) => handleDragStart(e, widget.id)}
+            onMouseDown={isEditing ? (e) => handleDragStart(e, widget.id) : undefined}
             data-testid={`widget-${widget.id}`}
           >
             {/* Widget Header */}
