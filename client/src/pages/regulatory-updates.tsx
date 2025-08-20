@@ -279,19 +279,19 @@ export default function RegulatoryUpdates() {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <CardTitle className="text-lg leading-tight">
-                    {getRegionIcon(update.region)} {update.title}
+                    {getRegionIcon(update.region || '')} {update.title}
                   </CardTitle>
                   <div className="flex items-center gap-2 mt-2">
                     <Badge variant="outline" className="text-xs">
-                      {update.source}
+                      {update.source || 'Unbekannte Quelle'}
                     </Badge>
                     <Badge 
                       className={`text-xs ${getImpactBadgeColor(update.impact_level)}`}
                     >
-                      {update.impact_level.toUpperCase()}
+                      {update.impact_level?.toUpperCase() || 'UNBEKANNT'}
                     </Badge>
                     <Badge variant="secondary" className="text-xs">
-                      {update.category}
+                      {update.category || 'Unbekannt'}
                     </Badge>
                   </div>
                 </div>
@@ -301,7 +301,7 @@ export default function RegulatoryUpdates() {
                 <div className="flex items-center gap-4 text-sm">
                   <span className="flex items-center gap-1">
                     <Clock className="h-4 w-4" />
-                    {new Date(update.date).toLocaleDateString('de-DE')}
+                    {new Date(update.date || new Date()).toLocaleDateString('de-DE')}
                   </span>
                   {update.implementation_deadline && (
                     <span className="flex items-center gap-1 text-orange-600">
