@@ -45,25 +45,16 @@ export function Header({ onSearch }: HeaderProps) {
           <div className="flex items-center space-x-3">
             {/* Language Selector */}
             <Select defaultValue="de">
-              <SelectTrigger className="w-20 h-8 text-xs border-gray-300">
-                <span className="text-xs font-medium">🌐 DE</span>
+              <SelectTrigger className="w-24 h-8 text-xs border-gray-300">
+                <Globe className="w-3 h-3 mr-1" />
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="de">🇩🇪 DE</SelectItem>
-                <SelectItem value="en">🇺🇸 EN</SelectItem>
-                <SelectItem value="fr">🇫🇷 FR</SelectItem>
+                <SelectItem value="de">DE</SelectItem>
+                <SelectItem value="en">EN</SelectItem>
+                <SelectItem value="fr">FR</SelectItem>
               </SelectContent>
             </Select>
-
-            {/* Customer Area Button - Rechts neben Sprachauswahl */}
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="bg-blue-600 hover:bg-blue-700 text-white border-blue-600 text-xs px-3 py-1 h-8"
-            >
-              <UserCheck className="w-3 h-3 mr-1" />
-              Customer Area
-            </Button>
 
             {/* Tenant Login Button */}
             <Button 
@@ -73,6 +64,16 @@ export function Header({ onSearch }: HeaderProps) {
             >
               <LogIn className="w-3 h-3 mr-1" />
               Tenant Login
+            </Button>
+
+            {/* Customer Area Button */}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="deltaways-button-primary text-xs px-3 py-1 h-8"
+            >
+              <UserCheck className="w-3 h-3 mr-1" />
+              Customer Area
             </Button>
 
             {/* Chat Button */}

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -92,12 +91,10 @@ export default function RechtsprechungFixed() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  // ECHTE API-DATEN VERWENDEN
-  const { data: legalCases = [], isLoading } = useQuery<LegalCase[]>({
-    queryKey: ['/api/legal-cases'],
-    staleTime: 300000, // 5 minutes
-    gcTime: 600000, // 10 minutes
-  });
+  // LOKALE DATEN VERWENDEN - KEINE API-AUFRUFE
+  const legalCases = legalCasesData;
+  const isLoading = false;
+  const error = null;
 
   const handleSync = () => {
     console.log("✅ MOCK SYNC: Legal cases synchronized (local data)");
@@ -143,7 +140,7 @@ export default function RechtsprechungFixed() {
   const uniqueJurisdictions = [...new Set(legalCases.map(c => c.jurisdiction))].filter(Boolean);
 
   return (
-    <div className="w-full max-w-none p-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-6">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
         <div>
           <h1 className="text-4xl font-bold mb-2 flex items-center gap-3 deltaways-brand-text">
@@ -158,10 +155,10 @@ export default function RechtsprechungFixed() {
         <div className="flex items-center gap-4">
           <Button 
             onClick={handleSync}
-            className="bg-orange-500 hover:bg-orange-600 text-white flex items-center gap-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
           >
             <RefreshCw className="h-4 w-4" />
-            🔄 Synchronisieren
+            Daten synchronisieren
           </Button>
         </div>
       </div>
@@ -264,8 +261,8 @@ export default function RechtsprechungFixed() {
         </CardContent>
       </Card>
 
-      {/* Legal Cases Grid - FULL WIDTH */}
-      <div className="grid grid-cols-1 gap-6">
+      {/* Legal Cases Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredCases.map((legalCase) => (
           <Card key={legalCase.id} className="hover:shadow-lg transition-shadow deltaways-card-hover">
             <CardHeader>

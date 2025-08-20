@@ -16,15 +16,14 @@ import NotFound from "@/pages/not-found";
 const Dashboard = React.lazy(() => import("@/pages/dashboard"));
 const Analytics = React.lazy(() => import("@/pages/analytics"));
 const SystemSettings = React.lazy(() => import("@/pages/system-settings"));
-const RegulatoryUpdates = React.lazy(() => import("@/pages/regulatory-updates-clean"));
+const RegulatoryUpdates = React.lazy(() => import("@/pages/regulatory-updates"));
 const DataCollection = React.lazy(() => import("@/pages/data-collection"));
 const NewsletterAdmin = React.lazy(() => import("@/pages/newsletter-admin"));
 const EmailManagement = React.lazy(() => import("@/pages/email-management"));
-const EmailAutomation = React.lazy(() => import("@/pages/email-automation"));
 const KnowledgeBase = React.lazy(() => import("@/pages/knowledge-base"));
-const RechtsprechungIntelligence = React.lazy(() => import("@/pages/rechtsprechung-intelligence"));
+const RechtsprechungFixed = React.lazy(() => import("@/pages/rechtsprechung-fixed"));
 const ZulassungenGlobal = React.lazy(() => import("@/pages/zulassungen-global"));
-const LaufendeZulassungenNew = React.lazy(() => import("@/pages/laufende-zulassungen-new"));
+const LaufendeZulassungen = React.lazy(() => import("@/pages/laufende-zulassungen"));
 const SyncManager = React.lazy(() => import("@/pages/sync-manager"));
 const GlobalSources = React.lazy(() => import("@/pages/global-sources"));
 const NewsletterManager = React.lazy(() => import("@/pages/newsletter-manager"));
@@ -36,14 +35,6 @@ const AuditLogs = React.lazy(() => import("@/pages/audit-logs"));
 const AiContentAnalysis = React.lazy(() => import("@/pages/ai-content-analysis"));
 const AiInsights = React.lazy(() => import("@/pages/ai-insights"));
 const GripIntegration = React.lazy(() => import("@/pages/grip-integration"));
-const CustomerDashboard = React.lazy(() => import("@/pages/customer-dashboard"));
-const CustomerApp = React.lazy(() => import("@/pages/customer-app"));
-const TenantAuth = React.lazy(() => import("@/pages/tenant-auth"));
-const TenantOnboarding = React.lazy(() => import("@/pages/tenant-onboarding"));
-const TenantDashboard = React.lazy(() => import("@/pages/tenant-dashboard"));
-const TenantDataCollection = React.lazy(() => import("@/pages/tenant-data-collection"));
-const TenantRegulatoryUpdates = React.lazy(() => import("@/pages/tenant-regulatory-updates"));
-const Wissensdatenbank = React.lazy(() => import("@/pages/wissensdatenbank"));
 
 // Simple Auth Hook
 function useSimpleAuth() {
@@ -97,50 +88,6 @@ function App() {
     );
   }
 
-  // Customer Routes Check - Vollständig getrennt von Admin
-  const pathname = window.location.pathname;
-  if (pathname.startsWith('/customer-login') || pathname.startsWith('/customer-area')) {
-    return <CustomerApp />;
-  }
-
-  // TENANT LOGIN SYSTEM - WIEDERHERGESTELLT
-  if (pathname.startsWith('/tenant-login') || pathname.startsWith('/tenant/')) {
-    return (
-      <ErrorBoundary>
-        <LanguageProvider>
-          <QueryClientProvider client={queryClient}>
-            <TooltipProvider>
-              <Toaster />
-              <React.Suspense fallback={
-                <div className="flex items-center justify-center min-h-screen">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                </div>
-              }>
-                <Switch>
-                  <Route path="/tenant-login" component={() => <TenantAuth tenantSubdomain="demo" tenantName="Demo Medical" colorScheme="blue" />} />
-                  <Route path="/tenant-onboarding" component={TenantOnboarding} />
-                  <Route path="/tenant/dashboard" component={TenantDashboard} />
-                  <Route path="/tenant/berichte" component={TenantDashboard} />
-                  <Route path="/tenant/analysen" component={TenantDashboard} />
-                  <Route path="/tenant/datensammlung" component={TenantDataCollection} />
-                  <Route path="/tenant/newsletter-verwaltung" component={TenantDashboard} />
-                  <Route path="/tenant/email-verwaltung" component={TenantDashboard} />
-                  <Route path="/tenant/wissensdatenbank" component={Wissensdatenbank} />
-                  <Route path="/tenant/regulatory-updates" component={TenantRegulatoryUpdates} />
-                  <Route path="/tenant/rechtsprechung" component={RechtsprechungIntelligence} />
-                  <Route path="/tenant/globale-zulassungen" component={ZulassungenGlobal} />
-                  <Route path="/tenant/laufende-zulassungen" component={LaufendeZulassungenNew} />
-                  <Route path="/tenant/data-collection" component={TenantDataCollection} />
-                  <Route path="/tenant/*" component={TenantDashboard} />
-                </Switch>
-              </React.Suspense>
-            </TooltipProvider>
-          </QueryClientProvider>
-        </LanguageProvider>
-      </ErrorBoundary>
-    );
-  }
-
   return (
     <ErrorBoundary>
       <LanguageProvider>
@@ -163,17 +110,15 @@ function App() {
                   <Route path="/data-collection" component={DataCollection} />
                   <Route path="/newsletter-admin" component={NewsletterAdmin} />
                   <Route path="/email-management" component={EmailManagement} />
-                  <Route path="/email-automation" component={EmailAutomation} />
                   <Route path="/knowledge-base" component={KnowledgeBase} />
-                  <Route path="/wissensdatenbank" component={Wissensdatenbank} />
                   
                   {/* Compliance & Regulation */}
                   <Route path="/regulatory-updates" component={RegulatoryUpdates} />
-                  <Route path="/rechtsprechung" component={RechtsprechungIntelligence} />
+                  <Route path="/rechtsprechung" component={RechtsprechungFixed} />
                   
                   {/* Approvals & Registration */}
                   <Route path="/zulassungen/global" component={ZulassungenGlobal} />
-                  <Route path="/zulassungen/laufende" component={LaufendeZulassungenNew} />
+                  <Route path="/zulassungen/laufende" component={LaufendeZulassungen} />
                   
                   {/* Advanced */}
                   <Route path="/sync-manager" component={SyncManager} />
@@ -187,9 +132,6 @@ function App() {
                   <Route path="/ai-content-analysis" component={AiContentAnalysis} />
                   <Route path="/ki-insights" component={AiInsights} />
                   <Route path="/grip-integration" component={GripIntegration} />
-                  
-                  {/* Customer Area */}
-                  <Route path="/customer-dashboard" component={CustomerDashboard} />
                   
                   <Route component={NotFound} />
                 </Switch>
