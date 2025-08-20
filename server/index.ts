@@ -16,24 +16,6 @@ app.use(cors({ origin: "*" }));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: false, limit: "10mb" }));
 
-// Security headers for iframe embedding - AGGRESSIVE OVERRIDE
-app.use((req, res, next) => {
-  // Override X-Frame-Options completely
-  res.removeHeader('X-Frame-Options');
-  res.setHeader('Content-Security-Policy', "frame-ancestors *");
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  
-  // Override response headers after they're set
-  const originalEnd = res.end;
-  res.end = function(...args: any[]) {
-    this.removeHeader('X-Frame-Options');
-    return originalEnd.apply(this, args);
-  };
-  
-  next();
-});
-
 // Simple Error Handler
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   logger.error('Server error', { error: error.message, path: req.path });

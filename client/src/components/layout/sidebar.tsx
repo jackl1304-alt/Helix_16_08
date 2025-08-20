@@ -63,7 +63,6 @@ const getNavigationStructure = (t: (key: string) => string): Record<string, Navi
   dataManagement: {
     title: t('nav.sections.dataManagement'),
     items: [
-      { name: "Data Collection Center", href: "/data-collection-center", icon: Database },
       { name: t('nav.dataCollection'), href: "/data-collection", icon: Database },
       { name: t('nav.newsletterAdmin'), href: "/newsletter-admin", icon: Mail },
       { name: t('nav.emailManagement'), href: "/email-management", icon: Mail },
@@ -184,8 +183,8 @@ export function Sidebar() {
         className={cn(
           "flex items-center justify-start px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer text-left",
           isActive
-            ? "bg-blue-100 text-blue-800 shadow-md"
-            : "text-gray-700 hover:bg-gray-200 hover:text-gray-900"
+            ? "bg-white text-[#1e3a5f] shadow-md"
+            : "text-gray-300 hover:bg-[#2d4a70] hover:text-white"
         )}
       >
         <IconComponent className="mr-3 h-5 w-5 flex-shrink-0" />
@@ -229,7 +228,7 @@ export function Sidebar() {
       <div key={sectionKey} className="mb-3">
         <button
           onClick={() => toggleSection(sectionKey)}
-          className="flex items-center justify-between w-full px-4 py-2 text-xs font-semibold text-gray-600 uppercase tracking-wider hover:text-gray-800 transition-colors duration-200 text-left"
+          className="flex items-center justify-between w-full px-4 py-2 text-xs font-semibold text-gray-300 uppercase tracking-wider hover:text-white transition-colors duration-200 text-left"
         >
           <span>{section.title}</span>
           <ChevronIcon className="h-4 w-4" />
@@ -246,18 +245,12 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-gray-100 shadow-lg z-50 overflow-y-auto">
-      {/* HELIX Logo Header - SCREENSHOT EXACT */}
-      <div className="p-6 border-b border-gray-200 bg-white">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-[#1e3a5f] shadow-lg z-50 overflow-y-auto">
+      {/* DELTA WAYS Logo Header */}
+      <div className="p-6 border-b border-gray-700">
         <Link to="/">
-          <div className="flex items-center cursor-pointer space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
-              <Shield className="w-8 h-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">HELIX</h1>
-              <p className="text-xs text-gray-500 font-medium">Powered by DELTA WAYS</p>
-            </div>
+          <div className="flex flex-col items-center cursor-pointer space-y-2">
+            <Logo size="lg" showText={true} />
           </div>
         </Link>
         
@@ -272,8 +265,8 @@ export function Sidebar() {
         </div>
       </div>
       
-      {/* Funktionsfähiger Suchbereich - SCREENSHOT EXACT */}
-      <div className="p-4 border-b border-gray-200 bg-gray-50">
+      {/* Funktionsfähiger Suchbereich */}
+      <div className="p-4 border-b border-gray-700">
         <SidebarSearchField />
       </div>
       
@@ -286,27 +279,27 @@ export function Sidebar() {
         </div>
       </nav>
       
-      {/* Status-Footer - SCREENSHOT EXACT */}
-      <div className="border-t border-gray-200 p-4 bg-gray-50">
-        <div className="text-xs text-gray-600">
+      {/* Status-Footer */}
+      <div className="border-t border-gray-700 p-4 bg-[#0f1f35]">
+        <div className="text-xs text-gray-300">
           <div className="flex items-center justify-between">
             <span>{t('status.label')}:</span>
-            <span className="text-green-600 font-medium">{t('status.online')}</span>
+            <span className="text-green-400 font-medium">{t('status.online')}</span>
           </div>
           <div className="flex items-center justify-between mt-1">
             <span>{t('status.dataSources')}</span>
-            <span className="text-blue-600 font-medium">{t('common.active')}</span>
+            <span className="text-blue-400 font-medium">{t('common.active')}</span>
           </div>
         </div>
         
-        {/* Logout Button - SCREENSHOT EXACT */}
-        <div className="mt-3 pt-3 border-t border-gray-300">
+        {/* Logout Button */}
+        <div className="mt-3 pt-3 border-t border-gray-600">
           <button
             onClick={() => {
               logout();
               window.location.reload();
             }}
-            className="flex items-center w-full px-2 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+            className="flex items-center w-full px-2 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded-md transition-colors"
           >
             <LogOut className="h-4 w-4 mr-2" />
             <span>Tenant Logout</span>
