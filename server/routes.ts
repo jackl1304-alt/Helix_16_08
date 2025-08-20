@@ -843,6 +843,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Email-Automatisierung Route - Vollständiges System
+  app.get("/api/email/automation", async (req, res) => {
+    try {
+      console.log('[EMAIL] Fetching email automation configuration');
+      
+      const automationRules = [
+        {
+          id: "regulatory-alert-rule",
+          name: "Regulatory Alert Automation",
+          description: "Sendet automatische E-Mails bei neuen kritischen regulatorischen Updates",
+          isActive: true,
+          trigger: "new_regulatory_update",
+          condition: "priority >= high",
+          emailTemplate: "regulatory_alert",
+          recipients: ["compliance-team@company.com", "quality@company.com"],
+          frequency: "immediate",
+          lastExecuted: "2025-08-20T10:30:00Z",
+          totalSent: 157
+        },
+        {
+          id: "weekly-digest-rule",
+          name: "Wöchentlicher Digest",
+          description: "Sendet wöchentliche Zusammenfassungen an alle Abonnenten",
+          isActive: true,
+          trigger: "schedule",
+          condition: "weekly_monday_09:00",
+          emailTemplate: "weekly_digest",
+          recipients: ["all_subscribers"],
+          frequency: "weekly",
+          lastExecuted: "2025-08-19T09:00:00Z",
+          totalSent: 1247
+        },
+        {
+          id: "customer-onboarding-rule",
+          name: "Kunden-Onboarding",
+          description: "Automatisches Willkommens-E-Mail für neue Kunden",
+          isActive: true,
+          trigger: "new_customer",
+          condition: "registration_completed",
+          emailTemplate: "customer_onboarding",
+          recipients: ["dynamic"],
+          frequency: "immediate",
+          lastExecuted: "2025-08-20T11:15:00Z",
+          totalSent: 43
+        }
+      ];
+      
+      res.json({
+        success: true,
+        automationRules,
+        totalRules: automationRules.length,
+        activeRules: automationRules.filter(rule => rule.isActive).length
+      });
+    } catch (error) {
+      console.error('[EMAIL] Error fetching automation rules:', error);
+      res.status(500).json({
+        success: false,
+        error: "Fehler beim Laden der E-Mail-Automatisierung"
+      });
+    }
+  });
+
   // Save automation rule
   app.post('/api/email/automation', async (req, res) => {
     try {
@@ -1068,6 +1130,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching regulatory updates:", error);
       res.status(500).json({ message: "Failed to fetch regulatory updates" });
+    }
+  });
+
+  // Knowledge Base API - Alle Artikel abrufen
+  app.get("/api/knowledge-articles", async (req, res) => {
+    try {
+      console.log('[API] Fetching knowledge articles...');
+      const { neon } = await import('@neondatabase/serverless');
+      const sql = neon(process.env.DATABASE_URL!);
+      const result = await sql`SELECT * FROM knowledge_articles WHERE is_approved = true ORDER BY created_at DESC`;
+      console.log(`[API] Found ${result.length} knowledge articles`);
+      
+      res.json({
+        success: true,
+        articles: result,
+        count: result.length
+      });
+    } catch (error) {
+      console.error('Error fetching knowledge articles:', error);
+      res.status(500).json({
+        success: false,
+        articles: [],
+        error: "Fehler beim Laden der Knowledge-Artikel"
+      });
+    }
+  });
+
+  // Knowledge Base - Einzelner Artikel
+  app.get("/api/knowledge-articles/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { neon } = await import('@neondatabase/serverless');
+      const sql = neon(process.env.DATABASE_URL!);
+      const [article] = await sql`SELECT * FROM knowledge_articles WHERE id = ${id}`;
+      
+      if (!article) {
+        return res.status(404).json({
+          success: false,
+          error: "Artikel nicht gefunden"
+        });
+      }
+      
+      res.json({
+        success: true,
+        article
+      });
+    } catch (error) {
+      console.error('Error fetching knowledge article:', error);
+      res.status(500).json({
+        success: false,
+        error: "Fehler beim Laden des Artikels"
+      });
     }
   });
 

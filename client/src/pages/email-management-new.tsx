@@ -88,6 +88,11 @@ export default function EmailManagementNew() {
     queryKey: ['/api/email/statistics']
   });
 
+  // Email Automation Query
+  const { data: automationData } = useQuery({
+    queryKey: ['/api/email/automation']
+  });
+
   // Test Gmail Connection Mutation
   const testConnectionMutation = useMutation({
     mutationFn: async () => {
@@ -198,9 +203,10 @@ export default function EmailManagementNew() {
       </div>
 
       <Tabs defaultValue="providers" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="providers">E-Mail-Provider</TabsTrigger>
           <TabsTrigger value="templates">E-Mail-Templates</TabsTrigger>
+          <TabsTrigger value="automation">Automatisierung</TabsTrigger>
           <TabsTrigger value="statistics">Statistiken</TabsTrigger>
         </TabsList>
 
@@ -327,6 +333,19 @@ export default function EmailManagementNew() {
                       ))}
                     </div>
 
+                    {/* HTML Template Preview */}
+                    <div className="mb-4 p-3 bg-gray-50 border rounded-lg">
+                      <h4 className="font-medium mb-2">Template-Vorschau:</h4>
+                      <div 
+                        className="text-sm prose prose-sm max-w-none border p-2 rounded bg-white"
+                        dangerouslySetInnerHTML={{ 
+                          __html: template.htmlContent ? 
+                            template.htmlContent.substring(0, 200) + '...' : 
+                            `<p><strong>E-Mail-Template: ${template.name}</strong></p><p>${template.description || 'Professionelle E-Mail-Vorlage'}</p>`
+                        }}
+                      />
+                    </div>
+
                     <div className="space-y-3">
                       <div className="flex items-center space-x-2">
                         <Input
@@ -416,6 +435,41 @@ export default function EmailManagementNew() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Automation Tab */}
+        <TabsContent value="automation" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Settings className="w-5 h-5 mr-2" />
+                E-Mail-Automatisierung
+              </CardTitle>
+              <CardDescription>
+                Automatische E-Mail-Regeln und Workflows verwalten
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <div className="mb-4">
+                  <Zap className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Erweiterte Automatisierung verfügbar
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Verwalten Sie komplexe E-Mail-Automatisierungsregeln in der dedizierten Automatisierung-Oberfläche.
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => window.location.href = '/email-automation'}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Automatisierung öffnen
+                </Button>
               </div>
             </CardContent>
           </Card>
