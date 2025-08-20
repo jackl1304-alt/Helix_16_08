@@ -46,14 +46,20 @@ function renderCurrentPage(page: string, userData: any) {
   }
 }
 
-// JSON-based Simple App without React Suspense issues
-function App() {
+// Main App Component wrapper  
+function AppContent() {
   const [appState, setAppState] = useState<AppState>({
     currentPage: window.location.pathname,
     userData: null,
     isLoading: true
   });
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  // Handle navigation via JSON state
+  const handleNavigation = (page: string) => {
+    setAppState(prev => ({ ...prev, currentPage: page }));
+    window.history.pushState({}, '', page);
+  };
 
   // Initialize app with JSON data
   useEffect(() => {
@@ -86,18 +92,6 @@ function App() {
     initializeApp();
   }, []);
 
-  // Handle navigation via JSON state
-  const handleNavigation = (page: string) => {
-    setAppState(prev => ({ ...prev, currentPage: page }));
-    window.history.pushState({}, '', page);
-  };
-
-  // Navigation context value
-  const navigationValue = {
-    navigate: handleNavigation,
-    currentPage: appState.currentPage
-  };
-
   // Loading state
   if (appState.isLoading || isAuthenticated === null) {
     return (
@@ -113,29 +107,55 @@ function App() {
   // Show login if not authenticated
   if (!isAuthenticated) {
     return (
-      <QueryClientProvider client={queryClient}>
-        <LanguageProvider>
-          <NavigationContext.Provider value={navigationValue}>
-            <div className="min-h-screen bg-gray-50">
-              <Toaster />
-              <Login onLogin={() => setIsAuthenticated(true)} />
-            </div>
-          </NavigationContext.Provider>
-        </LanguageProvider>
-      </QueryClientProvider>
+      <div className="min-h-screen bg-gray-50">
+        <Toaster />
+        <Login onLogin={() => setIsAuthenticated(true)} />
+      </div>
     );
   }
 
   // Main app with JSON-based navigation
   return (
+    <div className="min-h-screen bg-gray-50">
+      <Toaster />
+      {renderCurrentPage(appState.currentPage, appState.userData)}
+    </div>
+  );
+}
+
+// Navigation Provider wrapper
+function NavigationProvider({ children }: { children: React.ReactNode }) {
+  const [appState, setAppState] = useState<AppState>({
+    currentPage: window.location.pathname,
+    userData: null,
+    isLoading: false
+  });
+
+  const handleNavigation = (page: string) => {
+    setAppState(prev => ({ ...prev, currentPage: page }));
+    window.history.pushState({}, '', page);
+  };
+
+  const navigationValue = {
+    navigate: handleNavigation,
+    currentPage: appState.currentPage
+  };
+
+  return (
+    <NavigationContext.Provider value={navigationValue}>
+      {children}
+    </NavigationContext.Provider>
+  );
+}
+
+// JSON-based Simple App without React Suspense issues
+function App() {
+  return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
-        <NavigationContext.Provider value={navigationValue}>
-          <div className="min-h-screen bg-gray-50">
-            <Toaster />
-            {renderCurrentPage(appState.currentPage, appState.userData)}
-          </div>
-        </NavigationContext.Provider>
+        <NavigationProvider>
+          <AppContent />
+        </NavigationProvider>
       </LanguageProvider>
     </QueryClientProvider>
   );
