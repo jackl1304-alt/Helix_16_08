@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "wouter";
+// Navigation via props instead of wouter
 import { 
   BarChart3, 
   Database, 
@@ -23,7 +23,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import logoPath from "@assets/ICON Helix_1753735921077.jpg";
+// Logo path as static URL
+const logoPath = "/attached_assets/ICON Helix_1753735921077.jpg";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
@@ -49,45 +50,49 @@ const administration = [
   { name: "Audit Logs", href: "/audit-logs", icon: FileText },
 ];
 
-export function MobileSidebar() {
+interface MobileSidebarProps {
+  navigate: (page: string) => void;
+  currentPage: string;
+}
+
+export function MobileSidebar({ navigate, currentPage }: MobileSidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [location] = useLocation();
 
   const renderNavItem = (item: any, isActive: boolean, onClose?: () => void) => (
-    <Link key={item.name} href={item.href}>
-      <div
-        className={cn(
-          "flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors cursor-pointer",
-          isActive
-            ? "text-blue-600 bg-blue-50 border border-blue-200"
-            : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-        )}
-        onClick={onClose}
-      >
-        <item.icon className={cn(
-          "mr-3 h-5 w-5",
-          isActive ? "text-blue-600" : "text-gray-400"
-        )} />
-        {item.name}
-      </div>
-    </Link>
+    <button 
+      key={item.name} 
+      onClick={() => {
+        navigate(item.href);
+        if (onClose) onClose();
+      }}
+      className={cn(
+        "flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors cursor-pointer w-full text-left",
+        isActive
+          ? "text-blue-600 bg-blue-50 border border-blue-200"
+          : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+      )}
+    >
+      <item.icon className={cn(
+        "mr-3 h-5 w-5",
+        isActive ? "text-blue-600" : "text-gray-400"
+      )} />
+      {item.name}
+    </button>
   );
 
   return (
     <>
       {/* Mobile Header */}
       <div className="sticky top-0 z-40 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-        <Link href="/">
-          <div className="flex flex-col items-center cursor-pointer">
-            <img 
-              src={logoPath} 
-              alt="Helix Logo" 
-              className="h-10 w-10 rounded-lg object-cover"
-            />
-            <span className="text-xs font-medium text-gray-700 mt-1">MedTech Intelligence</span>
-          </div>
-        </Link>
+        <button onClick={() => navigate("/")} className="flex flex-col items-center cursor-pointer">
+          <img 
+            src={logoPath} 
+            alt="Helix Logo" 
+            className="h-10 w-10 rounded-lg object-cover"
+          />
+          <span className="text-xs font-medium text-gray-700 mt-1">MedTech Intelligence</span>
+        </button>
         
         <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
           <DropdownMenuTrigger asChild>
@@ -118,23 +123,25 @@ export function MobileSidebar() {
               Hauptmodule
             </DropdownMenuLabel>
             {navigation.map((item) => {
-              const isActive = location === item.href;
+              const isActive = currentPage === item.href;
               return (
-                <Link key={item.name} href={item.href}>
-                  <DropdownMenuItem 
-                    className={cn(
-                      "flex items-center px-4 py-3 cursor-pointer",
-                      isActive && "bg-blue-50 text-blue-600"
-                    )}
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    <item.icon className={cn(
-                      "mr-3 h-4 w-4",
-                      isActive ? "text-blue-600" : "text-gray-400"
-                    )} />
-                    {item.name}
-                  </DropdownMenuItem>
-                </Link>
+                <DropdownMenuItem 
+                  key={item.name}
+                  className={cn(
+                    "flex items-center px-4 py-3 cursor-pointer",
+                    isActive && "bg-blue-50 text-blue-600"
+                  )}
+                  onClick={() => {
+                    navigate(item.href);
+                    setDropdownOpen(false);
+                  }}
+                >
+                  <item.icon className={cn(
+                    "mr-3 h-4 w-4",
+                    isActive ? "text-blue-600" : "text-gray-400"
+                  )} />
+                  {item.name}
+                </DropdownMenuItem>
               );
             })}
 
@@ -145,23 +152,25 @@ export function MobileSidebar() {
               Knowledge Base
             </DropdownMenuLabel>
             {knowledgeBase.map((item) => {
-              const isActive = location === item.href;
+              const isActive = currentPage === item.href;
               return (
-                <Link key={item.name} href={item.href}>
-                  <DropdownMenuItem 
-                    className={cn(
-                      "flex items-center px-4 py-3 cursor-pointer",
-                      isActive && "bg-blue-50 text-blue-600"
-                    )}
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    <item.icon className={cn(
-                      "mr-3 h-4 w-4",
-                      isActive ? "text-blue-600" : "text-gray-400"
-                    )} />
-                    {item.name}
-                  </DropdownMenuItem>
-                </Link>
+                <DropdownMenuItem 
+                  key={item.name}
+                  className={cn(
+                    "flex items-center px-4 py-3 cursor-pointer",
+                    isActive && "bg-blue-50 text-blue-600"
+                  )}
+                  onClick={() => {
+                    navigate(item.href);
+                    setDropdownOpen(false);
+                  }}
+                >
+                  <item.icon className={cn(
+                    "mr-3 h-4 w-4",
+                    isActive ? "text-blue-600" : "text-gray-400"
+                  )} />
+                  {item.name}
+                </DropdownMenuItem>
               );
             })}
 
@@ -172,23 +181,25 @@ export function MobileSidebar() {
               Administration
             </DropdownMenuLabel>
             {administration.map((item) => {
-              const isActive = location === item.href;
+              const isActive = currentPage === item.href;
               return (
-                <Link key={item.name} href={item.href}>
-                  <DropdownMenuItem 
-                    className={cn(
-                      "flex items-center px-4 py-3 cursor-pointer",
-                      isActive && "bg-blue-50 text-blue-600"
-                    )}
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    <item.icon className={cn(
-                      "mr-3 h-4 w-4",
-                      isActive ? "text-blue-600" : "text-gray-400"
-                    )} />
-                    {item.name}
-                  </DropdownMenuItem>
-                </Link>
+                <DropdownMenuItem 
+                  key={item.name}
+                  className={cn(
+                    "flex items-center px-4 py-3 cursor-pointer",
+                    isActive && "bg-blue-50 text-blue-600"
+                  )}
+                  onClick={() => {
+                    navigate(item.href);
+                    setDropdownOpen(false);
+                  }}
+                >
+                  <item.icon className={cn(
+                    "mr-3 h-4 w-4",
+                    isActive ? "text-blue-600" : "text-gray-400"
+                  )} />
+                  {item.name}
+                </DropdownMenuItem>
               );
             })}
 

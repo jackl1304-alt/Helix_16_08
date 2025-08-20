@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "wouter";
 import { 
   BarChart3, 
   Database, 
@@ -27,7 +26,8 @@ import {
   LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logoPath from "@assets/ICON Helix_1753735921077.jpg";
+// Logo path as static URL
+const logoPath = "/attached_assets/ICON Helix_1753735921077.jpg";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -113,16 +113,16 @@ const getNavigationStructure = (t: (key: string) => string): Record<string, Navi
 });
 
 // Sidebar Search Field Component
-function SidebarSearchField() {
+function SidebarSearchField({ navigate }: { navigate: (page: string) => void }) {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
-  const [, setLocation] = useLocation();
+
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       // Navigate to intelligent search page with query
-      setLocation(`/intelligent-search?q=${encodeURIComponent(searchQuery.trim())}`);
+      navigate(`/intelligent-search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
 
@@ -150,9 +150,13 @@ function SidebarSearchField() {
   );
 }
 
-export function Sidebar() {
+interface SidebarProps {
+  navigate: (page: string) => void;
+  currentPage: string;
+}
+
+export function Sidebar({ navigate, currentPage }: SidebarProps) {
   const { t } = useLanguage();
-  const [location] = useLocation();
   const { logout } = useAuth();
   const navigationStructure = getNavigationStructure(t);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
@@ -172,15 +176,15 @@ export function Sidebar() {
   };
 
   const renderNavigationItem = (item: NavigationItem) => {
-    const isActive = location === item.href;
+    const isActive = currentPage === item.href;
     const IconComponent = item.icon;
     
     return (
-      <Link
+      <button
         key={item.href}
-        href={item.href}
+        onClick={() => navigate(item.href)}
         className={cn(
-          "flex items-center justify-start px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer text-left",
+          "flex items-center justify-start px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer text-left w-full",
           isActive
             ? "bg-[#07233e] text-white shadow-md"
             : "text-gray-700 hover:bg-[#f0f8ff] hover:text-[#07233e]"
@@ -188,7 +192,7 @@ export function Sidebar() {
       >
         <IconComponent className="mr-3 h-5 w-5 flex-shrink-0" />
         <span className="text-left">{item.name}</span>
-      </Link>
+      </button>
     );
   };
 
@@ -196,13 +200,13 @@ export function Sidebar() {
     return (
       <div className="flex justify-center space-x-4 py-3 border-t border-gray-200 dark:border-gray-700 mt-2">
         {hiddenItems.map((item) => {
-          const isActive = location === item.href;
+          const isActive = currentPage === item.href;
           const IconComponent = item.icon;
           
           return (
-            <Link
+            <button
               key={item.href}
-              href={item.href}
+              onClick={() => navigate(item.href)}
               className={cn(
                 "flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-300 cursor-pointer",
                 isActive
@@ -212,7 +216,7 @@ export function Sidebar() {
               title={item.name}
             >
               <IconComponent className="h-5 w-5" />
-            </Link>
+            </button>
           );
         })}
       </div>
@@ -247,7 +251,7 @@ export function Sidebar() {
     <aside className="fixed left-0 top-0 h-screen w-64 deltaways-nav shadow-lg z-50 overflow-y-auto">
       {/* DELTA WAYS Logo Header */}
       <div className="p-6 border-b border-gray-200">
-        <Link href="/">
+        <button onClick={() => navigate("/")} className="w-full">
           <div className="flex flex-col items-center cursor-pointer space-y-2">
             <img 
               src={logoPath} 
@@ -257,13 +261,13 @@ export function Sidebar() {
             <span className="text-lg deltaways-brand-text text-[#07233e]">HELIX</span>
             <p className="text-xs font-medium text-gray-600">Powered by DELTA WAYS</p>
           </div>
-        </Link>
+        </button>
         
       </div>
       
       {/* Funktionsfähiger Suchbereich */}
       <div className="p-4 border-b border-gray-100">
-        <SidebarSearchField />
+        <SidebarSearchField navigate={navigate} />
       </div>
       
       {/* Thematisch organisierte Navigation */}
