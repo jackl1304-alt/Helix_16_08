@@ -24,11 +24,10 @@ import {
   Bot,
   Sparkles,
   Building,
-  LogOut,
-  Activity
+  LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Logo } from "@/components/layout/logo";
+import logoPath from "@assets/ICON Helix_1753735921077.jpg";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -136,14 +135,14 @@ function SidebarSearchField() {
   return (
     <form onSubmit={handleSearch}>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#07233e]" />
         <Input
           type="text"
           placeholder={t('search.askQuestion')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyPress={handleKeyPress}
-          className="pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-gray-50 transition-colors duration-200"
+          className="pl-10 pr-4 py-2 bg-[#f0f8ff] border border-[#b0d4f6] rounded-lg text-sm text-[#07233e] placeholder-[#07233e]/70 focus:outline-none focus:ring-2 focus:ring-[#07233e] focus:border-transparent hover:bg-[#e6f3ff] transition-colors duration-200"
           data-testid="sidebar-search-input"
         />
       </div>
@@ -179,12 +178,12 @@ export function Sidebar() {
     return (
       <Link
         key={item.href}
-        to={item.href}
+        href={item.href}
         className={cn(
           "flex items-center justify-start px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer text-left",
           isActive
-            ? "bg-blue-50 text-blue-700 shadow-sm"
-            : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+            ? "bg-[#07233e] text-white shadow-md"
+            : "text-gray-700 hover:bg-[#f0f8ff] hover:text-[#07233e]"
         )}
       >
         <IconComponent className="mr-3 h-5 w-5 flex-shrink-0" />
@@ -203,7 +202,7 @@ export function Sidebar() {
           return (
             <Link
               key={item.href}
-              to={item.href}
+              href={item.href}
               className={cn(
                 "flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-300 cursor-pointer",
                 isActive
@@ -228,7 +227,7 @@ export function Sidebar() {
       <div key={sectionKey} className="mb-3">
         <button
           onClick={() => toggleSection(sectionKey)}
-          className="flex items-center justify-between w-full px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-gray-700 transition-colors duration-200 text-left"
+          className="flex items-center justify-between w-full px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-[#07233e] transition-colors duration-200 text-left"
         >
           <span>{section.title}</span>
           <ChevronIcon className="h-4 w-4" />
@@ -245,20 +244,25 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-white shadow-lg z-50 overflow-y-auto border-r border-gray-200">
+    <aside className="fixed left-0 top-0 h-screen w-64 deltaways-nav shadow-lg z-50 overflow-y-auto">
       {/* DELTA WAYS Logo Header */}
       <div className="p-6 border-b border-gray-200">
-        <Link to="/">
+        <Link href="/">
           <div className="flex flex-col items-center cursor-pointer space-y-2">
-            <Logo size="lg" showText={true} />
+            <img 
+              src={logoPath} 
+              alt="Helix Logo" 
+              className="h-32 w-32 object-cover rounded-lg ring-2 ring-[#b0d4f6]"
+            />
+            <span className="text-lg deltaways-brand-text text-[#07233e]">HELIX</span>
+            <p className="text-xs font-medium text-gray-600">Powered by DELTA WAYS</p>
           </div>
         </Link>
         
-
       </div>
       
       {/* Funktionsfähiger Suchbereich */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b border-gray-100">
         <SidebarSearchField />
       </div>
       
@@ -273,14 +277,14 @@ export function Sidebar() {
       
       {/* Status-Footer */}
       <div className="border-t border-gray-200 p-4 bg-gray-50">
-        <div className="text-xs text-gray-600">
+        <div className="text-xs text-gray-500">
           <div className="flex items-center justify-between">
             <span>{t('status.label')}:</span>
-            <span className="text-green-400 font-medium">{t('status.online')}</span>
+            <span className="text-green-600 font-medium">{t('status.online')}</span>
           </div>
           <div className="flex items-center justify-between mt-1">
             <span>{t('status.dataSources')}</span>
-            <span className="text-blue-400 font-medium">{t('common.active')}</span>
+            <span className="text-blue-600 font-medium">{t('common.active')}</span>
           </div>
         </div>
         
@@ -291,10 +295,10 @@ export function Sidebar() {
               logout();
               window.location.reload();
             }}
-            className="flex items-center w-full px-2 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded-md transition-colors"
+            className="flex items-center w-full px-2 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
           >
             <LogOut className="h-4 w-4 mr-2" />
-            <span>Tenant Logout</span>
+            <span>Abmelden</span>
           </button>
         </div>
       </div>

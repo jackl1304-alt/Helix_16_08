@@ -4,15 +4,6 @@
 Helix is a comprehensive regulatory intelligence platform for the medical device industry. It automates the collection, analysis, and distribution of regulatory updates from global authorities, provides AI-powered content approval workflows, and maintains historical data tracking for compliance monitoring. The platform aims to streamline regulatory intelligence, ensure compliance, and provide valuable insights into the dynamic regulatory landscape. Its business vision includes ensuring compliance, providing valuable insights, and achieving 100% data quality, making it production-ready with advanced analytics and a polished user experience.
 
 ## Recent Changes (August 2025)
-- **KOMPLETTE SCREENSHOT-UMSETZUNG**: Alle Hauptseiten exakt nach Screenshots erstellt (20. August 2025 14:18)
-- **GRAUER DESIGN-STANDARD**: Farbige Header-Balken entfernt, graues Design wie Screenshots implementiert
-- **EINZELARTIKEL-ANSICHT**: Regulatory Updates, Rechtsprechung und Zulassungen zeigen jeden Fall/Artikel einzeln
-- **66+ REGULATORY UPDATES**: Mindestens 66 Updates mit FDA 510(k) Struktur, Risiko-Scores und Kosten
-- **65+ LEGAL CASES**: Mindestens 65 Rechtsfälle mit 8-Tab-Struktur (Urteilsspruch, Schadensersatz)
-- **7+ GLOBALE ZULASSUNGEN**: USA-FDA und EU-MDR/IVDR Bereiche mit authentischen Compliance-Anforderungen
-- **BACKEND-FRONTEND SYNCHRONISATION**: Echte PostgreSQL-Daten statt Mock-Daten
-- **WISSENSDATENBANK**: 242 Artikel aus knowledge_articles Tabelle mit vollständiger API-Integration
-- **TAB-INTERFACE VOLLSTÄNDIG**: 6-8 Tabs je nach Seite (Regulatory: 6, Legal: 8, Zulassungen: 6)
 - **Multi-Tenant System**: Vollständige Implementierung der Tenant-Isolation mit abonnement-basiertem Dashboard (16. August 2025)
 - **Subscription-Based Access**: Tenant-Dashboard zeigt nur Inhalte basierend auf Abonnement-Level (Basic/Professional/Enterprise)
 - **Tenant Authentication**: Funktionierende Tenant-Anmeldung mit Demo-Credentials (admin@demo-medical.local/demo123)
