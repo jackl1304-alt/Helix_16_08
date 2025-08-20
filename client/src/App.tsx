@@ -90,6 +90,12 @@ function App() {
     );
   }
 
+  // Customer Routes Check - Vollständig getrennt von Admin
+  const pathname = window.location.pathname;
+  if (pathname.startsWith('/customer-login') || pathname.startsWith('/customer-area')) {
+    return <CustomerApp />;
+  }
+
   return (
     <ErrorBoundary>
       <LanguageProvider>
@@ -137,12 +143,6 @@ function App() {
                   
                   {/* Customer Area */}
                   <Route path="/customer-dashboard" component={CustomerDashboard} />
-                  <Route path="/customer-login">
-                    {() => <CustomerApp />}
-                  </Route>
-                  <Route path="/customer-area/:rest*">
-                    {() => <CustomerApp />}
-                  </Route>
                   
                   <Route component={NotFound} />
                 </Switch>

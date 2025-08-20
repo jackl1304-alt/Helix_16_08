@@ -82,7 +82,7 @@ export default function Analytics() {
   const isLoading = statsLoading || updatesLoading || casesLoading || sourcesLoading;
 
   // Berechnete Metriken basierend auf echten Daten
-  const stats: DashboardStats = dashboardStats || {
+  const defaultStats: DashboardStats = {
     activeDataSources: 70,
     totalUpdates: 24,
     totalLegalCases: 65,
@@ -92,6 +92,8 @@ export default function Analytics() {
     totalNewsletters: 4,
     totalSubscribers: 7
   };
+
+  const stats: DashboardStats = (dashboardStats as DashboardStats) || defaultStats;
 
   // Charts-Daten basierend auf echten APIs generieren
   const regionData = [

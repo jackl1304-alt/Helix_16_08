@@ -28,18 +28,29 @@ function CustomerAppContent() {
       </div>
     }>
       <Switch>
+        <Route path="/customer-login" component={() => <CustomerLogin onLogin={login} />} />
         <Route path="/customer-area" component={CustomerArea} />
         <Route path="/customer-area/settings" component={CustomerSettings} />
         <Route path="/customer-area/:rest*">
-          {(params: { rest?: string }) => (
-            <div className="p-6">
-              <h1 className="text-2xl font-bold mb-4">
-                {params.rest} - Coming Soon
-              </h1>
-              <p className="text-gray-600">
-                Diese Seite ist für Ihr Abonnement ({customer?.subscription}) verfügbar 
-                und wird bald implementiert.
-              </p>
+          {(params: { "rest*"?: string }) => (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+              <div className="text-center">
+                <h1 className="text-2xl font-bold mb-4 text-gray-900">
+                  {params["rest*"]} - Coming Soon
+                </h1>
+                <p className="text-gray-600">
+                  Diese Seite ist für Ihr Abonnement ({customer?.subscription}) verfügbar 
+                  und wird bald implementiert.
+                </p>
+                <div className="mt-6">
+                  <a 
+                    href="/customer-area" 
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+                  >
+                    Zurück zum Dashboard
+                  </a>
+                </div>
+              </div>
             </div>
           )}
         </Route>
