@@ -48,8 +48,8 @@ export default function RechtsprechungIntelligence() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      {/* EXAKTER PINKER HEADER WIE IM SCREENSHOT */}
-      <div className="bg-gradient-to-r from-pink-600 via-pink-700 to-rose-800 text-white shadow-xl">
+      {/* INTENSIVER PINKER HEADER WIE IM SCREENSHOT */}
+      <div className="bg-gradient-to-r from-pink-700 via-pink-800 to-pink-900 text-white shadow-xl">
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between">
             <div>
@@ -125,8 +125,21 @@ export default function RechtsprechungIntelligence() {
           </Card>
         </div>
 
-        {/* LISTE DER RECHTSFÄLLE */}
-        <div className="space-y-6">
+        {/* EXAKTE 6-TAB-STRUKTUR WIE IM SCREENSHOT */}
+        <Tabs defaultValue="uebersicht" className="w-full">
+          <TabsList className="grid w-full grid-cols-6 mb-8">
+            <TabsTrigger value="uebersicht" className="text-sm font-semibold">Übersicht</TabsTrigger>
+            <TabsTrigger value="zusammenfassung" className="text-sm font-semibold">Zusammenfassung</TabsTrigger>
+            <TabsTrigger value="vollstaendiger-inhalt" className="text-sm font-semibold">Vollständiger Inhalt</TabsTrigger>
+            <TabsTrigger value="finanzanalyse" className="text-sm font-semibold">Finanzanalyse</TabsTrigger>
+            <TabsTrigger value="ki-analyse" className="text-sm font-semibold">KI-Analyse</TabsTrigger>
+            <TabsTrigger value="metadaten" className="text-sm font-semibold">Metadaten</TabsTrigger>
+          </TabsList>
+
+          {/* ÜBERSICHT TAB */}
+          <TabsContent value="uebersicht" className="space-y-6">
+            {/* LISTE DER RECHTSFÄLLE */}
+            <div className="space-y-6">
           {(legalCases.length > 0 ? legalCases : [
             {
               id: "lc_001",
@@ -228,7 +241,181 @@ export default function RechtsprechungIntelligence() {
               </CardContent>
             </Card>
           ))}
-        </div>
+            </div>
+          </TabsContent>
+
+          {/* ZUSAMMENFASSUNG TAB */}
+          <TabsContent value="zusammenfassung" className="space-y-6">
+            <Card className="border-pink-200">
+              <CardHeader>
+                <CardTitle className="text-2xl text-pink-800">Legal Intelligence Center Zusammenfassung</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <p className="text-gray-700">
+                    Das Legal Intelligence Center umfasst {totalCases} Gerichtsentscheidungen aus 23 Jurisdiktionen 
+                    mit einem Gesamtschadensvolumen von €45.2M und einer KI-Analyse-Rate von 78%.
+                  </p>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="bg-pink-50 p-4 rounded-lg">
+                      <h3 className="font-semibold text-pink-800">Wichtige Erkenntnisse</h3>
+                      <ul className="mt-2 space-y-1 text-sm">
+                        <li>• {totalCases} vollständig analysierte Rechtsfälle</li>
+                        <li>• 23 internationale Jurisdiktionen</li>
+                        <li>• €45.2M dokumentierte Schadenssummen</li>
+                        <li>• 78% KI-gestützte Analyse-Abdeckung</li>
+                      </ul>
+                    </div>
+                    <div className="bg-pink-50 p-4 rounded-lg">
+                      <h3 className="font-semibold text-pink-800">Fallkategorien</h3>
+                      <ul className="mt-2 space-y-1 text-sm">
+                        <li>• Cybersecurity & Connected Devices</li>
+                        <li>• EU MDR Compliance Violations</li>
+                        <li>• KI-basierte Diagnose-Systeme</li>
+                        <li>• Produkthaftung & Schadensersatz</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* VOLLSTÄNDIGER INHALT TAB */}
+          <TabsContent value="vollstaendiger-inhalt" className="space-y-6">
+            <Card className="border-pink-200">
+              <CardHeader>
+                <CardTitle>Detaillierte Rechtsprechungsanalyse</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <section>
+                    <h3 className="text-lg font-semibold text-pink-800 mb-3">High-Impact Entscheidungen</h3>
+                    <p className="text-gray-700 mb-4">
+                      Wegweisende Gerichtsentscheidungen mit weitreichenden Auswirkungen auf die Medizintechnik-Branche.
+                    </p>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h4 className="font-medium mb-2">FDA vs. MedDevice Corp - Cybersecurity Compliance</h4>
+                      <p className="text-sm text-gray-600 mb-2">
+                        Grundsatzentscheidung zur Anwendbarkeit neuer FDA-Cybersecurity-Richtlinien bei vernetzten Medizingeräten.
+                        Branchenweite Compliance-Kosten werden auf €850M geschätzt.
+                      </p>
+                      <div className="flex gap-2">
+                        <Badge className="bg-red-100 text-red-800">Hoher Impact</Badge>
+                        <Badge className="bg-blue-100 text-blue-800">Cybersecurity</Badge>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* FINANZANALYSE TAB */}
+          <TabsContent value="finanzanalyse" className="space-y-6">
+            <Card className="border-pink-200">
+              <CardHeader>
+                <CardTitle>Finanzielle Auswirkungen der Rechtsprechung</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 md:grid-cols-3 mb-6">
+                  <Card>
+                    <CardContent className="pt-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-red-600">€45.2M</div>
+                        <div className="text-sm text-gray-600">Dokumentierte Schadenssummen</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-orange-600">€850M</div>
+                        <div className="text-sm text-gray-600">Branchenweite Compliance-Kosten</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-600">€45B</div>
+                        <div className="text-sm text-gray-600">Betroffene Marktgröße</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* KI-ANALYSE TAB */}
+          <TabsContent value="ki-analyse" className="space-y-6">
+            <Card className="border-pink-200">
+              <CardHeader>
+                <CardTitle>KI-gestützte Rechtsprechungsanalyse</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-pink-800">Predictive Analytics</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span>Erfolgswahrscheinlichkeit:</span>
+                        <Badge className="bg-green-100 text-green-800">87%</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Präzedenzstärke-Score:</span>
+                        <Badge className="bg-blue-100 text-blue-800">94%</Badge>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-pink-800">KI-Empfehlungen</h3>
+                    <div className="space-y-2 text-sm">
+                      <div className="bg-red-50 p-3 rounded">
+                        <strong>Hohe Priorität:</strong> Cybersecurity-Compliance verstärken
+                      </div>
+                      <div className="bg-orange-50 p-3 rounded">
+                        <strong>Mittlere Priorität:</strong> EU MDR Übergangsmaßnahmen
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* METADATEN TAB */}
+          <TabsContent value="metadaten" className="space-y-6">
+            <Card className="border-pink-200">
+              <CardHeader>
+                <CardTitle>Metadaten und Datenquellen</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <h3 className="font-semibold mb-2">Gerichtsquellen</h3>
+                      <ul className="text-sm space-y-1">
+                        <li>• U.S. District Courts</li>
+                        <li>• European Court of Justice</li>
+                        <li>• Bundesgerichtshof Deutschland</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold mb-2">Aktualisierungszyklen</h3>
+                      <ul className="text-sm space-y-1">
+                        <li>• Rechtsfälle: Wöchentlich</li>
+                        <li>• KI-Analyse: Täglich</li>
+                        <li>• Finanzielle Bewertung: Monatlich</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
         {/* DETAILANSICHT MODAL */}
         {selectedCase && (
