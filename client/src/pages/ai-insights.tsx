@@ -405,25 +405,10 @@ export default function AIInsights() {
                 </Tabs>
                 
                 <div className="flex items-center justify-end mt-4 pt-4 border-t">
-                  <PDFDownloadButton 
-                    content={{
-                      title: insight.title,
-                      description: insight.description,
-                      category: insight.category,
-                      severity: insight.severity,
-                      confidence: insight.confidence,
-                      impact: insight.impact,
-                      timeframe: insight.timeframe,
-                      recommendations: insight.recommendations,
-                      sources: insight.sources,
-                      relevantRegions: insight.relevantRegions,
-                      affectedDeviceClasses: insight.affectedDeviceClasses,
-                      tags: insight.tags,
-                      createdAt: insight.createdAt
-                    }}
-                    filename={`ai-insight-${insight.id}.pdf`}
-                    className="h-8"
-                  />
+                  <Button variant="outline" size="sm">
+                    <Download className="h-4 w-4 mr-2" />
+                    PDF Export
+                  </Button>
                 </div>
               </CardContent>
             </Card>
