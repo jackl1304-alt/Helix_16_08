@@ -1,354 +1,284 @@
-import React, { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useParams } from "wouter";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import CustomerNavigation, { type CustomerPermissions } from "@/components/customer/customer-navigation";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { LanguageSelector } from "@/components/LanguageSelector";
-import { useLiveTenantPermissions } from "@/hooks/use-live-tenant-permissions";
-import { useCustomerTheme } from "@/contexts/customer-theme-context";
-import ThemeCustomizer from "@/components/customer/theme-customizer";
+import { Badge } from "@/components/ui/badge";
 import { 
-  Settings,
-  User,
+  Settings, 
+  User, 
+  Palette, 
   Bell,
-  Shield,
-  Mail,
-  Globe,
+  Lock,
   Save,
-  Building,
-  Crown,
-  CheckCircle
+  Eye,
+  EyeOff
 } from "lucide-react";
-
-// Mock tenant ID - In production, get from authentication context  
-const mockTenantId = "030d3e01-32c4-4f95-8d54-98be948e8d4b";
+import { useCustomer } from "@/contexts/CustomerContext";
 
 export default function CustomerSettings() {
-  const [notificationSettings, setNotificationSettings] = useState({
-    emailAlerts: true,
-    smsAlerts: false,
-    weeklyDigest: true,
-    criticalOnly: false
+  const { customer, updateTheme, updateProfile } = useCustomer();
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    username: customer?.username || "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+    companyName: customer?.companyName || ""
   });
-  const [mounted, setMounted] = useState(true);
-  const { themeSettings, getThemeColors } = useCustomerTheme();
-  const colors = getThemeColors();
-
-  useEffect(() => {
-    return () => {
-      setMounted(false);
-    };
-  }, []);
-
-  // Fetch tenant data including permissions
-  const { data: tenantData, isLoading: isTenantLoading, error } = useQuery({
-    queryKey: ['/api/customer/tenant', mockTenantId],
-    queryFn: async () => {
-      const response = await fetch(`/api/customer/tenant/${mockTenantId}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch tenant data');
-      }
-      const data = await response.json();
-      return data;
-    },
-    enabled: mounted,
-    retry: 1,
-    staleTime: 5 * 60 * 1000 // 5 minutes
-  });
+  const [selectedTheme, setSelectedTheme] = useState(customer?.theme || "blue");
   
-  // Extract permissions from tenant data
-  const permissions = tenantData?.customerPermissions || {
-    dashboard: true,
-    regulatoryUpdates: true,
-    legalCases: true,
-    knowledgeBase: true,
-    newsletters: true,
-    analytics: false,
-    reports: false,
-    dataCollection: false,
-    globalSources: false,
-    historicalData: false,
-    administration: false,
-    userManagement: false,
-    systemSettings: false,
-    auditLogs: false,
-    aiInsights: false,
-    advancedAnalytics: false
+  const themes = [
+    { id: "blue", name: "Blau", primary: "bg-blue-600", secondary: "bg-blue-100", preview: "border-blue-500" },
+    { id: "purple", name: "Lila", primary: "bg-purple-600", secondary: "bg-purple-100", preview: "border-purple-500" },
+    { id: "green", name: "Grün", primary: "bg-green-600", secondary: "bg-green-100", preview: "border-green-500" }
+  ];
+
+  const dashboardTemplates = [
+    { id: "executive", name: "Executive Dashboard", description: "Fokus auf KPIs und Übersicht" },
+    { id: "detailed", name: "Detaillierte Ansicht", description: "Umfassende Datenvisualisierung" }, 
+    { id: "minimal", name: "Minimal", description: "Reduzierte, fokussierte Darstellung" },
+    { id: "custom", name: "Benutzerdefiniert", description: "Vollständig anpassbar" }
+  ];
+
+  const handleProfileUpdate = () => {
+    if (formData.newPassword && formData.newPassword !== formData.confirmPassword) {
+      alert("Passwörter stimmen nicht überein");
+      return;
+    }
+
+    updateProfile({
+      username: formData.username,
+      companyName: formData.companyName
+    });
+    
+    alert("Profil erfolgreich aktualisiert");
   };
 
-  if (isTenantLoading) {
-    return (
-      <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="animate-pulse space-y-4 p-6">
-          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-32 bg-gray-200 rounded"></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 items-center justify-center">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Fehler beim Laden der Einstellungen
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Die Tenant-Daten konnten nicht geladen werden. Bitte versuchen Sie es später erneut.
-          </p>
-          <Button onClick={() => window.location.reload()}>
-            Seite neu laden
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  const handleThemeChange = (themeId: string) => {
+    setSelectedTheme(themeId);
+    updateTheme(themeId);
+  };
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Navigation Sidebar */}
-      <CustomerNavigation 
-        permissions={permissions}
-        tenantName={tenantData?.name}
-      />
-      
-      {/* Main Content */}
-      <div className="flex-1 ml-64">
-        <div className="container mx-auto p-6 space-y-8 max-w-4xl">
-          {/* Header */}
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-                Einstellungen
-              </h1>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 via-purple-600 to-cyan-700 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                    {tenantData?.name?.charAt(0) || 'M'}
-                  </div>
-                  <span className="font-medium">{tenantData?.name || 'Customer Portal'}</span>
-                </div>
-                <Badge className="bg-purple-100 text-purple-800">
-                  <Crown className="w-3 h-3 mr-1" />
-                  Professional Plan
-                </Badge>
-                <Badge className="bg-green-100 text-green-800">
-                  <CheckCircle className="w-3 h-3 mr-1" />
-                  Active
-                </Badge>
-              </div>
-            </div>
-          </div>
-
-          <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="profile">Profil</TabsTrigger>
-              <TabsTrigger value="themes">Themes</TabsTrigger>
-              <TabsTrigger value="notifications">Benachrichtigungen</TabsTrigger>
-              <TabsTrigger value="preferences">Präferenzen</TabsTrigger>
-              <TabsTrigger value="security">Sicherheit</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="profile" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" />
-                    Unternehmensinformationen
-                  </CardTitle>
-                  <CardDescription>
-                    Verwalten Sie Ihre Unternehmensdaten und Kontaktinformationen
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="company">Unternehmensname</Label>
-                      <Input id="company" defaultValue={tenantData?.name || ""} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">E-Mail-Adresse</Label>
-                      <Input id="email" type="email" defaultValue={tenantData?.billingEmail || ""} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="industry">Branche</Label>
-                      <Input id="industry" defaultValue="Medizintechnik" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="country">Land</Label>
-                      <Input id="country" defaultValue="Deutschland" />
-                    </div>
-                  </div>
-                  <Button className="w-full md:w-auto">
-                    <Save className="w-4 h-4 mr-2" />
-                    Änderungen speichern
-                  </Button>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="themes" className="space-y-6">
-              <ThemeCustomizer />
-            </TabsContent>
-
-            <TabsContent value="notifications" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Bell className="h-5 w-5" />
-                    Benachrichtigungseinstellungen
-                  </CardTitle>
-                  <CardDescription>
-                    Konfigurieren Sie, wie und wann Sie Benachrichtigungen erhalten möchten
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="email-alerts">E-Mail-Benachrichtigungen</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Erhalten Sie wichtige Updates per E-Mail
-                        </p>
-                      </div>
-                      <Switch 
-                        id="email-alerts"
-                        checked={notificationSettings.emailAlerts}
-                        onCheckedChange={(checked) => 
-                          setNotificationSettings(prev => ({ ...prev, emailAlerts: checked }))
-                        }
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="weekly-digest">Wöchentlicher Digest</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Zusammenfassung der wichtigsten Updates
-                        </p>
-                      </div>
-                      <Switch 
-                        id="weekly-digest"
-                        checked={notificationSettings.weeklyDigest}
-                        onCheckedChange={(checked) => 
-                          setNotificationSettings(prev => ({ ...prev, weeklyDigest: checked }))
-                        }
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="critical-only">Nur kritische Warnungen</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Nur bei wichtigen regulatorischen Änderungen
-                        </p>
-                      </div>
-                      <Switch 
-                        id="critical-only"
-                        checked={notificationSettings.criticalOnly}
-                        onCheckedChange={(checked) => 
-                          setNotificationSettings(prev => ({ ...prev, criticalOnly: checked }))
-                        }
-                      />
-                    </div>
-                  </div>
-                  
-                  <Button className="w-full md:w-auto">
-                    <Save className="w-4 h-4 mr-2" />
-                    Einstellungen speichern
-                  </Button>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="preferences" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Globe className="h-5 w-5" />
-                    Präferenzen
-                  </CardTitle>
-                  <CardDescription>
-                    Personalisieren Sie Ihre Plattform-Erfahrung
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="language">Sprache</Label>
-                      <Input id="language" defaultValue="Deutsch" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="timezone">Zeitzone</Label>
-                      <Input id="timezone" defaultValue="Europe/Berlin" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="region">Hauptregion</Label>
-                      <Input id="region" defaultValue="Europa" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="updates-frequency">Update-Frequenz</Label>
-                      <Input id="updates-frequency" defaultValue="Täglich" />
-                    </div>
-                  </div>
-                  
-                  <Button className="w-full md:w-auto">
-                    <Save className="w-4 h-4 mr-2" />
-                    Präferenzen speichern
-                  </Button>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="security" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Shield className="h-5 w-5" />
-                    Sicherheitseinstellungen
-                  </CardTitle>
-                  <CardDescription>
-                    Verwalten Sie Ihre Sicherheits- und Zugriffseinstellungen
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid gap-4">
-                    <div className="space-y-2">
-                      <Label>Aktuelle Berechtigungen</Label>
-                      <div className="grid gap-2 md:grid-cols-2">
-                        {Object.entries(permissions).map(([key, value]) => (
-                          <div key={key} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                            <span className="text-sm capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
-                            <Badge variant={value ? "default" : "secondary"}>
-                              {value ? "Aktiviert" : "Deaktiviert"}
-                            </Badge>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                      <p className="text-sm text-yellow-800">
-                        <Shield className="w-4 h-4 inline mr-2" />
-                        Ihre Berechtigungen werden von Ihrem Administrator verwaltet. 
-                        Wenden Sie sich an Ihren Administrator, um Änderungen anzufordern.
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-white rounded-xl p-6 shadow-sm border">
+        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+          <Settings className="h-8 w-8 text-blue-600" />
+          Einstellungen
+        </h1>
+        <p className="text-gray-600 mt-2">
+          Personalisieren Sie Ihr Customer Portal • {customer?.subscription} Plan
+        </p>
       </div>
+
+      {/* Settings Tabs */}
+      <Tabs defaultValue="profile" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="profile">Profil</TabsTrigger>
+          <TabsTrigger value="appearance">Design</TabsTrigger>
+          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="notifications">Benachrichtigungen</TabsTrigger>
+        </TabsList>
+
+        {/* Profile Settings */}
+        <TabsContent value="profile">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                Profil & Anmeldedaten
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="companyName">Firmenname</Label>
+                  <Input
+                    id="companyName"
+                    value={formData.companyName}
+                    onChange={(e) => setFormData({...formData, companyName: e.target.value})}
+                    data-testid="input-company-name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="username">Benutzername</Label>
+                  <Input
+                    id="username"
+                    value={formData.username}
+                    onChange={(e) => setFormData({...formData, username: e.target.value})}
+                    data-testid="input-username"
+                  />
+                </div>
+              </div>
+
+              <div className="border-t pt-6">
+                <h3 className="text-lg font-medium mb-4">Passwort ändern</h3>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="currentPassword">Aktuelles Passwort</Label>
+                    <div className="relative">
+                      <Input
+                        id="currentPassword"
+                        type={showPassword ? "text" : "password"}
+                        value={formData.currentPassword}
+                        onChange={(e) => setFormData({...formData, currentPassword: e.target.value})}
+                        data-testid="input-current-password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="newPassword">Neues Passwort</Label>
+                      <Input
+                        id="newPassword"
+                        type="password"
+                        value={formData.newPassword}
+                        onChange={(e) => setFormData({...formData, newPassword: e.target.value})}
+                        data-testid="input-new-password"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="confirmPassword">Passwort bestätigen</Label>
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        value={formData.confirmPassword}
+                        onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                        data-testid="input-confirm-password"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <Button onClick={handleProfileUpdate} className="bg-blue-600 hover:bg-blue-700">
+                <Save className="h-4 w-4 mr-2" />
+                Änderungen speichern
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Appearance Settings */}
+        <TabsContent value="appearance">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="h-5 w-5" />
+                Design & Farbschema
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <h3 className="text-lg font-medium mb-4">Farbschema wählen</h3>
+                <div className="grid gap-4 md:grid-cols-3">
+                  {themes.map(theme => (
+                    <div
+                      key={theme.id}
+                      className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                        selectedTheme === theme.id ? theme.preview : "border-gray-200"
+                      }`}
+                      onClick={() => handleThemeChange(theme.id)}
+                      data-testid={`theme-${theme.id}`}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium">{theme.name}</h4>
+                        {selectedTheme === theme.id && (
+                          <Badge className="bg-green-500 text-white">Aktiv</Badge>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        <div className={`w-8 h-8 rounded ${theme.primary}`}></div>
+                        <div className={`w-8 h-8 rounded ${theme.secondary}`}></div>
+                        <div className="w-8 h-8 rounded bg-gray-200"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Dashboard Settings */}
+        <TabsContent value="dashboard">
+          <Card>
+            <CardHeader>
+              <CardTitle>Dashboard Layout</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <h3 className="text-lg font-medium mb-4">Template auswählen</h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {dashboardTemplates.map(template => (
+                    <div
+                      key={template.id}
+                      className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                      data-testid={`template-${template.id}`}
+                    >
+                      <h4 className="font-medium">{template.name}</h4>
+                      <p className="text-sm text-gray-600 mt-1">{template.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Notification Settings */}
+        <TabsContent value="notifications">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="h-5 w-5" />
+                Benachrichtigungen
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <h4 className="font-medium">E-Mail Benachrichtigungen</h4>
+                    <p className="text-sm text-gray-600">Updates und wichtige Änderungen</p>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    Konfigurieren
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <h4 className="font-medium">System Alerts</h4>
+                    <p className="text-sm text-gray-600">Warnungen und Fehlermeldungen</p>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    Konfigurieren
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <h4 className="font-medium">Weekly Reports</h4>
+                    <p className="text-sm text-gray-600">Wöchentliche Zusammenfassungen</p>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    Konfigurieren
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
