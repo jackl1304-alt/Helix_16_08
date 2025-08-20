@@ -1,0 +1,31 @@
+# Name des Workflows, der in GitHub angezeigt wird
+name: Deploy to Netcup Webhosting
+
+# Dieser Workflow startet, wenn Sie Änderungen zum "main"-Branch pushen
+on:
+  push:
+    branches:
+      - main # oder "master", je nachdem, wie Ihr Haupt-Branch heißt
+
+jobs:
+  deploy:
+    # Wir verwenden ein aktuelles Ubuntu-System für die Ausführung
+    runs-on: ubuntu-latest
+
+    steps:
+    # Schritt 1: Code aus dem Repository herunterladen
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Schritt 2: Dateien per FTP auf den Netcup-Server hochladen
+    - name: FTP Deploy
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        # Die Zugangsdaten holen wir aus den GitHub Secrets
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        # Optional: Wenn Ihre Website in einem Unterordner liegt (z.B. /build)
+        # local-dir: ./build/ 
+        # Wichtig: Das Zielverzeichnis auf dem Server
+        server-dir: ./httpdocs/
