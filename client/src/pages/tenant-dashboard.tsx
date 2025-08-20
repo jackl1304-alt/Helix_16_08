@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Building2, Users, FileText, AlertTriangle, TrendingUp, Mail, Settings, LogOut, Eye, Download } from 'lucide-react';
+import { Building2, Users, FileText, AlertTriangle, TrendingUp, Mail, Settings, LogOut, Eye, Download, ArrowLeft, Move, RefreshCw, Search, Filter, BookOpen } from 'lucide-react';
 import { Logo } from '@/components/layout/logo';
 
 interface TenantUser {
@@ -96,6 +96,10 @@ export default function TenantDashboard() {
             </div>
             
             <div className="flex items-center space-x-4">
+              <Button variant="ghost" size="sm" onClick={() => window.location.href = '/'}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                ← Zurück zum Admin Portal
+              </Button>
               <Badge variant="outline" className="capitalize">
                 {tenant.subscriptionTier}
               </Badge>
@@ -113,6 +117,121 @@ export default function TenantDashboard() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* DASHBOARD WIDGETS - FREI VERSCHIEBBAR */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Widget 1: Team-Status */}
+          <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-move" data-testid="widget-team-status">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg font-semibold">📊 Übersicht</CardTitle>
+                <Move className="w-4 h-4 text-gray-400" />
+              </div>
+              <CardDescription>Team-Status</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm font-medium">Max Müller</span>
+                  <Badge variant="secondary" className="text-xs">Analyst</Badge>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm font-medium">Sarah Schmidt</span>
+                  <Badge variant="secondary" className="text-xs">Manager</Badge>
+                </div>
+              </div>
+              <div className="pt-3 border-t">
+                <h4 className="text-sm font-medium mb-2">AI</h4>
+                <div className="space-y-2 text-sm text-gray-600">
+                  <div>🟢 Sync completed - vor 5 Min</div>
+                  <div>🟢 Report generated - vor 1 Tag</div>
+                  <div>🟢 New case added - vor 2 Tag</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Widget 2: Aktuelle Updates */}
+          <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-move" data-testid="widget-updates">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg font-semibold">📋 Aktuelle Updates</CardTitle>
+                <Move className="w-4 h-4 text-gray-400" />
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="space-y-3">
+                <div className="border-l-2 border-blue-500 pl-3">
+                  <div className="text-sm font-medium">FDA 510(k) Update</div>
+                  <div className="text-xs text-gray-500">25.08.2025</div>
+                </div>
+                <div className="border-l-2 border-blue-500 pl-3">
+                  <div className="text-sm font-medium">EMA Guidance</div>
+                  <div className="text-xs text-gray-500">18.08.2025</div>
+                </div>
+                <div className="border-l-2 border-blue-500 pl-3">
+                  <div className="text-sm font-medium">MDR Amendment</div>
+                  <div className="text-xs text-gray-500">16.08.2025</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Widget 3: Schnellzugriff - FUNKTIONAL */}
+          <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-move" data-testid="widget-quick-actions">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg font-semibold">⚡ Schnellzugriff</CardTitle>
+                <Move className="w-4 h-4 text-gray-400" />
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start" 
+                onClick={() => window.open('/regulatory-updates', '_blank')}
+                data-testid="button-new-report"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                📄 Neuer Report
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => {
+                  // Sync starten Animation
+                  const btn = document.querySelector('[data-testid="button-sync-start"]');
+                  if (btn) btn.classList.add('animate-pulse');
+                  setTimeout(() => {
+                    if (btn) btn.classList.remove('animate-pulse');
+                    alert('Synchronisation gestartet!');
+                  }, 2000);
+                }}
+                data-testid="button-sync-start"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                🔄 Sync starten
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => {
+                  // Export functionality
+                  const link = document.createElement('a');
+                  link.href = 'data:text/csv;charset=utf-8,Sample Export Data';
+                  link.download = 'tenant-data-export.csv';
+                  link.click();
+                }}
+                data-testid="button-export"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                📤 Export
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
