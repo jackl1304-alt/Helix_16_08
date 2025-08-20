@@ -133,11 +133,6 @@ function App() {
   );
 }
 
-// Simple navigation helper - no context needed
-export function createNavigation(navigate: (page: string) => void) {
-  return { navigate };
-}
-
 export default App;
 
 // JSON API helper functions
