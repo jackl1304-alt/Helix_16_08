@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "lib": ["ES2020", "DOM"],
+    "allowJs": false,
+    "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@services/*": ["server/services/*"],
+      "@storage": ["server/storage.ts"],
+      "@schema": ["shared/schema.ts"],
+      "@utils/*": ["server/utils/*"]
+    },
+    "outDir": "dist",
+    "rootDir": "server",
+    "sourceMap": true,
+    "inlineSources": true,
+    "removeComments": true
+  },
+  "include": ["server/**/*", "shared/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+}
