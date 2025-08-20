@@ -174,40 +174,29 @@ export default function ZulassungenGlobal() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* LILA HEADER WIE IM SCREENSHOT */}
-      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg">
+      {/* GRAUER HEADER OHNE FARBE */}
+      <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <div className="bg-purple-500 p-2 rounded-lg">
-                  <Globe className="w-6 h-6 text-white" />
+                <div className="bg-gray-100 p-2 rounded-lg">
+                  <Globe className="w-6 h-6 text-gray-700" />
                 </div>
-                <h1 className="text-3xl font-bold">Globale Medizintechnik-Zulassungen</h1>
-                <div className="bg-white text-purple-800 px-3 py-1 rounded-full font-bold text-xl">
+                <h1 className="text-3xl font-bold text-gray-900">Globale Zulassungen</h1>
+                <div className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full font-bold text-xl">
                   {totalApprovals}
                 </div>
               </div>
-              <div className="flex items-center gap-6 text-purple-100">
-                <div className="flex items-center gap-2">
-                  <Building2 className="w-4 h-4" />
-                  <span className="text-sm">Aktive Behörden</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Scale className="w-4 h-4" />
-                  <span className="text-sm">Weltweite Abdeckung</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Shield className="w-4 h-4" />
-                  <span className="text-sm">Authentische Daten</span>
-                </div>
-              </div>
-              <p className="text-purple-100 mt-2">Konkrete Regulierungslandschaft basierend auf offiziellen Behördendokumenten</p>
+              <p className="text-gray-600 mt-2">{totalApprovals} globale Medizintechnik-Zulassungsverfahren</p>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold">100%</div>
-              <div className="text-purple-100 text-sm">Authentizität</div>
-            </div>
+            <Button 
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+              onClick={handleSync}
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Synchronisieren
+            </Button>
           </div>
         </div>
       </div>

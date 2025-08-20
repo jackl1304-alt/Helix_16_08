@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, RefreshCw, Scale, Gavel, DollarSign, Brain, FileText, Calendar } from 'lucide-react';
+import { Search, RefreshCw, Scale, Gavel, DollarSign, Brain, FileText, Calendar, AlertTriangle, CheckCircle } from 'lucide-react';
 
 interface LegalCase {
   id: string;
@@ -59,41 +59,34 @@ export default function RechtsprechungIntelligence() {
     return Math.floor(Math.random() * 40) + 60; // 60-100%
   };
 
+  // DEBUGGING: Log data status
+  console.log("🔍 LEGAL CASES DEBUG:", {
+    apiData: legalCases.length,
+    targetMinimum: 65,
+    isLoading
+  });
+
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* PINKER HEADER WIE IM SCREENSHOT */}
-      <div className="bg-gradient-to-r from-pink-600 to-pink-700 text-white shadow-lg">
+      {/* GRAUER HEADER OHNE FARBE */}
+      <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <div className="bg-pink-500 p-2 rounded-lg">
-                  <Scale className="w-6 h-6 text-white" />
+                <div className="bg-gray-100 p-2 rounded-lg">
+                  <Scale className="w-6 h-6 text-gray-700" />
                 </div>
-                <h1 className="text-3xl font-bold">Legal Intelligence Center</h1>
+                <h1 className="text-3xl font-bold text-gray-900">Rechtsprechung Intelligence</h1>
               </div>
-              <div className="flex items-center gap-6 text-pink-100">
-                <div className="flex items-center gap-2">
-                  <Scale className="w-4 h-4" />
-                  <span className="text-sm">Rechtsfälle</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Gavel className="w-4 h-4" />
-                  <span className="text-sm">Gerichtsentscheidungen</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Brain className="w-4 h-4" />
-                  <span className="text-sm">Compliance</span>
-                </div>
-              </div>
-              <p className="text-pink-100 mt-2">{totalCases} Gerichtsentscheidungen und juristische Präzedenzfälle mit Executive-Analysen</p>
+              <p className="text-gray-600 mt-2">{totalCases} Gerichtsentscheidungen und juristische Präzedenzfälle</p>
             </div>
             <Button 
-              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
               onClick={handleSync}
             >
               <RefreshCw className="w-4 h-4 mr-2" />
-              Daten synchronisieren
+              Synchronisieren
             </Button>
           </div>
         </div>
@@ -190,8 +183,39 @@ export default function RechtsprechungIntelligence() {
             <TabsTrigger value="metadaten" className="text-xs font-semibold">Metadaten</TabsTrigger>
           </TabsList>
 
-          {/* ÜBERSICHT TAB - EINZELNE RECHTSFÄLLE */}
+          {/* ÜBERSICHT TAB - EINZELNE RECHTSFÄLLE MIT STATUS */}
           <TabsContent value="uebersicht" className="space-y-4">
+            {/* DATEN-STATUS ANZEIGE */}
+            {isLoading && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <div className="flex items-center gap-2">
+                  <RefreshCw className="w-4 h-4 text-blue-600 animate-spin" />
+                  <span className="text-blue-800 font-medium">Lade Rechtsfälle...</span>
+                </div>
+              </div>
+            )}
+            
+            {!isLoading && legalCases.length === 0 && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-red-600" />
+                  <span className="text-red-800 font-medium">⚠️ Keine Rechtsfälle gefunden. Backend-Verbindung prüfen.</span>
+                </div>
+              </div>
+            )}
+
+            {/* ERFOLGREICHE DATENLADUNG */}
+            {legalCases.length > 0 && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-green-800 font-medium">
+                    ✅ {legalCases.length} Rechtsfälle erfolgreich geladen
+                  </span>
+                </div>
+              </div>
+            )}
+
             {legalCases.map((legalCase) => {
               const damages = getRandomDamages();
               const probability = getRandomProbability();
@@ -236,7 +260,39 @@ export default function RechtsprechungIntelligence() {
 
                       <TabsContent value="overview-inner" className="mt-4">
                         <div className="space-y-4">
-                          <div className="bg-gray-50 p-4 rounded-lg">
+                          {/* FARBKODIERTE FALL-BEWERTUNG */}
+                          <div className={`p-4 rounded-lg border ${
+                            probability >= 80 ? 'bg-green-50 border-green-200' :
+                            probability >= 60 ? 'bg-yellow-50 border-yellow-200' :
+                            'bg-red-50 border-red-200'
+                          }`}>
+                            <div className="grid gap-3 md:grid-cols-2 mb-4">
+                              <div className="text-center">
+                                <div className={`text-2xl font-bold ${
+                                  probability >= 80 ? 'text-green-600' :
+                                  probability >= 60 ? 'text-yellow-600' :
+                                  'text-red-600'
+                                }`}>
+                                  {probability}%
+                                </div>
+                                <div className="text-xs text-gray-600">Erfolgswahrscheinlichkeit</div>
+                                <div className={`text-xs font-medium ${
+                                  probability >= 80 ? 'text-green-600' :
+                                  probability >= 60 ? 'text-yellow-600' :
+                                  'text-red-600'
+                                }`}>
+                                  {probability >= 80 ? '🟢 STARK' : 
+                                   probability >= 60 ? '🟡 MÄSSIG' : 
+                                   '🔴 SCHWACH'}
+                                </div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-green-600">{damages}</div>
+                                <div className="text-xs text-gray-600">Schadensersatz</div>
+                                <div className="text-xs font-medium text-green-600">💰 ZUGESPROCHEN</div>
+                              </div>
+                            </div>
+                            
                             <div className="space-y-3">
                               <p className="text-sm text-gray-700">
                                 <span className="font-medium">Gericht:</span> {legalCase.court}
@@ -252,12 +308,6 @@ export default function RechtsprechungIntelligence() {
                               </p>
                               <p className="text-sm text-gray-600">
                                 {legalCase.judgment || "Urteil zugunsten des Klägers mit Schadensersatz von " + damages}
-                              </p>
-                              <p className="text-sm text-gray-700">
-                                <span className="font-medium">Schadensersatz:</span>
-                              </p>
-                              <p className="text-sm font-semibold text-green-600">
-                                {damages}
                               </p>
                             </div>
                           </div>
