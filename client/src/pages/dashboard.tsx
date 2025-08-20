@@ -46,472 +46,185 @@ export default function Dashboard() {
     gcTime: 300000, // 5 minutes
   });
 
-  // Regulatory Updates von API laden  
-  const { data: regulatoryUpdates = [], isLoading: updatesLoading } = useQuery<RegulatoryUpdate[]>({
-    queryKey: ['/api/regulatory-updates'],
-    staleTime: 300000, // 5 minutes
-    gcTime: 600000, // 10 minutes
-  });
-
-  // Newsletter-Quellen - statisch wie in Screenshots
-  const newsletterSources = [
-    {
-      id: "ns_1",
-      name: "FDA News & Updates",
-      isActive: true,
-      count: 7
-    },
-    {
-      id: "ns_2",
-      name: "EMA Newsletter", 
-      isActive: true,
-      count: 7
-    },
-    {
-      id: "ns_3",
-      name: "MedTech Dive",
-      isActive: true,
-      count: 0
-    }
-  ];
-
   // Loading state
-  if (isLoading || updatesLoading) {
+  if (isLoading) {
     return <div className="p-6">Loading dashboard data...</div>;
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header - KLEINER BALKEN & GROSSES HELIX ICON */}
-      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 rounded-lg p-4 text-white shadow-md">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            {/* GROSSES HELIX ICON */}
-            <div className="bg-white/20 p-3 rounded-lg">
-              <svg viewBox="0 0 64 64" className="h-12 w-12 text-white">
-                <defs>
-                  <linearGradient id="helixGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#ffffff" stopOpacity="1"/>
-                    <stop offset="50%" stopColor="#e0e7ff" stopOpacity="0.9"/>
-                    <stop offset="100%" stopColor="#c7d2fe" stopOpacity="0.8"/>
-                  </linearGradient>
-                </defs>
-                <path d="M12 16 Q20 8, 32 16 Q44 24, 52 16" stroke="url(#helixGradient)" strokeWidth="3" fill="none" strokeLinecap="round"/>
-                <path d="M12 24 Q20 16, 32 24 Q44 32, 52 24" stroke="url(#helixGradient)" strokeWidth="3" fill="none" strokeLinecap="round"/>
-                <path d="M12 32 Q20 24, 32 32 Q44 40, 52 32" stroke="url(#helixGradient)" strokeWidth="3" fill="none" strokeLinecap="round"/>
-                <path d="M12 40 Q20 32, 32 40 Q44 48, 52 40" stroke="url(#helixGradient)" strokeWidth="3" fill="none" strokeLinecap="round"/>
-                <path d="M12 48 Q20 40, 32 48 Q44 56, 52 48" stroke="url(#helixGradient)" strokeWidth="3" fill="none" strokeLinecap="round"/>
-                <circle cx="12" cy="16" r="2" fill="url(#helixGradient)"/>
-                <circle cx="32" cy="24" r="2" fill="url(#helixGradient)"/>
-                <circle cx="52" cy="32" r="2" fill="url(#helixGradient)"/>
-                <circle cx="32" cy="40" r="2" fill="url(#helixGradient)"/>
-                <circle cx="12" cy="48" r="2" fill="url(#helixGradient)"/>
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold flex items-center gap-2">
-                Helix Regulatory Intelligence
-              </h1>
-              <p className="text-blue-100 text-sm">
-                KI-gestützte Analyse • Echtzeit-Updates • 100% Datenqualität
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-center">
-              <div className="text-3xl font-bold">{stats?.totalUpdates || 66}</div>
-              <div className="text-blue-100 text-sm">Updates</div>
+    <div className="min-h-screen bg-gray-50">
+      {/* ANALYTICS INTELLIGENCE HEADER EXAKT WIE SCREENSHOT */}
+      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="bg-purple-500 p-3 rounded-lg">
+                <MessageSquare className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold mb-2">Analytics Intelligence</h1>
+                <div className="flex items-center gap-6 text-purple-100">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4" />
+                    <span className="text-sm">Live Charts</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Database className="w-4 h-4" />
+                    <span className="text-sm">Echtzeit-Metriken</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Globe className="w-4 h-4" />
+                    <span className="text-sm">Globale Insights</span>
+                  </div>
+                </div>
+                <p className="text-purple-100 mt-2">Umfassende Analyse der regulatorischen Datenlandschaft mit Executive-Insights</p>
+              </div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold">100%</div>
-              <div className="text-blue-100 text-sm">Qualität</div>
+              <div className="text-5xl font-bold">90</div>
+              <div className="text-purple-100 text-sm">Tage ...</div>
+              <Button className="bg-white text-purple-700 hover:bg-purple-50 px-4 py-2 mt-2">
+                Export
+              </Button>
             </div>
-            <button className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
-              <RefreshCw className="h-4 w-4" />
-              Sync
-            </button>
           </div>
         </div>
       </div>
 
-      {/* Stats Cards - Exakt wie Screenshot 1 */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {/* Regulatory Updates */}
-        <Card className="border-l-4 border-l-blue-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Regulatory Updates
-            </CardTitle>
-            <FileText className="h-6 w-6 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-gray-900">
-              66
-            </div>
-            <p className="text-sm text-green-600 font-medium mt-2">
-              Aktuelle regulatorische Änderungen
-            </p>
-            <div className="flex items-center mt-3">
-              <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
-              <span className="text-xs text-gray-500 font-medium">100% Qualität</span>
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Legal Cases */}
-        <Card className="border-l-4 border-l-purple-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Legal Cases
-            </CardTitle>
-            <Scale className="h-6 w-6 text-purple-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-gray-900">
-              65
-            </div>
-            <p className="text-sm text-blue-600 font-medium mt-2">
-              Rechtsprechung und Präzedenzfälle
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Data Sources */}
-        <Card className="border-l-4 border-l-green-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Data Sources
-            </CardTitle>
-            <Database className="h-6 w-6 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-gray-900">
-              70
-            </div>
-            <p className="text-sm text-green-600 font-medium mt-2">
-              Aktive Datenquellen global
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* AI Analysis */}
-        <Card className="border-l-4 border-l-orange-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              AI Analysis
-            </CardTitle>
-            <Lightbulb className="h-6 w-6 text-orange-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-gray-900">
-              24
-            </div>
-            <p className="text-sm text-orange-600 font-medium mt-2">
-              KI-gestützte Analysen
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Second Row - Newsletter and Knowledge Base */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {/* Newsletter */}
-        <Card className="border-l-4 border-l-red-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Newsletter
-            </CardTitle>
-            <Mail className="h-6 w-6 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-gray-900">
-              7
-            </div>
-            <p className="text-sm text-red-600 font-medium mt-2">
-              Newsletter-Abonnements
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Knowledge Base */}
-        <Card className="border-l-4 border-l-teal-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Knowledge Base
-            </CardTitle>
-            <FileText className="h-6 w-6 text-teal-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-gray-900">
-              131
-            </div>
-            <p className="text-sm text-teal-600 font-medium mt-2">
-              Artikel und Expertenwissen
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* AI Analysis - Duplicate for layout */}
-        <Card className="border-l-4 border-l-pink-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              AI Analysis
-            </CardTitle>
-            <Zap className="h-6 w-6 text-pink-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-gray-900">
-              24
-            </div>
-            <p className="text-sm text-pink-600 font-medium mt-2">
-              KI-gestützte Analysen
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Main Content Grid - Exakt wie im Screenshot */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Regulatory Updates Section - Wie Screenshot */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  Regulatory Updates
-                </CardTitle>
-                <CardDescription>
-                  Neueste regulatorische Änderungen von globalen Behörden
-                </CardDescription>
+      <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+        {/* HAUPTSTATISTIKEN EXAKT WIE SCREENSHOT */}
+        <div className="grid gap-6 md:grid-cols-4">
+          <Card className="bg-white shadow-sm">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <div className="text-4xl font-bold text-gray-900">66</div>
+                <div className="text-sm text-gray-600 mt-1">Gesamt Updates</div>
+                <div className="text-xs text-gray-500 mt-1">+5.1% gegenüber letztem Monat</div>
               </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Exakte Items aus Screenshot */}
-            <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 rounded-full bg-blue-500 mt-2"></div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900">
-                  FDA 510(k): Sonic Speed Anchor, Iconic Speed HA+ Anchor (K252144)
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  30.7.2025 • Regulatory Update
-                </p>
+            </CardContent>
+          </Card>
+          <Card className="bg-white shadow-sm">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <div className="text-4xl font-bold text-gray-900">65</div>
+                <div className="text-sm text-gray-600 mt-1">Rechtsfälle</div>
+                <div className="text-xs text-gray-500 mt-1">+8.1% gegenüber letztem Monat</div>
               </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 rounded-full bg-blue-500 mt-2"></div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900">
-                  FDA 510(k): IntelliMAX System (K252215)
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  25.7.2025 • Regulatory Update
-                </p>
+            </CardContent>
+          </Card>
+          <Card className="bg-white shadow-sm">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <div className="text-4xl font-bold text-gray-900">70</div>
+                <div className="text-sm text-gray-600 mt-1">Aktive Datenquellen</div>
+                <div className="text-xs text-gray-500 mt-1">Vollständig aktiv</div>
               </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 rounded-full bg-blue-500 mt-2"></div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900">
-                  FDA 510(k): MF GC GBNz Facial Toning System (K252238)
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  18.7.2025 • Regulatory Update
-                </p>
+            </CardContent>
+          </Card>
+          <Card className="bg-white shadow-sm">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <div className="text-4xl font-bold text-gray-900">242</div>
+                <div className="text-sm text-gray-600 mt-1">Wissensartikel</div>
+                <div className="text-xs text-gray-500 mt-1">Kontinuierlich wachsend</div>
               </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 rounded-full bg-blue-500 mt-2"></div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900">
-                  FDA 510(k): Sonic Speed Anchor, Iconic Speed HA+ Anchor
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  30.7.2025 • Regulatory Update
-                </p>
-              </div>
-            </div>
-            <div className="pt-2 border-t">
-              <div className="text-center text-sm text-gray-600">
-                Synchronisierung...
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
 
-        {/* Newsletter Sources Section - Exakt wie Screenshot */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Mail className="h-5 w-5" />
-                  Newsletter Sources
-                </CardTitle>
-                <CardDescription>
-                  Authentische MedTech-Newsletter für automatische Inhaltsextraktion
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    FDA News & Updates
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Offizielle FDA Updates
-                  </p>
+        {/* CHARTS ROW */}
+        <div className="grid gap-6 md:grid-cols-3">
+          {/* REGIONALE VERTEILUNG */}
+          <Card className="bg-white shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">Regionale Verteilung</CardTitle>
+              <CardDescription>Updates nach Regionen</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Europa</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-16 h-2 bg-blue-500 rounded"></div>
+                    <span className="text-sm font-medium">24</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Nordamerika</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-12 h-2 bg-blue-400 rounded"></div>
+                    <span className="text-sm font-medium">18</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Asien-Pazifik</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-10 h-2 bg-blue-300 rounded"></div>
+                    <span className="text-sm font-medium">15</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Deutschland</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-2 bg-blue-200 rounded"></div>
+                    <span className="text-sm font-medium">9</span>
+                  </div>
                 </div>
               </div>
-              <Button size="sm" variant="outline" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700 text-xs px-3">
-                Aktiv
-              </Button>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    EMA Newsletter
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Europäische Arzneimittel-Agentur
-                  </p>
+            </CardContent>
+          </Card>
+
+          {/* KATEGORIE BREAKDOWN */}
+          <Card className="bg-white shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">Kategorie Breakdown</CardTitle>
+              <CardDescription>Verteilung nach Kategorien</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <span className="text-sm">Regulatorische Updates: 66</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span className="text-sm">Rechtsfälle: 65</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                    <span className="text-sm">Knowledge Articles: 242</span>
+                  </div>
                 </div>
               </div>
-              <Button size="sm" variant="outline" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700 text-xs px-3">
-                Aktiv
-              </Button>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    MedTech Dive
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Medizintechnik-Branche News
-                  </p>
-                </div>
+            </CardContent>
+          </Card>
+
+          {/* 30-TAGE TREND */}
+          <Card className="bg-white shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">30-Tage Trend</CardTitle>
+              <CardDescription>Updates und Änderungen über Zeit</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-24 bg-gradient-to-r from-green-100 via-blue-100 to-green-100 rounded flex items-end justify-between px-2 py-2">
+                <div className="w-2 bg-green-400 rounded-t" style={{height: '60%'}}></div>
+                <div className="w-2 bg-blue-400 rounded-t" style={{height: '80%'}}></div>
+                <div className="w-2 bg-green-400 rounded-t" style={{height: '70%'}}></div>
+                <div className="w-2 bg-blue-400 rounded-t" style={{height: '90%'}}></div>
+                <div className="w-2 bg-green-400 rounded-t" style={{height: '85%'}}></div>
+                <div className="w-2 bg-blue-400 rounded-t" style={{height: '75%'}}></div>
+                <div className="w-2 bg-green-400 rounded-t" style={{height: '95%'}}></div>
+                <div className="w-2 bg-blue-400 rounded-t" style={{height: '80%'}}></div>
               </div>
-              <Button size="sm" variant="outline" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700 text-xs px-3">
-                Aktiv
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-
-      {/* KI-Powered Intelligence Section - Wie Screenshot 2 */}
-      <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Lightbulb className="h-5 w-5 text-purple-600" />
-                KI-Powered Intelligence
-              </CardTitle>
-              <CardDescription>
-                Intelligente Suche und Analyse mit Perspektivity AI
-              </CardDescription>
-            </div>
-            <Badge className="bg-purple-100 text-purple-800 border-purple-200">
-              Powered by Perspektivity
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-4 mb-6">
-            <div className="flex items-center gap-2 p-3 bg-white rounded-lg">
-              <Search className="h-5 w-5 text-blue-500" />
-              <span className="text-sm font-medium">Intelligente Suche</span>
-            </div>
-            <div className="flex items-center gap-2 p-3 bg-white rounded-lg">
-              <TrendingUp className="h-5 w-5 text-green-500" />
-              <span className="text-sm font-medium">Trend-Analyse</span>
-            </div>
-            <div className="flex items-center gap-2 p-3 bg-white rounded-lg">
-              <MessageSquare className="h-5 w-5 text-purple-500" />
-              <span className="text-sm font-medium">Content-Analyse</span>
-            </div>
-            <div className="flex items-center gap-2 p-3 bg-white rounded-lg">
-              <Zap className="h-5 w-5 text-orange-500" />
-              <span className="text-sm font-medium">Smart Insights</span>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-lg p-4 border">
-            <div className="flex items-center gap-3 mb-3">
-              <Search className="h-5 w-5 text-gray-500" />
-              <span className="text-sm text-gray-600">Regulatory Intelligence Search</span>
-            </div>
-            <input
-              type="text"
-              placeholder="z.B. 'Neue FDA Cybersecurity-Richtlinien für Medizingeräte'"
-              className="w-full px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            />
-            <div className="flex justify-end mt-3">
-              <Button className="bg-purple-600 hover:bg-purple-700">
-                Suchen
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Schnelle Aktionen - Wie Screenshot 2 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5" />
-            Schnelle Aktionen
-          </CardTitle>
-          <CardDescription>
-            Häufig verwendete Funktionen für effizientes Arbeiten
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-6">
-            <Button variant="outline" size="sm" className="flex flex-col items-center p-4 h-auto">
-              <Database className="h-6 w-6 mb-2 text-blue-500" />
-              <span className="text-xs">Datenquellen Sync</span>
-              <span className="text-xs text-gray-500">FDA, EMA, WHO</span>
-            </Button>
-            <Button variant="outline" size="sm" className="flex flex-col items-center p-4 h-auto">
-              <Mail className="h-6 w-6 mb-2 text-green-500" />
-              <span className="text-xs">Newsletter Sync</span>
-              <span className="text-xs text-gray-500">MedTech Sources</span>
-            </Button>
-            <Button variant="outline" size="sm" className="flex flex-col items-center p-4 h-auto">
-              <FileText className="h-6 w-6 mb-2 text-purple-500" />
-              <span className="text-xs">Knowledge Base</span>
-              <span className="text-xs text-gray-500">Artikel verwalten</span>
-            </Button>
-            <Button variant="outline" size="sm" className="flex flex-col items-center p-4 h-auto">
-              <Mail className="h-6 w-6 mb-2 text-red-500" />
-              <span className="text-xs">Newsletter</span>
-              <span className="text-xs text-gray-500">Neue Ausgabe erstellen</span>
-            </Button>
-            <Button variant="outline" size="sm" className="flex flex-col items-center p-4 h-auto">
-              <BarChart3 className="h-6 w-6 mb-2 text-orange-500" />
-              <span className="text-xs">Analytics</span>
-              <span className="text-xs text-gray-500">Erweiterte Trends</span>
-            </Button>
-            <Button variant="outline" size="sm" className="flex flex-col items-center p-4 h-auto">
-              <MessageSquare className="h-6 w-6 mb-2 text-teal-500" />
-              <span className="text-xs">Support Chat</span>
-              <span className="text-xs text-gray-500">Direkter Administrator-Support</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
