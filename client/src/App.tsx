@@ -16,15 +16,15 @@ import NotFound from "@/pages/not-found";
 const Dashboard = React.lazy(() => import("@/pages/dashboard"));
 const Analytics = React.lazy(() => import("@/pages/analytics"));
 const SystemSettings = React.lazy(() => import("@/pages/system-settings"));
-const RegulatoryUpdates = React.lazy(() => import("@/pages/regulatory-updates"));
+const RegulatoryUpdates = React.lazy(() => import("@/pages/regulatory-updates-clean"));
 const DataCollection = React.lazy(() => import("@/pages/data-collection"));
 const NewsletterAdmin = React.lazy(() => import("@/pages/newsletter-admin"));
 const EmailManagement = React.lazy(() => import("@/pages/email-management"));
 const EmailAutomation = React.lazy(() => import("@/pages/email-automation"));
 const KnowledgeBase = React.lazy(() => import("@/pages/knowledge-base"));
-const RechtsprechungFixed = React.lazy(() => import("@/pages/rechtsprechung-fixed"));
+const RechtsprechungIntelligence = React.lazy(() => import("@/pages/rechtsprechung-intelligence"));
 const ZulassungenGlobal = React.lazy(() => import("@/pages/zulassungen-global"));
-const LaufendeZulassungen = React.lazy(() => import("@/pages/laufende-zulassungen"));
+const LaufendeZulassungenNew = React.lazy(() => import("@/pages/laufende-zulassungen-new"));
 const SyncManager = React.lazy(() => import("@/pages/sync-manager"));
 const GlobalSources = React.lazy(() => import("@/pages/global-sources"));
 const NewsletterManager = React.lazy(() => import("@/pages/newsletter-manager"));
@@ -148,11 +148,11 @@ function App() {
                   
                   {/* Compliance & Regulation */}
                   <Route path="/regulatory-updates" component={RegulatoryUpdates} />
-                  <Route path="/rechtsprechung" component={RechtsprechungFixed} />
+                  <Route path="/rechtsprechung" component={RechtsprechungIntelligence} />
                   
                   {/* Approvals & Registration */}
                   <Route path="/zulassungen/global" component={ZulassungenGlobal} />
-                  <Route path="/zulassungen/laufende" component={LaufendeZulassungen} />
+                  <Route path="/zulassungen/laufende" component={LaufendeZulassungenNew} />
                   
                   {/* Advanced */}
                   <Route path="/sync-manager" component={SyncManager} />
