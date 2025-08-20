@@ -476,7 +476,7 @@ export default function DataCollection() {
             <Button
               onClick={() => syncAllMutation.mutate()}
               disabled={syncAllMutation.isPending}
-              className="bg-green-600 hover:bg-green-700 text-white font-medium"
+              className="bg-[#d95d2c] hover:bg-[#b8441f] text-white font-medium"
               size="default"
             >
               {syncAllMutation.isPending ? (
@@ -577,7 +577,7 @@ export default function DataCollection() {
                       size="sm"
                       onClick={() => regulatoryDataSyncMutation.mutate()}
                       disabled={regulatoryDataSyncMutation.isPending}
-                      className="bg-red-600 hover:bg-red-700 text-white"
+                      className="bg-[#d95d2c] hover:bg-[#b8441f] text-white"
                     >
                       {regulatoryDataSyncMutation.isPending ? (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -650,7 +650,7 @@ export default function DataCollection() {
                       size="sm"
                       onClick={() => newsletterSyncMutation.mutate()}
                       disabled={newsletterSyncMutation.isPending}
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      className="bg-[#d95d2c] hover:bg-[#b8441f] text-white"
                     >
                       {newsletterSyncMutation.isPending ? (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />

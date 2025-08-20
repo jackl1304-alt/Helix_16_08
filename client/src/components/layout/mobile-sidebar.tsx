@@ -1,5 +1,6 @@
 import { useState } from "react";
-// Navigation via props instead of wouter
+import { Link, useLocation } from "wouter";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   BarChart3, 
   Database, 
@@ -23,76 +24,113 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-// Logo path as static URL
-const logoPath = "/attached_assets/ICON Helix_1753735921077.jpg";
+// import logoPath from "@assets/ICON Helix_1753735921077.jpg";
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: BarChart3 },
-  { name: "Data Collection", href: "/data-collection", icon: Database },
-  { name: "Global Sources", href: "/global-sources", icon: Globe },
-  { name: "Regulatory Updates", href: "/regulatory-updates", icon: FileText },
-  { name: "Approval Workflow", href: "/approval-workflow", icon: CheckCircle },
-  { name: "Analytics", href: "/analytics", icon: TrendingUp },
+  {
+    name: "Dashboard",
+    href: "/",
+    icon: BarChart3,
+    description: "Übersicht und KPIs"
+  },
+  {
+    name: "Datensammlung",
+    href: "/data-collection",
+    icon: Database,
+    description: "Automatisierte Datenerfassung"
+  },
+  {
+    name: "Globale Quellen",
+    href: "/global-sources",
+    icon: Globe,
+    description: "Weltweite Regulierungsquellen"
+  },
+  {
+    name: "Analytics",
+    href: "/analytics",
+    icon: BarChart3,
+    description: "Datenanalyse und Berichte"
+  },
+  {
+    name: "Regulierungs-Updates",
+    href: "/regulatory-updates",
+    icon: FileText,
+    description: "Aktuelle Änderungen"
+  },
+  {
+    name: "Newsletter-Manager",
+    href: "/newsletter-manager",
+    icon: Mail,
+    description: "Newsletter-Verwaltung"
+  },
+  {
+    name: "Historische Daten",
+    href: "/historical-data",
+    icon: Archive,
+    description: "Archivierte Dokumente"
+  },
+  {
+    name: "Rechtsfälle",
+    href: "/legal-cases",
+    icon: Scale,
+    description: "Jurisprudenz-Datenbank"
+  },
+  {
+    name: "Knowledge Base",
+    href: "/knowledge-base",
+    icon: Book,
+    description: "Wissensdatenbank"
+  },
+  {
+    name: "Benutzerverwaltung",
+    href: "/user-management",
+    icon: Users,
+    description: "Nutzer & Berechtigungen"
+  },
+  {
+    name: "Systemeinstellungen",
+    href: "/system-settings",
+    icon: Settings,
+    description: "Konfiguration"
+  }
 ];
 
-const knowledgeBase = [
-  { name: "AI Insights", href: "/ai-insights", icon: Brain },
-  { name: "Custom Knowledge", href: "/knowledge-base", icon: Book },
-  { name: "Historische Daten", href: "/historical-data", icon: Archive },
-  { name: "Rechtsfälle", href: "/legal-cases", icon: Scale },
-];
-
-const administration = [
-  { name: "User Management", href: "/user-management", icon: Users },
-  { name: "Data Sources Admin", href: "/administration/data-sources", icon: Database },
-  { name: "Newsletter-Verwaltung", href: "/newsletter-admin", icon: Mail },
-  { name: "System Settings", href: "/system-settings", icon: Settings },
-  { name: "Audit Logs", href: "/audit-logs", icon: FileText },
-];
-
-interface MobileSidebarProps {
-  navigate: (page: string) => void;
-  currentPage: string;
-}
-
-export function MobileSidebar({ navigate, currentPage }: MobileSidebarProps) {
+export function MobileSidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [location] = useLocation();
+  const { t } = useLanguage();
 
   const renderNavItem = (item: any, isActive: boolean, onClose?: () => void) => (
-    <button 
-      key={item.name} 
-      onClick={() => {
-        navigate(item.href);
-        if (onClose) onClose();
-      }}
-      className={cn(
-        "flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors cursor-pointer w-full text-left",
-        isActive
-          ? "text-blue-600 bg-blue-50 border border-blue-200"
-          : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-      )}
-    >
-      <item.icon className={cn(
-        "mr-3 h-5 w-5",
-        isActive ? "text-blue-600" : "text-gray-400"
-      )} />
-      {item.name}
-    </button>
+    <Link key={item.name} href={item.href}>
+      <div
+        className={cn(
+          "flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors cursor-pointer",
+          isActive
+            ? "text-blue-600 bg-blue-50 border border-blue-200"
+            : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+        )}
+        onClick={onClose}
+      >
+        <item.icon className={cn(
+          "mr-3 h-5 w-5",
+          isActive ? "text-blue-600" : "text-gray-400"
+        )} />
+        {item.name}
+      </div>
+    </Link>
   );
 
   return (
     <>
       {/* Mobile Header */}
       <div className="sticky top-0 z-40 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-        <button onClick={() => navigate("/")} className="flex flex-col items-center cursor-pointer">
-          <img 
-            src={logoPath} 
-            alt="Helix Logo" 
-            className="h-10 w-10 rounded-lg object-cover"
-          />
-          <span className="text-xs font-medium text-gray-700 mt-1">MedTech Intelligence</span>
-        </button>
+        <Link href="/">
+          <div className="flex flex-col items-center cursor-pointer">
+            <Activity className="h-10 w-10 text-blue-600" />
+            <span className="text-xs font-medium text-gray-700 mt-1">Helix</span>
+          </div>
+        </Link>
         
         <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
           <DropdownMenuTrigger asChild>
@@ -109,11 +147,7 @@ export function MobileSidebar({ navigate, currentPage }: MobileSidebarProps) {
             {/* Header */}
             <div className="p-4 border-b border-gray-200">
               <div className="flex flex-col items-center">
-                <img 
-                  src={logoPath} 
-                  alt="Helix Logo" 
-                  className="h-12 w-12 rounded-lg object-cover mb-2"
-                />
+                <Activity className="h-12 w-12 text-blue-600 mb-2" />
                 <div className="text-sm font-medium text-gray-700">MedTech Intelligence</div>
               </div>
             </div>
@@ -123,85 +157,31 @@ export function MobileSidebar({ navigate, currentPage }: MobileSidebarProps) {
               Hauptmodule
             </DropdownMenuLabel>
             {navigation.map((item) => {
-              const isActive = currentPage === item.href;
+              const isActive = location === item.href;
               return (
-                <DropdownMenuItem 
-                  key={item.name}
-                  className={cn(
-                    "flex items-center px-4 py-3 cursor-pointer",
-                    isActive && "bg-blue-50 text-blue-600"
-                  )}
-                  onClick={() => {
-                    navigate(item.href);
-                    setDropdownOpen(false);
-                  }}
-                >
-                  <item.icon className={cn(
-                    "mr-3 h-4 w-4",
-                    isActive ? "text-blue-600" : "text-gray-400"
-                  )} />
-                  {item.name}
-                </DropdownMenuItem>
+                <Link key={item.name} href={item.href}>
+                  <DropdownMenuItem 
+                    className={cn(
+                      "flex items-center px-4 py-3 cursor-pointer",
+                      isActive && "bg-blue-50 text-blue-600"
+                    )}
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    <item.icon className={cn(
+                      "mr-3 h-4 w-4",
+                      isActive ? "text-blue-600" : "text-gray-400"
+                    )} />
+                    {item.name}
+                  </DropdownMenuItem>
+                </Link>
               );
             })}
 
             <DropdownMenuSeparator />
-
-            {/* Knowledge Base */}
+            
             <DropdownMenuLabel className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-              Knowledge Base
+              Weitere Optionen
             </DropdownMenuLabel>
-            {knowledgeBase.map((item) => {
-              const isActive = currentPage === item.href;
-              return (
-                <DropdownMenuItem 
-                  key={item.name}
-                  className={cn(
-                    "flex items-center px-4 py-3 cursor-pointer",
-                    isActive && "bg-blue-50 text-blue-600"
-                  )}
-                  onClick={() => {
-                    navigate(item.href);
-                    setDropdownOpen(false);
-                  }}
-                >
-                  <item.icon className={cn(
-                    "mr-3 h-4 w-4",
-                    isActive ? "text-blue-600" : "text-gray-400"
-                  )} />
-                  {item.name}
-                </DropdownMenuItem>
-              );
-            })}
-
-            <DropdownMenuSeparator />
-
-            {/* Administration */}
-            <DropdownMenuLabel className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-              Administration
-            </DropdownMenuLabel>
-            {administration.map((item) => {
-              const isActive = currentPage === item.href;
-              return (
-                <DropdownMenuItem 
-                  key={item.name}
-                  className={cn(
-                    "flex items-center px-4 py-3 cursor-pointer",
-                    isActive && "bg-blue-50 text-blue-600"
-                  )}
-                  onClick={() => {
-                    navigate(item.href);
-                    setDropdownOpen(false);
-                  }}
-                >
-                  <item.icon className={cn(
-                    "mr-3 h-4 w-4",
-                    isActive ? "text-blue-600" : "text-gray-400"
-                  )} />
-                  {item.name}
-                </DropdownMenuItem>
-              );
-            })}
 
             {/* Footer */}
             <DropdownMenuSeparator />

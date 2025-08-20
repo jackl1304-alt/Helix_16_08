@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link, useLocation } from "wouter";
 import { 
   BarChart3, 
   Database, 
@@ -23,11 +24,11 @@ import {
   Bot,
   Sparkles,
   Building,
-  LogOut
+  LogOut,
+  Activity
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-// Logo path as static URL
-const logoPath = "/attached_assets/ICON Helix_1753735921077.jpg";
+import { Logo } from "@/components/layout/logo";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -113,16 +114,16 @@ const getNavigationStructure = (t: (key: string) => string): Record<string, Navi
 });
 
 // Sidebar Search Field Component
-function SidebarSearchField({ navigate }: { navigate: (page: string) => void }) {
+function SidebarSearchField() {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
-
+  const [, setLocation] = useLocation();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       // Navigate to intelligent search page with query
-      navigate(`/intelligent-search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setLocation(`/intelligent-search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
 
@@ -135,14 +136,14 @@ function SidebarSearchField({ navigate }: { navigate: (page: string) => void }) 
   return (
     <form onSubmit={handleSearch}>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#07233e]" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
         <Input
           type="text"
           placeholder={t('search.askQuestion')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyPress={handleKeyPress}
-          className="pl-10 pr-4 py-2 bg-[#f0f8ff] border border-[#b0d4f6] rounded-lg text-sm text-[#07233e] placeholder-[#07233e]/70 focus:outline-none focus:ring-2 focus:ring-[#07233e] focus:border-transparent hover:bg-[#e6f3ff] transition-colors duration-200"
+          className="pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-gray-50 transition-colors duration-200"
           data-testid="sidebar-search-input"
         />
       </div>
@@ -150,13 +151,9 @@ function SidebarSearchField({ navigate }: { navigate: (page: string) => void }) 
   );
 }
 
-interface SidebarProps {
-  navigate: (page: string) => void;
-  currentPage: string;
-}
-
-export function Sidebar({ navigate, currentPage }: SidebarProps) {
+export function Sidebar() {
   const { t } = useLanguage();
+  const [location] = useLocation();
   const { logout } = useAuth();
   const navigationStructure = getNavigationStructure(t);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
@@ -176,23 +173,23 @@ export function Sidebar({ navigate, currentPage }: SidebarProps) {
   };
 
   const renderNavigationItem = (item: NavigationItem) => {
-    const isActive = currentPage === item.href;
+    const isActive = location === item.href;
     const IconComponent = item.icon;
     
     return (
-      <button
+      <Link
         key={item.href}
-        onClick={() => navigate(item.href)}
+        to={item.href}
         className={cn(
-          "flex items-center justify-start px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer text-left w-full",
+          "flex items-center justify-start px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer text-left",
           isActive
-            ? "bg-[#07233e] text-white shadow-md"
-            : "text-gray-700 hover:bg-[#f0f8ff] hover:text-[#07233e]"
+            ? "bg-blue-50 text-blue-700 shadow-sm"
+            : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
         )}
       >
         <IconComponent className="mr-3 h-5 w-5 flex-shrink-0" />
         <span className="text-left">{item.name}</span>
-      </button>
+      </Link>
     );
   };
 
@@ -200,13 +197,13 @@ export function Sidebar({ navigate, currentPage }: SidebarProps) {
     return (
       <div className="flex justify-center space-x-4 py-3 border-t border-gray-200 dark:border-gray-700 mt-2">
         {hiddenItems.map((item) => {
-          const isActive = currentPage === item.href;
+          const isActive = location === item.href;
           const IconComponent = item.icon;
           
           return (
-            <button
+            <Link
               key={item.href}
-              onClick={() => navigate(item.href)}
+              to={item.href}
               className={cn(
                 "flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-300 cursor-pointer",
                 isActive
@@ -216,7 +213,7 @@ export function Sidebar({ navigate, currentPage }: SidebarProps) {
               title={item.name}
             >
               <IconComponent className="h-5 w-5" />
-            </button>
+            </Link>
           );
         })}
       </div>
@@ -231,7 +228,7 @@ export function Sidebar({ navigate, currentPage }: SidebarProps) {
       <div key={sectionKey} className="mb-3">
         <button
           onClick={() => toggleSection(sectionKey)}
-          className="flex items-center justify-between w-full px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-[#07233e] transition-colors duration-200 text-left"
+          className="flex items-center justify-between w-full px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-gray-700 transition-colors duration-200 text-left"
         >
           <span>{section.title}</span>
           <ChevronIcon className="h-4 w-4" />
@@ -248,26 +245,21 @@ export function Sidebar({ navigate, currentPage }: SidebarProps) {
   };
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 deltaways-nav shadow-lg z-50 overflow-y-auto">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-white shadow-lg z-50 overflow-y-auto border-r border-gray-200">
       {/* DELTA WAYS Logo Header */}
       <div className="p-6 border-b border-gray-200">
-        <button onClick={() => navigate("/")} className="w-full">
+        <Link to="/">
           <div className="flex flex-col items-center cursor-pointer space-y-2">
-            <img 
-              src={logoPath} 
-              alt="Helix Logo" 
-              className="h-32 w-32 object-cover rounded-lg ring-2 ring-[#b0d4f6]"
-            />
-            <span className="text-lg deltaways-brand-text text-[#07233e]">HELIX</span>
-            <p className="text-xs font-medium text-gray-600">Powered by DELTA WAYS</p>
+            <Logo size="lg" showText={true} />
           </div>
-        </button>
+        </Link>
         
+
       </div>
       
       {/* Funktionsfähiger Suchbereich */}
-      <div className="p-4 border-b border-gray-100">
-        <SidebarSearchField navigate={navigate} />
+      <div className="p-4 border-b border-gray-200">
+        <SidebarSearchField />
       </div>
       
       {/* Thematisch organisierte Navigation */}
@@ -281,14 +273,14 @@ export function Sidebar({ navigate, currentPage }: SidebarProps) {
       
       {/* Status-Footer */}
       <div className="border-t border-gray-200 p-4 bg-gray-50">
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-gray-600">
           <div className="flex items-center justify-between">
             <span>{t('status.label')}:</span>
-            <span className="text-green-600 font-medium">{t('status.online')}</span>
+            <span className="text-green-400 font-medium">{t('status.online')}</span>
           </div>
           <div className="flex items-center justify-between mt-1">
             <span>{t('status.dataSources')}</span>
-            <span className="text-blue-600 font-medium">{t('common.active')}</span>
+            <span className="text-blue-400 font-medium">{t('common.active')}</span>
           </div>
         </div>
         
@@ -299,10 +291,10 @@ export function Sidebar({ navigate, currentPage }: SidebarProps) {
               logout();
               window.location.reload();
             }}
-            className="flex items-center w-full px-2 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+            className="flex items-center w-full px-2 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded-md transition-colors"
           >
             <LogOut className="h-4 w-4 mr-2" />
-            <span>Abmelden</span>
+            <span>Tenant Logout</span>
           </button>
         </div>
       </div>

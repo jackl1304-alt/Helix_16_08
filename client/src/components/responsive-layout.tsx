@@ -8,11 +8,9 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 interface ResponsiveLayoutProps {
   children: ReactNode;
   showSidebar?: boolean;
-  navigate?: (page: string) => void;
-  currentPage?: string;
 }
 
-export function ResponsiveLayout({ children, showSidebar = true, navigate, currentPage = "/" }: ResponsiveLayoutProps) {
+export function ResponsiveLayout({ children, showSidebar = true }: ResponsiveLayoutProps) {
   const device = useDevice();
 
   return (
@@ -20,23 +18,27 @@ export function ResponsiveLayout({ children, showSidebar = true, navigate, curre
       "min-h-screen bg-gray-50 dark:bg-gray-900",
       getDeviceClasses(device)
     )}>
-      {showSidebar && navigate && (
+      {showSidebar && (
         <>
           {/* Desktop Sidebar - only show on screens larger than 1024px */}
           <div className="hidden lg:block">
-            <Sidebar navigate={navigate} currentPage={currentPage} />
+            <Sidebar />
           </div>
           
           {/* Mobile/Tablet Sidebar - show on screens smaller than 1024px */}
           <div className="lg:hidden">
-            <MobileSidebar navigate={navigate} currentPage={currentPage} />
+            <MobileSidebar />
           </div>
         </>
       )}
       
-      {/* Language Selector - Top Right */}
-      <div className="fixed top-4 right-4 z-50">
+      {/* Header Controls - Top Right wie Screenshot */}
+      <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
         <LanguageSelector />
+        <a href="/customer-login" className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-medium inline-block no-underline">
+          👤 Customer Area
+        </a>
+
       </div>
       
       {/* Main Content */}

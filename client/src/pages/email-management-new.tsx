@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Settings, Mail, Send, Key, Users, Clock, AlertTriangle, CheckCircle, Edit, Trash, Plus, Server } from 'lucide-react';
+import { Settings, Mail, Send, Key, Users, Clock, AlertTriangle, CheckCircle, Edit, Trash, Plus, Server, Eye, Zap, ExternalLink } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -33,9 +33,13 @@ interface GmailTemplate {
   name: string;
   subject: string;
   content: string;
+  htmlContent?: string;
   type: 'customer_onboarding' | 'customer_offboarding' | 'billing_reminder' | 'regulatory_alert' | 'weekly_digest' | 'trial_expiry';
   isActive: boolean;
   variables: string[];
+  description?: string;
+  recipients?: number;
+  lastSent?: string;
 }
 
 // Email Statistics Interface
@@ -86,6 +90,11 @@ export default function EmailManagementNew() {
   // Email Statistics Query
   const { data: stats } = useQuery<EmailStats>({
     queryKey: ['/api/email/statistics']
+  });
+
+  // Email Automation Query
+  const { data: automationData } = useQuery({
+    queryKey: ['/api/email/automation']
   });
 
   // Test Gmail Connection Mutation
@@ -198,9 +207,10 @@ export default function EmailManagementNew() {
       </div>
 
       <Tabs defaultValue="providers" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="providers">E-Mail-Provider</TabsTrigger>
           <TabsTrigger value="templates">E-Mail-Templates</TabsTrigger>
+          <TabsTrigger value="automation">Automatisierung</TabsTrigger>
           <TabsTrigger value="statistics">Statistiken</TabsTrigger>
         </TabsList>
 
@@ -327,6 +337,68 @@ export default function EmailManagementNew() {
                       ))}
                     </div>
 
+                    {/* HTML Template Preview - Vollständige Rendering-Vorschau */}
+                    <div className="mb-4 p-4 bg-gray-50 border rounded-lg">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium">Template-Vorschau:</h4>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            const newWindow = window.open('', '_blank');
+                            newWindow?.document.write(template.htmlContent || template.content || `<h2>${template.name}</h2><p>${template.subject}</p>`);
+                          }}
+                        >
+                          <Eye className="w-3 h-3 mr-1" />
+                          Vollansicht
+                        </Button>
+                      </div>
+                      
+                      <div className="border rounded bg-white">
+                        {/* Rendered HTML Preview */}
+                        <div className="p-3 border-b bg-gray-100 text-sm font-mono text-gray-600">
+                          {template.subject}
+                        </div>
+                        <div className="p-4 max-w-none" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                          {/* RENDERED HTML PREVIEW - KEIN RAW HTML-CODE MEHR */}
+                          <iframe 
+                            srcDoc={template.htmlContent || `
+                              <!DOCTYPE html>
+                              <html>
+                              <head>
+                                <meta charset="UTF-8">
+                                <style>
+                                  body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: white; }
+                                  .header { color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px; margin-bottom: 15px; }
+                                  .content { color: #666; line-height: 1.6; margin-bottom: 15px; }
+                                  .info-box { background: #f8f9fa; padding: 15px; border-left: 4px solid #007bff; border-radius: 4px; }
+                                </style>
+                              </head>
+                              <body>
+                                <h2 class="header">${template.name}</h2>
+                                <p class="content"><strong>Betreff:</strong> ${template.subject}</p>
+                                <div class="info-box">
+                                  <p><strong>Template-Typ:</strong> ${template.type}</p>
+                                  <p><strong>Status:</strong> ${template.isActive ? '✅ Aktiv' : '❌ Inaktiv'}</p>
+                                  <p><strong>Empfänger:</strong> ${template.recipients || 0}</p>
+                                </div>
+                              </body>
+                              </html>
+                            `}
+                            style={{ 
+                              width: '100%', 
+                              height: '150px', 
+                              border: '1px solid #e5e5e5', 
+                              borderRadius: '4px',
+                              background: 'white'
+                            }}
+                            sandbox="allow-same-origin"
+                            title={`Template-Vorschau: ${template.name}`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="space-y-3">
                       <div className="flex items-center space-x-2">
                         <Input
@@ -416,6 +488,41 @@ export default function EmailManagementNew() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Automation Tab */}
+        <TabsContent value="automation" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Settings className="w-5 h-5 mr-2" />
+                E-Mail-Automatisierung
+              </CardTitle>
+              <CardDescription>
+                Automatische E-Mail-Regeln und Workflows verwalten
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <div className="mb-4">
+                  <Zap className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Erweiterte Automatisierung verfügbar
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Verwalten Sie komplexe E-Mail-Automatisierungsregeln in der dedizierten Automatisierung-Oberfläche.
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => window.location.href = '/email-automation'}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Automatisierung öffnen
+                </Button>
               </div>
             </CardContent>
           </Card>
