@@ -115,10 +115,12 @@ function App() {
     return (
       <QueryClientProvider client={queryClient}>
         <LanguageProvider>
-          <div className="min-h-screen bg-gray-50">
-            <Toaster />
-            <Login onLogin={() => setIsAuthenticated(true)} />
-          </div>
+          <NavigationContext.Provider value={navigationValue}>
+            <div className="min-h-screen bg-gray-50">
+              <Toaster />
+              <Login onLogin={() => setIsAuthenticated(true)} />
+            </div>
+          </NavigationContext.Provider>
         </LanguageProvider>
       </QueryClientProvider>
     );

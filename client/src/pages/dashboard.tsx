@@ -461,7 +461,7 @@ export default function Dashboard() {
               <Button 
                 variant="outline" 
                 className="flex-col items-center gap-3 h-24 hover:border-green-400 transition-all"
-                onClick={() => setLocation('/chat-support')}
+                onClick={() => navigate('/chat-support')}
               >
                 <MessageCircle className="h-6 w-6 text-green-600" />
                 <div className="text-center">
