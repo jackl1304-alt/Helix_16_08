@@ -13,9 +13,12 @@ import {
   Lock,
   Save,
   Eye,
-  EyeOff
+  EyeOff,
+  ArrowLeft,
+  Home
 } from "lucide-react";
 import { useCustomer } from "@/contexts/CustomerContext";
+import { CustomerLayout } from "@/components/customer/customer-layout";
 
 export default function CustomerSettings() {
   const { customer, updateTheme, updateProfile } = useCustomer();
@@ -62,10 +65,122 @@ export default function CustomerSettings() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border">
-        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+    <CustomerLayout>
+      <div className="space-y-6">
+        {/* Header mit Navigation */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => window.location.href = '/customer-area'}
+              data-testid="button-back-dashboard"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Zurück zum Dashboard
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Einstellungen</h1>
+              <p className="text-gray-600">Verwalten Sie Ihr Profil und Dashboard-Einstellungen</p>
+            </div>
+          </div>
+          <Badge variant="outline">{customer?.subscription} Plan</Badge>
+        </div>
+
+        {/* Settings Tabs */}
+        <Tabs defaultValue="profile" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="profile">Profil</TabsTrigger>
+            <TabsTrigger value="appearance">Design</TabsTrigger>
+            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="notifications">Benachrichtigungen</TabsTrigger>
+          </TabsList>
+
+          {/* Profile Settings */}
+          <TabsContent value="profile">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  Profil & Sicherheit
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <Label htmlFor="username">Benutzername</Label>
+                    <Input
+                      id="username"
+                      value={formData.username}
+                      onChange={(e) => setFormData({...formData, username: e.target.value})}
+                      data-testid="input-username"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="companyName">Firmenname</Label>
+                    <Input
+                      id="companyName"
+                      value={formData.companyName}
+                      onChange={(e) => setFormData({...formData, companyName: e.target.value})}
+                      data-testid="input-company-name"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Passwort ändern</h3>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div>
+                      <Label htmlFor="currentPassword">Aktuelles Passwort</Label>
+                      <div className="relative">
+                        <Input
+                          id="currentPassword"
+                          type={showPassword ? "text" : "password"}
+                          value={formData.currentPassword}
+                          onChange={(e) => setFormData({...formData, currentPassword: e.target.value})}
+                          data-testid="input-current-password"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="newPassword">Neues Passwort</Label>
+                      <Input
+                        id="newPassword"
+                        type="password"
+                        value={formData.newPassword}
+                        onChange={(e) => setFormData({...formData, newPassword: e.target.value})}
+                        data-testid="input-new-password"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="confirmPassword">Passwort bestätigen</Label>
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        value={formData.confirmPassword}
+                        onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                        data-testid="input-confirm-password"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <Button onClick={handleProfileUpdate} className="bg-blue-600 hover:bg-blue-700">
+                  <Save className="h-4 w-4 mr-2" />
+                  Änderungen speichern
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
           <Settings className="h-8 w-8 text-blue-600" />
           Einstellungen
         </h1>
@@ -278,7 +393,8 @@ export default function CustomerSettings() {
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
-    </div>
+        </Tabs>
+      </div>
+    </CustomerLayout>
   );
 }
