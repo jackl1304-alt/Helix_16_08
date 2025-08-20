@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +12,6 @@ interface LoginProps {
 }
 
 export default function Login({ onLogin }: LoginProps) {
-  const [, setLocation] = useLocation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -33,7 +31,6 @@ export default function Login({ onLogin }: LoginProps) {
       
       setTimeout(() => {
         onLogin?.();
-        setLocation("/");
       }, 500);
     } else {
       setError("Ungültige Zugangsdaten. Bitte versuchen Sie es erneut.");
