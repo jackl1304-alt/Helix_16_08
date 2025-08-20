@@ -1,15 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ExternalLink, Users, LogIn } from 'lucide-react';
-import { useLocation } from 'wouter';
 
 interface NavigationHeaderProps {
   showTenantLinks?: boolean;
   currentView?: 'admin' | 'tenant' | 'public';
+  navigate?: (page: string) => void;
 }
 
-export function NavigationHeader({ showTenantLinks = true, currentView = 'admin' }: NavigationHeaderProps) {
-  const [, setLocation] = useLocation();
+export function NavigationHeader({ showTenantLinks = true, currentView = 'admin', navigate }: NavigationHeaderProps) {
 
   return (
     <div className="flex justify-between items-center mb-6 p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
@@ -34,7 +33,7 @@ export function NavigationHeader({ showTenantLinks = true, currentView = 'admin'
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setLocation('/tenant/dashboard')}
+                onClick={() => navigate?.('/tenant/dashboard')}
                 className="flex items-center space-x-2 text-sm"
                 data-testid="button-goto-tenant-dashboard"
               >
@@ -49,7 +48,7 @@ export function NavigationHeader({ showTenantLinks = true, currentView = 'admin'
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setLocation('/')}
+              onClick={() => navigate?.('/')}
               className="flex items-center space-x-2 text-sm"
               data-testid="button-goto-admin"
             >
