@@ -29,3 +29,4 @@ jobs:
         # ANPASSUNG HIER: Absoluter Pfad zum Zielverzeichnis
         # Wir geben den Pfad vom Stammverzeichnis des Webspaces an.
         server-dir: /httpdocs/
+
