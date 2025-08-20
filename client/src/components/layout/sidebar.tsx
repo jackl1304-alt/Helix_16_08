@@ -136,14 +136,14 @@ function SidebarSearchField() {
   return (
     <form onSubmit={handleSearch}>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#07233e]" />
         <Input
           type="text"
           placeholder={t('search.askQuestion')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyPress={handleKeyPress}
-          className="pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-gray-50 transition-colors duration-200"
+          className="pl-10 pr-4 py-2 bg-[#f0f8ff] border border-[#b0d4f6] rounded-lg text-sm text-[#07233e] placeholder-[#07233e]/70 focus:outline-none focus:ring-2 focus:ring-[#07233e] focus:border-transparent hover:bg-[#e6f3ff] transition-colors duration-200"
           data-testid="sidebar-search-input"
         />
       </div>
@@ -183,8 +183,8 @@ export function Sidebar() {
         className={cn(
           "flex items-center justify-start px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer text-left",
           isActive
-            ? "bg-blue-50 text-blue-700 shadow-sm"
-            : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+            ? "bg-white text-[#1e3a5f] shadow-md"
+            : "text-gray-300 hover:bg-[#2d4a70] hover:text-white"
         )}
       >
         <IconComponent className="mr-3 h-5 w-5 flex-shrink-0" />
@@ -228,7 +228,7 @@ export function Sidebar() {
       <div key={sectionKey} className="mb-3">
         <button
           onClick={() => toggleSection(sectionKey)}
-          className="flex items-center justify-between w-full px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-gray-700 transition-colors duration-200 text-left"
+          className="flex items-center justify-between w-full px-4 py-2 text-xs font-semibold text-gray-300 uppercase tracking-wider hover:text-white transition-colors duration-200 text-left"
         >
           <span>{section.title}</span>
           <ChevronIcon className="h-4 w-4" />
@@ -245,20 +245,28 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-white shadow-lg z-50 overflow-y-auto border-r border-gray-200">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-[#1e3a5f] shadow-lg z-50 overflow-y-auto">
       {/* DELTA WAYS Logo Header */}
-      <div className="p-6 border-b border-gray-200">
+      <div className="p-6 border-b border-gray-700">
         <Link to="/">
           <div className="flex flex-col items-center cursor-pointer space-y-2">
             <Logo size="lg" showText={true} />
           </div>
         </Link>
         
-
+        {/* Customer Area Button */}
+        <div className="mt-4">
+          <Link to="/customer-dashboard">
+            <button className="w-full flex items-center justify-center px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+              <Users className="h-4 w-4 mr-2" />
+              Customer Area
+            </button>
+          </Link>
+        </div>
       </div>
       
       {/* Funktionsfähiger Suchbereich */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b border-gray-700">
         <SidebarSearchField />
       </div>
       
@@ -272,8 +280,8 @@ export function Sidebar() {
       </nav>
       
       {/* Status-Footer */}
-      <div className="border-t border-gray-200 p-4 bg-gray-50">
-        <div className="text-xs text-gray-600">
+      <div className="border-t border-gray-700 p-4 bg-[#0f1f35]">
+        <div className="text-xs text-gray-300">
           <div className="flex items-center justify-between">
             <span>{t('status.label')}:</span>
             <span className="text-green-400 font-medium">{t('status.online')}</span>
@@ -285,7 +293,7 @@ export function Sidebar() {
         </div>
         
         {/* Logout Button */}
-        <div className="mt-3 pt-3 border-t border-gray-300">
+        <div className="mt-3 pt-3 border-t border-gray-600">
           <button
             onClick={() => {
               logout();

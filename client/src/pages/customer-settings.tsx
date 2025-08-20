@@ -1,372 +1,354 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "wouter";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CustomerNavigation, { type CustomerPermissions } from "@/components/customer/customer-navigation";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { useLiveTenantPermissions } from "@/hooks/use-live-tenant-permissions";
+import { useCustomerTheme } from "@/contexts/customer-theme-context";
+import ThemeCustomizer from "@/components/customer/theme-customizer";
 import { 
-  Settings, 
-  User, 
-  Palette, 
+  Settings,
+  User,
   Bell,
+  Shield,
+  Mail,
+  Globe,
   Save,
-  Eye,
-  EyeOff,
-  ArrowLeft,
-  LayoutDashboard
+  Building,
+  Crown,
+  CheckCircle
 } from "lucide-react";
-import { useCustomer } from "@/contexts/CustomerContext";
-import { CustomerLayout } from "@/components/customer/customer-layout";
-import { useLocation } from "wouter";
+
+// Mock tenant ID - In production, get from authentication context  
+const mockTenantId = "030d3e01-32c4-4f95-8d54-98be948e8d4b";
 
 export default function CustomerSettings() {
-  const { customer, updateTheme, updateProfile } = useCustomer();
-  const [, setLocation] = useLocation();
-  const { toast } = useToast();
-  const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    username: customer?.username || "",
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-    companyName: customer?.companyName || ""
+  const [notificationSettings, setNotificationSettings] = useState({
+    emailAlerts: true,
+    smsAlerts: false,
+    weeklyDigest: true,
+    criticalOnly: false
   });
+  const [mounted, setMounted] = useState(true);
+  const { themeSettings, getThemeColors } = useCustomerTheme();
+  const colors = getThemeColors();
 
-  const handleProfileUpdate = () => {
-    if (formData.newPassword && formData.newPassword !== formData.confirmPassword) {
-      toast({
-        title: "Fehler",
-        description: "Passwörter stimmen nicht überein",
-        variant: "destructive"
-      });
-      return;
-    }
+  useEffect(() => {
+    return () => {
+      setMounted(false);
+    };
+  }, []);
 
-    updateProfile({
-      username: formData.username,
-      companyName: formData.companyName
-    });
-    
-    toast({
-      title: "Erfolg",
-      description: "Profil erfolgreich aktualisiert"
-    });
+  // Fetch tenant data including permissions
+  const { data: tenantData, isLoading: isTenantLoading, error } = useQuery({
+    queryKey: ['/api/customer/tenant', mockTenantId],
+    queryFn: async () => {
+      const response = await fetch(`/api/customer/tenant/${mockTenantId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch tenant data');
+      }
+      const data = await response.json();
+      return data;
+    },
+    enabled: mounted,
+    retry: 1,
+    staleTime: 5 * 60 * 1000 // 5 minutes
+  });
+  
+  // Extract permissions from tenant data
+  const permissions = tenantData?.customerPermissions || {
+    dashboard: true,
+    regulatoryUpdates: true,
+    legalCases: true,
+    knowledgeBase: true,
+    newsletters: true,
+    analytics: false,
+    reports: false,
+    dataCollection: false,
+    globalSources: false,
+    historicalData: false,
+    administration: false,
+    userManagement: false,
+    systemSettings: false,
+    auditLogs: false,
+    aiInsights: false,
+    advancedAnalytics: false
   };
 
-  const handleThemeChange = (themeId: string) => {
-    updateTheme(themeId);
-    toast({
-      title: "Design geändert",
-      description: `Farbschema auf ${themeId} geändert`
-    });
-  };
+  if (isTenantLoading) {
+    return (
+      <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="animate-pulse space-y-4 p-6">
+          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-32 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 items-center justify-center">
+        <div className="text-center space-y-4">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Fehler beim Laden der Einstellungen
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            Die Tenant-Daten konnten nicht geladen werden. Bitte versuchen Sie es später erneut.
+          </p>
+          <Button onClick={() => window.location.reload()}>
+            Seite neu laden
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <CustomerLayout>
-      <div className="space-y-6">
-        {/* Header with Back Button */}
-        <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setLocation('/customer')}
-            className="flex items-center gap-2"
-            data-testid="button-back-to-dashboard"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Zurück zum Dashboard
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <Settings className="h-8 w-8 text-blue-600" />
-              Einstellungen
-            </h1>
-            <p className="text-gray-600 mt-2">
-              Verwalten Sie Ihr Profil und Dashboard-Einstellungen
-            </p>
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Navigation Sidebar */}
+      <CustomerNavigation 
+        permissions={permissions}
+        tenantName={tenantData?.name}
+      />
+      
+      {/* Main Content */}
+      <div className="flex-1 ml-64">
+        <div className="container mx-auto p-6 space-y-8 max-w-4xl">
+          {/* Header */}
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+                Einstellungen
+              </h1>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 via-purple-600 to-cyan-700 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                    {tenantData?.name?.charAt(0) || 'M'}
+                  </div>
+                  <span className="font-medium">{tenantData?.name || 'Customer Portal'}</span>
+                </div>
+                <Badge className="bg-purple-100 text-purple-800">
+                  <Crown className="w-3 h-3 mr-1" />
+                  Professional Plan
+                </Badge>
+                <Badge className="bg-green-100 text-green-800">
+                  <CheckCircle className="w-3 h-3 mr-1" />
+                  Active
+                </Badge>
+              </div>
+            </div>
           </div>
-          <Badge variant="outline">{customer?.subscription} Plan</Badge>
-        </div>
 
-        {/* Settings Tabs */}
-        <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="profile">Profil</TabsTrigger>
-            <TabsTrigger value="appearance">Design</TabsTrigger>
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="notifications">Benachrichtigungen</TabsTrigger>
-          </TabsList>
+          <Tabs defaultValue="profile" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="profile">Profil</TabsTrigger>
+              <TabsTrigger value="themes">Themes</TabsTrigger>
+              <TabsTrigger value="notifications">Benachrichtigungen</TabsTrigger>
+              <TabsTrigger value="preferences">Präferenzen</TabsTrigger>
+              <TabsTrigger value="security">Sicherheit</TabsTrigger>
+            </TabsList>
 
-          {/* Profile Settings */}
-          <TabsContent value="profile">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5" />
-                  Profil & Sicherheit
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <Label htmlFor="username">Benutzername</Label>
-                    <Input
-                      id="username"
-                      value={formData.username}
-                      onChange={(e) => setFormData({...formData, username: e.target.value})}
-                      data-testid="input-username"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="companyName">Firmenname</Label>
-                    <Input
-                      id="companyName"
-                      value={formData.companyName}
-                      onChange={(e) => setFormData({...formData, companyName: e.target.value})}
-                      data-testid="input-company-name"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Passwort ändern</h3>
-                  <div className="grid gap-4 md:grid-cols-3">
-                    <div>
-                      <Label htmlFor="currentPassword">Aktuelles Passwort</Label>
-                      <div className="relative">
-                        <Input
-                          id="currentPassword"
-                          type={showPassword ? "text" : "password"}
-                          value={formData.currentPassword}
-                          onChange={(e) => setFormData({...formData, currentPassword: e.target.value})}
-                          data-testid="input-current-password"
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                          onClick={() => setShowPassword(!showPassword)}
-                        >
-                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                    </div>
-                    <div>
-                      <Label htmlFor="newPassword">Neues Passwort</Label>
-                      <Input
-                        id="newPassword"
-                        type="password"
-                        value={formData.newPassword}
-                        onChange={(e) => setFormData({...formData, newPassword: e.target.value})}
-                        data-testid="input-new-password"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="confirmPassword">Passwort bestätigen</Label>
-                      <Input
-                        id="confirmPassword"
-                        type="password"
-                        value={formData.confirmPassword}
-                        onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-                        data-testid="input-confirm-password"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <Button onClick={handleProfileUpdate} className="bg-blue-600 hover:bg-blue-700">
-                  <Save className="h-4 w-4 mr-2" />
-                  Änderungen speichern
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Appearance Settings */}
-          <TabsContent value="appearance">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Palette className="h-5 w-5" />
-                  Design & Erscheinungsbild
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Farbschema wählen</h3>
-                  <div className="grid grid-cols-3 gap-4">
-                    {['blue', 'purple', 'green'].map((color) => (
-                      <div
-                        key={color}
-                        className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                          customer?.colorScheme === color 
-                            ? 'border-blue-500 bg-blue-50' 
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                        onClick={() => handleThemeChange(color)}
-                        data-testid={`theme-${color}`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className={`w-6 h-6 rounded-full bg-${color}-500`}></div>
-                          <span className="font-medium capitalize">{color}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Logo & Branding</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <h4 className="font-medium">Firmen-Logo hochladen</h4>
-                        <p className="text-sm text-gray-600">Anpassung des Dashboard-Logos</p>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        Upload
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Dashboard Settings */}
-          <TabsContent value="dashboard">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <LayoutDashboard className="h-5 w-5" />
-                  Dashboard-Konfiguration
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Widget-Einstellungen</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <h4 className="font-medium">Automatisches Layout</h4>
-                        <p className="text-sm text-gray-600">Widgets automatisch anordnen</p>
-                      </div>
-                      <Switch />
-                    </div>
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <h4 className="font-medium">Erweiterte Widgets</h4>
-                        <p className="text-sm text-gray-600">Zusätzliche Widget-Optionen anzeigen</p>
-                      </div>
-                      <Switch />
-                    </div>
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <h4 className="font-medium">Live-Updates</h4>
-                        <p className="text-sm text-gray-600">Echtzeit-Datenaktualisierung</p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Dashboard-Layout</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    {[
-                      { id: "compact", name: "Kompakt", description: "Platzsparende Darstellung" },
-                      { id: "spacious", name: "Geräumig", description: "Mehr Platz zwischen Elementen" },
-                      { id: "minimal", name: "Minimal", description: "Reduzierte Oberfläche" },
-                      { id: "detailed", name: "Detailliert", description: "Umfassende Informationen" }
-                    ].map((layout) => (
-                      <div
-                        key={layout.id}
-                        className="p-4 border rounded-lg cursor-pointer hover:border-blue-300 transition-colors"
-                        data-testid={`layout-${layout.id}`}
-                      >
-                        <h4 className="font-medium">{layout.name}</h4>
-                        <p className="text-sm text-gray-600">{layout.description}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Notification Settings */}
-          <TabsContent value="notifications">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Bell className="h-5 w-5" />
-                  Benachrichtigungen
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h4 className="font-medium">Email-Benachrichtigungen</h4>
-                      <p className="text-sm text-gray-600">Wichtige Updates per Email erhalten</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h4 className="font-medium">Push-Benachrichtigungen</h4>
-                      <p className="text-sm text-gray-600">Browser-Benachrichtigungen aktivieren</p>
-                    </div>
-                    <Switch />
-                  </div>
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h4 className="font-medium">Wöchentliche Berichte</h4>
-                      <p className="text-sm text-gray-600">Automatische Zusammenfassungen</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h4 className="font-medium">System-Alerts</h4>
-                      <p className="text-sm text-gray-600">Kritische Warnungen und Fehler</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Benachrichtigungszeiten</h3>
+            <TabsContent value="profile" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="h-5 w-5" />
+                    Unternehmensinformationen
+                  </CardTitle>
+                  <CardDescription>
+                    Verwalten Sie Ihre Unternehmensdaten und Kontaktinformationen
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
                   <div className="grid gap-4 md:grid-cols-2">
-                    <div>
-                      <Label htmlFor="notificationStart">Start-Zeit</Label>
-                      <Input
-                        id="notificationStart"
-                        type="time"
-                        defaultValue="09:00"
-                        data-testid="input-notification-start"
+                    <div className="space-y-2">
+                      <Label htmlFor="company">Unternehmensname</Label>
+                      <Input id="company" defaultValue={tenantData?.name || ""} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">E-Mail-Adresse</Label>
+                      <Input id="email" type="email" defaultValue={tenantData?.billingEmail || ""} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="industry">Branche</Label>
+                      <Input id="industry" defaultValue="Medizintechnik" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="country">Land</Label>
+                      <Input id="country" defaultValue="Deutschland" />
+                    </div>
+                  </div>
+                  <Button className="w-full md:w-auto">
+                    <Save className="w-4 h-4 mr-2" />
+                    Änderungen speichern
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="themes" className="space-y-6">
+              <ThemeCustomizer />
+            </TabsContent>
+
+            <TabsContent value="notifications" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Bell className="h-5 w-5" />
+                    Benachrichtigungseinstellungen
+                  </CardTitle>
+                  <CardDescription>
+                    Konfigurieren Sie, wie und wann Sie Benachrichtigungen erhalten möchten
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="email-alerts">E-Mail-Benachrichtigungen</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Erhalten Sie wichtige Updates per E-Mail
+                        </p>
+                      </div>
+                      <Switch 
+                        id="email-alerts"
+                        checked={notificationSettings.emailAlerts}
+                        onCheckedChange={(checked) => 
+                          setNotificationSettings(prev => ({ ...prev, emailAlerts: checked }))
+                        }
                       />
                     </div>
-                    <div>
-                      <Label htmlFor="notificationEnd">End-Zeit</Label>
-                      <Input
-                        id="notificationEnd"
-                        type="time"
-                        defaultValue="18:00"
-                        data-testid="input-notification-end"
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="weekly-digest">Wöchentlicher Digest</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Zusammenfassung der wichtigsten Updates
+                        </p>
+                      </div>
+                      <Switch 
+                        id="weekly-digest"
+                        checked={notificationSettings.weeklyDigest}
+                        onCheckedChange={(checked) => 
+                          setNotificationSettings(prev => ({ ...prev, weeklyDigest: checked }))
+                        }
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="critical-only">Nur kritische Warnungen</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Nur bei wichtigen regulatorischen Änderungen
+                        </p>
+                      </div>
+                      <Switch 
+                        id="critical-only"
+                        checked={notificationSettings.criticalOnly}
+                        onCheckedChange={(checked) => 
+                          setNotificationSettings(prev => ({ ...prev, criticalOnly: checked }))
+                        }
                       />
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                  
+                  <Button className="w-full md:w-auto">
+                    <Save className="w-4 h-4 mr-2" />
+                    Einstellungen speichern
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="preferences" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Globe className="h-5 w-5" />
+                    Präferenzen
+                  </CardTitle>
+                  <CardDescription>
+                    Personalisieren Sie Ihre Plattform-Erfahrung
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="language">Sprache</Label>
+                      <Input id="language" defaultValue="Deutsch" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="timezone">Zeitzone</Label>
+                      <Input id="timezone" defaultValue="Europe/Berlin" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="region">Hauptregion</Label>
+                      <Input id="region" defaultValue="Europa" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="updates-frequency">Update-Frequenz</Label>
+                      <Input id="updates-frequency" defaultValue="Täglich" />
+                    </div>
+                  </div>
+                  
+                  <Button className="w-full md:w-auto">
+                    <Save className="w-4 h-4 mr-2" />
+                    Präferenzen speichern
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="security" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    Sicherheitseinstellungen
+                  </CardTitle>
+                  <CardDescription>
+                    Verwalten Sie Ihre Sicherheits- und Zugriffseinstellungen
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid gap-4">
+                    <div className="space-y-2">
+                      <Label>Aktuelle Berechtigungen</Label>
+                      <div className="grid gap-2 md:grid-cols-2">
+                        {Object.entries(permissions).map(([key, value]) => (
+                          <div key={key} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                            <span className="text-sm capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                            <Badge variant={value ? "default" : "secondary"}>
+                              {value ? "Aktiviert" : "Deaktiviert"}
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <p className="text-sm text-yellow-800">
+                        <Shield className="w-4 h-4 inline mr-2" />
+                        Ihre Berechtigungen werden von Ihrem Administrator verwaltet. 
+                        Wenden Sie sich an Ihren Administrator, um Änderungen anzufordern.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
-    </CustomerLayout>
+    </div>
   );
 }

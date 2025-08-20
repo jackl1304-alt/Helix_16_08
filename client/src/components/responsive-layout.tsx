@@ -32,13 +32,9 @@ export function ResponsiveLayout({ children, showSidebar = true }: ResponsiveLay
         </>
       )}
       
-      {/* Header Controls - Top Right wie Screenshot */}
-      <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+      {/* Language Selector - Top Right */}
+      <div className="fixed top-4 right-4 z-50">
         <LanguageSelector />
-        <a href="/customer-login" className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-medium inline-block no-underline">
-          👤 Customer Area
-        </a>
-
       </div>
       
       {/* Main Content */}
