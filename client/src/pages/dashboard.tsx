@@ -29,8 +29,8 @@ export default function Dashboard() {
       <div className="deltaways-dashboard-card bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 rounded-xl p-8 text-white shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <h1 className="text-2xl font-bold mb-3 flex items-center gap-3 deltaways-brand-text">
-              <Activity className="h-6 w-6" />
+            <h1 className="text-4xl font-bold mb-3 flex items-center gap-3 deltaways-brand-text deltaways-text-animate">
+              <Activity className="h-10 w-10" />
               Regulatory Intelligence Dashboard
             </h1>
             <p className="text-blue-100 mb-6 text-lg font-medium">

@@ -108,7 +108,6 @@ function App() {
                   
                   {/* Data Management */}
                   <Route path="/data-collection" component={DataCollection} />
-                  <Route path="/data-collection-center" component={React.lazy(() => import("./pages/data-collection-center"))} />
                   <Route path="/newsletter-admin" component={NewsletterAdmin} />
                   <Route path="/email-management" component={EmailManagement} />
                   <Route path="/knowledge-base" component={KnowledgeBase} />
