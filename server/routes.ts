@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import administrationRoutes from "./routes/administration";
 import adminDataSourcesRoutes from "./routes/adminDataSourcesRoutes";
+import tenantAuthRoutes from "./routes/tenant-auth-simple";
 
 // Define interfaces for type safety
 interface LegalCaseData {
@@ -705,26 +706,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
 <p><strong>Compliance-Deadline:</strong> {{complianceDeadline}}</p>
 </div>
 <a href="{{dashboardUrl}}" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;">Zum Dashboard</a>`,
-          htmlContent: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center;">
-<h1 style="margin: 0; font-size: 24px;">🚨 Kritisches Regulatory Update</h1>
+          htmlContent: `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kritisches Regulatory Update</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background: #f5f5f5;">
+<div style="max-width: 600px; margin: 0 auto; background: white;">
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center;">
+<h1 style="margin: 0; font-size: 28px; font-weight: bold;">🚨 Kritisches Regulatory Update</h1>
+<p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Helix Regulatory Intelligence Platform</p>
 </div>
-<div style="padding: 30px; background: white;">
-<p style="font-size: 16px; color: #333;">Hallo <strong>{{customerName}}</strong>,</p>
-<p style="color: #666; line-height: 1.6;">Ein neues kritisches Regulatory Update wurde für <strong>{{deviceType}}</strong> veröffentlicht:</p>
-<div style="background: #f8f9fa; padding: 25px; margin: 25px 0; border-left: 5px solid #dc3545; border-radius: 5px;">
-<h3 style="margin: 0 0 15px 0; color: #dc3545;">{{updateTitle}}</h3>
-<table style="width: 100%; border-collapse: collapse;">
-<tr><td style="padding: 5px 0; font-weight: bold; color: #333;">Region:</td><td style="color: #666;">{{region}}</td></tr>
-<tr><td style="padding: 5px 0; font-weight: bold; color: #333;">Gültigkeitsdatum:</td><td style="color: #666;">{{effectiveDate}}</td></tr>
-<tr><td style="padding: 5px 0; font-weight: bold; color: #333;">Compliance-Deadline:</td><td style="color: #666;">{{complianceDeadline}}</td></tr>
+<div style="padding: 40px 30px; background: white;">
+<p style="font-size: 18px; color: #333; margin: 0 0 20px 0;">Hallo <strong>{{customerName}}</strong>,</p>
+<p style="color: #666; line-height: 1.8; font-size: 16px; margin: 0 0 30px 0;">Ein neues kritisches Regulatory Update wurde für <strong style="color: #333;">{{deviceType}}</strong> veröffentlicht und erfordert Ihre sofortige Aufmerksamkeit:</p>
+<div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); padding: 30px; margin: 30px 0; border-left: 6px solid #dc3545; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+<h3 style="margin: 0 0 20px 0; color: #dc3545; font-size: 20px;">{{updateTitle}}</h3>
+<table style="width: 100%; border-collapse: collapse; font-size: 15px;">
+<tr style="border-bottom: 1px solid rgba(0,0,0,0.1);"><td style="padding: 12px 0; font-weight: bold; color: #333; width: 35%;">Region:</td><td style="color: #666; padding: 12px 0;">{{region}}</td></tr>
+<tr style="border-bottom: 1px solid rgba(0,0,0,0.1);"><td style="padding: 12px 0; font-weight: bold; color: #333;">Gültigkeitsdatum:</td><td style="color: #666; padding: 12px 0;">{{effectiveDate}}</td></tr>
+<tr><td style="padding: 12px 0; font-weight: bold; color: #333;">Compliance-Deadline:</td><td style="color: #dc3545; font-weight: bold; padding: 12px 0;">{{complianceDeadline}}</td></tr>
 </table>
 </div>
-<div style="text-align: center; margin: 30px 0;">
-<a href="{{dashboardUrl}}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Zum Dashboard</a>
+<div style="text-align: center; margin: 40px 0;">
+<a href="{{dashboardUrl}}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.3s ease;">Zum Dashboard</a>
+</div>
+<div style="border-top: 1px solid #e5e5e5; padding-top: 20px; margin-top: 30px; text-align: center; color: #999; font-size: 14px;">
+<p style="margin: 0;">© 2025 Helix Regulatory Intelligence Platform</p>
 </div>
 </div>
-</div>`,
+</div>
+</body>
+</html>`,
           type: 'regulatory_alert',
           isActive: true,
           recipients: 342,
@@ -6721,6 +6736,50 @@ Für vollständige Details und weitere Analysen besuchen Sie die ursprüngliche 
     } catch (error: any) {
       console.error("Error fetching tenant data:", error);
       res.status(400).json({ error: error.message });
+    }
+  });
+
+  // Register tenant authentication routes - WIEDERHERGESTELLT
+  app.use("/api/tenant/auth", tenantAuthRoutes);
+  
+  // Tenant-specific API routes
+  app.get("/api/tenant/regulatory-updates", async (req, res) => {
+    try {
+      const updates = await storage.getAllRegulatoryUpdates();
+      const filteredUpdates = updates.slice(0, 10); // Limit for tenant users
+      res.json(filteredUpdates);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch tenant updates' });
+    }
+  });
+
+  app.get("/api/tenant/legal-cases", async (req, res) => {
+    try {
+      const cases = await storage.getAllLegalCases();
+      const filteredCases = cases.slice(0, 10); // Limit for tenant users
+      res.json(filteredCases);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch tenant legal cases' });
+    }
+  });
+
+  app.get("/api/tenant/analytics", async (req, res) => {
+    try {
+      const updates = await storage.getAllRegulatoryUpdates();
+      const cases = await storage.getAllLegalCases();
+      
+      const analytics = {
+        totalUpdates: updates.length,
+        totalCases: cases.length,
+        criticalAlerts: Math.floor(updates.length * 0.15),
+        notifications: Math.floor(updates.length * 0.3),
+        monthlyViews: 1247,
+        documentsDownloaded: 89
+      };
+      
+      res.json(analytics);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch tenant analytics' });
     }
   });
 

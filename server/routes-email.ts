@@ -129,7 +129,7 @@ export function registerEmailRoutes(app: Express) {
         connected: false,
         message: 'Gmail-Verbindung fehlgeschlagen',
         details: (error as Error)?.message || 'Unbekannter Fehler bei der Verbindung',
-        provider: 'Gmail (deltawayshelixinfo@gmail.com)'
+        provider: 'Gmail (deltawaysnewsletter@gmail.com)'
       });
     }
   });
