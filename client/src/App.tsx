@@ -39,6 +39,7 @@ const GripIntegration = React.lazy(() => import("@/pages/grip-integration"));
 const CustomerDashboard = React.lazy(() => import("@/pages/customer-dashboard"));
 const CustomerApp = React.lazy(() => import("@/pages/customer-app"));
 const TenantAuth = React.lazy(() => import("@/pages/tenant-auth"));
+const TenantOnboarding = React.lazy(() => import("@/pages/tenant-onboarding"));
 const TenantDashboard = React.lazy(() => import("@/pages/tenant-dashboard"));
 const TenantDataCollection = React.lazy(() => import("@/pages/tenant-data-collection"));
 const TenantRegulatoryUpdates = React.lazy(() => import("@/pages/tenant-regulatory-updates"));
@@ -116,10 +117,20 @@ function App() {
                 </div>
               }>
                 <Switch>
-                  <Route path="/tenant-login" render={() => <TenantAuth tenantSubdomain="demo" tenantName="Demo Medical" colorScheme="blue" />} />
+                  <Route path="/tenant-login" component={() => <TenantAuth tenantSubdomain="demo" tenantName="Demo Medical" colorScheme="blue" />} />
+                  <Route path="/tenant-onboarding" component={TenantOnboarding} />
                   <Route path="/tenant/dashboard" component={TenantDashboard} />
-                  <Route path="/tenant/data-collection" component={TenantDataCollection} />
+                  <Route path="/tenant/berichte" component={TenantDashboard} />
+                  <Route path="/tenant/analysen" component={TenantDashboard} />
+                  <Route path="/tenant/datensammlung" component={TenantDataCollection} />
+                  <Route path="/tenant/newsletter-verwaltung" component={TenantDashboard} />
+                  <Route path="/tenant/email-verwaltung" component={TenantDashboard} />
+                  <Route path="/tenant/wissensdatenbank" component={Wissensdatenbank} />
                   <Route path="/tenant/regulatory-updates" component={TenantRegulatoryUpdates} />
+                  <Route path="/tenant/rechtsprechung" component={RechtsprechungIntelligence} />
+                  <Route path="/tenant/globale-zulassungen" component={ZulassungenGlobal} />
+                  <Route path="/tenant/laufende-zulassungen" component={LaufendeZulassungenNew} />
+                  <Route path="/tenant/data-collection" component={TenantDataCollection} />
                   <Route path="/tenant/*" component={TenantDashboard} />
                 </Switch>
               </React.Suspense>
