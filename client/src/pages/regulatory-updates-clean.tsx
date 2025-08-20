@@ -253,11 +253,11 @@ export default function RegulatoryUpdatesClean() {
                           <h4 className="font-semibold text-gray-900">Zusammenfassung</h4>
                           <p className="text-sm text-gray-700">{update.summary}</p>
                           <div className="flex flex-wrap gap-2">
-                            {update.tags.map((tag, idx) => (
+                            {update.tags?.map((tag, idx) => (
                               <Badge key={idx} variant="secondary" className="text-xs">
                                 {tag}
                               </Badge>
-                            ))}
+                            )) || <Badge variant="secondary" className="text-xs">Regulatory Update</Badge>}
                           </div>
                         </div>
                       </TabsContent>

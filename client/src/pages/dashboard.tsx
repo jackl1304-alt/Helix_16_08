@@ -82,41 +82,54 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header - Exakt wie Screenshot 1 */}
-      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 rounded-xl p-8 text-white shadow-lg">
+      {/* Header - KLEINER BALKEN & GROSSES HELIX ICON */}
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 rounded-lg p-4 text-white shadow-md">
         <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <h1 className="text-4xl font-bold mb-3 flex items-center gap-3">
-              <Activity className="h-10 w-10" />
-              Regulatory Intelligence Dashboard
-            </h1>
-            <p className="text-blue-100 mb-6 text-lg font-medium">
-              KI-gestützte Analyse • Echtzeit-Updates • 100% Datenqualität
-            </p>
-            <div className="flex items-center space-x-6">
-              <div className="flex items-center gap-2 bg-white/10 rounded-lg px-4 py-2">
-                <Activity className="h-5 w-5" />
-                <span className="font-medium">Live System</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/10 rounded-lg px-4 py-2">
-                <CheckCircle className="h-5 w-5" />
-                <span className="font-medium">70 Quellen aktiv</span>
-              </div>
-              <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2">
-                <RefreshCw className="h-4 w-4" />
-                Alle synchronisieren
-              </button>
+          <div className="flex items-center gap-4">
+            {/* GROSSES HELIX ICON */}
+            <div className="bg-white/20 p-3 rounded-lg">
+              <svg viewBox="0 0 64 64" className="h-12 w-12 text-white">
+                <defs>
+                  <linearGradient id="helixGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#ffffff" stopOpacity="1"/>
+                    <stop offset="50%" stopColor="#e0e7ff" stopOpacity="0.9"/>
+                    <stop offset="100%" stopColor="#c7d2fe" stopOpacity="0.8"/>
+                  </linearGradient>
+                </defs>
+                <path d="M12 16 Q20 8, 32 16 Q44 24, 52 16" stroke="url(#helixGradient)" strokeWidth="3" fill="none" strokeLinecap="round"/>
+                <path d="M12 24 Q20 16, 32 24 Q44 32, 52 24" stroke="url(#helixGradient)" strokeWidth="3" fill="none" strokeLinecap="round"/>
+                <path d="M12 32 Q20 24, 32 32 Q44 40, 52 32" stroke="url(#helixGradient)" strokeWidth="3" fill="none" strokeLinecap="round"/>
+                <path d="M12 40 Q20 32, 32 40 Q44 48, 52 40" stroke="url(#helixGradient)" strokeWidth="3" fill="none" strokeLinecap="round"/>
+                <path d="M12 48 Q20 40, 32 48 Q44 56, 52 48" stroke="url(#helixGradient)" strokeWidth="3" fill="none" strokeLinecap="round"/>
+                <circle cx="12" cy="16" r="2" fill="url(#helixGradient)"/>
+                <circle cx="32" cy="24" r="2" fill="url(#helixGradient)"/>
+                <circle cx="52" cy="32" r="2" fill="url(#helixGradient)"/>
+                <circle cx="32" cy="40" r="2" fill="url(#helixGradient)"/>
+                <circle cx="12" cy="48" r="2" fill="url(#helixGradient)"/>
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold flex items-center gap-2">
+                Helix Regulatory Intelligence
+              </h1>
+              <p className="text-blue-100 text-sm">
+                KI-gestützte Analyse • Echtzeit-Updates • 100% Datenqualität
+              </p>
             </div>
           </div>
-          <div className="text-right">
-            <div className="text-6xl font-bold mb-2">
-              66
+          <div className="flex items-center gap-4">
+            <div className="text-center">
+              <div className="text-3xl font-bold">{stats?.totalUpdates || 66}</div>
+              <div className="text-blue-100 text-sm">Updates</div>
             </div>
-            <div className="text-blue-100 text-lg font-medium">Updates</div>
-            <div className="text-4xl font-bold mt-4">
-              100%
+            <div className="text-center">
+              <div className="text-3xl font-bold">100%</div>
+              <div className="text-blue-100 text-sm">Qualität</div>
             </div>
-            <div className="text-blue-100 text-lg font-medium">Qualität</div>
+            <button className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+              <RefreshCw className="h-4 w-4" />
+              Sync
+            </button>
           </div>
         </div>
       </div>
