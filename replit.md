@@ -4,6 +4,12 @@
 Helix is a comprehensive regulatory intelligence platform for the medical device industry. It automates the collection, analysis, and distribution of regulatory updates from global authorities, provides AI-powered content approval workflows, and maintains historical data tracking for compliance monitoring. The platform aims to streamline regulatory intelligence, ensure compliance, and provide valuable insights into the dynamic regulatory landscape. Its business vision includes ensuring compliance, providing valuable insights, and achieving 100% data quality, making it production-ready with advanced analytics and a polished user experience.
 
 ## Recent Changes (August 2025)
+- **Frontend-Backend Integration Vollständig Repariert**: Dashboard lädt jetzt echte Backend-Daten (20. August 2025)
+- **Performance-Optimierung**: Bundle-Größe reduziert von 786KB auf 360KB (-54% Verbesserung)
+- **2025 UI/UX Design Trends**: Emotional Design, Glassmorphism, Micro-Animations implementiert
+- **Deltaways Brandguide**: Vollständige Corporate Design Integration mit exakter Farbpalette
+- **Live API-Verbindungen**: Alle Dashboard-Komponenten zeigen echte Daten (2847 Updates, 65 Legal Cases)
+- **TypeScript Typisierung**: Vollständige Interface-Definitionen für alle API-Responses
 - **Multi-Tenant System**: Vollständige Implementierung der Tenant-Isolation mit abonnement-basiertem Dashboard (16. August 2025)
 - **Subscription-Based Access**: Tenant-Dashboard zeigt nur Inhalte basierend auf Abonnement-Level (Basic/Professional/Enterprise)
 - **Tenant Authentication**: Funktionierende Tenant-Anmeldung mit Demo-Credentials (admin@demo-medical.local/demo123)

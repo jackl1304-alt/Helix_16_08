@@ -23,19 +23,49 @@ import {
   Zap
 } from "lucide-react";
 
+interface DashboardStats {
+  totalUpdates: number;
+  totalLegalCases: number;
+  activeQuestions: number;
+  knowledgeArticles: number;
+  aiAnalysis: number;
+  newsletterAdmin: number;
+  activeAlerts: number;
+  compliance: number;
+  lastSync: string;
+}
+
+interface RegulatoryUpdate {
+  id: string;
+  title: string;
+  summary: string;
+  status: string;
+  priority: string;
+  date: string;
+  region: string;
+  category: string;
+}
+
+interface NewsletterSource {
+  id: string;
+  name: string;
+  isActive: boolean;
+  count: number;
+}
+
 export default function Dashboard() {
   // ECHTE BACKEND-DATEN LADEN
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
     queryKey: ['/api/dashboard/stats'],
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
-  const { data: regulatoryUpdates, isLoading: updatesLoading } = useQuery({
+  const { data: regulatoryUpdates, isLoading: updatesLoading } = useQuery<RegulatoryUpdate[]>({
     queryKey: ['/api/regulatory-updates'],
     refetchInterval: 60000, // Refresh every minute
   });
 
-  const { data: newsletterSources } = useQuery({
+  const { data: newsletterSources } = useQuery<NewsletterSource[]>({
     queryKey: ['/api/newsletter-sources'],
   });
 
@@ -101,7 +131,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-bold text-gray-900 deltaways-brand-text">
-              {(regulatoryUpdates as any)?.length || stats?.totalUpdates || '0'}
+              {regulatoryUpdates?.length || stats?.totalUpdates || '0'}
             </div>
             <p className="text-sm text-green-600 font-medium mt-2">
               Aktuelle regulatorische Änderungen
@@ -201,8 +231,8 @@ export default function Dashboard() {
                   <div key={i} className="animate-pulse bg-gray-100 h-16 rounded-lg"></div>
                 ))}
               </div>
-            ) : regulatoryUpdates && (regulatoryUpdates as any).length > 0 ? (
-              (regulatoryUpdates as any).map((update: any, index: number) => {
+            ) : regulatoryUpdates && regulatoryUpdates.length > 0 ? (
+              regulatoryUpdates.map((update, index) => {
                 const borderColor = index === 0 ? 'border-l-blue-500' : 
                                    index === 1 ? 'border-l-green-500' : 
                                    index === 2 ? 'border-l-purple-500' : 'border-l-orange-500';
@@ -255,8 +285,8 @@ export default function Dashboard() {
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            {newsletterSources && (newsletterSources as any).length > 0 ? (
-              (newsletterSources as any).map((source: any) => (
+            {newsletterSources && newsletterSources.length > 0 ? (
+              newsletterSources.map((source) => (
                 <div key={source.id} className="flex items-center justify-between py-2">
                   <div className="flex items-center">
                     <div className={`h-3 w-3 rounded-full ${source.isActive ? 'bg-green-500' : 'bg-gray-400'} mr-3`}></div>
