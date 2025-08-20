@@ -188,7 +188,7 @@ export default function Dashboard({ navigate }: DashboardProps) {
   const handleAnalytics = () => navigate('/analytics');
 
   return (
-    <ResponsiveLayout>
+    <ResponsiveLayout navigate={navigate} currentPage="/dashboard">
       {/* Navigation Header */}
       <NavigationHeader showTenantLinks={true} currentView="admin" />
       

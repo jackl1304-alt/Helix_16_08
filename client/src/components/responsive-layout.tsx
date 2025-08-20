@@ -8,9 +8,11 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 interface ResponsiveLayoutProps {
   children: ReactNode;
   showSidebar?: boolean;
+  navigate?: (page: string) => void;
+  currentPage?: string;
 }
 
-export function ResponsiveLayout({ children, showSidebar = true }: ResponsiveLayoutProps) {
+export function ResponsiveLayout({ children, showSidebar = true, navigate, currentPage = "/" }: ResponsiveLayoutProps) {
   const device = useDevice();
 
   return (
@@ -18,16 +20,16 @@ export function ResponsiveLayout({ children, showSidebar = true }: ResponsiveLay
       "min-h-screen bg-gray-50 dark:bg-gray-900",
       getDeviceClasses(device)
     )}>
-      {showSidebar && (
+      {showSidebar && navigate && (
         <>
           {/* Desktop Sidebar - only show on screens larger than 1024px */}
           <div className="hidden lg:block">
-            <Sidebar />
+            <Sidebar navigate={navigate} currentPage={currentPage} />
           </div>
           
           {/* Mobile/Tablet Sidebar - show on screens smaller than 1024px */}
           <div className="lg:hidden">
-            <MobileSidebar />
+            <MobileSidebar navigate={navigate} currentPage={currentPage} />
           </div>
         </>
       )}
