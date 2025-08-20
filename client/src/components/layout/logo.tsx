@@ -1,13 +1,14 @@
-import { Link } from "wouter";
-import logoPath from "@assets/ICON Helix_1753735921077.jpg";
 import { cn } from "@/lib/utils";
+
+// Logo path as static URL to avoid import issues
+const logoPath = "/attached_assets/ICON Helix_1753735921077.jpg";
 
 interface LogoProps {
   size?: "small" | "medium" | "large";
   showText?: boolean;
   showSubtext?: boolean;
   className?: string;
-  linkTo?: string;
+  onClick?: () => void;
 }
 
 export function Logo({ 
@@ -15,7 +16,7 @@ export function Logo({
   showText = false, 
   showSubtext = false, 
   className,
-  linkTo = "/" 
+  onClick
 }: LogoProps) {
   const sizeClasses = {
     small: "h-10 w-10",
@@ -57,13 +58,11 @@ export function Logo({
     </div>
   );
 
-  if (linkTo) {
+  if (onClick) {
     return (
-      <Link href={linkTo}>
-        <div className="cursor-pointer hover:opacity-80 transition-opacity">
-          {content}
-        </div>
-      </Link>
+      <button onClick={onClick} className="cursor-pointer hover:opacity-80 transition-opacity">
+        {content}
+      </button>
     );
   }
 
