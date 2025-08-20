@@ -102,6 +102,10 @@ export default function Dashboard() {
                 <CheckCircle className="h-5 w-5" />
                 <span className="font-medium">70 Quellen aktiv</span>
               </div>
+              <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2">
+                <RefreshCw className="h-4 w-4" />
+                Alle synchronisieren
+              </button>
             </div>
           </div>
           <div className="text-right">
