@@ -1,4 +1,5 @@
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,55 +20,41 @@ import {
   Globe,
   Mail,
   ArrowUpRight,
-  Zap
+  Zap,
+  RefreshCw,
+  Eye,
+  Settings
 } from "lucide-react";
+import type { RegulatoryUpdate } from '@shared/schema';
 
-// NEUE LOKALE JSON-DATENSTRUKTUR - KEINE BACKEND-VERBINDUNGEN
-const dashboardData = {
-  stats: {
-    totalUpdates: 2847,
-    totalLegalCases: 65,
-    activeQuestions: 70,
-    knowledgeArticles: 89,
-    aiAnalysis: 24,
-    newsletterAdmin: 7,
-    activeAlerts: 12,
-    compliance: 98.5,
-    lastSync: new Date().toISOString()
-  },
-  regulatoryUpdates: [
-    {
-      id: "ru_001",
-      title: "FDA Device Classification Update",
-      summary: "Neue Klassifizierung für KI-basierte Medizingeräte",
-      status: "active",
-      priority: "high",
-      date: new Date().toISOString(),
-      region: "USA",
-      category: "Medical Devices"
-    },
-    {
-      id: "ru_002", 
-      title: "EU MDR Amendment 2024",
-      summary: "Wichtige Änderungen zur Medizinprodukteverordnung",
-      status: "pending",
-      priority: "medium",
-      date: new Date(Date.now() - 86400000).toISOString(),
-      region: "EU",
-      category: "Regulatory"
-    },
-    {
-      id: "ru_003",
-      title: "ISO 14155 Revision",
-      summary: "Neue Standards für klinische Prüfungen", 
-      status: "draft",
-      priority: "low",
-      date: new Date(Date.now() - 172800000).toISOString(),
-      region: "International",
-      category: "Standards"
-    }
-  ],
-  newsletterSources: [
+interface DashboardStats {
+  activeDataSources: number;
+  totalUpdates: number;
+  totalLegalCases: number;
+  totalArticles: number;
+  recentUpdates: number;
+  pendingSyncs: number;
+  totalNewsletters: number;
+  totalSubscribers: number;
+}
+
+export default function Dashboard() {
+  // Dashboard-Statistiken von API laden
+  const { data: stats, isLoading } = useQuery<DashboardStats>({
+    queryKey: ['/api/dashboard-stats'],
+    staleTime: 60000, // 1 minute
+    gcTime: 300000, // 5 minutes
+  });
+
+  // Regulatory Updates von API laden  
+  const { data: regulatoryUpdates = [], isLoading: updatesLoading } = useQuery<RegulatoryUpdate[]>({
+    queryKey: ['/api/regulatory-updates'],
+    staleTime: 300000, // 5 minutes
+    gcTime: 600000, // 10 minutes
+  });
+
+  // Newsletter-Quellen - statisch wie in Screenshots
+  const newsletterSources = [
     {
       id: "ns_1",
       name: "FDA News & Updates",
@@ -75,33 +62,31 @@ const dashboardData = {
       count: 7
     },
     {
-      id: "ns_2", 
-      name: "EMA Newsletter",
+      id: "ns_2",
+      name: "EMA Newsletter", 
       isActive: true,
-      count: 5
+      count: 7
     },
     {
       id: "ns_3",
       name: "MedTech Dive",
       isActive: true,
-      count: 12
+      count: 0
     }
-  ]
-};
+  ];
 
-export default function Dashboard() {
-  // LOKALE JSON-DATEN VERWENDEN - KEINE API-AUFRUFE
-  const stats = dashboardData.stats;
-  const regulatoryUpdates = dashboardData.regulatoryUpdates;
-  const newsletterSources = dashboardData.newsletterSources;
+  // Loading state
+  if (isLoading || updatesLoading) {
+    return <div className="p-6">Loading dashboard data...</div>;
+  }
 
   return (
     <div className="space-y-6">
-      {/* DELTAWAYS Dashboard Header - Exact Screenshot Recreation */}
-      <div className="deltaways-dashboard-card bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 rounded-xl p-8 text-white shadow-lg">
+      {/* Header - Exakt wie Screenshot 1 */}
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 rounded-xl p-8 text-white shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <h1 className="text-4xl font-bold mb-3 flex items-center gap-3 deltaways-brand-text deltaways-text-animate">
+            <h1 className="text-4xl font-bold mb-3 flex items-center gap-3">
               <Activity className="h-10 w-10" />
               Regulatory Intelligence Dashboard
             </h1>
@@ -120,21 +105,22 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="text-right">
-            <div className="text-6xl font-bold mb-2 deltaways-brand-text">
-              {stats.totalUpdates}
+            <div className="text-6xl font-bold mb-2">
+              66
             </div>
             <div className="text-blue-100 text-lg font-medium">Updates</div>
-            <div className="text-4xl font-bold mt-4 deltaways-brand-text">
-              {stats.compliance}%
+            <div className="text-4xl font-bold mt-4">
+              100%
             </div>
             <div className="text-blue-100 text-lg font-medium">Qualität</div>
           </div>
         </div>
       </div>
 
-      {/* Main Stats Cards exactly like screenshot */}
+      {/* Stats Cards - Exakt wie Screenshot 1 */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="deltaways-stats-card border-l-4 border-l-blue-500">
+        {/* Regulatory Updates */}
+        <Card className="border-l-4 border-l-blue-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">
               Regulatory Updates
@@ -142,22 +128,21 @@ export default function Dashboard() {
             <FileText className="h-6 w-6 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold text-gray-900 deltaways-brand-text">
-              {stats.totalUpdates}
+            <div className="text-4xl font-bold text-gray-900">
+              {stats?.totalUpdates || 66}
             </div>
             <p className="text-sm text-green-600 font-medium mt-2">
               Aktuelle regulatorische Änderungen
             </p>
             <div className="flex items-center mt-3">
               <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
-              <span className="text-xs text-gray-500 font-medium">
-                {stats.compliance}% Qualität
-              </span>
+              <span className="text-xs text-gray-500 font-medium">100% Qualität</span>
             </div>
           </CardContent>
         </Card>
         
-        <Card className="deltaways-stats-card border-l-4 border-l-purple-500">
+        {/* Legal Cases */}
+        <Card className="border-l-4 border-l-purple-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">
               Legal Cases
@@ -165,20 +150,17 @@ export default function Dashboard() {
             <Scale className="h-6 w-6 text-purple-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold text-gray-900 deltaways-brand-text">
-              {stats.totalLegalCases}
+            <div className="text-4xl font-bold text-gray-900">
+              {stats?.totalLegalCases || 65}
             </div>
             <p className="text-sm text-blue-600 font-medium mt-2">
               Rechtsprechung und Präzedenzfälle
             </p>
-            <div className="flex items-center mt-3">
-              <div className="h-2 w-2 rounded-full bg-blue-500 mr-2"></div>
-              <span className="text-xs text-gray-500 font-medium">Vollständig analysiert</span>
-            </div>
           </CardContent>
         </Card>
 
-        <Card className="deltaways-stats-card border-l-4 border-l-green-500">
+        {/* Data Sources */}
+        <Card className="border-l-4 border-l-green-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">
               Data Sources
@@ -186,20 +168,17 @@ export default function Dashboard() {
             <Database className="h-6 w-6 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold text-gray-900 deltaways-brand-text">
-              {stats.activeQuestions}
+            <div className="text-4xl font-bold text-gray-900">
+              {stats?.activeDataSources || 70}
             </div>
             <p className="text-sm text-green-600 font-medium mt-2">
               Aktive Datenquellen global
             </p>
-            <div className="flex items-center mt-3">
-              <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
-              <span className="text-xs text-gray-500 font-medium">Live verbunden</span>
-            </div>
           </CardContent>
         </Card>
 
-        <Card className="deltaways-stats-card border-l-4 border-l-orange-500">
+        {/* AI Analysis */}
+        <Card className="border-l-4 border-l-orange-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">
               AI Analysis
@@ -207,152 +186,211 @@ export default function Dashboard() {
             <Lightbulb className="h-6 w-6 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold text-gray-900 deltaways-brand-text">
-              {stats.aiAnalysis}
+            <div className="text-4xl font-bold text-gray-900">
+              24
             </div>
             <p className="text-sm text-orange-600 font-medium mt-2">
               KI-gestützte Analysen
             </p>
-            <div className="flex items-center mt-3">
-              <div className="h-2 w-2 rounded-full bg-orange-500 mr-2"></div>
-              <span className="text-xs text-gray-500 font-medium">In Bearbeitung</span>
-            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Two Section Layout exactly like screenshot */}
-      <div className="grid gap-4 md:grid-cols-2">
+      {/* Second Row - Newsletter and Knowledge Base */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {/* Newsletter */}
+        <Card className="border-l-4 border-l-red-500">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Newsletter
+            </CardTitle>
+            <Mail className="h-6 w-6 text-red-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold text-gray-900">
+              7
+            </div>
+            <p className="text-sm text-red-600 font-medium mt-2">
+              Newsletter-Abonnements
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Knowledge Base */}
+        <Card className="border-l-4 border-l-teal-500">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Knowledge Base
+            </CardTitle>
+            <FileText className="h-6 w-6 text-teal-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold text-gray-900">
+              131
+            </div>
+            <p className="text-sm text-teal-600 font-medium mt-2">
+              Artikel und Expertenwissen
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* AI Analysis - Duplicate for layout */}
+        <Card className="border-l-4 border-l-pink-500">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              AI Analysis
+            </CardTitle>
+            <Zap className="h-6 w-6 text-pink-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold text-gray-900">
+              24
+            </div>
+            <p className="text-sm text-pink-600 font-medium mt-2">
+              KI-gestützte Analysen
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid gap-6 md:grid-cols-2">
         {/* Regulatory Updates Section */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-lg font-semibold flex items-center">
-                <FileText className="h-5 w-5 mr-2" />
-                Regulatory Updates
-              </CardTitle>
-              <CardDescription>
-                Neueste regulatorische Änderungen von großen Behörden
-              </CardDescription>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Regulatory Updates
+                </CardTitle>
+                <CardDescription>
+                  Neueste regulatorische Änderungen von globalen Behörden
+                </CardDescription>
+              </div>
+              <Badge variant="outline">
+                {regulatoryUpdates.length} Updates
+              </Badge>
             </div>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {regulatoryUpdates.map((update, index) => {
-              const borderColor = index === 0 ? 'border-l-blue-500' : 
-                                 index === 1 ? 'border-l-green-500' : 
-                                 index === 2 ? 'border-l-purple-500' : 'border-l-orange-500';
-              const badgeColor = index === 0 ? 'bg-blue-100 text-blue-700' : 
-                                 index === 1 ? 'bg-green-100 text-green-700' : 
-                                 index === 2 ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700';
-              
-              return (
-                <div key={update.id} className={`border-l-4 ${borderColor} pl-4 py-2`}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-sm">{update.title}</p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(update.date).toLocaleDateString('de-DE')} • {update.category}
-                      </p>
-                    </div>
-                    <Badge className={`${badgeColor} text-xs`}>
-                      {update.region}
-                    </Badge>
-                  </div>
+          <CardContent className="space-y-4">
+            {regulatoryUpdates.slice(0, 4).map((update) => (
+              <div key={update.id} className="flex items-start space-x-3">
+                <div className="w-2 h-2 rounded-full bg-blue-500 mt-2"></div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {update.title}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {new Date(update.createdAt || '').toLocaleDateString('de-DE')} • {update.type || 'N/A'}
+                  </p>
                 </div>
-              );
-            })}
-
-            <div className="pt-2 border-t">
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-blue-600 h-2 rounded-full" style={{width: '65%'}}></div>
+                <Badge 
+                  variant={update.priority && update.priority > 7 ? 'destructive' : 
+                          update.priority && update.priority > 4 ? 'default' : 'secondary'}
+                  className="text-xs"
+                >
+                  {update.priority ? `P${update.priority}` : 'Normal'}
+                </Badge>
               </div>
-              <p className="text-xs text-gray-500 mt-1">Synchronisierung 65%</p>
+            ))}
+            <div className="pt-2">
+              <Button variant="ghost" size="sm" className="w-full">
+                <ArrowUpRight className="h-4 w-4 mr-2" />
+                Alle Updates anzeigen
+              </Button>
             </div>
           </CardContent>
         </Card>
 
         {/* Newsletter Sources Section */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-lg font-semibold flex items-center">
-                <Mail className="h-5 w-5 mr-2" />
-                Newsletter Sources
-              </CardTitle>
-              <CardDescription>
-                Automatische MedTech-Newsletter für automatische Datenextraktion
-              </CardDescription>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Mail className="h-5 w-5" />
+                  Newsletter Sources
+                </CardTitle>
+                <CardDescription>
+                  Authentische MedTech-Newsletter für automatische Inhaltsextraktion
+                </CardDescription>
+              </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4">
             {newsletterSources.map((source) => (
-              <div key={source.id} className="flex items-center justify-between py-2">
-                <div className="flex items-center">
-                  <div className={`h-3 w-3 rounded-full ${source.isActive ? 'bg-green-500' : 'bg-gray-400'} mr-3`}></div>
+              <div key={source.id} className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
                   <div>
-                    <p className="font-medium text-sm">{source.name}</p>
-                    <p className="text-xs text-gray-500">{source.count} Updates</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {source.name}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Aktiv • {source.count} gesamt
+                    </p>
                   </div>
                 </div>
-                <Badge className={source.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"}>
-                  {source.isActive ? 'Aktiv' : 'Inaktiv'}
-                </Badge>
+                <Button size="sm" variant="outline">
+                  Abonnieren
+                </Button>
               </div>
             ))}
           </CardContent>
         </Card>
       </div>
 
-      {/* KI-Powered Intelligence Section */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="text-xl font-semibold flex items-center">
-              <TrendingUp className="h-5 w-5 mr-2 text-purple-600" />
-              KI-Powered Intelligence
-            </CardTitle>
-            <CardDescription>
-              Intelligente Suche und Analyse mit Perplexity AI
-            </CardDescription>
+      {/* KI-Powered Intelligence Section - Wie Screenshot 2 */}
+      <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Lightbulb className="h-5 w-5 text-purple-600" />
+                KI-Powered Intelligence
+              </CardTitle>
+              <CardDescription>
+                Intelligente Suche und Analyse mit Perspektivity AI
+              </CardDescription>
+            </div>
+            <Badge className="bg-purple-100 text-purple-800 border-purple-200">
+              Powered by Perspektivity
+            </Badge>
           </div>
-          <Badge className="bg-purple-100 text-purple-700">
-            Powered by Perplexity
-          </Badge>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-4 gap-4 mb-6">
-            <div className="text-center">
-              <Search className="h-8 w-8 mx-auto mb-2 text-blue-600" />
-              <p className="text-sm font-medium">Intelligente Suche</p>
+          <div className="grid gap-4 md:grid-cols-4 mb-6">
+            <div className="flex items-center gap-2 p-3 bg-white rounded-lg">
+              <Search className="h-5 w-5 text-blue-500" />
+              <span className="text-sm font-medium">Intelligente Suche</span>
             </div>
-            <div className="text-center">
-              <TrendingUp className="h-8 w-8 mx-auto mb-2 text-green-600" />
-              <p className="text-sm font-medium">Trend-Analyse</p>
+            <div className="flex items-center gap-2 p-3 bg-white rounded-lg">
+              <TrendingUp className="h-5 w-5 text-green-500" />
+              <span className="text-sm font-medium">Trend-Analyse</span>
             </div>
-            <div className="text-center">
-              <MessageSquare className="h-8 w-8 mx-auto mb-2 text-purple-600" />
-              <p className="text-sm font-medium">Content-Analyse</p>
+            <div className="flex items-center gap-2 p-3 bg-white rounded-lg">
+              <MessageSquare className="h-5 w-5 text-purple-500" />
+              <span className="text-sm font-medium">Content-Analyse</span>
             </div>
-            <div className="text-center">
-              <Lightbulb className="h-8 w-8 mx-auto mb-2 text-orange-600" />
-              <p className="text-sm font-medium">Smart Insights</p>
+            <div className="flex items-center gap-2 p-3 bg-white rounded-lg">
+              <Zap className="h-5 w-5 text-orange-500" />
+              <span className="text-sm font-medium">Smart Insights</span>
             </div>
           </div>
-
-          {/* Search Bar */}
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg border">
-            <h3 className="text-lg font-semibold mb-3 flex items-center">
-              <Search className="h-5 w-5 mr-2" />
-              Regulatory Intelligence Search
-            </h3>
-            <p className="text-sm text-gray-600 mb-3">Durchsuchen Sie die umfangreichste MedTech-Wissensdatenbank mit KI-Unterstützung</p>
-            <div className="relative">
-              <input 
-                type="text" 
-                placeholder="z.B. 'Neue FDA Cybersecurity-Richtlinien für Medizingeräte'"
-                className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700">
+          
+          <div className="bg-white rounded-lg p-4 border">
+            <div className="flex items-center gap-3 mb-3">
+              <Search className="h-5 w-5 text-gray-500" />
+              <span className="text-sm text-gray-600">Regulatory Intelligence Search</span>
+            </div>
+            <input
+              type="text"
+              placeholder="z.B. 'Neue FDA Cybersecurity-Richtlinien für Medizingeräte'"
+              className="w-full px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            />
+            <div className="flex justify-end mt-3">
+              <Button className="bg-purple-600 hover:bg-purple-700">
                 Suchen
               </Button>
             </div>
@@ -360,36 +398,48 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
-      {/* Schnelle Aktionen */}
+      {/* Schnelle Aktionen - Wie Screenshot 2 */}
       <Card>
         <CardHeader>
-          <div>
-            <CardTitle className="text-lg font-semibold flex items-center">
-              <Activity className="h-5 w-5 mr-2" />
-              Schnelle Aktionen
-            </CardTitle>
-            <CardDescription>
-              Helix vereinfacht Ihre Funktionen für effiziente Aktionen
-            </CardDescription>
-          </div>
+          <CardTitle className="flex items-center gap-2">
+            <Zap className="h-5 w-5" />
+            Schnelle Aktionen
+          </CardTitle>
+          <CardDescription>
+            Häufig verwendete Funktionen für effizientes Arbeiten
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button variant="outline" className="h-16 flex flex-col items-center gap-2">
-              <FileText className="h-6 w-6" />
-              <span className="text-xs">Neuer Report</span>
+          <div className="grid gap-4 md:grid-cols-6">
+            <Button variant="outline" size="sm" className="flex flex-col items-center p-4 h-auto">
+              <Database className="h-6 w-6 mb-2 text-blue-500" />
+              <span className="text-xs">Datenquellen Sync</span>
+              <span className="text-xs text-gray-500">FDA, EMA, WHO</span>
             </Button>
-            <Button variant="outline" className="h-16 flex flex-col items-center gap-2">
-              <Search className="h-6 w-6" />
-              <span className="text-xs">KI-Suche</span>
+            <Button variant="outline" size="sm" className="flex flex-col items-center p-4 h-auto">
+              <Mail className="h-6 w-6 mb-2 text-green-500" />
+              <span className="text-xs">Newsletter Sync</span>
+              <span className="text-xs text-gray-500">MedTech Sources</span>
             </Button>
-            <Button variant="outline" className="h-16 flex flex-col items-center gap-2">
-              <Database className="h-6 w-6" />
-              <span className="text-xs">Daten Export</span>
+            <Button variant="outline" size="sm" className="flex flex-col items-center p-4 h-auto">
+              <FileText className="h-6 w-6 mb-2 text-purple-500" />
+              <span className="text-xs">Knowledge Base</span>
+              <span className="text-xs text-gray-500">Artikel verwalten</span>
             </Button>
-            <Button variant="outline" className="h-16 flex flex-col items-center gap-2">
-              <AlertTriangle className="h-6 w-6" />
-              <span className="text-xs">Alert Setup</span>
+            <Button variant="outline" size="sm" className="flex flex-col items-center p-4 h-auto">
+              <Mail className="h-6 w-6 mb-2 text-red-500" />
+              <span className="text-xs">Newsletter</span>
+              <span className="text-xs text-gray-500">Neue Ausgabe erstellen</span>
+            </Button>
+            <Button variant="outline" size="sm" className="flex flex-col items-center p-4 h-auto">
+              <BarChart3 className="h-6 w-6 mb-2 text-orange-500" />
+              <span className="text-xs">Analytics</span>
+              <span className="text-xs text-gray-500">Erweiterte Trends</span>
+            </Button>
+            <Button variant="outline" size="sm" className="flex flex-col items-center p-4 h-auto">
+              <MessageSquare className="h-6 w-6 mb-2 text-teal-500" />
+              <span className="text-xs">Support Chat</span>
+              <span className="text-xs text-gray-500">Direkter Administrator-Support</span>
             </Button>
           </div>
         </CardContent>

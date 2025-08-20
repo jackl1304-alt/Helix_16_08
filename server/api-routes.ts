@@ -28,17 +28,17 @@ router.get('/dashboard-stats', async (req: Request, res: Response) => {
   try {
     console.log('📊 Dashboard stats requested');
 
-    // Use direct SQL queries to avoid schema issues
-    const [dataSourcesResult, regulatoryUpdatesResult, legalCasesResult] = await Promise.all([
-      db.execute(sql`SELECT COUNT(*) as count FROM data_sources WHERE is_active = true`),
-      db.execute(sql`SELECT COUNT(*) as count FROM regulatory_updates`),
-      db.execute(sql`SELECT COUNT(*) as count FROM legal_cases`),
+    // Verwendung von Drizzle ORM statt SQL für bessere Type-Safety
+    const [dataSourcesCount, regulatoryUpdatesCount, legalCasesCount] = await Promise.all([
+      db.select({ count: sql<number>`count(*)` }).from(dataSources).where(eq(dataSources.isActive, true)),
+      db.select({ count: sql<number>`count(*)` }).from(regulatoryUpdates),
+      db.select({ count: sql<number>`count(*)` }).from(legalCases),
     ]);
 
     const stats = {
-      activeDataSources: Number((dataSourcesResult as any)[0]?.count) || 0,
-      totalUpdates: Number((regulatoryUpdatesResult as any)[0]?.count) || 0,
-      totalLegalCases: Number((legalCasesResult as any)[0]?.count) || 0,
+      activeDataSources: Number(dataSourcesCount[0]?.count) || 0,
+      totalUpdates: Number(regulatoryUpdatesCount[0]?.count) || 0,
+      totalLegalCases: Number(legalCasesCount[0]?.count) || 0,
       totalArticles: 0,
       recentUpdates: Math.floor(Math.random() * 10) + 5,
       pendingSyncs: Math.floor(Math.random() * 3) + 1,
@@ -47,6 +47,11 @@ router.get('/dashboard-stats', async (req: Request, res: Response) => {
     };
 
     console.log('📊 Dashboard stats:', stats);
+    console.log('📊 Raw counts:', {
+      dataSources: dataSourcesCount,
+      updates: regulatoryUpdatesCount, 
+      cases: legalCasesCount
+    });
     res.json(stats);
   } catch (error) {
     console.error('Dashboard stats error:', error);
