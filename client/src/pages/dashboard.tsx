@@ -352,7 +352,7 @@ export default function Dashboard() {
                   </p>
                 </div>
               </div>
-              <Button size="sm" variant="outline" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700">
+              <Button size="sm" variant="outline" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700 text-xs px-3">
                 Aktiv
               </Button>
             </div>
@@ -368,7 +368,7 @@ export default function Dashboard() {
                   </p>
                 </div>
               </div>
-              <Button size="sm" variant="outline" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700">
+              <Button size="sm" variant="outline" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700 text-xs px-3">
                 Aktiv
               </Button>
             </div>
@@ -384,7 +384,7 @@ export default function Dashboard() {
                   </p>
                 </div>
               </div>
-              <Button size="sm" variant="outline" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700">
+              <Button size="sm" variant="outline" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700 text-xs px-3">
                 Aktiv
               </Button>
             </div>
