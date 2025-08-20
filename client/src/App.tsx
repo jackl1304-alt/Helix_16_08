@@ -40,6 +40,8 @@ const CustomerDashboard = React.lazy(() => import("@/pages/customer-dashboard"))
 const CustomerApp = React.lazy(() => import("@/pages/customer-app"));
 const TenantAuth = React.lazy(() => import("@/pages/tenant-auth"));
 const TenantDashboard = React.lazy(() => import("@/pages/tenant-dashboard"));
+const TenantDataCollection = React.lazy(() => import("@/pages/tenant-data-collection"));
+const TenantRegulatoryUpdates = React.lazy(() => import("@/pages/tenant-regulatory-updates"));
 
 // Simple Auth Hook
 function useSimpleAuth() {
@@ -112,7 +114,13 @@ function App() {
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                 </div>
               }>
-                {pathname === '/tenant-login' ? <TenantAuth /> : <TenantDashboard />}
+                <Switch>
+                  <Route path="/tenant-login" component={TenantAuth} />
+                  <Route path="/tenant/dashboard" component={TenantDashboard} />
+                  <Route path="/tenant/data-collection" component={TenantDataCollection} />
+                  <Route path="/tenant/regulatory-updates" component={TenantRegulatoryUpdates} />
+                  <Route path="/tenant/*" component={TenantDashboard} />
+                </Switch>
               </React.Suspense>
             </TooltipProvider>
           </QueryClientProvider>
