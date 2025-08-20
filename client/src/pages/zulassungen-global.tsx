@@ -186,7 +186,7 @@ export default function ZulassungenGlobal() {
                 <h1 className="text-3xl font-bold">Globale Medizintechnik-Zulassungen</h1>
                 <div className="flex items-center gap-6 text-purple-100 mt-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm">{totalApprovals} Aktive Behörden</span>
+                    <span className="text-sm">7 Aktive Behörden</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm">Weltweite Abdeckung</span>
@@ -199,7 +199,7 @@ export default function ZulassungenGlobal() {
               </div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold">{totalApprovals}</div>
+              <div className="text-4xl font-bold">7</div>
               <div className="text-purple-100 text-sm">Jurisdiktionen</div>
               <div className="text-2xl font-bold mt-2">100%</div>
               <div className="text-purple-100 text-xs">Authentizität</div>

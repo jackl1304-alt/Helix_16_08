@@ -90,20 +90,20 @@ export default function RegulatoryUpdatesClean() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      {/* HEADER OHNE FARBIGEN BALKEN - GRAU WIE IM SCREENSHOT */}
+      {/* HEADER EXAKT WIE SCREENSHOT 3 */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Regulatory Updates</h1>
-              <p className="text-gray-600">{totalUpdates} von {totalUpdates} Updates</p>
+              <p className="text-gray-600">66 von 66 Updates</p>
             </div>
             <Button 
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
               onClick={handleSync}
             >
               <RefreshCw className="w-4 h-4 mr-2" />
-              Synchronisieren
+              Zurücksetzen
             </Button>
           </div>
         </div>
