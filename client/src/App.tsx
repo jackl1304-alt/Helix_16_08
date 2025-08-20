@@ -42,6 +42,7 @@ const TenantAuth = React.lazy(() => import("@/pages/tenant-auth"));
 const TenantDashboard = React.lazy(() => import("@/pages/tenant-dashboard"));
 const TenantDataCollection = React.lazy(() => import("@/pages/tenant-data-collection"));
 const TenantRegulatoryUpdates = React.lazy(() => import("@/pages/tenant-regulatory-updates"));
+const Wissensdatenbank = React.lazy(() => import("@/pages/wissensdatenbank"));
 
 // Simple Auth Hook
 function useSimpleAuth() {
@@ -115,7 +116,7 @@ function App() {
                 </div>
               }>
                 <Switch>
-                  <Route path="/tenant-login" component={TenantAuth} />
+                  <Route path="/tenant-login" render={() => <TenantAuth tenantSubdomain="demo" tenantName="Demo Medical" colorScheme="blue" />} />
                   <Route path="/tenant/dashboard" component={TenantDashboard} />
                   <Route path="/tenant/data-collection" component={TenantDataCollection} />
                   <Route path="/tenant/regulatory-updates" component={TenantRegulatoryUpdates} />
@@ -153,6 +154,7 @@ function App() {
                   <Route path="/email-management" component={EmailManagement} />
                   <Route path="/email-automation" component={EmailAutomation} />
                   <Route path="/knowledge-base" component={KnowledgeBase} />
+                  <Route path="/wissensdatenbank" component={Wissensdatenbank} />
                   
                   {/* Compliance & Regulation */}
                   <Route path="/regulatory-updates" component={RegulatoryUpdates} />
