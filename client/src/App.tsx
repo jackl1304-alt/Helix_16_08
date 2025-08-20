@@ -6,9 +6,8 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import Login from "@/pages/login";
 
 // Direct imports - no lazy loading to eliminate Suspense issues
-import Dashboard from "@/pages/dashboard";
+import SimpleDashboard from "@/simple-dashboard";
 import NotFound from "@/pages/not-found";
-import TestSimple from "@/test-simple";
 
 // JSON-based Navigation State
 interface AppState {
@@ -22,7 +21,7 @@ function renderCurrentPage(page: string, userData: any, navigate: (page: string)
   switch (page) {
     case '/':
     case '/dashboard':
-      return <TestSimple />;
+      return <SimpleDashboard navigate={navigate} />;
     case '/regulatory-updates':
       return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Regulatory Updates</h1><p>Regulatory Updates Seite wird geladen...</p><button onClick={() => navigate('/dashboard')} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Zurück zum Dashboard</button></div>;
     case '/knowledge-base':
