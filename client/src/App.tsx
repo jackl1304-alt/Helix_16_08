@@ -16,12 +16,30 @@ interface AppState {
   isLoading: boolean;
 }
 
+// Navigation Context for sharing navigation function
+interface NavigationContextType {
+  navigate: (page: string) => void;
+  currentPage: string;
+}
+
+const NavigationContext = React.createContext<NavigationContextType | null>(null);
+
 // Simple page renderer without complex routing
 function renderCurrentPage(page: string, userData: any) {
   switch (page) {
     case '/':
     case '/dashboard':
       return <Dashboard />;
+    case '/regulatory-updates':
+      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Regulatory Updates</h1><p>Regulatory Updates Seite wird geladen...</p></div>;
+    case '/knowledge-base':
+      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Knowledge Base</h1><p>Knowledge Base Seite wird geladen...</p></div>;
+    case '/analytics':
+      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Analytics</h1><p>Analytics Seite wird geladen...</p></div>;
+    case '/data-collection':
+      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">Data Collection</h1><p>Data Collection Seite wird geladen...</p></div>;
+    case '/user-management':
+      return <div className="p-8"><h1 className="text-2xl font-bold mb-4">User Management</h1><p>User Management Seite wird geladen...</p></div>;
     case '/404':
     default:
       return <NotFound />;
@@ -74,6 +92,12 @@ function App() {
     window.history.pushState({}, '', page);
   };
 
+  // Navigation context value
+  const navigationValue = {
+    navigate: handleNavigation,
+    currentPage: appState.currentPage
+  };
+
   // Loading state
   if (appState.isLoading || isAuthenticated === null) {
     return (
@@ -104,13 +128,24 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
-        <div className="min-h-screen bg-gray-50">
-          <Toaster />
-          {renderCurrentPage(appState.currentPage, appState.userData)}
-        </div>
+        <NavigationContext.Provider value={navigationValue}>
+          <div className="min-h-screen bg-gray-50">
+            <Toaster />
+            {renderCurrentPage(appState.currentPage, appState.userData)}
+          </div>
+        </NavigationContext.Provider>
       </LanguageProvider>
     </QueryClientProvider>
   );
+}
+
+// Hook für Navigation
+export function useNavigation() {
+  const context = React.useContext(NavigationContext);
+  if (!context) {
+    throw new Error('useNavigation must be used within NavigationProvider');
+  }
+  return context;
 }
 
 export default App;

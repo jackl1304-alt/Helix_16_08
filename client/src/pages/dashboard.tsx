@@ -7,7 +7,6 @@ import { NavigationHeader } from "@/components/ui/navigation-header";
 import { ResponsiveLayout } from "@/components/responsive-layout";
 import { AISearchPanel } from "@/components/admin/ai-search-panel";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLocation } from "wouter";
 import { 
   FileText, 
   Database, 
@@ -34,9 +33,10 @@ import {
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useNavigation } from "@/App";
 
 export default function Dashboard() {
-  const [, setLocation] = useLocation();
+  const { navigate } = useNavigation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -181,9 +181,9 @@ export default function Dashboard() {
     newsletterSyncMutation.mutate();
   };
 
-  const handleKnowledgeBase = () => setLocation('/knowledge-base');
-  const handleNewsletter = () => setLocation('/newsletter');
-  const handleAnalytics = () => setLocation('/analytics');
+  const handleKnowledgeBase = () => navigate('/knowledge-base');
+  const handleNewsletter = () => navigate('/newsletter');
+  const handleAnalytics = () => navigate('/analytics');
 
   return (
     <ResponsiveLayout>
@@ -282,7 +282,7 @@ export default function Dashboard() {
                   <div 
                     key={index} 
                     className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
-                    onClick={() => setLocation(`/regulatory-updates/${update.id}`)}
+                    onClick={() => navigate(`/regulatory-updates/${update.id}`)}
                   >
                     <div className="flex-1">
                       <p className="font-medium text-sm text-blue-600 hover:text-blue-800">{update.title}</p>
