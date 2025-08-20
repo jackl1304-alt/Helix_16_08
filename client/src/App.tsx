@@ -20,6 +20,7 @@ const RegulatoryUpdates = React.lazy(() => import("@/pages/regulatory-updates"))
 const DataCollection = React.lazy(() => import("@/pages/data-collection"));
 const NewsletterAdmin = React.lazy(() => import("@/pages/newsletter-admin"));
 const EmailManagement = React.lazy(() => import("@/pages/email-management"));
+const EmailAutomation = React.lazy(() => import("@/pages/email-automation"));
 const KnowledgeBase = React.lazy(() => import("@/pages/knowledge-base"));
 const RechtsprechungFixed = React.lazy(() => import("@/pages/rechtsprechung-fixed"));
 const ZulassungenGlobal = React.lazy(() => import("@/pages/zulassungen-global"));
@@ -118,6 +119,7 @@ function App() {
                   <Route path="/data-collection" component={DataCollection} />
                   <Route path="/newsletter-admin" component={NewsletterAdmin} />
                   <Route path="/email-management" component={EmailManagement} />
+                  <Route path="/email-automation" component={EmailAutomation} />
                   <Route path="/knowledge-base" component={KnowledgeBase} />
                   
                   {/* Compliance & Regulation */}
