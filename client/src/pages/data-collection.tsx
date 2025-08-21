@@ -32,79 +32,11 @@ export default function DataCollection() {
     queryKey: ["/api/data-sources"],
   });
 
-  // STATISCHE NEWSLETTER-QUELLEN - Keine Backend-Verbindung mehr
-  const newsletterSources = [
-    {
-      id: "ns_1",
-      name: "FDA News & Updates",
-      type: "newsletter",
-      category: "regulatory",
-      region: "US",
-      endpoint: "https://www.fda.gov/news-events/fda-newsroom",
-      is_active: true,
-      description: "Offizielle FDA Updates und Ankündigungen"
-    },
-    {
-      id: "ns_2",
-      name: "EMA Newsletter",
-      type: "newsletter",
-      category: "regulatory",
-      region: "EU",
-      endpoint: "https://www.ema.europa.eu/en/news",
-      is_active: true,
-      description: "Europäische Arzneimittel-Agentur Newsletter"
-    },
-    {
-      id: "ns_3",
-      name: "MedTech Dive",
-      type: "newsletter",
-      category: "industry",
-      region: "Global",
-      endpoint: "https://www.medtechdive.com/news/",
-      is_active: true,
-      description: "Medizintechnik-Industrie News und Updates"
-    },
-    {
-      id: "ns_4",
-      name: "RAPS Newsletter",
-      type: "newsletter",
-      category: "regulatory",
-      region: "Global",
-      endpoint: "https://www.raps.org/news",
-      is_active: true,
-      description: "Regulatory Affairs Professional Society Updates"
-    },
-    {
-      id: "ns_5",
-      name: "Medical Device Industry",
-      type: "newsletter",
-      category: "industry",
-      region: "Global",
-      endpoint: "https://medicaldevice-network.com/news/",
-      is_active: true,
-      description: "Technische Nachrichten und Marktanalysen"
-    },
-    {
-      id: "ns_6",
-      name: "BfArM Aktuell",
-      type: "newsletter",
-      category: "regulatory",
-      region: "DE",
-      endpoint: "https://www.bfarm.de/DE/Service/Presse/_node.html",
-      is_active: true,
-      description: "Deutsche Behörden-Updates und Mitteilungen"
-    },
-    {
-      id: "ns_7",
-      name: "MedTech Europe Policy",
-      type: "newsletter",
-      category: "regulatory",
-      region: "EU",
-      endpoint: "https://www.medtecheurope.org/news-and-events/",
-      is_active: true,
-      description: "Policy Updates und Markttrends aus Europa"
-    }
-  ];
+  const { data: newsletterSources } = useQuery({
+    queryKey: ['/api/newsletter-sources'],
+    staleTime: 300000, // 5 minutes
+    gcTime: 600000, // 10 minutes
+  });
 
   // Dashboard Stats für Live-Sync-Tracking
   const { data: dashboardStats } = useQuery({
@@ -165,36 +97,43 @@ export default function DataCollection() {
     },
   });
 
-  // Newsletter Sync - Simuliert lokale Datenaktualisierung ohne Backend
+  // Newsletter Sync Mutation - Einfache Cache-Refresh-Lösung
   const newsletterSyncMutation = useMutation({
     mutationFn: async () => {
-      console.log("Frontend: Simulating newsletter data sync with static data");
+      console.log("Frontend: Starting newsletter data refresh");
       
-      // Simuliere Verarbeitung für UX
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Hole aktuelle Newsletter-Daten für echte Zahlen
+      const currentNewsletterSources = (newsletterSources as any)?.sources || [];
+      const activeNewsletterSources = currentNewsletterSources.filter((source: any) => source.status === 'active').length;
       
-      const activeCount = newsletterSources.filter(s => s.is_active).length;
+      // Cache-Invalidierung zum Neuladen der Daten
+      queryClient.invalidateQueries({ queryKey: ["/api/newsletter-sources"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/knowledge-base"] });
+      
+      // Kurze Verarbeitung für UX
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       return { 
         success: true, 
-        message: "Newsletter-Daten erfolgreich synchronisiert",
-        activeNewsletters: activeCount,
-        totalNewsletters: newsletterSources.length
+        message: "Newsletter-Daten wurden aktualisiert",
+        activeNewsletters: activeNewsletterSources,
+        totalNewsletters: currentNewsletterSources.length
       };
     },
     onSuccess: (data) => {
-      console.log("Frontend: Newsletter sync simulation completed", data);
+      console.log("Frontend: Newsletter data refresh successful", data);
       
       toast({
-        title: "✅ Newsletter Sync Abgeschlossen",
-        description: `${data.activeNewsletters} aktive von ${data.totalNewsletters} Newsletter-Quellen erfolgreich synchronisiert`,
+        title: "✅ Newsletter Daten Aktualisiert",
+        description: `${data.activeNewsletters} aktive von ${data.totalNewsletters} Newsletter-Quellen überprüft`,
       });
     },
     onError: (error: any) => {
-      console.error("Frontend: Newsletter sync error:", error);
+      console.error("Frontend: Newsletter data refresh error:", error);
       toast({
-        title: "Sync Fehlgeschlagen",
-        description: "Newsletter-Synchronisation konnte nicht abgeschlossen werden",
+        title: "Fehler beim Aktualisieren",
+        description: "Die Newsletter-Daten konnten nicht aktualisiert werden",
         variant: "destructive",
       });
     },
@@ -643,8 +582,8 @@ export default function DataCollection() {
                   </div>
                   <div className="flex items-center gap-2">
                       <div className="text-sm text-blue-700 text-right">
-                        <div className="font-medium">{newsletterSources.filter(s => s.is_active !== false).length} aktiv</div>
-                        <div className="text-xs">{newsletterSources.length} gesamt</div>
+                        <div className="font-medium">{((newsletterSources as any[]) || []).filter((s: any) => s.type === 'newsletter' && s.is_active !== false).length || 0} aktiv</div>
+                        <div className="text-xs">{((newsletterSources as any[]) || []).filter((s: any) => s.type === 'newsletter').length || 0} gesamt</div>
                       </div>
                     <Button
                       size="sm"
@@ -663,9 +602,9 @@ export default function DataCollection() {
                 </div>
               </CardHeader>
               <CardContent>
-                {newsletterSources.length > 0 ? (
+                {((newsletterSources as any[]) || []).filter((s: any) => s.type === 'newsletter').length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96 overflow-y-auto">
-                    {newsletterSources.map((source, index) => (
+                    {((newsletterSources as any[]) || []).filter((s: any) => s.type === 'newsletter').map((source: any, index: number) => (
                       <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
@@ -700,7 +639,7 @@ export default function DataCollection() {
                 ) : (
                   <div className="text-center py-6">
                     <div className="text-blue-500 mb-2">📧</div>
-                    <p className="text-sm text-blue-600">Keine Newsletter-Quellen verfügbar</p>
+                    <p className="text-sm text-blue-600">Newsletter-Quellen werden geladen...</p>
                   </div>
                 )}
               </CardContent>

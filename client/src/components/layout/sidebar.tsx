@@ -1,5 +1,5 @@
-import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useState } from "react";
 import { 
   BarChart3, 
   Database, 
@@ -23,16 +23,10 @@ import {
   Mail,
   Bot,
   Sparkles,
-  Building,
-  LogOut,
-  Activity
+  Building
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Logo } from "@/components/layout/logo";
-import { Input } from "@/components/ui/input";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { LanguageSelector } from "@/components/LanguageSelector";
-import { useAuth } from "@/hooks/use-auth";
+import logoPath from "@assets/ICON Helix_1753735921077.jpg";
 
 // Verbesserte thematische Sidebar-Struktur basierend auf Benutzeranalyse
 interface NavigationItem {
@@ -48,61 +42,61 @@ interface NavigationSection {
   hiddenItems?: NavigationItem[];
 }
 
-const getNavigationStructure = (t: (key: string) => string): Record<string, NavigationSection> => ({
-  // 1. OVERVIEW & CONTROL
+const navigationStructure: Record<string, NavigationSection> = {
+  // 1. ÜBERSICHT & STEUERUNG
   overview: {
-    title: t('nav.sections.overview'),
+    title: "ÜBERSICHT & STEUERUNG",
     items: [
-      { name: t('nav.dashboard'), href: "/", icon: BarChart3 },
-      { name: t('nav.analytics'), href: "/analytics", icon: TrendingUp },
+      { name: "Dashboard", href: "/", icon: BarChart3 },
+      { name: "Berichte & Analysen", href: "/analytics", icon: TrendingUp },
     ],
     defaultOpen: true
   },
 
-  // 2. DATA MANAGEMENT 
+  // 2. DATENMANAGEMENT 
   dataManagement: {
-    title: t('nav.sections.dataManagement'),
+    title: "DATENMANAGEMENT",
     items: [
-      { name: t('nav.dataCollection'), href: "/data-collection", icon: Database },
-      { name: t('nav.newsletterAdmin'), href: "/newsletter-admin", icon: Mail },
-      { name: t('nav.emailManagement'), href: "/email-management", icon: Mail },
-      { name: t('nav.knowledgeBase'), href: "/knowledge-base", icon: Book },
+      { name: "Datensammlung", href: "/data-collection", icon: Database },
+      { name: "Newsletter-Verwaltung", href: "/newsletter-admin", icon: Mail },
+      { name: "Email-Verwaltung", href: "/email-management", icon: Mail },
+      { name: "Wissensdatenbank", href: "/knowledge-base", icon: Book },
     ],
     defaultOpen: true
   },
 
-  // 3. COMPLIANCE & REGULATION
+  // 3. COMPLIANCE & REGULIERUNG
   compliance: {
-    title: t('nav.sections.compliance'),
+    title: "COMPLIANCE & REGULIERUNG",
     items: [
-      { name: t('nav.regulatoryUpdates'), href: "/regulatory-updates", icon: FileText },
-      { name: t('nav.legalCases'), href: "/rechtsprechung", icon: Scale },
+      { name: "Regulatorische Updates", href: "/regulatory-updates", icon: FileText },
+      { name: "Rechtsprechung", href: "/rechtsprechung", icon: Scale },
     ],
     defaultOpen: true
   },
 
-  // 4. APPROVALS & REGISTRATION
+  // 4. ZULASSUNGEN & REGISTRIERUNG
   approvals: {
-    title: t('nav.sections.approvals'),
+    title: "ZULASSUNGEN & REGISTRIERUNG",
     items: [
-      { name: t('nav.globalApprovals'), href: "/zulassungen/global", icon: Globe },
-      { name: t('nav.ongoingApprovals'), href: "/zulassungen/laufende", icon: CheckCircle },
+      { name: "Globale Zulassungen", href: "/zulassungen/global", icon: Globe },
+      { name: "Laufende Zulassungen", href: "/zulassungen/laufende", icon: CheckCircle },
     ],
     defaultOpen: true
   },
 
-  // 5. ADVANCED (collapsible)
+  // 5. ERWEITERT (kollabierbar)
   advanced: {
-    title: t('nav.sections.advanced'),
+    title: "ERWEITERT",
     items: [
-      { name: t('nav.syncManager'), href: "/sync-manager", icon: RefreshCw },
-      { name: t('nav.globalSources'), href: "/global-sources", icon: Globe },
-      { name: t('nav.newsletterManager'), href: "/newsletter-manager", icon: Newspaper },
-      { name: t('nav.historicalData'), href: "/historical-data", icon: Archive },
-      { name: t('nav.customerManagement'), href: "/admin-customers", icon: Building },
-      { name: t('nav.userManagement'), href: "/user-management", icon: Users },
-      { name: t('nav.systemAdmin'), href: "/administration", icon: Settings },
-      { name: t('nav.auditLogs'), href: "/audit-logs", icon: FileSearch },
+      { name: "Sync-Verwaltung", href: "/sync-manager", icon: RefreshCw },
+      { name: "Globale Quellen", href: "/global-sources", icon: Globe },
+      { name: "Newsletter Manager", href: "/newsletter-manager", icon: Newspaper },
+      { name: "Historische Daten", href: "/historical-data", icon: Archive },
+      { name: "Kunden-Management", href: "/admin-customers", icon: Building },
+      { name: "Benutzerverwaltung", href: "/user-management", icon: Users },
+      { name: "System-Verwaltung", href: "/administration", icon: Settings },
+      { name: "Audit-Protokolle", href: "/audit-logs", icon: FileSearch },
     ],
     defaultOpen: false,
     hiddenItems: [
@@ -111,51 +105,10 @@ const getNavigationStructure = (t: (key: string) => string): Record<string, Navi
       { name: "✨", href: "/grip-integration", icon: Sparkles },
     ]
   }
-});
-
-// Sidebar Search Field Component
-function SidebarSearchField() {
-  const { t } = useLanguage();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [, setLocation] = useLocation();
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      // Navigate to intelligent search page with query
-      setLocation(`/intelligent-search?q=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch(e);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSearch}>
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#07233e]" />
-        <Input
-          type="text"
-          placeholder={t('search.askQuestion')}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyPress={handleKeyPress}
-          className="pl-10 pr-4 py-2 bg-[#f0f8ff] border border-[#b0d4f6] rounded-lg text-sm text-[#07233e] placeholder-[#07233e]/70 focus:outline-none focus:ring-2 focus:ring-[#07233e] focus:border-transparent hover:bg-[#e6f3ff] transition-colors duration-200"
-          data-testid="sidebar-search-input"
-        />
-      </div>
-    </form>
-  );
-}
+};
 
 export function Sidebar() {
-  const { t } = useLanguage();
   const [location] = useLocation();
-  const { logout } = useAuth();
-  const navigationStructure = getNavigationStructure(t);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
     // Initialize with default open states
     const initial: Record<string, boolean> = {};
@@ -179,12 +132,12 @@ export function Sidebar() {
     return (
       <Link
         key={item.href}
-        to={item.href}
+        href={item.href}
         className={cn(
           "flex items-center justify-start px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer text-left",
           isActive
-            ? "bg-white text-[#1e3a5f] shadow-md"
-            : "text-gray-300 hover:bg-[#2d4a70] hover:text-white"
+            ? "bg-[#07233e] text-white shadow-md"
+            : "text-gray-700 hover:bg-[#f0f8ff] hover:text-[#07233e]"
         )}
       >
         <IconComponent className="mr-3 h-5 w-5 flex-shrink-0" />
@@ -203,7 +156,7 @@ export function Sidebar() {
           return (
             <Link
               key={item.href}
-              to={item.href}
+              href={item.href}
               className={cn(
                 "flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-300 cursor-pointer",
                 isActive
@@ -228,7 +181,7 @@ export function Sidebar() {
       <div key={sectionKey} className="mb-3">
         <button
           onClick={() => toggleSection(sectionKey)}
-          className="flex items-center justify-between w-full px-4 py-2 text-xs font-semibold text-gray-300 uppercase tracking-wider hover:text-white transition-colors duration-200 text-left"
+          className="flex items-center justify-between w-full px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-[#07233e] transition-colors duration-200 text-left"
         >
           <span>{section.title}</span>
           <ChevronIcon className="h-4 w-4" />
@@ -245,29 +198,30 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-[#1e3a5f] shadow-lg z-50 overflow-y-auto">
+    <aside className="fixed left-0 top-0 h-screen w-64 deltaways-nav shadow-lg z-50 overflow-y-auto">
       {/* DELTA WAYS Logo Header */}
-      <div className="p-6 border-b border-gray-700">
-        <Link to="/">
+      <div className="p-6 border-b border-gray-200">
+        <Link href="/">
           <div className="flex flex-col items-center cursor-pointer space-y-2">
-            <Logo size="lg" showText={true} />
+            <img 
+              src={logoPath} 
+              alt="Helix Logo" 
+              className="h-32 w-32 object-cover rounded-lg ring-2 ring-[#b0d4f6]"
+            />
+            <span className="text-lg deltaways-brand-text text-[#07233e]">HELIX</span>
+            <p className="text-xs font-medium text-gray-600">Powered by DELTA WAYS</p>
           </div>
         </Link>
-        
-        {/* Customer Area Button */}
-        <div className="mt-4">
-          <Link to="/customer-dashboard">
-            <button className="w-full flex items-center justify-center px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-              <Users className="h-4 w-4 mr-2" />
-              Customer Area
-            </button>
-          </Link>
-        </div>
       </div>
       
-      {/* Funktionsfähiger Suchbereich */}
-      <div className="p-4 border-b border-gray-700">
-        <SidebarSearchField />
+      {/* Optimierter Suchbereich */}
+      <div className="p-4 border-b border-gray-100">
+        <Link href="/intelligent-search">
+          <div className="flex items-center px-3 py-2 bg-[#f0f8ff] rounded-lg border border-[#b0d4f6] hover:bg-[#e6f3ff] transition-colors duration-200 cursor-pointer">
+            <Search className="h-4 w-4 text-[#07233e] mr-2" />
+            <span className="text-sm text-[#07233e] font-medium">Intelligente Suche</span>
+          </div>
+        </Link>
       </div>
       
       {/* Thematisch organisierte Navigation */}
@@ -280,30 +234,16 @@ export function Sidebar() {
       </nav>
       
       {/* Status-Footer */}
-      <div className="border-t border-gray-700 p-4 bg-[#0f1f35]">
-        <div className="text-xs text-gray-300">
+      <div className="border-t border-gray-200 p-4 bg-gray-50">
+        <div className="text-xs text-gray-500">
           <div className="flex items-center justify-between">
-            <span>{t('status.label')}:</span>
-            <span className="text-green-400 font-medium">{t('status.online')}</span>
+            <span>Status:</span>
+            <span className="text-green-600 font-medium">Online</span>
           </div>
           <div className="flex items-center justify-between mt-1">
-            <span>{t('status.dataSources')}</span>
-            <span className="text-blue-400 font-medium">{t('common.active')}</span>
+            <span>46 Datenquellen</span>
+            <span className="text-blue-600 font-medium">Aktiv</span>
           </div>
-        </div>
-        
-        {/* Logout Button */}
-        <div className="mt-3 pt-3 border-t border-gray-600">
-          <button
-            onClick={() => {
-              logout();
-              window.location.reload();
-            }}
-            className="flex items-center w-full px-2 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded-md transition-colors"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            <span>Tenant Logout</span>
-          </button>
         </div>
       </div>
     </aside>

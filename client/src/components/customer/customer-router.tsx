@@ -1,49 +1,100 @@
-import React, { useState, useEffect } from "react";
+import { useLocation, useParams } from "wouter";
+import { lazy, Suspense } from "react";
 
-// Direct imports - NO lazy loading for zero Suspense issues
-import CustomerDashboard from "@/pages/customer-dashboard";
+// Lazy load components to avoid circular dependencies
+const CustomerDashboard = lazy(() => import("@/pages/customer-dashboard"));
+const CustomerSettings = lazy(() => import("@/pages/customer-settings"));
+const CustomerAIInsightsClean = lazy(() => import("@/pages/customer-ai-insights-clean"));
+const CustomerRegulatoryUpdates = lazy(() => import("@/pages/customer-regulatory-updates"));
 
-// JSON-based Customer Portal - NO complex routing or Suspense
-interface CustomerData {
-  tenantId: string;
-  permissions: string[];
-  theme: string;
-}
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+  </div>
+);
 
 export default function CustomerRouter() {
-  const [customerData, setCustomerData] = useState<CustomerData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [location] = useLocation();
+  const params = useParams();
 
-  useEffect(() => {
-    // Simple JSON-based customer data loading
-    const loadCustomerData = async () => {
-      try {
-        const response = await fetch('/api/customer/profile');
-        if (response.ok) {
-          const data = await response.json();
-          setCustomerData(data);
-        }
-      } catch (error) {
-        console.error('Error loading customer data:', error);
-      } finally {
-        setIsLoading(false);
+  const renderComponent = () => {
+    // Multi-tenant routing: /tenant/:tenantId/*
+    if (location.includes('/tenant/') && params.tenantId) {
+      // Extract the route part after tenant ID
+      const urlParts = location.split('/');
+      const tenantIndex = urlParts.indexOf('tenant');
+      const routeParts = urlParts.slice(tenantIndex + 2); // Skip 'tenant' and tenantId
+      const route = routeParts.join('/');
+      
+      switch (route) {
+        case "":
+        case "dashboard":
+        case "customer-dashboard":
+          return <CustomerDashboard />;
+        case "regulatory-updates":
+        case "customer/regulatory-updates":
+          return <CustomerRegulatoryUpdates />;
+        case "ai-insights":
+        case "customer-ai-insights":
+          return <CustomerAIInsightsClean />;
+        case "settings":
+        case "customer-settings":
+          return <CustomerSettings />;
+        case "legal-cases":
+          return <CustomerDashboard />; // Placeholder
+        case "knowledge-base":
+          return <CustomerDashboard />; // Placeholder
+        case "newsletters":
+          return <CustomerDashboard />; // Placeholder
+        case "analytics":
+          return <CustomerDashboard />; // Placeholder
+        case "advanced-analytics":
+          return <CustomerDashboard />; // Placeholder
+        case "global-sources":
+          return <CustomerDashboard />; // Placeholder
+        case "data-collection":
+          return <CustomerDashboard />; // Placeholder
+        case "historical-data":
+          return <CustomerDashboard />; // Placeholder
+        default:
+          return <CustomerDashboard />;
       }
-    };
+    }
 
-    loadCustomerData();
-  }, []);
+    // Legacy customer routes (fallback for old URLs)
+    switch (location) {
+      case "/customer-dashboard":
+        return <CustomerDashboard />;
+      case "/customer-settings":
+        return <CustomerSettings />;
+      case "/customer-ai-insights":
+        return <CustomerAIInsightsClean />;
+      case "/customer/regulatory-updates":
+        return <CustomerRegulatoryUpdates />;
+      case "/customer/legal-cases":
+        return <CustomerDashboard />; // Placeholder
+      case "/customer/knowledge-base":
+        return <CustomerDashboard />; // Placeholder
+      case "/customer/newsletters":
+        return <CustomerDashboard />; // Placeholder
+      case "/customer/analytics":
+        return <CustomerDashboard />; // Placeholder
+      case "/customer/advanced-analytics":
+        return <CustomerDashboard />; // Placeholder
+      case "/customer/global-sources":
+        return <CustomerDashboard />; // Placeholder
+      case "/customer/data-collection":
+        return <CustomerDashboard />; // Placeholder
+      case "/customer/historical-data":
+        return <CustomerDashboard />; // Placeholder
+      default:
+        return <CustomerDashboard />;
+    }
+  };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Customer Portal wird geladen...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Simple direct rendering - no complex routing
-  return <CustomerDashboard />;
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      {renderComponent()}
+    </Suspense>
+  );
 }

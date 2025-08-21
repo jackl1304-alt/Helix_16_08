@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import CustomerNavigation from "@/components/customer/customer-navigation";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { LanguageSelector } from "@/components/LanguageSelector";
-import { useLiveTenantPermissions } from "@/hooks/use-live-tenant-permissions";
 import { useCustomerTheme } from "@/contexts/customer-theme-context";
 import { 
   Brain,
@@ -208,9 +204,9 @@ export default function CustomerAIInsights() {
           )}
 
           {/* Insights Grid */}
-          {!isInsightsLoading && !insightsError && (insights || mockInsights) && (
+          {!isInsightsLoading && !insightsError && displayInsights && (
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {(insights || mockInsights).map((insight: AIInsight) => (
+              {displayInsights.map((insight) => (
               <Card key={insight.id} className={`${colors.cardBg} hover:shadow-lg transition-shadow`}>
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between">
@@ -240,7 +236,7 @@ export default function CustomerAIInsights() {
                   </p>
                   
                   <div className="flex flex-wrap gap-2">
-                    {insight.tags.map((tag: string) => (
+                    {insight.tags.map((tag) => (
                       <Badge key={tag} variant="outline" className="text-xs">
                         {tag}
                       </Badge>
@@ -263,7 +259,7 @@ export default function CustomerAIInsights() {
           )}
 
           {/* No Data State */}
-          {!isInsightsLoading && !insightsError && (!(insights || mockInsights) || (insights || mockInsights).length === 0) && (
+          {!isInsightsLoading && !insightsError && (!displayInsights || displayInsights.length === 0) && (
             <Card className={`${colors.cardBg}`}>
               <CardHeader>
                 <CardTitle className={`${colors.textPrimary} flex items-center gap-2`}>

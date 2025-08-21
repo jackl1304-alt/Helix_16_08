@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,11 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CustomerNavigation, { type CustomerPermissions } from "@/components/customer/customer-navigation";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { LanguageSelector } from "@/components/LanguageSelector";
-import { useLiveTenantPermissions } from "@/hooks/use-live-tenant-permissions";
-import { useCustomerTheme } from "@/contexts/customer-theme-context";
 import ThemeCustomizer from "@/components/customer/theme-customizer";
+import { useCustomerTheme } from "@/contexts/customer-theme-context";
 import { 
   Settings,
   User,
