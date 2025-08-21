@@ -1,308 +1,147 @@
 import React, { useState, useEffect } from "react";
+import { Switch, Route } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { ResponsiveLayout } from "@/components/responsive-layout";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-import Login from "@/pages/login";
 
-// Direct imports - no lazy loading to eliminate Suspense issues
-import Dashboard from "@/pages/dashboard";
+// Core Pages (eager loading)
+import Login from "@/pages/login";
 import NotFound from "@/pages/not-found";
 
-// Admin Pages
-import Administration from "@/pages/administration";
-import AdminCustomers from "@/pages/admin-customers";
-import AdminGlossary from "@/pages/admin-glossary";
-import DataSourcesAdmin from "@/pages/DataSourcesAdmin";
-import UserManagement from "@/pages/user-management";
-import SystemSettings from "@/pages/system-settings";
-import AuditLogs from "@/pages/audit-logs";
+// Lazy loaded pages (code splitting!)
+const Dashboard = React.lazy(() => import("@/pages/dashboard"));
+const Analytics = React.lazy(() => import("@/pages/analytics"));
+const SystemSettings = React.lazy(() => import("@/pages/system-settings"));
+const RegulatoryUpdates = React.lazy(() => import("@/pages/regulatory-updates"));
+const DataCollection = React.lazy(() => import("@/pages/data-collection"));
+const NewsletterAdmin = React.lazy(() => import("@/pages/newsletter-admin"));
+const EmailManagement = React.lazy(() => import("@/pages/email-management"));
+const KnowledgeBase = React.lazy(() => import("@/pages/knowledge-base"));
+const RechtsprechungFixed = React.lazy(() => import("@/pages/rechtsprechung-fixed"));
+const ZulassungenGlobal = React.lazy(() => import("@/pages/zulassungen-global"));
+const LaufendeZulassungen = React.lazy(() => import("@/pages/laufende-zulassungen"));
+const SyncManager = React.lazy(() => import("@/pages/sync-manager"));
+const GlobalSources = React.lazy(() => import("@/pages/global-sources"));
+const NewsletterManager = React.lazy(() => import("@/pages/newsletter-manager"));
+const HistoricalData = React.lazy(() => import("@/pages/historical-data"));
+const AdminCustomers = React.lazy(() => import("@/pages/admin-customers"));
+const UserManagement = React.lazy(() => import("@/pages/user-management"));
+const Administration = React.lazy(() => import("@/pages/administration"));
+const AuditLogs = React.lazy(() => import("@/pages/audit-logs"));
+const AiContentAnalysis = React.lazy(() => import("@/pages/ai-content-analysis"));
+const AiInsights = React.lazy(() => import("@/pages/ai-insights"));
+const GripIntegration = React.lazy(() => import("@/pages/grip-integration"));
 
-// Customer Pages
-import CustomerDashboard from "@/pages/customer-dashboard";
-import CustomerAiInsights from "@/pages/customer-ai-insights-clean";
-import CustomerAnalytics from "@/pages/customer-analytics";
-import CustomerSettings from "@/pages/customer-settings";
-import CustomerDataCollection from "@/pages/customer-data-collection";
-import CustomerGlobalSources from "@/pages/customer-global-sources";
-import CustomerHistoricalData from "@/pages/customer-historical-data";
-import CustomerKnowledgeBase from "@/pages/customer-knowledge-base";
-import CustomerLegalCases from "@/pages/customer-legal-cases";
-import CustomerNewsletters from "@/pages/customer-newsletters";
-import CustomerRegulatoryUpdates from "@/pages/customer-regulatory-updates";
+// Simple Auth Hook
+function useSimpleAuth() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-// Main Pages
-import Analytics from "@/pages/analytics";
-import AdvancedAnalytics from "@/pages/advanced-analytics";
-import AiInsights from "@/pages/ai-insights";
-import AiAnalysisCombined from "@/pages/ai-analysis-combined";
-import AiContentAnalysis from "@/pages/ai-content-analysis";
-import ApprovalWorkflow from "@/pages/approval-workflow";
-import DataCollection from "@/pages/data-collection";
-import EmailManagement from "@/pages/email-management-new";
-import GlobalSources from "@/pages/global-sources";
-import GripData from "@/pages/grip-data";
-import GripIntegration from "@/pages/grip-integration";
-import HistoricalData from "@/pages/historical-data";
-import IntelligentSearch from "@/pages/intelligent-search";
-import KnowledgeBase from "@/pages/knowledge-base-new";
-import NewsletterAdmin from "@/pages/newsletter-admin";
-import NewsletterManager from "@/pages/newsletter-manager";
-import RegulatoryUpdates from "@/pages/regulatory-updates-clean";
-import SyncManager from "@/pages/sync-manager-new";
-import TerminologyGlossary from "@/pages/terminology-glossary";
-import ZulassungenGlobal from "@/pages/zulassungen-global";
-import LaufendeZulassungen from "@/pages/laufende-zulassungen";
-import RechtsprechungFixed from "@/pages/rechtsprechung-fixed";
-import ChatSupport from "@/pages/chat-support";
-
-// Tenant Pages
-import TenantAuth from "@/pages/tenant-auth";
-import TenantDashboard from "@/pages/tenant-dashboard";
-import TenantOnboarding from "@/pages/tenant-onboarding";
-
-// JSON-based Navigation State
-interface AppState {
-  currentPage: string;
-  userData: any;
-  isLoading: boolean;
-}
-
-// Enhanced page renderer with all routes activated
-function renderCurrentPage(page: string, userData: any) {
-  switch (page) {
-    // Main Routes
-    case '/':
-    case '/dashboard':
-      return <Dashboard />;
-    
-    // Admin Routes
-    case '/administration':
-      return <Administration />;
-    case '/admin/customers':
-      return <AdminCustomers />;
-    case '/admin/glossary':
-      return <AdminGlossary />;
-    case '/admin/data-sources':
-      return <DataSourcesAdmin />;
-    case '/admin/users':
-      return <UserManagement />;
-    case '/admin/settings':
-      return <SystemSettings />;
-    case '/admin/audit-logs':
-      return <AuditLogs />;
-    case '/admin/newsletters':
-      return <NewsletterAdmin />;
-    case '/admin/newsletter-manager':
-      return <NewsletterManager />;
-    
-    // Customer Routes
-    case '/customer':
-    case '/customer/dashboard':
-      return <CustomerDashboard />;
-    case '/customer/ai-insights':
-      return <CustomerAiInsights />;
-    case '/customer/analytics':
-      return <CustomerAnalytics />;
-    case '/customer/settings':
-      return <CustomerSettings />;
-    case '/customer/data-collection':
-      return <CustomerDataCollection />;
-    case '/customer/global-sources':
-      return <CustomerGlobalSources />;
-    case '/customer/historical-data':
-      return <CustomerHistoricalData />;
-    case '/customer/knowledge-base':
-      return <CustomerKnowledgeBase />;
-    case '/customer/legal-cases':
-      return <CustomerLegalCases />;
-    case '/customer/newsletters':
-      return <CustomerNewsletters />;
-    case '/customer/regulatory-updates':
-      return <CustomerRegulatoryUpdates />;
-    
-    // Analytics & AI
-    case '/analytics':
-      return <Analytics />;
-    case '/advanced-analytics':
-      return <AdvancedAnalytics />;
-    case '/ai-insights':
-      return <AiInsights />;
-    case '/ai-analysis':
-      return <AiAnalysisCombined />;
-    case '/ai-content-analysis':
-      return <AiContentAnalysis />;
-    
-    // Data & Content Management
-    case '/data-collection':
-      return <DataCollection />;
-    case '/historical-data':
-      return <HistoricalData />;
-    case '/global-sources':
-      return <GlobalSources />;
-    case '/knowledge-base':
-      return <KnowledgeBase />;
-    case '/regulatory-updates':
-      return <RegulatoryUpdates />;
-    case '/approval-workflow':
-      return <ApprovalWorkflow />;
-    
-    // Integration & External Data
-    case '/grip-data':
-      return <GripData />;
-    case '/grip-integration':
-      return <GripIntegration />;
-    case '/sync-manager':
-      return <SyncManager />;
-    
-    // Search & Tools
-    case '/intelligent-search':
-      return <IntelligentSearch />;
-    case '/terminology-glossary':
-      return <TerminologyGlossary />;
-    
-    // Communication
-    case '/email-management':
-      return <EmailManagement />;
-    case '/chat-support':
-      return <ChatSupport />;
-    
-    // Regulatory & Legal
-    case '/zulassungen-global':
-      return <ZulassungenGlobal />;
-    case '/laufende-zulassungen':
-      return <LaufendeZulassungen />;
-    case '/rechtsprechung':
-      return <RechtsprechungFixed />;
-    
-    // Tenant Management
-    case '/tenant/auth':
-      return <TenantAuth />;
-    case '/tenant/dashboard':
-      return <TenantDashboard />;
-    case '/tenant/onboarding':
-      return <TenantOnboarding />;
-    
-    // Error Routes
-    case '/404':
-    case '/not-found':
-      return <NotFound />;
-    
-    default:
-      return <NotFound />;
-  }
-}
-
-// JSON-based Simple App without React Suspense issues
-function App() {
-  const [appState, setAppState] = useState<AppState>({
-    currentPage: window.location.pathname,
-    userData: null,
-    isLoading: true
-  });
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
-  // Initialize app with JSON data
   useEffect(() => {
-    const initializeApp = async () => {
-      try {
-        // Check authentication
-        const authStatus = localStorage.getItem('isAuthenticated') === 'true';
-        setIsAuthenticated(authStatus);
-        
-        // Load user data from JSON endpoint if authenticated
-        if (authStatus) {
-          const userData = await fetch('/api/user/profile')
-            .then(res => res.ok ? res.json() : null)
-            .catch(() => null);
-          
-          setAppState(prev => ({
-            ...prev,
-            userData,
-            isLoading: false
-          }));
-        } else {
-          setAppState(prev => ({ ...prev, isLoading: false }));
-        }
-      } catch (error) {
-        console.error('App initialization error:', error);
-        setAppState(prev => ({ ...prev, isLoading: false }));
-      }
-    };
-
-    initializeApp();
+    const authStatus = localStorage.getItem("isAuthenticated");
+    setIsAuthenticated(authStatus === "true");
+    setIsLoading(false);
   }, []);
 
-  // Handle navigation via JSON state
-  const handleNavigation = (page: string) => {
-    setAppState(prev => ({ ...prev, currentPage: page }));
-    window.history.pushState({}, '', page);
+  const login = () => {
+    localStorage.setItem("isAuthenticated", "true");
+    setIsAuthenticated(true);
   };
 
-  // Loading state
-  if (appState.isLoading || isAuthenticated === null) {
+  const logout = () => {
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("loginTime");
+    setIsAuthenticated(false);
+  };
+
+  return { isAuthenticated, isLoading, login, logout };
+}
+
+function App() {
+  const { isAuthenticated, isLoading, login } = useSimpleAuth();
+
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Helix wird geladen...</p>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
-  // Show login if not authenticated
   if (!isAuthenticated) {
     return (
-      <QueryClientProvider client={queryClient}>
+      <ErrorBoundary>
         <LanguageProvider>
-          <div className="min-h-screen bg-gray-50">
-            <Toaster />
-            <Login onLogin={() => setIsAuthenticated(true)} />
-          </div>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <Toaster />
+              <Login onLogin={login} />
+            </TooltipProvider>
+          </QueryClientProvider>
         </LanguageProvider>
-      </QueryClientProvider>
+      </ErrorBoundary>
     );
   }
 
-  // Main app with JSON-based navigation
   return (
-    <QueryClientProvider client={queryClient}>
+    <ErrorBoundary>
       <LanguageProvider>
-        <div className="min-h-screen bg-gray-50">
-          <Toaster />
-          {renderCurrentPage(appState.currentPage, appState.userData)}
-        </div>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <ResponsiveLayout>
+              <React.Suspense fallback={
+                <div className="flex items-center justify-center min-h-screen">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                </div>
+              }>
+                <Switch>
+                  <Route path="/" component={Dashboard} />
+                  <Route path="/dashboard" component={Dashboard} />
+                  <Route path="/analytics" component={Analytics} />
+                  <Route path="/system-settings" component={SystemSettings} />
+                  
+                  {/* Data Management */}
+                  <Route path="/data-collection" component={DataCollection} />
+                  <Route path="/newsletter-admin" component={NewsletterAdmin} />
+                  <Route path="/email-management" component={EmailManagement} />
+                  <Route path="/knowledge-base" component={KnowledgeBase} />
+                  
+                  {/* Compliance & Regulation */}
+                  <Route path="/regulatory-updates" component={RegulatoryUpdates} />
+                  <Route path="/rechtsprechung" component={RechtsprechungFixed} />
+                  
+                  {/* Approvals & Registration */}
+                  <Route path="/zulassungen/global" component={ZulassungenGlobal} />
+                  <Route path="/zulassungen/laufende" component={LaufendeZulassungen} />
+                  
+                  {/* Advanced */}
+                  <Route path="/sync-manager" component={SyncManager} />
+                  <Route path="/global-sources" component={GlobalSources} />
+                  <Route path="/newsletter-manager" component={NewsletterManager} />
+                  <Route path="/historical-data" component={HistoricalData} />
+                  <Route path="/admin-customers" component={AdminCustomers} />
+                  <Route path="/user-management" component={UserManagement} />
+                  <Route path="/administration" component={Administration} />
+                  <Route path="/audit-logs" component={AuditLogs} />
+                  <Route path="/ai-content-analysis" component={AiContentAnalysis} />
+                  <Route path="/ki-insights" component={AiInsights} />
+                  <Route path="/grip-integration" component={GripIntegration} />
+                  
+                  <Route component={NotFound} />
+                </Switch>
+              </React.Suspense>
+            </ResponsiveLayout>
+          </TooltipProvider>
+        </QueryClientProvider>
       </LanguageProvider>
-    </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
 export default App;
-
-// JSON API helper functions
-export const jsonApi = {
-  get: async (endpoint: string) => {
-    try {
-      const response = await fetch(endpoint);
-      return response.ok ? await response.json() : null;
-    } catch (error) {
-      console.error('JSON API GET error:', error);
-      return null;
-    }
-  },
-  
-  post: async (endpoint: string, data: any) => {
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      return response.ok ? await response.json() : null;
-    } catch (error) {
-      console.error('JSON API POST error:', error);
-      return null;
-    }
-  }
-};
