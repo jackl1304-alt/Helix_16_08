@@ -9,6 +9,58 @@ import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import NotFound from "@/pages/not-found";
 
+// Admin Pages
+import Administration from "@/pages/administration";
+import AdminCustomers from "@/pages/admin-customers";
+import AdminGlossary from "@/pages/admin-glossary";
+import DataSourcesAdmin from "@/pages/DataSourcesAdmin";
+import UserManagement from "@/pages/user-management";
+import SystemSettings from "@/pages/system-settings";
+import AuditLogs from "@/pages/audit-logs";
+
+// Customer Pages
+import CustomerDashboard from "@/pages/customer-dashboard";
+import CustomerAiInsights from "@/pages/customer-ai-insights-clean";
+import CustomerAnalytics from "@/pages/customer-analytics";
+import CustomerSettings from "@/pages/customer-settings";
+import CustomerDataCollection from "@/pages/customer-data-collection";
+import CustomerGlobalSources from "@/pages/customer-global-sources";
+import CustomerHistoricalData from "@/pages/customer-historical-data";
+import CustomerKnowledgeBase from "@/pages/customer-knowledge-base";
+import CustomerLegalCases from "@/pages/customer-legal-cases";
+import CustomerNewsletters from "@/pages/customer-newsletters";
+import CustomerRegulatoryUpdates from "@/pages/customer-regulatory-updates";
+
+// Main Pages
+import Analytics from "@/pages/analytics";
+import AdvancedAnalytics from "@/pages/advanced-analytics";
+import AiInsights from "@/pages/ai-insights";
+import AiAnalysisCombined from "@/pages/ai-analysis-combined";
+import AiContentAnalysis from "@/pages/ai-content-analysis";
+import ApprovalWorkflow from "@/pages/approval-workflow";
+import DataCollection from "@/pages/data-collection";
+import EmailManagement from "@/pages/email-management-new";
+import GlobalSources from "@/pages/global-sources";
+import GripData from "@/pages/grip-data";
+import GripIntegration from "@/pages/grip-integration";
+import HistoricalData from "@/pages/historical-data";
+import IntelligentSearch from "@/pages/intelligent-search";
+import KnowledgeBase from "@/pages/knowledge-base-new";
+import NewsletterAdmin from "@/pages/newsletter-admin";
+import NewsletterManager from "@/pages/newsletter-manager";
+import RegulatoryUpdates from "@/pages/regulatory-updates-clean";
+import SyncManager from "@/pages/sync-manager-new";
+import TerminologyGlossary from "@/pages/terminology-glossary";
+import ZulassungenGlobal from "@/pages/zulassungen-global";
+import LaufendeZulassungen from "@/pages/laufende-zulassungen";
+import RechtsprechungFixed from "@/pages/rechtsprechung-fixed";
+import ChatSupport from "@/pages/chat-support";
+
+// Tenant Pages
+import TenantAuth from "@/pages/tenant-auth";
+import TenantDashboard from "@/pages/tenant-dashboard";
+import TenantOnboarding from "@/pages/tenant-onboarding";
+
 // JSON-based Navigation State
 interface AppState {
   currentPage: string;
@@ -16,13 +68,126 @@ interface AppState {
   isLoading: boolean;
 }
 
-// Simple page renderer without complex routing
+// Enhanced page renderer with all routes activated
 function renderCurrentPage(page: string, userData: any) {
   switch (page) {
+    // Main Routes
     case '/':
     case '/dashboard':
       return <Dashboard />;
+    
+    // Admin Routes
+    case '/administration':
+      return <Administration />;
+    case '/admin/customers':
+      return <AdminCustomers />;
+    case '/admin/glossary':
+      return <AdminGlossary />;
+    case '/admin/data-sources':
+      return <DataSourcesAdmin />;
+    case '/admin/users':
+      return <UserManagement />;
+    case '/admin/settings':
+      return <SystemSettings />;
+    case '/admin/audit-logs':
+      return <AuditLogs />;
+    case '/admin/newsletters':
+      return <NewsletterAdmin />;
+    case '/admin/newsletter-manager':
+      return <NewsletterManager />;
+    
+    // Customer Routes
+    case '/customer':
+    case '/customer/dashboard':
+      return <CustomerDashboard />;
+    case '/customer/ai-insights':
+      return <CustomerAiInsights />;
+    case '/customer/analytics':
+      return <CustomerAnalytics />;
+    case '/customer/settings':
+      return <CustomerSettings />;
+    case '/customer/data-collection':
+      return <CustomerDataCollection />;
+    case '/customer/global-sources':
+      return <CustomerGlobalSources />;
+    case '/customer/historical-data':
+      return <CustomerHistoricalData />;
+    case '/customer/knowledge-base':
+      return <CustomerKnowledgeBase />;
+    case '/customer/legal-cases':
+      return <CustomerLegalCases />;
+    case '/customer/newsletters':
+      return <CustomerNewsletters />;
+    case '/customer/regulatory-updates':
+      return <CustomerRegulatoryUpdates />;
+    
+    // Analytics & AI
+    case '/analytics':
+      return <Analytics />;
+    case '/advanced-analytics':
+      return <AdvancedAnalytics />;
+    case '/ai-insights':
+      return <AiInsights />;
+    case '/ai-analysis':
+      return <AiAnalysisCombined />;
+    case '/ai-content-analysis':
+      return <AiContentAnalysis />;
+    
+    // Data & Content Management
+    case '/data-collection':
+      return <DataCollection />;
+    case '/historical-data':
+      return <HistoricalData />;
+    case '/global-sources':
+      return <GlobalSources />;
+    case '/knowledge-base':
+      return <KnowledgeBase />;
+    case '/regulatory-updates':
+      return <RegulatoryUpdates />;
+    case '/approval-workflow':
+      return <ApprovalWorkflow />;
+    
+    // Integration & External Data
+    case '/grip-data':
+      return <GripData />;
+    case '/grip-integration':
+      return <GripIntegration />;
+    case '/sync-manager':
+      return <SyncManager />;
+    
+    // Search & Tools
+    case '/intelligent-search':
+      return <IntelligentSearch />;
+    case '/terminology-glossary':
+      return <TerminologyGlossary />;
+    
+    // Communication
+    case '/email-management':
+      return <EmailManagement />;
+    case '/chat-support':
+      return <ChatSupport />;
+    
+    // Regulatory & Legal
+    case '/zulassungen-global':
+      return <ZulassungenGlobal />;
+    case '/laufende-zulassungen':
+      return <LaufendeZulassungen />;
+    case '/rechtsprechung':
+      return <RechtsprechungFixed />;
+    
+    // Tenant Management
+    case '/tenant/auth':
+      return <TenantAuth />;
+    case '/tenant/dashboard':
+      return <TenantDashboard />;
+    case '/tenant/onboarding':
+      return <TenantOnboarding />;
+    
+    // Error Routes
     case '/404':
+    case '/not-found':
+      return <NotFound />;
+    
     default:
       return <NotFound />;
   }

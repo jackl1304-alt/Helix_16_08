@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { useDevice, getDeviceClasses } from "@/hooks/use-device";
-import { Sidebar } from "@/components/layout/sidebar";
+import { Sidebar } from "@/components/sidebar";
 import { MobileSidebar } from "@/components/layout/mobile-sidebar";
 import { cn } from "@/lib/utils";
 import { LanguageSelector } from "@/components/LanguageSelector";
