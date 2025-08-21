@@ -3,7 +3,6 @@ import { useDevice, getDeviceClasses } from "@/hooks/use-device";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileSidebar } from "@/components/layout/mobile-sidebar";
 import { cn } from "@/lib/utils";
-import { LanguageSelector } from "@/components/LanguageSelector";
 
 interface ResponsiveLayoutProps {
   children: ReactNode;
@@ -31,11 +30,6 @@ export function ResponsiveLayout({ children, showSidebar = true }: ResponsiveLay
           </div>
         </>
       )}
-      
-      {/* Language Selector - Top Right */}
-      <div className="fixed top-4 right-4 z-50">
-        <LanguageSelector />
-      </div>
       
       {/* Main Content */}
       <div className={cn(

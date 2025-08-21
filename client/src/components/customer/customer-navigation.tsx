@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useParams } from "wouter";
 import { cn } from "@/lib/utils";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { LanguageSelector } from "@/components/LanguageSelector";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
+import { useCustomerTheme } from "@/contexts/customer-theme-context";
 import {
   LayoutDashboard,
   FileText,
@@ -21,9 +18,7 @@ import {
   Shield,
   Clipboard,
   Search,
-  Brain,
-  LogOut,
-  MessageCircle
+  Brain
 } from "lucide-react";
 
 // Customer permissions interface
@@ -55,7 +50,7 @@ interface NavigationItem {
   description?: string;
 }
 
-// All possible navigation items with German names
+// All possible navigation items
 const ALL_NAVIGATION_ITEMS: NavigationItem[] = [
   {
     name: "Dashboard",
@@ -65,21 +60,21 @@ const ALL_NAVIGATION_ITEMS: NavigationItem[] = [
     description: "Übersicht und aktuelle Statistiken"
   },
   {
-    name: "Regulatorische Updates",
+    name: "Regulatory Updates",
     href: "/regulatory-updates",
     icon: FileText,
     permission: "regulatoryUpdates",
     description: "Aktuelle regulatorische Änderungen"
   },
   {
-    name: "Rechtsprechung",
+    name: "Legal Cases",
     href: "/legal-cases",
     icon: Scale,
     permission: "legalCases",
     description: "Rechtsprechung und Präzedenzfälle"
   },
   {
-    name: "Wissensdatenbank",
+    name: "Knowledge Base",
     href: "/knowledge-base",
     icon: BookOpen,
     permission: "knowledgeBase",
@@ -100,42 +95,42 @@ const ALL_NAVIGATION_ITEMS: NavigationItem[] = [
     description: "Datenanalyse und Berichte"
   },
   {
-    name: "Erweiterte Analytics", 
+    name: "Advanced Analytics", 
     href: "/advanced-analytics",
     icon: Activity,
     permission: "advancedAnalytics",
     description: "Erweiterte Analysetools"
   },
   {
-    name: "KI-Erkenntnisse",
+    name: "AI Insights",
     href: "/ai-insights",
     icon: Brain,
     permission: "aiInsights",
     description: "KI-gestützte Erkenntnisse"
   },
   {
-    name: "Globale Datenquellen",
+    name: "Global Sources",
     href: "/global-sources",
     icon: Globe,
     permission: "globalSources",
     description: "Globale Datenquellen"
   },
   {
-    name: "Datensammlung",
+    name: "Data Collection",
     href: "/data-collection", 
     icon: Database,
     permission: "dataCollection",
     description: "Datensammlung und -verwaltung"
   },
   {
-    name: "Historische Daten",
+    name: "Historical Data",
     href: "/historical-data",
     icon: Clipboard,
     permission: "historicalData",
     description: "Historische Datenanalyse"
   },
   {
-    name: "Einstellungen",
+    name: "Settings",
     href: "/settings",
     icon: Settings,
     permission: "systemSettings",
@@ -154,7 +149,6 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
   const [location, setLocation] = useLocation();
   const params = useParams();
   const [currentPermissions, setCurrentPermissions] = useState(permissions);
-  const { logout } = useAuth();
   
   // Build tenant-specific URLs
   const buildTenantUrl = (path: string) => {
@@ -197,7 +191,6 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
     currentPermissions[item.permission]
   );
 
-
   const renderNavigationItem = (item: NavigationItem) => {
     const tenantUrl = buildTenantUrl(item.href);
     const isActive = location === tenantUrl || location === item.href;
@@ -234,7 +227,7 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
   };
 
   return (
-    <div className="fixed left-0 top-0 h-screen w-64 flex flex-col bg-white border-r border-gray-200 shadow-lg z-50">
+    <div className="fixed left-0 top-0 h-screen w-64 flex flex-col bg-white border-r border-gray-200 shadow-sm z-40">
       {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
@@ -264,30 +257,9 @@ export default function CustomerNavigation({ permissions, tenantName, onPermissi
         )}
       </nav>
 
-      {/* Footer with Logout and Chat */}
-      <div className="p-4 border-t border-gray-200 bg-gray-50 space-y-2">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="w-full" 
-          onClick={() => window.open('/chat-support', '_blank')}
-        >
-          <MessageCircle className="w-4 h-4 mr-2" />
-          Support Chat
-        </Button>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="w-full text-red-600 hover:text-red-700 hover:bg-red-50" 
-          onClick={() => {
-            logout();
-            window.location.reload();
-          }}
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          Abmelden
-        </Button>
-        <p className="text-xs text-gray-500 text-center mt-2">
+      {/* Footer */}
+      <div className="p-4 border-t border-gray-200 bg-gray-50">
+        <p className="text-xs text-gray-500 text-center">
           Powered by Helix Platform
         </p>
       </div>

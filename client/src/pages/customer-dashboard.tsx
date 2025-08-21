@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import { useLiveTenantPermissions } from "@/hooks/use-live-tenant-permissions";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { LanguageSelector } from "@/components/LanguageSelector";
-import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -32,9 +29,7 @@ import {
   Target,
   ArrowUp,
   ArrowDown,
-  Minus,
-  LogOut,
-  MessageCircle
+  Minus
 } from "lucide-react";
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -67,7 +62,6 @@ const regionDistribution = [
 export default function CustomerDashboard() {
   const [selectedTimeRange, setSelectedTimeRange] = useState('30d');
   const params = useParams();
-  const { logout } = useAuth();
   
   // Use tenant ID from URL if available, otherwise use mock ID
   const tenantId = params.tenantId || mockTenantId;
@@ -237,15 +231,8 @@ export default function CustomerDashboard() {
     );
   }
 
-  const { t } = useLanguage();
-  
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 relative">
-      {/* Language Selector - Top Right */}
-      <div className="fixed top-4 right-4 z-50">
-        <LanguageSelector />
-      </div>
-      
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Navigation Sidebar */}
       <CustomerNavigation 
         permissions={permissions}
@@ -259,7 +246,7 @@ export default function CustomerDashboard() {
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            Kunden-Dashboard
+            Customer Dashboard
           </h1>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
@@ -291,23 +278,12 @@ export default function CustomerDashboard() {
             </SelectContent>
           </Select>
           <Button variant="outline">
-            <MessageCircle className="w-4 h-4 mr-2" />
-            Support Chat
-          </Button>
-          <Button variant="outline">
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
           <Button>
             <Settings className="w-4 h-4 mr-2" />
             Einstellungen
-          </Button>
-          <Button variant="outline" onClick={() => {
-            logout();
-            window.location.reload();
-          }}>
-            <LogOut className="w-4 h-4 mr-2" />
-            Abmelden
           </Button>
         </div>
       </div>
